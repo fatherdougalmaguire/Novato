@@ -1,4 +1,4 @@
-Novato is a SwiftUI/Swift emulator compatible with the Microbee 32IC
+Novato is a SwiftUI/Swift emulator compatible with the Microbee 32IC home computer
 
 Requires MacOS Sonoma 14.6 or greater
 
