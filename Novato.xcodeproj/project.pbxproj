@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		EA58B6842E2F87680030E3C5 /* novato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = novato.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA58B6842E2F87680030E3C5 /* Novato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Novato.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		EA58B6862E2F87680030E3C5 /* novato */ = {
+		EA58B6862E2F87680030E3C5 /* Novato */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = novato;
+			path = Novato;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +32,7 @@
 		EA58B67B2E2F87680030E3C5 = {
 			isa = PBXGroup;
 			children = (
-				EA58B6862E2F87680030E3C5 /* novato */,
+				EA58B6862E2F87680030E3C5 /* Novato */,
 				EA58B6852E2F87680030E3C5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +40,7 @@
 		EA58B6852E2F87680030E3C5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				EA58B6842E2F87680030E3C5 /* novato.app */,
+				EA58B6842E2F87680030E3C5 /* Novato.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		EA58B6832E2F87680030E3C5 /* novato */ = {
+		EA58B6832E2F87680030E3C5 /* Novato */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EA58B6902E2F87690030E3C5 /* Build configuration list for PBXNativeTarget "novato" */;
+			buildConfigurationList = EA58B6902E2F87690030E3C5 /* Build configuration list for PBXNativeTarget "Novato" */;
 			buildPhases = (
 				EA58B6802E2F87680030E3C5 /* Sources */,
 				EA58B6812E2F87680030E3C5 /* Frameworks */,
@@ -61,13 +61,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				EA58B6862E2F87680030E3C5 /* novato */,
+				EA58B6862E2F87680030E3C5 /* Novato */,
 			);
-			name = novato;
+			name = Novato;
 			packageProductDependencies = (
 			);
 			productName = novato;
-			productReference = EA58B6842E2F87680030E3C5 /* novato.app */;
+			productReference = EA58B6842E2F87680030E3C5 /* Novato.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = EA58B67F2E2F87680030E3C5 /* Build configuration list for PBXProject "novato" */;
+			buildConfigurationList = EA58B67F2E2F87680030E3C5 /* Build configuration list for PBXProject "Novato" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				EA58B6832E2F87680030E3C5 /* novato */,
+				EA58B6832E2F87680030E3C5 /* Novato */,
 			);
 		};
 /* End PBXProject section */
@@ -302,7 +302,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EA58B67F2E2F87680030E3C5 /* Build configuration list for PBXProject "novato" */ = {
+		EA58B67F2E2F87680030E3C5 /* Build configuration list for PBXProject "Novato" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EA58B68E2E2F87690030E3C5 /* Debug */,
@@ -311,7 +311,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EA58B6902E2F87690030E3C5 /* Build configuration list for PBXNativeTarget "novato" */ = {
+		EA58B6902E2F87690030E3C5 /* Build configuration list for PBXNativeTarget "Novato" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EA58B6912E2F87690030E3C5 /* Debug */,
