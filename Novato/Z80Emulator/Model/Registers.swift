@@ -1,5 +1,3 @@
-import Foundation
-
 struct Registers
 
 {
@@ -124,6 +122,27 @@ struct Registers
     
     var IX : UInt16 = 0         // Index Register IX - 16 bit
     var IY : UInt16 = 0         // Index Register IY - 16 bit
-    var SP : UInt16 = 0         // Stack Pointer - 16 bit
+    
+    var SP : UInt16 = 0xFFFF    // Stack Pointer - 16 bit
     var PC : UInt16 = 0         // Program Counter - 16 bit
+}
+
+struct CPUState
+{
+    let PC : UInt16
+    let SP : UInt16
+    
+    let A : UInt8
+    let F : UInt8
+    
+    let B : UInt8
+    let C : UInt8
+    
+    let D : UInt8
+    let E : UInt8
+    
+    let H : UInt8
+    let L : UInt8
+    
+    let memoryDump: [UInt8]
 }
