@@ -34,7 +34,7 @@ struct ContentView: View {
                 }
             }
             
-            FlagRegister(label: "S   Z   x   H   y   P/V N   C", value: vm.fReg)
+            FlagRegister(label: "S   Z   x   H   y  P/V  N   C   ", value: vm.fReg)
             
             // Small memory dump (first 16 bytes)
             VStack(alignment: .leading)
@@ -49,7 +49,8 @@ struct ContentView: View {
                                   let address = row * 16
                                   let bytes = vm.memoryDump[address..<address+16]
                                   let hexBytes = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
-                                  Text(String(format: "0x%04X: %@", address, hexBytes))
+                                  let charBytes = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
+                                  Text(String(format: "0x%04X: %@ %@", address, hexBytes,charBytes))
                                       .font(.system(.body, design: .monospaced))
                                       .foregroundColor(.orange)
                             }
@@ -84,6 +85,13 @@ struct ContentView: View {
                         Label("Reset", systemImage:"arrow.trianglehead.clockwise.rotate.90")
                 }
                 .buttonStyle(.bordered)
+                
+                Button(action: {NSApp.terminate(nil)})
+                {
+                        Label("Quit", systemImage:"power")
+                }
+                .buttonStyle(.bordered)
+                
             }
 
             Spacer()
@@ -109,7 +117,9 @@ struct ContentView: View {
     {
         VStack
         {
-            Text(label).font(.caption)
+            //Text(label).font(.caption)
+            Text(label)
+                .font(.system(.body, design: .monospaced))
             Text(String(format:"%02X", value))
                 .font(.system(.body, design: .monospaced))
         }
@@ -155,5 +165,15 @@ struct ContentView: View {
         return result
     }
     
+    func mapascii (ascii : UInt8) -> String
+    {
+        switch ascii
+        {
+            case 32...127:
+                return String(UnicodeScalar(Int(ascii))!)
+            default:
+                return "."
+        }
+    }
 }
 

@@ -7,7 +7,15 @@ actor Z80CPU {
     var CPUstarttime : Date = Date()
     var CPUendtime : Date = Date()
 
-    var memory: [UInt8] = Array(repeating: 0x00, count: 0x10000)
+    var memory: [UInt8] = Array(repeating: 0, count: 0x10000)
+    
+    init()
+    {
+        for mycount in 0...0xFFFF
+        {
+            memory[mycount] = UInt8.random(in: 0...255)
+        }
+    }
 
     private(set) var running = false
 
