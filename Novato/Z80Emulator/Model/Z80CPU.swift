@@ -114,10 +114,13 @@ actor Z80CPU {
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x04: // INC B
             print("Unimplemented opcode: \(String(format: "%02X", opcodes.opcode1))")
+            registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x05: // DEC B
             print("Unimplemented opcode: \(String(format: "%02X", opcodes.opcode1))")
+            registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         default:
             print("Unknown opcode: \(String(format: "%02X", opcodes.opcode1))")
+            registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         }
         runcycles = runcycles+1
     }
