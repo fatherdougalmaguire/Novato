@@ -86,13 +86,13 @@ actor Z80CPU {
         case 0x00: // NOP
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x21: // LD HL, nn
-        registers.HL = UInt16(opcodes.opcode2 << 8 | opcodes.opcode3)
+            registers.HL = UInt16(opcodes.opcode2 << 8 | opcodes.opcode3)
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:3)
         case 0x23: // INC HL
-            registers.HL = registers.HL + 1
+            registers.HL = IncrementRegPair(BaseValue:registers.HL,Increment:1)
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x3C: // INC A
-            registers.A = registers.A + 1
+            registers.A = IncrementReg(BaseValue:registers.A,Increment:1)
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x78: // LD A, B
             registers.A = registers.B

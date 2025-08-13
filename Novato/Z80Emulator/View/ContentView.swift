@@ -35,8 +35,7 @@ struct ContentView: View {
             }
             
             FlagRegister(label: "S   Z   x   H   y  P/V  N   C   ", value: vm.fReg)
-            
-            // Small memory dump (first 16 bytes)
+        
             VStack(alignment: .leading)
             {
                 Text("Memory View").font(.headline)

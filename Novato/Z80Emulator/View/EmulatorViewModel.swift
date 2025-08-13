@@ -58,7 +58,7 @@ final class EmulatorViewModel: ObservableObject
             }
 
             // Aim for 60 Hz UI refresh – adjust as needed
-           try? await Task.sleep(nanoseconds: 16_666_667)
+           //try? await Task.sleep(nanoseconds: 16_666_667)
         }
     }
 }
