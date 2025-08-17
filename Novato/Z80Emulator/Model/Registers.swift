@@ -77,7 +77,7 @@ struct Registers
         set
         {
             AltA = UInt8(newValue >> 8)
-        AltF = UInt8(newValue & 0xFF)
+            AltF = UInt8(newValue & 0xFF)
         }
     }
     var AltBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bitt
@@ -124,7 +124,7 @@ struct Registers
     var IY : UInt16 = 0         // Index Register IY - 16 bit
     
     var SP : UInt16 = 0xFFFF    // Stack Pointer - 16 bit
-    var PC : UInt16 = 0         // Program Counter - 16 bit
+    var PC : UInt16 = 0x0000    // Program Counter - 16 bit
 }
 
 struct CPUState
@@ -132,17 +132,38 @@ struct CPUState
     let PC : UInt16
     let SP : UInt16
     
+    let BC : UInt16
+    let DE : UInt16
+    let HL : UInt16
+    
+    let AltBC : UInt16
+    let AltDE : UInt16
+    let AltHL : UInt16
+    
+    let IX : UInt16
+    let IY : UInt16
+    
+    let I : UInt8
+    let R : UInt8
+    
     let A : UInt8
     let F : UInt8
-    
     let B : UInt8
     let C : UInt8
-    
     let D : UInt8
     let E : UInt8
-    
     let H : UInt8
     let L : UInt8
     
+    let AltA : UInt8
+    let AltF : UInt8
+    let AltB : UInt8
+    let AltC : UInt8
+    let AltD : UInt8
+    let AltE : UInt8
+    let AltH : UInt8
+    let AltL : UInt8
+    
     let memoryDump: [UInt8]
+    let VDU: [UInt8]
 }
