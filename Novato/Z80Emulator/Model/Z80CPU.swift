@@ -161,7 +161,7 @@ actor Z80CPU {
                 46, 32, 68, 111, 110, 101, 99, 46, 32, 69, 110, 100, 46]
                 //  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Bacon ipsum dolor amet pork belly pork loin. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Bacon ipsum dolor amet pancetta. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Bacon ipsum dolor amet kielbasa. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Bacon ipsum dolor amet short ribs. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam, eget aliquet lorem. Bacon ipsum dolor amet pancetta. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Bacon ipsum dolor amet prosciutto. Fusce nec tellus sed augue semper porta. Morbi lectus risus, iaculis vel, suscipit quis, luctus non. Bacon ipsum dolor amet strip steak. Nulla facilisi. Praesent egestas leo in pede. Vestibulum turingo. Ut laoreet aliquam magna. Bacon ipsum dolor amet bacon. Pellentesque fermentum. Etiam vel lectus. Nulla id dolor. In hac habitasse platea dictumst. Sed semper nulla. Bacon ipsum dolor amet bresaola. Ut sem. Duis cursus. In hac habitasse platea dictumst. Morbi odio. Quisque cursus. Bacon ipsum dolor amet ground. Proin sodales ligula. Vivamus at augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Bacon ipsum dolor amet t-bone. Donec congue. Suspendisse nisl. Nunc sed sem. Maecenas non. Bacon ipsum dolor amet. In hac habitasse platea dictumst. Aenean lectus. Sed sagittis. Ut volutpat. Bacon ipsum dolor amet. Phasellus blandit. Sed sed. Maecenas porta. Bacon ipsum dolor amet. Quisque velit. Phasellus. Cras venenatis. Bacon ipsum dolor amet. Vestibulum. Aliquam. Sed ut. Quis enim. Ut condimentum. Bacon ipsum dolor amet. Praesent at. In. Nibh condimentum. Donec. Bacon ipsum dolor amet. Nullam. Nisi. Sed. Vivamus. Nulla. Bacon ipsum dolor amet. Egestas. Duis. Morbi. Ut. Cras. Bacon ipsum dolor amet. Integer. Duis. Lorem. Ut. Nullam. Suspendisse. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Bacon ipsum dolor amet. Aliquam. Suspendisse potenti. Ut condimentum. Cras. Nulla. Donec. Bacon ipsum dolor amet. Integer eu. Sed. In. Donec. End.
         memory[0xf000...0xf7ff] = VDURAM[0...0x7ff]
-        memory[0x000...0x0016] = [0x21,0x00,0xF0,0x3E,0x48,0x77,0x23,0x3E,0x45,0x77,0x23,0x3E,0x4C,0x23,0x3E,0x4C,0x77,0x23,0x3E,0x4F,0x77,0x23]
+        memory[0x000...0x0016] = [0x21,0x00,0xF0,0x3E,0x48,0x77,0x23,0x3E,0x45,0x77,0x23,0x3E,0x4C,0x77,0x23,0x3E,0x4C,0x77,0x23,0x3E,0x4F,0x77,0x23]
         //        0000   21 00 F0               LD   HL,$F000
         //        0003   3E 48                  LD   A,"H"
         //        0005   77                     LD   (HL),A
@@ -207,7 +207,6 @@ actor Z80CPU {
         {
             let prefetch = fetch(pc:Int(registers.PC))
             await execute( opcodes : prefetch)
-            // Roughly emulate 1 Mhz (≈1 µs per instruction) – tweak as needed.
             try? await Task.sleep(nanoseconds: 100)
         }
     }
@@ -245,44 +244,82 @@ actor Z80CPU {
 
     private func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8)) async {
         switch opcodes.opcode1
+        //        0000   21 00 F0               LD   HL,$F000
+        //        0003   3E 48                  LD   A,"H"
+        //        0005   77                     LD   (HL),A
+        //        0006   23                     INC   HL
+        //        0007   3E 45                  LD   A,"E"
+        //        0009   77                     LD   (HL),A
+        //        000A   23                     INC   HL
+        //        000B   3E 4C                  LD   A,"L"
+        //        000D   77                     LD   (HL),A
+        //        000E   23                     INC   HL
+        //        000F   3E 4C                  LD   A,"L"
+        //        0011   77                     LD   (HL),A
+        //        0012   23                     INC   HL
+        //        0013   3E 4F                  LD   A,"O"
+        //        0015   77                     LD   (HL),A
+        //        0016   23                     INC   HL
         {
         case 0x00: // NOP
+            print("Executed NOP @ "+String(format:"%04X",registers.PC))
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x21: // LD HL, nn
-            registers.HL = UInt16(opcodes.opcode2 << 8 | opcodes.opcode3)
+            print("Executed LD HL, nn @ "+String(format:"%04X",registers.PC))
+            registers.HL = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:3)
         case 0x23: // INC HL
+            print("Executed INC HL @ "+String(format:"%04X",registers.PC))
             registers.HL = IncrementRegPair(BaseValue:registers.HL,Increment:1)
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x3C: // INC A
+            print("Executed INC A @ "+String(format:"%04X",registers.PC))
             registers.A = IncrementReg(BaseValue:registers.A,Increment:1)
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
+        case 0x3E: // LD A, n
+            print("Executed LD A, n @ "+String(format:"%04X",registers.PC))
+            registers.A = opcodes.opcode2
+            registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:2)
+        case 0x77: // LD (HL), A
+            print("Executed LD (HL), A @ "+String(format:"%04X",registers.PC))
+            if (0xF000...0xF7FF).contains(registers.HL)
+            {
+                VDURAM[Int(registers.HL)-0xF000] = registers.A
+            }
+            memory[Int(registers.HL)] = registers.A
+            registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x78: // LD A, B
+            print("Executed LD A, B @ "+String(format:"%04X",registers.PC))
             registers.A = registers.B
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x79: // LD A,C
+            print("Executed LD A, C @ "+String(format:"%04X",registers.PC))
             registers.A = registers.C
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x7A: // LD A,D
+            print("Executed LD A, D @ "+String(format:"%04X",registers.PC))
             registers.A = registers.D
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x7B: // LD A,E
+            print("Executed LD A, E @ "+String(format:"%04X",registers.PC))
             registers.A = registers.E
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x7C: // LD A,H
+            print("Executed LD A, H @ "+String(format:"%04X",registers.PC))
             registers.A = registers.H
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x7D: // LD A,L
+            print("Executed LD A, L @ "+String(format:"%04X",registers.PC))
             registers.A = registers.L
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x04: // INC B
-            print("Unimplemented opcode: \(String(format: "%02X", opcodes.opcode1))")
+            print("Unimplemented opcode "+String(format: "%02X", opcodes.opcode1) + " @ "+String(format:"%04X",registers.PC))
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         case 0x05: // DEC B
-            print("Unimplemented opcode: \(String(format: "%02X", opcodes.opcode1))")
+            print("Unimplemented opcode "+String(format: "%02X", opcodes.opcode1) + " @ "+String(format:"%04X",registers.PC))
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         default:
-            print("Unknown opcode: \(String(format: "%02X", opcodes.opcode1))")
+            print("Unknown opcode "+String(format: "%02X", opcodes.opcode1) + " @ "+String(format:"%04X",registers.PC))
             registers.PC = IncrementRegPair(BaseValue:registers.PC,Increment:1)
         }
         runcycles = runcycles+1

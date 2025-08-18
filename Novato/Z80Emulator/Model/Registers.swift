@@ -23,7 +23,7 @@ struct Registers
     {
         get
         {
-            return UInt16(A << 8 | F)
+            return UInt16(A) << 8 | UInt16(F)
         }
         set
         {
@@ -35,7 +35,7 @@ struct Registers
     {
         get
         {
-            return UInt16(B << 8 | C)
+            return UInt16(B) << 8 | UInt16(C)
         }
         set
         {
@@ -47,7 +47,7 @@ struct Registers
     {
         get
         {
-            return UInt16(D << 8 | E)
+            return UInt16(D) << 8 | UInt16(E)
         }
         set
         {
@@ -59,7 +59,7 @@ struct Registers
     {
         get
         {
-            return UInt16(H << 8 | L)
+            return UInt16(H) << 8 | UInt16(L)
         }
         set
         {
@@ -68,11 +68,11 @@ struct Registers
         }
     }
     
-    var AltAF : UInt16             // Altenrtie General Purpose Register Pair AF - 16 bit
+    var AltAF : UInt16             // Alternate General Purpose Register Pair AF - 16 bit
     {
         get
         {
-            return UInt16(AltA << 8 | AltF)
+            return UInt16(AltA) << 8 | UInt16(AltF)
         }
         set
         {
@@ -80,11 +80,11 @@ struct Registers
             AltF = UInt8(newValue & 0xFF)
         }
     }
-    var AltBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bitt
+    var AltBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bit
     {
         get
         {
-            return UInt16(AltB << 8 | AltC)
+            return UInt16(AltB) << 8 | UInt16(AltC)
         }
         set
         {
@@ -92,11 +92,11 @@ struct Registers
             AltC = UInt8(newValue & 0xFF)
         }
     }
-    var AltDE : UInt16       // Alternate General Purpose Register Pair DE - 16 bitt
+    var AltDE : UInt16       // Alternate General Purpose Register Pair DE - 16 bit
     {
         get
         {
-            return UInt16(AltD << 8 | AltE)
+            return UInt16(AltD) << 8 | UInt16(AltE)
         }
         set
         {
@@ -108,7 +108,7 @@ struct Registers
     {
         get
         {
-            return UInt16(AltH << 8 | AltL)
+            return UInt16(AltH) << 8 | UInt16(AltL)
         }
         set
         {
