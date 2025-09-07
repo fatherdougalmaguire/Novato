@@ -31,64 +31,74 @@ struct EmulatorView: View
     
     var body: some View
     {
-        VStack(spacing: 20)
-        {
-            Text("Microbee 32IC compatible emulator")
-                .font(.largeTitle)
-                .bold()
-            Text("App Version: "+getAppVersion()+"/"+getBuildNumber())
+        ZStack {
+            Color.white
             
-            Spacer()
-            
-            Rectangle()
-                .colorEffect(ShaderLibrary.ScreenBuffer(.floatArray(vm.VDU),.floatArray(vm.CharRom)))
-                .scaleEffect(x: 1, y:1.333)
-                .colorEffect(ShaderLibrary.interlace(.float(0)))
-                .frame(width: CGFloat(512), height: CGFloat(256))
-            
-            Spacer()
-            
-            HStack(spacing: 40)
+            VStack(spacing: 20)
             {
-                Button(action: { Task { await vm.startEmulation() } })
-                {
-                    Label("Start", systemImage:"play.fill")
-                }
-                .buttonStyle(.bordered)
+                Text("Microbee 32IC compatible emulator")
+                    .font(.largeTitle)
+                    .bold()
+                    .padding(.top,20)
+
+                Text("App Version: "+getAppVersion()+"/"+getBuildNumber())
+
+                Spacer()
                 
-                Button(action: { Task { await vm.stopEmulation() } })
-                {
-                    Label("Stop", systemImage:"stop.fill")
-                }
-                .buttonStyle(.bordered)
+                Rectangle()
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.floatArray(vm.VDU),.floatArray(vm.CharRom)))
+                    .scaleEffect(x: 1, y:1.333)
+                    .colorEffect(ShaderLibrary.interlace(.float(0)))
+                    .frame(width: CGFloat(512), height: CGFloat(256))
                 
-                Button(action: {})
-                {
-                    Label("Step", systemImage:"play.square.fill")
-                }
-                .buttonStyle(.bordered)
-                .disabled(true)
+                Spacer()
                 
-                Button(action: {})
+                HStack(spacing: 40)
                 {
-                    Label("Reset", systemImage:"arrow.trianglehead.clockwise.rotate.90")
+                    Button(action: { Task { await vm.startEmulation() } })
+                    {
+                        Label("Start", systemImage:"play.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button(action: { Task { await vm.stopEmulation() } })
+                    {
+                        Label("Stop", systemImage:"stop.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button(action: {})
+                    {
+                        Label("Step", systemImage:"play.square.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(true)
+                    
                 }
-                .buttonStyle(.bordered)
-                .disabled(true)
                 
-                Button(action: {NSApp.terminate(nil)})
+                HStack(spacing: 40)
                 {
-                    Label("Quit", systemImage:"power")
+                    Button(action: {})
+                    {
+                        Label("Reset", systemImage:"arrow.trianglehead.clockwise.rotate.90")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(true)
+                    
+                    Button(action: {NSApp.terminate(nil)})
+                    {
+                        Label("Quit", systemImage:"power")
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
-            }
-            Spacer()
-        }
-        .padding(20) // fix this to fill all visible area
-        .background(.white)
+                
+                Spacer()
+                
+            } // vstack
+        }  //zstack
         .onAppear
         {
             openWindow(id: "DebugWindow")
         }
-    }
-}
+    } // body
+} // struct
