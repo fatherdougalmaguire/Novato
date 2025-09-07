@@ -184,6 +184,8 @@ struct DebugView: View
                             Text(String(format: "0x%04X: %@ %@", dispaddress, hexBytes,charBytes))
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.orange)
+                                .background(Color.gray
+                                    .brightness(0.4))
                         }
                     }
                     .padding()

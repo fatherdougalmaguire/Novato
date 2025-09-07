@@ -164,6 +164,7 @@ struct CPUState
     let AltH : UInt8
     let AltL : UInt8
     
-    let memoryDump: [UInt8]
-    let VDU: [UInt8]
+    let memoryDump : [UInt8]
+    let VDU : [Float]
+    let CharRom : [Float]
 }

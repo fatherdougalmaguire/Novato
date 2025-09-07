@@ -4,8 +4,6 @@ import Combine
 @Observable
 class EmulatorViewModel
 {
-
-    
     var aReg   : UInt8 = 0
     var bReg   : UInt8 = 0
     var cReg   : UInt8 = 0
@@ -42,7 +40,8 @@ class EmulatorViewModel
     var spReg  : UInt16 = 0
     
     var memoryDump: [UInt8] = []
-    var VDU: [UInt8] = []
+    var VDU: [Float] = []
+    var CharRom : [Float] = []
 
     private let cpu: Z80CPU
 
@@ -106,6 +105,7 @@ class EmulatorViewModel
 
                 self.memoryDump = state.memoryDump
                 self.VDU = state.VDU
+                self.CharRom = state.CharRom
             }
         }
     }

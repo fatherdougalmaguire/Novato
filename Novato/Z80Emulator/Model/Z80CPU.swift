@@ -19,21 +19,21 @@ actor Z80CPU {
         AddressSpace.LoadMemoryFromFile(FileName: "telcom_1.0", FileExtension: "rom",MemoryAddress : 0xE000)
         CharGenROM.LoadMemoryFromFile(FileName: "charrom", FileExtension: "bin", MemoryAddress : 0x0000)
         AddressSpace.LoadMemoryFromArray(MemoryAddress : 0x0000,
-                                   MemoryData :  [0x21,0x00,0xF0,0x3E,0x48,0x77,0x23,0x3E,0x45,0x77,0x23,0x3E,0x4C,0x77,0x23,0x3E,0x4C,0x77,0x23,0x3E,0x4F,0x77,0x23])
+                                   MemoryData :  [0x21,0x00,0xF0,0x3E,82,0x77,0x23,0x3E,101,0x77,0x23,0x3E,97,0x77,0x23,0x3E,100,0x77,0x23,0x3E,121,0x77,0x23])
         //        0000   21 00 F0               LD   HL,$F000
-        //        0003   3E 48                  LD   A,"H"
+        //        0003   3E 82D                  LD   A,"R"
         //        0005   77                     LD   (HL),A
         //        0006   23                     INC   HL
-        //        0007   3E 45                  LD   A,"E"
+        //        0007   3E 101D                  LD   A,"e"
         //        0009   77                     LD   (HL),A
         //        000A   23                     INC   HL
-        //        000B   3E 4C                  LD   A,"L"
+        //        000B   3E 97D                  LD   A,"a"
         //        000D   77                     LD   (HL),A
         //        000E   23                     INC   HL
-        //        000F   3E 4C                  LD   A,"L"
+        //        000F   3E 100D                  LD   A,"d"
         //        0011   77                     LD   (HL),A
         //        0012   23                     INC   HL
-        //        0013   3E 4F                  LD   A,"O"
+        //        0013   3E 121D                  LD   A,"y"
         //        0015   77                     LD   (HL),A
         //        0016   23                     INC   HL
     }
@@ -205,7 +205,8 @@ actor Z80CPU {
                              AltH: registers.AltH,
                              AltL: registers.AltL,
                              memoryDump: Array(AddressSpace.memory[Int(registers.PC)..<0xffff]),
-                             VDU : VDURAM.memory)
+                             VDU : VDURAM.memory.map { Float($0) },
+                             CharRom : CharGenROM.memory.map { Float($0) } )
         }
         return CPUState( PC: registers.PC,
                          SP: registers.SP,
@@ -236,7 +237,8 @@ actor Z80CPU {
                          AltH: registers.AltH,
                          AltL: registers.AltL,
                          memoryDump: Array(AddressSpace.memory[Int(registers.PC)..<Int(registers.PC)+0x0ff]),
-                         VDU : VDURAM.memory)
+                         VDU : VDURAM.memory.map { Float($0) },
+                         CharRom : CharGenROM.memory.map { Float($0) } )
     }
 }
 
