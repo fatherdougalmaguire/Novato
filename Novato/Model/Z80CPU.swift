@@ -36,15 +36,15 @@ actor Z80CPU {
 //        0014   ED B0                  LDIR
 //        0016   21 83 00               LD   HL,LINE3
 //        0019   11 00 F1               LD   DE,$F100
-//        001C   01 01 00               LD   BC,$1
+//        001C   01 02 00               LD   BC,$2
 //        001F   ED B0                  LDIR
 //        0021   C3 00 10               JP   $1000
 //        0024                LINE1:
-//        0024   41 70 70 6C 69 65 64 20 54 65 63 68 6E 6F 6C 6F 67 79 20 4D 69 63 72 6F 62 65 65 20 43 6F 6C 6F 75 72 20 42 61 73 69 63 2E 20 56 65 72 20 35 2E 32 32 65 DB   "Applied Technology Microbee Colour Basic. Ver 5.22e"
+//        0024   41 70 70 6C 69 65 64 20 54 65 63 68 6E 6F 6C 6F 67 79 20 4D 69 63 72 6F 62 65 65 20 43 6F 6C 6F 75 72 20 42 61 73 69 63 2E 20 56 65 72 20 35 2E 32 32 65 DB    "Applied Technology Microbee Colour Basic. Ver 5.22e"
 //        0057                LINE2:
-//        0057   43 6F 70 79 72 69 67 68 74 20 4D 53 20 31 39 38 33 20 66 6F 72 20 4D 69 63 72 6F 57 6F 72 6C 64 20 41 75 73 74 72 61 6C 69 61 DB   "Copyright MS 1983 for MicroWorld Australia"
+//        0057   43 6F 70 79 72 69 67 68 74 20 4D 53 20 31 39 38 33 20 66 6F 72 20 4D 69 63 72 6F 57 6F 72 6C 64 20 41 75 73 74 72 61 6C 69 61 DB                               "Copyright MS 1983 for MicroWorld Australia"
 //        0081                LINE3:
-//        0081   3E                     DB   ">"
+//        0081   3E              DB                                                                                                                                             ">"
     }
 
     private(set) var running = false
