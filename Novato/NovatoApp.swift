@@ -7,11 +7,11 @@ struct NovatoApp: App
     
     var body: some Scene
     {
-        WindowGroup("Emulator",id: "EmulatorWindow")
+        WindowGroup("Novato - Emulator",id: "EmulatorWindow")
         {
             EmulatorView().environment(vm)
         }
-        WindowGroup("Debug", id: "DebugWindow")
+        WindowGroup("Novato - Debug", id: "DebugWindow")
         {
             DebugView().environment(vm)
         }
