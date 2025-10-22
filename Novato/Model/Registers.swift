@@ -168,3 +168,15 @@ struct CPUState
     let VDU : [Float]
     let CharRom : [Float]
 }
+
+enum Z80Flags : UInt8
+{
+    case Carry = 0x01               // 00000001
+    case Negative = 0x02            // 00000010
+    case Parity_Overflow = 0x04     // 00000100
+    case Y = 0x08                   // 00001000
+    case Half_Carry = 0x10          // 00010000
+    case X = 0x20                   // 00100000
+    case Zero = 0x40                // 01000000
+    case Sign = 0x80                // 10000000
+}
