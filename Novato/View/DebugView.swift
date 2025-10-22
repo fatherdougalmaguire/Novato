@@ -168,7 +168,7 @@ struct DebugView: View
                         registerRow(label: "L'", value: vm.altlReg)
                     }
                 }
-                FlagRegister(label: "S   Z   x   H   y  P/V  N   C   ", value: vm.fReg)
+                FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.fReg)
                 
                 VStack(alignment: .leading)
                 {
