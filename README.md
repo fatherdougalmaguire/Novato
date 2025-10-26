@@ -10,7 +10,8 @@ The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM are used in this emula
 
 <img width="2784" height="1816" alt="image" src="https://github.com/user-attachments/assets/f713a882-2907-4b9f-bb9e-93514e84f3df" />
 
-<img width="2170" height="1470" alt="image" src="https://github.com/user-attachments/assets/ed0c5c59-b60b-4bac-b686-f7fd50eac965" />
+<img width="2024" height="1402" alt="image" src="https://github.com/user-attachments/assets/c1e3d2a7-12fe-4920-88c1-a79f214a0603" />
+
 
 
 
