@@ -11,7 +11,21 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "EmulatorView.body.getter:EmulatorView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "Int(vm.vmR12_DisplayStartAddrH) &lt;&lt; 8">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "Z80CPU.execute(opcodes:):Z80CPU.swift">
+      </ContextState>
+      <ContextState
          contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CRTC.WriteRegister(RegNum:RegValue:):CRTC.swift">
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
@@ -24,6 +38,14 @@
          <PersistentStrings>
             <PersistentString
                value = "(myrow*64)+mycol+0xf000">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "vm.vmR1_HorizDisplayed">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

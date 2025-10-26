@@ -1,12 +1,61 @@
 import Foundation
 
-actor Z80CPU {
+actor Z80CPU
+{
     var registers = Registers()
+ 
+    var ports = [UInt8](repeating: 0, count: 256)
+    
+    //    00 or 10 PIO port A data port
+    //    01 or 11 PIO port A control port
+    //    02 or 12 PIO port B data port
+    //    03 or 13 PIO port B control port
+    //    08 or 18 COLOUR control port
+    //    09 or 19 Colour "Wait off"
+    //    0A or 1A Extended addressing port
+    //    OB or 1B Character ROM CPU access - makes character generator ROM appear from F000h to F7FFh when bit 0 of this port is set.
+    //    OC or 1C 6545 CRTC address/status port
+    //    OD or 1D 6545 CRTC data port
+    //    44 FDC command/status
+    //    45 FDC track register
+    //    46 FDC sector register
+    //    47 FDC data register
+    //    48 Controller select/side/DD latch
+        
+    //    PORT B DATA PORT BIT ASSIGNMENTS
+    //    bit 0 Cassette data in
+    //    bit 1 Cassette data outddd
+    //    bit 2 RS232 CLOCK or DTR line
+    //    bit 3 RS232 CTS line (0-> clear to send)
+    //    bit 4 RS232 input (0 = mark)
+    //    bit 5 RS232 output (1 = mark)
+    //    bit 6 Speaker bit (1 = on)
+    //    bit 7 Network interrupt bit
+
+    //    FLOPPY DISC CONTROLLER
+    //    Controller select/side/DD latch bit assignments (write only)
+    //    bit 0 LSB of drive address
+    //    bit 1 MSB of drive address
+    //    bit 2 Side select (0 = side 0; 1 = side 1)
+    //    bit 3 DD select (0 = single density)
+    //
+    //    Controller TRANSFER status bit - bit 7 when port 48H is read gives (INTRQ or DRQ)
+
+    //    COLOUR PORT BIT ASSIGNMENT
+    //    bit 0 Not used
+    //    bit 1 RED background intensity (1 = full)
+    //    bit 2 GREEN backgroung intensity
+    //    bit 3 BLUE background intensity
+    //    bit 6 COLOUR RAM enable (0 = PCG, 1= RAM)
     
     var runcycles : UInt64 = 0
     var CPUstarttime : Date = Date()
     var CPUendtime : Date = Date()
+    
+    var emulatorHalted : Bool = false
 
+    var MOS6545 = CRTC()
+    
     var AddressSpace = MMU(MemorySize : 0x10000, MemoryValue : 0x00)
     var VDURAM = MMU(MemorySize : 0x800, MemoryValue : 0x20)
     var CharGenROM = MMU(MemorySize : 0x1000, MemoryValue : 0x00)
@@ -22,32 +71,52 @@ actor Z80CPU {
                                    MemoryData :  [0x3E,0x01,
                                                   0xFE,0x01,
                                                   0x28,0x24,
-                                                  0x21,0x4E,0x00,
+                                                  0x21,0x76,0x00,
                                                   0x11,0x00,0xF0,
                                                   0x01,0x33,0x00,
                                                   0xED,0xB0,
-                                                  0x21,0x81,0x00,
+                                                  0x21,0xA9,0x00,
                                                   0x11,0x80,0xF0,
                                                   0x01,0x2A,0x00,
                                                   0xED,0xB0,
-                                                  0x21,0xAB,0x00,
+                                                  0x21,0xD3,0x00,
                                                   0x11,0x00,0xF1,
                                                   0x01,0x01,0x00,
                                                   0xED,0xB0,
-                                                  0xC3,0x00,0x10,
-                                                  0x21,0xAC,0x00,
+                                                  0x76,0x00,0x10,
+                                                  0x3E,0x01,
+                                                  0xD3,0x0C,
+                                                  0x3E,0x50,
+                                                  0xD3,0x0D,
+                                                  0x3E,0x06,
+                                                  0xD3,0x0C,
+                                                  0x3E,0x18,
+                                                  0xD3,0x0D,
+                                                  0x3E,0x09,
+                                                  0xD3,0x0C,
+                                                  0x3E,0x0A,
+                                                  0xD3,0x0D,
+                                                  0x3E,0x0C,
+                                                  0xD3,0x0C,
+                                                  0x3E,0x08,
+                                                  0xD3,0x0D,
+                                                  0x3E,0x0D,
+                                                  0xD3,0x0C,
+                                                  0x3E,0x00,
+                                                  0xD3,0x0D,
+                                                  0x21,0xD4,0x00,
                                                   0x11,0x50,0xF0,
                                                   0x01,0x13,0x00,
                                                   0xED,0xB0,
-                                                  0x21,0xBF,0x00,
+                                                  0x21,0xE7,0x00,
                                                   0x11,0xA0,0xF0,
                                                   0x01,0x13,0x00,
                                                   0xED,0xB0,
-                                                  0x21,0xD2,0x00,
+                                                  0x21,0xFA,0x00,
                                                   0x11,0x40,0xF1,
                                                   0x01,0x02,0x00,
                                                   0xED,0xB0,
-                                                  0xC3,0x00,0x10,
+                                                  0x76,0x00,0x10,
                                                   0x41,0x70,0x70,0x6C,0x69,0x65,0x64,0x20,0x54,0x65,0x63,0x68,0x6E,0x6F,0x6C,0x6F,0x67,0x79,0x20,0x4D,0x69,0x63,0x72,0x6F,0x62,0x65,0x65,0x20,0x43,0x6F,0x6C,0x6F,0x75,0x72,0x20,0x42,0x61,0x73,0x69,0x63,0x2E,0x20,0x56,0x65,0x72,0x20,0x35,0x2E,0x32,0x32,0x65,
                                                   0x43,0x6F,0x70,0x79,0x72,0x69,0x67,0x68,0x74,0x20,0x4D,0x53,0x20,0x31,0x39,0x38,0x33,0x20,0x66,0x6F,0x72,0x20,0x4D,0x69,0x63,0x72,0x6F,0x57,0x6F,0x72,0x6C,0x64,0x20,0x41,0x75,0x73,0x74,0x72,0x61,0x6C,0x69,0x61,
                                                   0x3E,
@@ -57,45 +126,65 @@ actor Z80CPU {
 //        0000   3E 01                  LD   A,1
 //        0002   FE 01                  CP   1
 //        0004   28 24                  JR   Z,EIGHTY
-//        0006   21 4E 00               LD   HL,LINE1_64
+//        0006   21 76 00               LD   HL,LINE1_64
 //        0009   11 00 F0               LD   DE,$F000
 //        000C   01 33 00               LD   BC,$33
 //        000F   ED B0                  LDIR
-//        0011   21 81 00               LD   HL,LINE2_64
+//        0011   21 A9 00               LD   HL,LINE2_64
 //        0014   11 80 F0               LD   DE,$F080
 //        0017   01 2A 00               LD   BC,$2A
 //        001A   ED B0                  LDIR
-//        001C   21 AB 00               LD   HL,LINE3_64
+//        001C   21 D3 00               LD   HL,LINE3_64
 //        001F   11 00 F1               LD   DE,$F100
 //        0022   01 01 00               LD   BC,$01
 //        0025   ED B0                  LDIR
-//        0027   C3 00 10               JP   $1000
+//        0027   76 00 00               HALT
 //        002A                EIGHTY:
-//        002A   21 AC 00               LD   HL,LINE1_80
-//        002D   11 50 F0               LD   DE,$F050
-//        0030   01 13 00               LD   BC,$13
-//        0033   ED B0                  LDIR
-//        0035   21 BF 00               LD   HL,LINE2_80
-//        0038   11 A0 F0               LD   DE,$F0A0
-//        003B   01 13 00               LD   BC,$13
-//        003E   ED B0                  LDIR
-//        0040   21 D2 00               LD   HL,LINE3_80
-//        0043   11 40 F1               LD   DE,$F140
-//        0046   01 02 00               LD   BC,$02
-//        0049   ED B0                  LDIR
-//        004B   C3 00 10               JP   $1000
-//        004E                LINE1_64:
-//        004E   41 70 70 6C 69 65 64 20 54 65 63 68 6E 6F 6C 6F 67 79 20 4D 69 63 72 6F 62 65 65 20 43 6F 6C 6F 75 72 20 42 61 73 69 63 2E 20 56 65 72 20 35 2E 32 32 65 DB   "Applied Technology Microbee Colour Basic. Ver 5.22e"
-//        0081                LINE2_64:
-//        0081   43 6F 70 79 72 69 67 68 74 20 4D 53 20 31 39 38 33 20 66 6F 72 20 4D 69 63 72 6F 57 6F 72 6C 64 20 41 75 73 74 72 61 6C 69 61 DB   "Copyright MS 1983 for MicroWorld Australia"
-//        00AB                LINE3_64:
-//        00AB   3E                     DB   ">"
-//        00AC                LINE1_80:
-//        00AC   4D 69 63 72 6F 62 65 65 20 20 35 36 4B 20 20 43 50 2F 4D DB   "Microbee  56K  CP/M"
-//        00BF                LINE2_80:
-//        00BF   56 65 72 73 20 32 2E 32 30 20 5B 5A 43 50 52 20 49 49 5D DB   "Vers 2.20 [ZCPR II]"
-//        00D2                LINE3_80:
-//        00D2   41 3E                  DB   "A>"
+//        002A   3E 01                  LD   A,1
+//        002C   D3 0C                  OUT   ($0C),A
+//        002E   3E 50                  LD   A,80
+//        0030   D3 0D                  OUT   ($0D),A
+//        0032   3E 06                  LD   A,6
+//        0034   D3 0C                  OUT   ($0C),A
+//        0036   3E 18                  LD   A,24
+//        0038   D3 0D                  OUT   ($0D),A
+//        003A   3E 09                  LD   A,9
+//        003C   D3 0C                  OUT   ($0C),A
+//        003E   3E 0A                  LD   A,10
+//        0040   D3 0D                  OUT   ($0D),A
+//        0042   3E 0C                  LD   A,12
+//        0044   D3 0C                  OUT   ($0C),A
+//        0046   3E 08                  LD   A,8
+//        0048   D3 0D                  OUT   ($0D),A
+//        004A   3E 0D                  LD   A,13
+//        004C   D3 0C                  OUT   ($0C),A
+//        004E   3E 00                  LD   A,0
+//        0050   D3 0D                  OUT   ($0D),A
+//        0052   21 D4 00               LD   HL,LINE1_80
+//        0055   11 50 F0               LD   DE,$F050
+//        0058   01 13 00               LD   BC,$13
+//        005B   ED B0                  LDIR
+//        005D   21 E7 00               LD   HL,LINE2_80
+//        0060   11 A0 F0               LD   DE,$F0A0
+//        0063   01 13 00               LD   BC,$13
+//        0066   ED B0                  LDIR
+//        0068   21 FA 00               LD   HL,LINE3_80
+//        006B   11 40 F1               LD   DE,$F140
+//        006E   01 02 00               LD   BC,$02
+//        0071   ED B0                  LDIR
+//        0073   76 00 00               HALT
+//        0076                LINE1_64:
+//        0076   41 70 70 6C 69 65 64 20 54 65 63 68 6E 6F 6C 6F 67 79 20 4D 69 63 72 6F 62 65 65 20 43 6F 6C 6F 75 72 20 42 61 73 69 63 2E 20 56 65 72 20 35 2E 32 32 65 DB   "Applied Technology Microbee Colour Basic. Ver 5.22e"
+//        00A9                LINE2_64:
+//        00A9   43 6F 70 79 72 69 67 68 74 20 4D 53 20 31 39 38 33 20 66 6F 72 20 4D 69 63 72 6F 57 6F 72 6C 64 20 41 75 73 74 72 61 6C 69 61 DB   "Copyright MS 1983 for MicroWorld Australia"
+//        00D3                LINE3_64:
+//        00D3   3E                     DB   ">"
+//        00D4                LINE1_80:
+//        00D4   4D 69 63 72 6F 62 65 65 20 20 35 36 4B 20 20 43 50 2F 4D DB   "Microbee  56K  CP/M"
+//        00E7                LINE2_80:
+//        00E7   56 65 72 73 20 32 2E 32 30 20 5B 5A 43 50 52 20 49 49 5D DB   "Vers 2.20 [ZCPR II]"
+//        00FA                LINE3_80:
+//        00FA   41 3E                  DB   "A>"   
     }
 
     private(set) var running = false
@@ -124,7 +213,10 @@ actor Z80CPU {
         while running
         {
             let prefetch = fetch(ProgramCounter : registers.PC)
-            await execute(opcodes : prefetch)
+            if !emulatorHalted
+            {
+                await execute(opcodes : prefetch)
+            }
             try? await Task.sleep(nanoseconds: 100)
         }
     }
@@ -243,9 +335,12 @@ actor Z80CPU {
             registers.A = IncrementReg(BaseValue:registers.A,Increment:1)
             registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
         case 0x3E: // LD A, n
-            print("Executed LD A, n @ "+String(format:"%04X",registers.PC))
+            print("Executed LD A, n @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
             registers.A = opcodes.opcode2
             registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+        case 0x76: // HALT
+            print("Executed HALT @ "+String(format:"%04X",registers.PC))
+            emulatorHalted = true
         case 0x77: // LD (HL), A
             print("Executed LD (HL), A @ "+String(format:"%04X",registers.PC))
             if (0xF000...0xF7FF).contains(registers.HL)
@@ -278,6 +373,34 @@ actor Z80CPU {
             print("Executed LD A, L @ "+String(format:"%04X",registers.PC))
             registers.A = registers.L
             registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
+        case 0xD3: // OUT (n),A
+            print("Executed OUT (n),A @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
+            ports[Int(opcodes.opcode2)] = registers.A
+            switch opcodes.opcode2
+            {
+                case 0x0C: break // writing to port 0x0C needs no further processing
+                case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
+            }
+        
+            //Writing to port 0x0C writes a register number
+            //Writing port 0x0D writes the register selected on port 0x0C
+            
+            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+        case 0xDB: // IN A,(n)
+            print("Executed IN A,(n) @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
+            registers.A = ports[Int(opcodes.opcode2)]
+            switch opcodes.opcode2
+            {
+                case 0x0C: registers.A = MOS6545.ReadStatusRegister()
+                case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
+                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
+            }
+            
+            //Reading port 0x0D reads the register selected on port 0x0C
+            //Reading from port 0x0C reads the status register
+            
+            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
         case 0xC3: // JP nn
             print("Executed JP nn @ "+String(format:"%04X",registers.PC))
             registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
@@ -371,7 +494,18 @@ actor Z80CPU {
                              AltL: registers.AltL,
                              memoryDump: Array(AddressSpace.memory[Int(registers.PC)..<0xffff]),
                              VDU : VDURAM.memory.map { Float($0) },
-                             CharRom : CharGenROM.memory.map { Float($0) } )
+                             CharRom : CharGenROM.memory.map { Float($0) },
+                             
+                             vmR1_HorizDisplayed : MOS6545.ReadRegister(RegNum: 1),
+                             vmR6_VertDisplayed : MOS6545.ReadRegister(RegNum: 6),
+                             vmR9_ScanLinesMinus1 : MOS6545.ReadRegister(RegNum: 9),
+                             vmR10_CursorStart : MOS6545.ReadRegister(RegNum: 10),
+                             vmR11_CursorEnd : MOS6545.ReadRegister(RegNum: 11),
+                             vmR12_DisplayStartAddrH : MOS6545.ReadRegister(RegNum: 12),
+                             vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
+                             vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
+                             vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15)
+            )
         }
         return CPUState( PC: registers.PC,
                          SP: registers.SP,
@@ -401,9 +535,21 @@ actor Z80CPU {
                          AltE: registers.AltE,
                          AltH: registers.AltH,
                          AltL: registers.AltL,
+                         
                          memoryDump: Array(AddressSpace.memory[Int(registers.PC)..<Int(registers.PC)+0x0ff]),
                          VDU : VDURAM.memory.map { Float($0) },
-                         CharRom : CharGenROM.memory.map { Float($0) } )
+                         CharRom : CharGenROM.memory.map { Float($0) },
+        
+                         vmR1_HorizDisplayed : MOS6545.ReadRegister(RegNum: 1),
+                         vmR6_VertDisplayed : MOS6545.ReadRegister(RegNum: 6),
+                         vmR9_ScanLinesMinus1 : MOS6545.ReadRegister(RegNum: 9),
+                         vmR10_CursorStart : MOS6545.ReadRegister(RegNum: 10),
+                         vmR11_CursorEnd : MOS6545.ReadRegister(RegNum: 11),
+                         vmR12_DisplayStartAddrH : MOS6545.ReadRegister(RegNum: 12),
+                         vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
+                         vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
+                         vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15)
+        )
     }
 }
 

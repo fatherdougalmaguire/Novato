@@ -4,32 +4,27 @@ struct EmulatorView: View
 {
     @Environment(EmulatorViewModel.self) private var vm
     @Environment(\.openWindow) var openWindow
-    
-    let eightyCol = 0.0 // set to 1 if 80 col mode is turned on
-    
-    let charWidth : CGFloat =  8 // pixel width per character - 8 for 64x16 and 80x24
-    let charHeight : CGFloat =  16 // pixel height per character - 16 for 64x16 and 11 for 80x24
-    let charCols : CGFloat =  64 // Characters per row
-    let charRows : CGFloat =  16 // Number of rows
-    
-    //        let charWidth : CGFloat =  8 // pixel width per character - 8 for 64x16 and 80x24
-    //        let charHeight : CGFloat =  11 // pixel height per character - 16 for 64x16 and 11 for 80x24
-    //        let charCols : CGFloat =  80 // Characters per row
-    //        let charRows : CGFloat =  24 // Number of rows
-    
-    let charScale : CGFloat = 2.0 // Scale for visibility on 27" screen ( 2560 x 1440 )
-    let charAspect : CGFloat = 4/3 // Correction for CRT aspect ratio
+        
+    let charScale : CGFloat = 2             // Scale for visibility on 27" screen ( 2560 x 1440 )
+    let charAspect : CGFloat = 4/3          // Correction for CRT aspect ratio
+    let phosphorColour : Float = 1         // 0 - green, 1 - amber, 2 - white, else blue
     
     var body: some View
     {
+        let frameWidth = 8*Int(vm.vmR1_HorizDisplayed)
+        let frameHeight = Int(vm.vmR9_ScanLinesMinus1+1)*Int(vm.vmR6_VertDisplayed)
+        let scanLineHeight = Float(vm.vmR9_ScanLinesMinus1+1)
+        let displayColumns = Float(vm.vmR1_HorizDisplayed)
+        let fontLocationOffset = Float(Int(vm.vmR12_DisplayStartAddrH) << 8 | Int(vm.vmR13_DisplayStartAddrL))
+        let cursorPosition = Float(vm.vmR14_CursorPositionH << 8 | vm.vmR15_CursorPositionL)
         ZStack {
             Color.white
             VStack {
                 Rectangle()
-                    .frame(width: charWidth*charCols, height: charHeight*charRows,alignment: .center)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(eightyCol),.floatArray(vm.VDU),.floatArray(vm.CharRom)))
+                    .frame(width: CGFloat(frameWidth), height: CGFloat(frameHeight),alignment: .center)
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(phosphorColour),.floatArray(vm.VDU),.floatArray(vm.CharRom)))
                     .scaleEffect(x: charScale,y:charScale*charAspect)
-                    .frame(width: charWidth*charCols*charScale, height: charHeight*charRows*charScale*charAspect,alignment: .center)
+                    .frame(width: CGFloat(frameWidth)*charScale, height: CGFloat(frameHeight)*charScale*charAspect,alignment: .center)
                 
                 HStack
                 {
