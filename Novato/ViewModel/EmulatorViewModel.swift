@@ -42,7 +42,17 @@ class EmulatorViewModel
     var memoryDump: [UInt8] = []
     var VDU: [Float] = []
     var CharRom : [Float] = []
-
+    
+    var vmR1_HorizDisplayed : UInt8 = 0
+    var vmR6_VertDisplayed : UInt8 = 0
+    var vmR9_ScanLinesMinus1 : UInt8 = 0
+    var vmR10_CursorStart : UInt8 = 0
+    var vmR11_CursorEnd : UInt8 = 0
+    var vmR12_DisplayStartAddrH : UInt8 = 0
+    var vmR13_DisplayStartAddrL : UInt8 = 0
+    var vmR14_CursorPositionH : UInt8 = 0
+    var vmR15_CursorPositionL : UInt8 = 0
+    
     private let cpu: Z80CPU
 
     init(cpu: Z80CPU)
@@ -106,8 +116,18 @@ class EmulatorViewModel
                 self.memoryDump = state.memoryDump
                 self.VDU = state.VDU
                 self.CharRom = state.CharRom
+                
+                self.vmR1_HorizDisplayed = state.vmR1_HorizDisplayed
+                self.vmR6_VertDisplayed = state.vmR6_VertDisplayed
+                self.vmR9_ScanLinesMinus1 = state.vmR9_ScanLinesMinus1
+                self.vmR10_CursorStart = state.vmR10_CursorStart
+                self.vmR11_CursorEnd = state.vmR11_CursorEnd
+                self.vmR12_DisplayStartAddrH = state.vmR12_DisplayStartAddrH
+                self.vmR13_DisplayStartAddrL = state.vmR13_DisplayStartAddrL
+                self.vmR14_CursorPositionH = state.vmR14_CursorPositionH
+                self.vmR15_CursorPositionL = state.vmR15_CursorPositionL
+                
             }
         }
     }
 }
-    
