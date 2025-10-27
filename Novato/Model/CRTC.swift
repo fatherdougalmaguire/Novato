@@ -23,7 +23,7 @@ class CRTC
         case 7: crtcRegisters.R7_VertSyncPosition = RegValue
         case 8: crtcRegisters.R8_ModeControl = RegValue
         case 9: crtcRegisters.R9_ScanLinesMinus1 = RegValue
-        case 10: crtcRegisters.R10_CursorStart = RegValue
+        case 10: crtcRegisters.R10_CursorStartAndBlinkMode = RegValue
         case 11: crtcRegisters.R11_CursorEnd = RegValue
         case 12: crtcRegisters.R12_DisplayStartAddrH = RegValue
         case 13: crtcRegisters.R13_DisplayStartAddrL = RegValue
@@ -51,7 +51,7 @@ class CRTC
         case 7: return crtcRegisters.R7_VertSyncPosition
         case 8: return crtcRegisters.R8_ModeControl
         case 9: return crtcRegisters.R9_ScanLinesMinus1
-        case 10: return crtcRegisters.R10_CursorStart
+        case 10: return crtcRegisters.R10_CursorStartAndBlinkMode
         case 11: return crtcRegisters.R11_CursorEnd
         case 12: return crtcRegisters.R12_DisplayStartAddrH
         case 13: return crtcRegisters.R13_DisplayStartAddrL

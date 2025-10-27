@@ -7,7 +7,7 @@ struct EmulatorView: View
         
     let charScale : CGFloat = 2             // Scale for visibility on 27" screen ( 2560 x 1440 )
     let charAspect : CGFloat = 4/3          // Correction for CRT aspect ratio
-    let phosphorColour : Float = 1         // 0 - green, 1 - amber, 2 - white, else blue
+    let phosphorColour : Float = 1          // 0 - green, 1 - amber, 2 - white, else black on white
     
     var body: some View
     {
@@ -15,17 +15,21 @@ struct EmulatorView: View
         let frameHeight = Int(vm.vmR9_ScanLinesMinus1+1)*Int(vm.vmR6_VertDisplayed)
         let scanLineHeight = Float(vm.vmR9_ScanLinesMinus1+1)
         let displayColumns = Float(vm.vmR1_HorizDisplayed)
+        let cursorStartScanLine = Float(Int(vm.vmR10_CursorStartAndBlinkMode) & 0b00001111 )
+        let cursorEndScanLine = Float(vm.vmR11_CursorEnd)
+        let cursorBlinkType = Float(Int(vm.vmR10_CursorStartAndBlinkMode) & 0b01110000 >> 4)
         let fontLocationOffset = Float(Int(vm.vmR12_DisplayStartAddrH) << 8 | Int(vm.vmR13_DisplayStartAddrL))
-        let cursorPosition = Float(vm.vmR14_CursorPositionH << 8 | vm.vmR15_CursorPositionL)
+        let cursorPosition = Float(Int(vm.vmR14_CursorPositionH) << 8 | Int(vm.vmR15_CursorPositionL))
+        let cursorBlinkCounter = Float(20)
+        
         ZStack {
             Color.white
             VStack {
                 Rectangle()
                     .frame(width: CGFloat(frameWidth), height: CGFloat(frameHeight),alignment: .center)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(phosphorColour),.floatArray(vm.VDU),.floatArray(vm.CharRom)))
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(phosphorColour),.floatArray(vm.VDU),.floatArray(vm.CharRom)))
                     .scaleEffect(x: charScale,y:charScale*charAspect)
-                    .frame(width: CGFloat(frameWidth)*charScale, height: CGFloat(frameHeight)*charScale*charAspect,alignment: .center)
-                
+                    .frame(width: CGFloat(frameWidth)*charScale, height: CGFloat(frameHeight)*charScale*charAspect,alignment: .center)                
                 HStack
                 {
                     Button("Start", systemImage:"play.fill")

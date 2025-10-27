@@ -46,7 +46,7 @@ class EmulatorViewModel
     var vmR1_HorizDisplayed : UInt8 = 0
     var vmR6_VertDisplayed : UInt8 = 0
     var vmR9_ScanLinesMinus1 : UInt8 = 0
-    var vmR10_CursorStart : UInt8 = 0
+    var vmR10_CursorStartAndBlinkMode : UInt8 = 0
     var vmR11_CursorEnd : UInt8 = 0
     var vmR12_DisplayStartAddrH : UInt8 = 0
     var vmR13_DisplayStartAddrL : UInt8 = 0
@@ -120,7 +120,7 @@ class EmulatorViewModel
                 self.vmR1_HorizDisplayed = state.vmR1_HorizDisplayed
                 self.vmR6_VertDisplayed = state.vmR6_VertDisplayed
                 self.vmR9_ScanLinesMinus1 = state.vmR9_ScanLinesMinus1
-                self.vmR10_CursorStart = state.vmR10_CursorStart
+                self.vmR10_CursorStartAndBlinkMode = state.vmR10_CursorStartAndBlinkMode
                 self.vmR11_CursorEnd = state.vmR11_CursorEnd
                 self.vmR12_DisplayStartAddrH = state.vmR12_DisplayStartAddrH
                 self.vmR13_DisplayStartAddrL = state.vmR13_DisplayStartAddrL
