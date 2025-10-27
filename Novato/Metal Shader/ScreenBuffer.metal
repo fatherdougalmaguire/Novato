@@ -1,30 +1,41 @@
 #include <metal_stdlib>
 using namespace metal;
 
-[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float PhosphorColour, device const float *screenram, int screenramsize, device const float *pcgchar, int pcgcharsize)
+[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float CursorBlinkCounter, float PhosphorColour, device const float *screenram, int screenramsize, device const float *pcgchar, int pcgcharsize)
 {
-    half4 pixelcolor;
+    half4 ForegroundColour;
+    half4 BackgroundColour;
     int screenpos;
     int pcgpos;
     int xcursor;
     int ycursor;
+    bool pixelset;
     
     const int CellWidth = 8;            // each character in font ROM is 8 pixels wide
     const int CellHeight = 16;          // each character in font ROM is 16 pixels high
     
+    const half4 BlackColour = half4(0.0,0.0,0.0,1.0);
+    const half4 WhiteColour = half4(1,1,1,1.0);
+    const half4 GreenColour = half4(0,1,0.2,1);
+    const half4 AmberColour = half4(1,0.749,0,1);
+    
     switch (int(PhosphorColour))
     {
     case 0 :    // green
-        pixelcolor = half4(0,1,0.2,1);
+        ForegroundColour = GreenColour;
+        BackgroundColour = BlackColour;
         break;
     case 1 :    // amber
-        pixelcolor = half4(1,0.749,0,1);
+        ForegroundColour = AmberColour;
+        BackgroundColour = BlackColour;
         break;
     case 2 :    // white
-        pixelcolor = half4(1,1,1,1);
+        ForegroundColour = WhiteColour;
+        BackgroundColour = BlackColour;
         break;
-    default :   // red
-        pixelcolor = half4(1,0,0,1);
+    default :   // black on white
+        ForegroundColour = BlackColour;
+        BackgroundColour = WhiteColour;
     }
     
     ycursor = int(position.y) % int(ScanLineHeight);    // calculate x pixel position in cell
@@ -35,13 +46,48 @@ using namespace metal;
     
     int bitmask = (128 >> int(xcursor));
     
-    if ((int(pcgchar[pcgpos]) & bitmask)  > 0 )
+    if ((int(pcgchar[pcgpos]) & bitmask)  > 0 )  // test for pixel set in character definition in font rom
     {
-        return pixelcolor;
+        pixelset = true;
     }
     else
     {
-        return half4(0.0,0.0,0.0,1.0);
+        pixelset = false;
+    }
+    
+    if (screenpos == int(CursorPosition))
+    {
+        switch (int(CursorBlinkType))
+        {
+            case 0: // 0 = always on
+//                if ((int(position.x) >= int((xcursorpos-1)*8)) && (int(position.x) <= int((xcursorpos*8)-1)) && ( int(position.y) >= int(((ycursorpos-1)*ypixels)+cursorstart)) && ( int(position.y) <= int((int(ycursorpos-1)*ypixels)+cursorend)))
+//                {
+//                    pixelset = true;
+//                }
+//                break;
+            case 1: break; // 1 = always off
+            case 2: // 2 = normal flash 1/16 frame rate
+//                if (( tick > 20 ) && (int(position.x) >= int((xcursorpos-1)*8)) && (int(position.x) <= int((xcursorpos*8)-1)) && ( int(position.y) >= int(((ycursorpos-1)*ypixels)+cursorstart)) && ( int(position.y) <= int((int(ycursorpos-1)*ypixels)+cursorend)))
+//                {
+//                    thingy = drawingcolor;
+//                }
+                break;
+            case 3: // 3 = fast flash 1/32 frame rate
+//                if (( tick > 10 ) && (int(position.x) >= int((xcursorpos-1)*8)) && (int(position.x) <= int((xcursorpos*8)-1)) && ( int(position.y) >= int(((ycursorpos-1)*ypixels)+cursorstart)) && ( int(position.y) <= int((int(ycursorpos-1)*ypixels)+cursorend)))
+//                {
+//                    thingy = drawingcolor;
+//                }
+                break;
+        }
+    }
+    
+    if (pixelset)
+    {
+        return ForegroundColour;
+    }
+    else
+    {
+        return BackgroundColour;
     }
 }
 
