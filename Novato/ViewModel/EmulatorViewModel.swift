@@ -52,6 +52,8 @@ class EmulatorViewModel
     var vmR13_DisplayStartAddrL : UInt8 = 0
     var vmR14_CursorPositionH : UInt8 = 0
     var vmR15_CursorPositionL : UInt8 = 0
+    var vmCursorBlinkCounter: Int = 0
+    var vmCursorFlashLimit  : Int = 0
     
     private let cpu: Z80CPU
 
@@ -64,6 +66,11 @@ class EmulatorViewModel
     func startEmulation() async
     {
         await cpu.start()
+    }
+    
+    func stepEmulation() async
+    {
+        await cpu.step()
     }
 
     func stopEmulation() async
@@ -126,7 +133,8 @@ class EmulatorViewModel
                 self.vmR13_DisplayStartAddrL = state.vmR13_DisplayStartAddrL
                 self.vmR14_CursorPositionH = state.vmR14_CursorPositionH
                 self.vmR15_CursorPositionL = state.vmR15_CursorPositionL
-                
+                self.vmCursorBlinkCounter = state.vmCursorBlinkCounter
+                self.vmCursorFlashLimit = state.vmCursorFlashLimit
             }
         }
     }

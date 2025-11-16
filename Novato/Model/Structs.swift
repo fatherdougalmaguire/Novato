@@ -177,6 +177,9 @@ struct CPUState
     let vmR13_DisplayStartAddrL : UInt8
     let vmR14_CursorPositionH : UInt8
     let vmR15_CursorPositionL : UInt8
+    
+    let vmCursorBlinkCounter : Int
+    let vmCursorFlashLimit  : Int
 }
 
 enum Z80Flags : UInt8
@@ -194,27 +197,31 @@ enum Z80Flags : UInt8
 
 struct CRTCRegisters
 {
-    var R0_HorizTotalMinus1 : UInt8 = 0x6B              // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
-    var R1_HorizDisplayed : UInt8 = 0x40                // Number of characters displayed in a line
-    var R2_HorizSyncPosition : UInt8 = 0x51             // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
-    var R3_VSynchHSynchWidths : UInt8 = 0x37            // Ignored by emulator
-    var R4_VertTotalMinus1 : UInt8 = 0x12               // The number of character lines of the screen minus 1
-    var R5_VertTotalAdjust : UInt8 = 0x09               // Ignored by emulator - The additional number of scanlines to complete a screen
-    var R6_VertDisplayed : UInt8 = 0x10                 // Number character lines that are displayed
-    var R7_VertSyncPosition : UInt8 = 0x11              // Ignored by emulator - Position of the vertical sync pulse in character lines.
-    var R8_ModeControl : UInt8 = 0x48                   // Ignored by emulator
-    var R9_ScanLinesMinus1 : UInt8 = 0x0F               // Number of scanlines per character minus 1
-    var R10_CursorStartAndBlinkMode : UInt8 = 0x6F      // Cursor scanline start ( 5 bits ) and blink mode ( 2 bits )
-    var R11_CursorEnd : UInt8 = 0x0F                    // Cursor scanline end ( 5 bits )
-    var R12_DisplayStartAddrH : UInt8 = 0x00            // Character Generator Rom start address ( high byte )
-    var R13_DisplayStartAddrL : UInt8 = 0x00            // Character Generator Rom start address ( low byte )
-    var R14_CursorPositionH : UInt8 = 0x00              // Ignored by emulator
-    var R15_CursorPositionL : UInt8 = 0x00              // Ignored by emulator
-    var R16_LightPenRegH : UInt8 = 0x00                 // Ignored by emulator
-    var R17_LightPenRegL : UInt8 = 0x00                 // Ignored by emulator
-    var R18_UpdateAddressRegH : UInt8 = 0x00            // Ignored by emulator
-    var R19_UpdateAddressRegL : UInt8 = 0xD0            // Ignored by emulator
+    var R0_HorizTotalMinus1 : UInt8 = 0x00                              // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
+    var R1_HorizDisplayed : UInt8 = 0x40                                // Number of characters displayed in a line
+    var R2_HorizSyncPosition : UInt8 = 0x00                             // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
+    var R3_VSynchHSynchWidths : UInt8 = 0x00                            // Ignored by emulator
+    var R4_VertTotalMinus1 : UInt8 = 0x12                               // The number of character lines of the screen minus 1
+    var R5_VertTotalAdjust : UInt8 = 0x00                               // Ignored by emulator - The additional number of scanlines to complete a screen
+    var R6_VertDisplayed : UInt8 = 0x10                                 // Number character lines that are displayed
+    var R7_VertSyncPosition : UInt8 = 0x00                              // Ignored by emulator - Position of the vertical sync pulse in character lines.
+    var R8_ModeControl : UInt8 = 0x00                                   // Ignored by emulator
+    var R9_ScanLinesMinus1 : UInt8 = 0x0F                               // Number of scanlines per character minus 1
+    var R10_CursorStartAndBlinkMode : UInt8 = (0x01 << 5) & 0b01100000  // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no c
+    var R11_CursorEnd : UInt8 = 0b00000000 & 0b0011111                  // Cursor scanline end ( bits 0-4 )
+    var R12_DisplayStartAddrH : UInt8 = 0x00                            // Character Generator Rom start address ( high byte )
+    var R13_DisplayStartAddrL : UInt8 = 0x00                            // Character Generator Rom start address ( low byte )
+    var R14_CursorPositionH : UInt8 = 0x00                              // Cursor address ( high byte )
+    var R15_CursorPositionL : UInt8 = 0x00                              // Cursor address ( low byte )
+    var R16_LightPenRegH : UInt8 = 0x00                                 // Ignored by emulator
+    var R17_LightPenRegL : UInt8 = 0x00                                 // Ignored by emulator
+    var R18_UpdateAddressRegH : UInt8 = 0x00                            // Ignored by emulator
+    var R19_UpdateAddressRegL : UInt8 = 0x00                            // Ignored by emulator
     
     var StatusRegister : UInt8 = 0b10000000
+    
+    var CursorBlinkCounter : Int = 0
+    var CursorFlashLimit : Int = 5000                              // Initial setting for base cursor flash limit - approx 0.5 sec duty cycle on Apple Silicon M2
 }
+
 
