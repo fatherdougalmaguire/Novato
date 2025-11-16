@@ -267,34 +267,6 @@ actor Z80CPU
             print("Executed LD A, L @ "+String(format:"%04X",registers.PC))
             registers.A = registers.L
             registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0xD3: // OUT (n),A
-            print("Executed OUT (n),A @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
-            ports[Int(opcodes.opcode2)] = registers.A
-            switch opcodes.opcode2
-            {
-                case 0x0C: break // writing to port 0x0C needs no further processing
-                case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
-                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
-            }
-        
-            //Writing to port 0x0C writes a register number
-            //Writing port 0x0D writes the register selected on port 0x0C
-            
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
-        case 0xDB: // IN A,(n)
-            print("Executed IN A,(n) @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
-            registers.A = ports[Int(opcodes.opcode2)]
-            switch opcodes.opcode2
-            {
-                case 0x0C: registers.A = MOS6545.ReadStatusRegister()
-                case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
-                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
-            }
-            
-            //Reading port 0x0D reads the register selected on port 0x0C
-            //Reading from port 0x0C reads the status register
-            
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
         case 0xC2: // JP NZ,nn
             print("Executed JP NZ,nn @ "+String(format:"%04X",registers.PC))
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
@@ -311,6 +283,74 @@ actor Z80CPU
         case 0xCA: // JP Z,nn
             print("Executed JP Z,nn @ "+String(format:"%04X",registers.PC))
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+            else
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
+        case 0xD2: // JP NC,nn
+            print("Executed JP NC,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
+            else
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+        case 0xD3: // OUT (n),A
+            print("Executed OUT (n),A @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
+            ports[Int(opcodes.opcode2)] = registers.A
+            switch opcodes.opcode2
+            {
+                case 0x0C: break // writing to port 0x0C needs no further processing
+                case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
+            }
+        
+            //Writing to port 0x0C writes a register number
+            //Writing port 0x0D writes the register selected on port 0x0C
+            
+            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+        case 0xDA: // JP C,nn
+            print("Executed JP C,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+            else
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
+        case 0xDB: // IN A,(n)
+            print("Executed IN A,(n) @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
+            registers.A = ports[Int(opcodes.opcode2)]
+            switch opcodes.opcode2
+            {
+                case 0x0C: registers.A = MOS6545.ReadStatusRegister()
+                case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
+                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
+            }
+            
+            //Reading port 0x0D reads the register selected on port 0x0C
+            //Reading from port 0x0C reads the status register
+            
+            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+        case 0xE2: // JP PO,nn
+            print("Executed JP PO,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
+            else
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+        case 0xEA: // JP PE,nn
+            print("Executed JP PE,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
@@ -349,6 +389,26 @@ actor Z80CPU
             default:
                 print("Unknown opcode "+String(format: "%02X", opcodes.opcode1)+String(format: "%02X", opcodes.opcode2) + " @ "+String(format:"%04X",registers.PC))
                 registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+            }
+        case 0xF2: // JP P,nn
+            print("Executed JP P,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
+            else
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+        case 0xFA: // JP M,nn
+            print("Executed JP M,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+            else
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
             }
         case 0xFE: // CP n
             print("Executed CP n @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
