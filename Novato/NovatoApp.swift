@@ -11,7 +11,7 @@ struct NovatoApp: App
         {
             EmulatorView().environment(vm)
         }
-        WindowGroup("Novato - Debug", id: "DebugWindow")
+        WindowGroup("Novato -  Debug", id: "DebugWindow")
         {
             DebugView().environment(vm)
         }

@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float CursorBlinkCounter, float PhosphorColour, device const float *screenram, int screenramsize, device const float *pcgchar, int pcgcharsize)
+[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float CursorBlinkCounter, float CursorFlashLimit, float PhosphorColour, device const float *screenram, int screenramsize, device const float *pcgchar, int pcgcharsize)
 {
     half4 ForegroundColour;
     half4 BackgroundColour;
@@ -18,6 +18,7 @@ using namespace metal;
     const half4 WhiteColour = half4(1,1,1,1.0);
     const half4 GreenColour = half4(0,1,0.2,1);
     const half4 AmberColour = half4(1,0.749,0,1);
+    const half4 BlueColour  = half4(0.68,0.85,0.9,1);
     
     switch (int(PhosphorColour))
     {
@@ -31,6 +32,10 @@ using namespace metal;
         break;
     case 2 :    // white
         ForegroundColour = WhiteColour;
+        BackgroundColour = BlackColour;
+        break;
+    case 3 :    // blue
+        ForegroundColour = BlueColour;
         BackgroundColour = BlackColour;
         break;
     default :   // black on white
@@ -60,24 +65,24 @@ using namespace metal;
         switch (int(CursorBlinkType))
         {
             case 0: // 0 = always on
-//                if ((int(position.x) >= int((xcursorpos-1)*8)) && (int(position.x) <= int((xcursorpos*8)-1)) && ( int(position.y) >= int(((ycursorpos-1)*ypixels)+cursorstart)) && ( int(position.y) <= int((int(ycursorpos-1)*ypixels)+cursorend)))
-//                {
-//                    pixelset = true;
-//                }
-//                break;
+                    if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)))
+                    {
+                        pixelset = !pixelset;
+                    }
+                    break;
             case 1: break; // 1 = always off
             case 2: // 2 = normal flash 1/16 frame rate
-//                if (( tick > 20 ) && (int(position.x) >= int((xcursorpos-1)*8)) && (int(position.x) <= int((xcursorpos*8)-1)) && ( int(position.y) >= int(((ycursorpos-1)*ypixels)+cursorstart)) && ( int(position.y) <= int((int(ycursorpos-1)*ypixels)+cursorend)))
-//                {
-//                    thingy = drawingcolor;
-//                }
-                break;
+                    if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
+                    {
+                        pixelset = !pixelset;
+                    }
+                    break;
             case 3: // 3 = fast flash 1/32 frame rate
-//                if (( tick > 10 ) && (int(position.x) >= int((xcursorpos-1)*8)) && (int(position.x) <= int((xcursorpos*8)-1)) && ( int(position.y) >= int(((ycursorpos-1)*ypixels)+cursorstart)) && ( int(position.y) <= int((int(ycursorpos-1)*ypixels)+cursorend)))
-//                {
-//                    thingy = drawingcolor;
-//                }
-                break;
+                    if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
+                    {
+                        pixelset = !pixelset;
+                    }
+                    break;
         }
     }
     

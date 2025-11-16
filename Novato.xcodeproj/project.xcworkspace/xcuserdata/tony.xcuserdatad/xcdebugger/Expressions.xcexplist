@@ -11,14 +11,6 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "EmulatorView.body.getter:EmulatorView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "Int(vm.vmR12_DisplayStartAddrH) &lt;&lt; 8">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "Z80CPU.execute(opcodes:):Z80CPU.swift">
       </ContextState>
       <ContextState

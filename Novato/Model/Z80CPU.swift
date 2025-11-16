@@ -62,172 +62,27 @@ actor Z80CPU
     
     init()
     {
+        MOS6545.SetCursorDutyCycle()
         AddressSpace.memory[0xf000...0xf7ff] = VDURAM.memory[0...0x7ff]
-        AddressSpace.LoadMemoryFromFile(FileName: "basic_5.22e", FileExtension: "rom",MemoryAddress : 0x8000)
-        AddressSpace.LoadMemoryFromFile(FileName: "wordbee_1.2", FileExtension: "rom",MemoryAddress : 0xC000)
-        AddressSpace.LoadMemoryFromFile(FileName: "telcom_1.0", FileExtension: "rom",MemoryAddress : 0xE000)
-        CharGenROM.LoadMemoryFromFile(FileName: "charrom", FileExtension: "bin", MemoryAddress : 0x0000)
-        AddressSpace.LoadMemoryFromArray(MemoryAddress : 0x0000,
-                                   MemoryData :  [0x3e,0x01,
-                                                  0xfe,0x01,
-                                                  0x28,0x22,
-                                                  0x21,0x92,0x00,
-                                                  0x11,0x00,0xf0,
-                                                  0x01,0x33,0x00,
-                                                  0xed,0xb0,
-                                                  0x21,0xc5,0x00,
-                                                  0x11,0x80,0xf0,
-                                                  0x01,0x2a,0x00,
-                                                  0xed,0xb0,
-                                                  0x21,0xef,0x00,
-                                                  0x11,0x00,0xf1,
-                                                  0x01,0x01,0x00,
-                                                  0xed,0xb0,
-                                                  0x76,
-                                                  0x3e,0x01,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x50,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x06,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x18,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x09,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x0a,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x0c,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x08,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x0d,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x00,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x0a,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x00,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x0b,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x0b,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x0e,
-                                                  0xd3,0x0c,
-                                                  0x3e,0xf1,
-                                                  0xd3,0x0d,
-                                                  0x3e,0x0f,
-                                                  0xd3,0x0c,
-                                                  0x3e,0x42,
-                                                  0xd3,0x0d,
-                                                  0x21,0xf0,0x00,
-                                                  0x11,0x50,0xf0,
-                                                  0x01,0x13,0x00,
-                                                  0xed,0xb0,
-                                                  0x21,0x03,0x01,
-                                                  0x11,0xa0,0xf0,
-                                                  0x01,0x13,0x00,
-                                                  0xed,0xb0,
-                                                  0x21,0x16,0x01,
-                                                  0x11,0x40,0xf1,
-                                                  0x01,0x02,0x00,
-                                                  0xed,0xb0,
-                                                  0x76,
-                                                  0x41,0x70,0x70,0x6c,0x69,0x65,0x64,0x20,0x54,0x65,0x63,0x68,0x6e,0x6f,
-                                                  0x6c,0x6f,0x67,0x79,0x20,0x4d,0x69,0x63,0x72,0x6f,0x62,0x65,0x65,0x20,
-                                                  0x43,0x6f,
-                                                  0x6c,0x6f,0x75,0x72,0x20,0x42,0x61,0x73,0x69,0x63,0x2e,0x20,0x56,0x65,0x72,0x20,
-                                                  0x35,0x2e,0x32,0x32,0x65,0x43,0x6f,0x70,0x79,0x72,0x69,0x67,0x68,0x74,0x20,0x4d,
-                                                  0x53,0x20,0x31,0x39,0x38,0x33,0x20,0x66,0x6f,0x72,0x20,0x4d,0x69,0x63,0x72,0x6f,
-                                                  0x57,0x6f,0x72,0x6c,0x64,0x20,0x41,0x75,0x73,0x74,0x72,0x61,0x6c,0x69,
-                                                  0x61,0x3e,
-                                                  0x4d,0x69,0x63,0x72,0x6f,0x62,0x65,0x65,0x20,0x20,0x35,0x36,0x4b,0x20,0x20,0x43,
-                                                  0x50,0x2f,0x4d,0x56,0x65,0x72,0x73,0x20,0x32,0x2e,0x32,0x30,0x20,0x5b,0x5a,0x43,
-                                                  0x50,0x52,0x20,0x49,0x49,0x5d,
-                                                  0x41,0x3e])
-//        0000   3E 01                  LD   A,1
-//        0002   FE 01                  CP   1
-//        0004   28 22                  JR   Z,EIGHTY
-//        0006   21 92 00               LD   HL,LINE1_64
-//        0009   11 00 F0               LD   DE,$F000
-//        000C   01 33 00               LD   BC,$33
-//        000F   ED B0                  LDIR
-//        0011   21 C5 00               LD   HL,LINE2_64
-//        0014   11 80 F0               LD   DE,$F080
-//        0017   01 2A 00               LD   BC,$2A
-//        001A   ED B0                  LDIR
-//        001C   21 EF 00               LD   HL,LINE3_64
-//        001F   11 00 F1               LD   DE,$F100
-//        0022   01 01 00               LD   BC,$01
-//        0025   ED B0                  LDIR
-//        0027   76                     HALT
-//        0028                EIGHTY:
-//        0028   3E 01                  LD   A,1
-//        002A   D3 0C                  OUT   ($0C),A
-//        002C   3E 50                  LD   A,80
-//        002E   D3 0D                  OUT   ($0D),A
-//        0030   3E 06                  LD   A,6
-//        0032   D3 0C                  OUT   ($0C),A
-//        0034   3E 18                  LD   A,24
-//        0036   D3 0D                  OUT   ($0D),A
-//        0038   3E 09                  LD   A,9
-//        003A   D3 0C                  OUT   ($0C),A
-//        003C   3E 0A                  LD   A,10
-//        003E   D3 0D                  OUT   ($0D),A
-//        0040   3E 0C                  LD   A,12
-//        0042   D3 0C                  OUT   ($0C),A
-//        0044   3E 08                  LD   A,8
-//        0046   D3 0D                  OUT   ($0D),A
-//        0048   3E 0D                  LD   A,13
-//        004A   D3 0C                  OUT   ($0C),A
-//        004C   3E 00                  LD   A,0
-//        004E   D3 0D                  OUT   ($0D),A
-//        0050   3E 0A                  LD   A,10
-//        0052   D3 0C                  OUT   ($0C),A
-//        0054   3E 00                  LD   A,0
-//        0056   D3 0D                  OUT   ($0D),A
-//        0058   3E 0B                  LD   A,11
-//        005A   D3 0C                  OUT   ($0C),A
-//        005C   3E 0B                  LD   A,11
-//        005E   D3 0D                  OUT   ($0D),A
-//        0060   3E 0E                  LD   A,14
-//        0062   D3 0C                  OUT   ($0C),A
-//        0064   3E F1                  LD   A,$F1
-//        0066   D3 0D                  OUT   ($0D),A
-//        0068   3E 0F                  LD   A,15
-//        006A   D3 0C                  OUT   ($0C),A
-//        006C   3E 42                  LD   A,$42
-//        006E   D3 0D                  OUT   ($0D),A
-//        0070   21 F0 00               LD   HL,LINE1_80
-//        0073   11 50 F0               LD   DE,$F050
-//        0076   01 13 00               LD   BC,$13
-//        0079   ED B0                  LDIR
-//        007B   21 03 01               LD   HL,LINE2_80
-//        007E   11 A0 F0               LD   DE,$F0A0
-//        0081   01 13 00               LD   BC,$13
-//        0084   ED B0                  LDIR
-//        0086   21 16 01               LD   HL,LINE3_80
-//        0089   11 40 F1               LD   DE,$F140
-//        008C   01 02 00               LD   BC,$02
-//        008F   ED B0                  LDIR
-//        0091   76                     HALT
-//        0092                LINE1_64:
-//        0092   41 70 70 6C 69 65 64 20 54 65 63 68 6E 6F 6C 6F 67 79 20 4D 69 63 72 6F 62 65 65 20 43 6F 6C 6F 75 72 20 42 61 73 69 63 2E 20 56 65 72 20 35 2E 32 32 65 DB   "Applied Technology Microbee Colour Basic. Ver 5.22e"
-//        00C5                LINE2_64:
-//        00C5   43 6F 70 79 72 69 67 68 74 20 4D 53 20 31 39 38 33 20 66 6F 72 20 4D 69 63 72 6F 57 6F 72 6C 64 20 41 75 73 74 72 61 6C 69 61 DB   "Copyright MS 1983 for MicroWorld Australia"
-//        00EF                LINE3_64:
-//        00EF   3E                     DB   ">"
-//        00F0                LINE1_80:
-//        00F0   4D 69 63 72 6F 62 65 65 20 20 35 36 4B 20 20 43 50 2F 4D DB   "Microbee  56K  CP/M"
-//        0103                LINE2_80:
-//        0103   56 65 72 73 20 32 2E 32 30 20 5B 5A 43 50 52 20 49 49 5D DB   "Vers 2.20 [ZCPR II]"
-//        0116                LINE3_80:
-//        0116   41 3E                  DB   "A>"
+        AddressSpace.LoadROM(FileName: "basic_5.22e", FileExtension: "rom",MemoryAddress : 0x8000)
+        AddressSpace.LoadROM(FileName: "wordbee_1.2", FileExtension: "rom",MemoryAddress : 0xC000)
+        AddressSpace.LoadROM(FileName: "telcom_1.0", FileExtension: "rom",MemoryAddress : 0xE000)
+        CharGenROM.LoadROM(FileName: "charrom", FileExtension: "bin", MemoryAddress : 0x0000)
+        AddressSpace.LoadROM(FileName: "hello", FileExtension: "bin",MemoryAddress : 0x0000)
     }
 
     private(set) var running = false
+    private(set) var stepping = false
 
     func start()
+    {
+        CPUstarttime = Date()
+        guard !running else { return }
+        running = true
+        Task.detached(priority: .background) { await self.runLoop() }
+    }
+    
+    func step()
     {
         CPUstarttime = Date()
         guard !running else { return }
@@ -251,6 +106,7 @@ actor Z80CPU
         while running
         {
             let prefetch = fetch(ProgramCounter : registers.PC)
+            MOS6545.ResetCursorDutyCycle()
             if !emulatorHalted
             {
                 await execute(opcodes : prefetch)
@@ -439,9 +295,29 @@ actor Z80CPU
             //Reading from port 0x0C reads the status register
             
             registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+        case 0xC2: // JP NZ,nn
+            print("Executed JP NZ,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
+            else
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
         case 0xC3: // JP nn
             print("Executed JP nn @ "+String(format:"%04X",registers.PC))
             registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+        case 0xCA: // JP Z,nn
+            print("Executed JP Z,nn @ "+String(format:"%04X",registers.PC))
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            {
+                registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            }
+            else
+            {
+                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            }
         case 0xED: // ED instructions
             switch opcodes.opcode2
             {
@@ -542,7 +418,9 @@ actor Z80CPU
                              vmR12_DisplayStartAddrH : MOS6545.ReadRegister(RegNum: 12),
                              vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
                              vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
-                             vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15)
+                             vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
+                             vmCursorBlinkCounter: MOS6545.crtcRegisters.CursorBlinkCounter,
+                             vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit
             )
         }
         return CPUState( PC: registers.PC,
@@ -586,7 +464,9 @@ actor Z80CPU
                          vmR12_DisplayStartAddrH : MOS6545.ReadRegister(RegNum: 12),
                          vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
                          vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
-                         vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15)
+                         vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
+                         vmCursorBlinkCounter: MOS6545.crtcRegisters.CursorBlinkCounter,
+                         vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit,
         )
     }
 }
