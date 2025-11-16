@@ -26,13 +26,13 @@ class CRTC
         let frameStart = HiResTimer.now()
         for _ in 0..<1000 { }
         let elapsed = HiResTimer.secondsSince(frameStart)
-        if Int(crtcRegisters.R10_CursorStartAndBlinkMode & 0b00110000) >> 4 == 2
+        if Int(crtcRegisters.R10_CursorStartAndBlinkMode >> 5) == 2
         {
-            crtcRegisters.CursorFlashLimit = Int(1 / elapsed)
+            crtcRegisters.CursorFlashLimit = Int(0.06 / elapsed)
         }
         else
         {
-            crtcRegisters.CursorFlashLimit = Int(0.5 / elapsed)
+            crtcRegisters.CursorFlashLimit = Int(0.03 / elapsed)
         }
     }
     
@@ -66,8 +66,8 @@ class CRTC
         case 8: crtcRegisters.R8_ModeControl = RegValue
         case 9: crtcRegisters.R9_ScanLinesMinus1 = RegValue
         case 10:
-            let oldBlinkMode = Int(crtcRegisters.R10_CursorStartAndBlinkMode & 0b00110000) >> 4
-            let NewBlinkMode = Int(RegValue & 0b00110000) >> 4
+            let oldBlinkMode = Int(crtcRegisters.R10_CursorStartAndBlinkMode >> 5)
+            let NewBlinkMode = Int(RegValue >> 5)
             if oldBlinkMode != NewBlinkMode
             {
                 SetCursorDutyCycle()
