@@ -12,7 +12,7 @@ The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM are used in this emula
 
 ## Current status
 
-This emulator is still in what could charitablity called *alpha* status.
+This emulator is still in what could charitably called *alpha* status.
 
 * You can start and stop the emulator via button control.
 * You can quit the emulator via button control.
