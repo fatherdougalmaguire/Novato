@@ -1,5 +1,8 @@
 # Introduction
 Novato is a SwiftUI/Swift emulator compatible with the [Microbee 32IC home computer](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee+Series+1+Models#Microbee_16K_32K_IC)
+<div align=left>
+  <img width="300" alt="image" src="https://github.com/user-attachments/assets/9c6fc378-3184-44ff-a0e7-11361103483c"/>
+</div>
 
 Requires MacOS Sonoma or later
 
