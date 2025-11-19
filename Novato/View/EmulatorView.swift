@@ -74,9 +74,10 @@ struct EmulatorView: View
                     .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
                 HStack
                 {
-                    LED(isOn: powerOn, color: .green)
+                    LED(isOn: powerOn, color: .red)
                     Button("Start", systemImage:"play.fill")
                     {
+                        LED(isOn: powerOn, color: .green)
                         Task { await vm.startEmulation() }
                     }
                     .buttonStyle(.borderedProminent)
@@ -96,8 +97,6 @@ struct EmulatorView: View
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Color.orange)
-                    .disabled(true)
-                    
                 } //hstack
                 
                 HStack
