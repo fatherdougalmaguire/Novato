@@ -71,48 +71,42 @@ actor Z80CPU
         AddressSpace.LoadROM(FileName: "hello", FileExtension: "bin",MemoryAddress : 0x0000)
     }
 
-    private(set) var running = false
-    private(set) var stepping = false
+    private(set) var isRunning = false
+    private var stepTask: Task<Void, Never>?
 
     func start()
     {
-        CPUstarttime = Date()
-        guard !running else { return }
-        running = true
-        Task.detached(priority: .background) { await self.runLoop() }
+        guard !isRunning else { return }
+        isRunning = true
+        stepTask = Task
+        {
+            while isRunning
+            {
+                step()
+                try? await Task.sleep(nanoseconds: 1000) // 1 microsecond
+            }
+        }
     }
     
     func step()
     {
         CPUstarttime = Date()
-        guard !running else { return }
-        running = true
-        Task.detached(priority: .background) { await self.runLoop() }
+        let prefetch = fetch(ProgramCounter : registers.PC)
+        MOS6545.ResetCursorDutyCycle()
+        if !emulatorHalted
+        {
+            execute(opcodes : prefetch)
+        }
+        CPUendtime = Date()
+        let ken = CPUendtime.timeIntervalSince1970-CPUstarttime.timeIntervalSince1970
+        print("Instruction took ",ken / Double(runcycles)*1000*1000," microseconds to execute")
+        runcycles = 0
     }
 
     func stop()
     {
-        CPUendtime = Date()
-        running = false
-        let ken = CPUendtime.timeIntervalSince1970-CPUstarttime.timeIntervalSince1970
-        print(ken,"seconds")
-        print(runcycles," instructions")
-        print("Each instruction takes ",ken / Double(runcycles)*1000*1000," microseconds to execute")
-        runcycles = 0
-    }
-
-    private func runLoop() async
-    {
-        while running
-        {
-            let prefetch = fetch(ProgramCounter : registers.PC)
-            MOS6545.ResetCursorDutyCycle()
-            if !emulatorHalted
-            {
-                await execute(opcodes : prefetch)
-            }
-            try? await Task.sleep(nanoseconds: 100)
-        }
+        isRunning = false
+        stepTask?.cancel()
     }
 
     private func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
@@ -186,7 +180,8 @@ actor Z80CPU
         return result
     }
 
-    private func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8)) async {
+    private func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8))
+    {
         switch opcodes.opcode1
         {
         case 0x00: // NOP
