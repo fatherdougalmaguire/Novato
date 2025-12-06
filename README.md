@@ -1,16 +1,21 @@
 # Introduction
-Novato is a SwiftUI/Swift emulator compatible with the [Microbee 32IC home computer](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee+Series+1+Models#Microbee_16K_32K_IC)
+Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee) family of home computers.
+
+© Tony Sanchez 2025 All Rights Reserved
+
 <div align=left>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/9c6fc378-3184-44ff-a0e7-11361103483c"/>
 </div>
 
-Requires MacOS Sonoma or later
+It will run on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe.
+
+Universal binaries for Intel and Apple Silicon can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
 
 The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM are used in this emulator with kind permission from Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
 
-© Tony Sanchez 2025 All Rights Reserved
-
 ## Current status
+
+Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee+Series+1+Models#Microbee_16K_32K_IC) model.
 
 This emulator is still in what could charitably called *alpha* status.
 
@@ -28,13 +33,28 @@ This emulator is still in what could charitably called *alpha* status.
   - Supports selection of Character ROM address.
   - Supports selection of cursor start and end scanline.
   - Supports cursor flash mode ( On/Off/slow flash/fast flash ).
+* Splash screen displaying the application logo as PCG characters
 
 ## On the to-do list
 
+* Refactor the MMU unit.
+  - Needs to support bank switching for font ROM, PCG RAM and colour RAM
 * Capture keyboard input
+* Colour support
 * Sound output
 * Cassette load/save functionality
 * Full emulator of Z80 including undocumented instructions
+* Rejig the cursor flash timing code as it isn't CPU independent
+
+## Emulator screenshots
+
+### Splash Screen
+
+<img width="2184" height="1752" alt="image" src="https://github.com/user-attachments/assets/bfb79869-5219-453f-8923-a18545b397f2" />
+
+### Status window
+
+<img width="2024" height="1402" alt="image" src="https://github.com/user-attachments/assets/c1e3d2a7-12fe-4920-88c1-a79f214a0603" />
 
 ## Demo Screens
 
@@ -49,11 +69,8 @@ The emulator is **NOT** currently booting BASIC nor CP/M
 <img width="2272" height="1840" alt="image" src="https://github.com/user-attachments/assets/8d3923a5-c4fa-4062-bd3d-59c4ec5dabf9" />
 
 ### 40 columns x 24 rows 
-<img width="2272" height="1840" alt="image" src="https://github.com/user-attachments/assets/fd0b64ae-3cbe-4dbf-abd2-a24640c0e67c" />
+<img width="2272" height="1840" alt="image" src="https://github.com/user-attachments/assets/d7ac5e81-c878-46c8-b2b6-b99dfb4bb360" />
 
-### The real emulator status window
-
-<img width="2024" height="1402" alt="image" src="https://github.com/user-attachments/assets/c1e3d2a7-12fe-4920-88c1-a79f214a0603" />
 
 
 
