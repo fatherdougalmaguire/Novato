@@ -7,11 +7,17 @@ Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.mi
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/9c6fc378-3184-44ff-a0e7-11361103483c"/>
 </div>
 
-It will run on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe.
+It runs on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe ( Intel and Apple Silicon ).
 
-Universal binaries for Intel and Apple Silicon can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
+Universal binaries can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
 
-The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM are used in this emulator with kind permission from Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
+At some point,  I may build iOS and iPadOS versions off the same codebase.
+
+And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly ( though unlikely to be written in Swift ) 
+
+## Ackowledgements
+
+The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM are used within this emulator have been made available with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
 
 ## Current status
 
@@ -39,12 +45,11 @@ This emulator is still in what could charitably called *alpha* status.
 
 * Refactor the MMU unit.
   - Needs to support bank switching for font ROM, PCG RAM and colour RAM
+* Full emulator of Z80 including undocumented instructions
 * Capture keyboard input
 * Colour support
-* Sound output
 * Cassette load/save functionality
-* Full emulator of Z80 including undocumented instructions
-* Rejig the cursor flash timing code as it isn't CPU independent
+* Sound output
 
 ## Emulator screenshots
 
