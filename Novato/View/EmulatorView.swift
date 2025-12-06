@@ -26,6 +26,7 @@ struct EmulatorView: View
     
     @State var cursorBlinkCounter : Float = 0
     @State private var powerOn = true
+    @State private var ClearScreen = true
         
     let charScale : CGFloat = 2             // Scale for visibility on 27" screen ( 2560 x 1440 )
     let charAspect : CGFloat = 4/3          // Correction for CRT aspect ratio
@@ -77,8 +78,13 @@ struct EmulatorView: View
                     LED(isOn: powerOn, color: .red)
                     Button("Start", systemImage:"play.fill")
                     {
-                        LED(isOn: powerOn, color: .green)
-                        Task { await vm.startEmulation() }
+                        Task {
+                            if ClearScreen {
+                                await vm.ClearEmulationScreen()
+                                ClearScreen = false
+                            }
+                            await vm.startEmulation()
+                        }
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Color.orange)
@@ -126,3 +132,4 @@ struct EmulatorView: View
         }
     }
 } // struct
+

@@ -63,6 +63,11 @@ class EmulatorViewModel
         Task { await updateLoop() }
     }
 
+    func ClearEmulationScreen() async
+    {
+        await cpu.ClearVideoMemory()
+    }
+    
     func startEmulation() async
     {
         await cpu.start()
