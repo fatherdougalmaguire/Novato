@@ -4,36 +4,55 @@ class CRTC
 {
     var crtcRegisters = CRTCRegisters()
 
-    struct HiResTimer {
-        private static let timebase: mach_timebase_info_data_t = {
+    struct HiResTimer
+    {
+        private static let timebase: mach_timebase_info_data_t =
+        {
             var info = mach_timebase_info_data_t()
             mach_timebase_info(&info)
             return info
         }()
-
-        static func now() -> UInt64 {
+        
+        static func now() -> UInt64
+        {
             let ticks = mach_absolute_time()
             return ticks * UInt64(timebase.numer) / UInt64(timebase.denom)
         }
-
-        static func secondsSince(_ start: UInt64) -> Double {
-            return Double(now() - start) / 1_000_000_000.0
+        
+        static func secondsSince(_ start: UInt64) -> Double
+        {
+            let timePassed = Double(now() - start) / 1_000_000_000.0
+            guard timePassed == 0.00
+            else
+            {
+                return 0.0015
+            }
+            return timePassed
         }
     }
 
     func SetCursorDutyCycle()
     {
+        var flashRate : Double
+        
         let frameStart = HiResTimer.now()
-        for _ in 0..<1000 { }
+        for _ in 0..<10000 { }
         let elapsed = HiResTimer.secondsSince(frameStart)
         if Int(crtcRegisters.R10_CursorStartAndBlinkMode >> 5) == 2
         {
-            crtcRegisters.CursorFlashLimit = Int(0.06 / elapsed)
+            flashRate = 12.5
         }
         else
         {
-            crtcRegisters.CursorFlashLimit = Int(0.03 / elapsed)
+            flashRate = 6.25
         }
+        guard !(((flashRate/elapsed).isNaN) || ((flashRate/elapsed).isInfinite))
+        else
+        {
+            crtcRegisters.CursorFlashLimit = 4166
+            return
+        }
+        crtcRegisters.CursorFlashLimit = Int(flashRate/elapsed)
     }
     
     func ResetCursorDutyCycle()
