@@ -1,6 +1,6 @@
 import Foundation
 
-class CRTC
+final class CRTC
 {
     var crtcRegisters = CRTCRegisters()
 

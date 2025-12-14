@@ -60,8 +60,31 @@ actor Z80CPU
     var VDURAM = MMU(MemorySize : 0x800, MemoryValue : 0x20)
     var CharGenROM = MMU(MemorySize : 0x1000, MemoryValue : 0x00)
     
+    let MemoryManager = MemoryMapper()
+
+    let mainRAM = MemoryBlock(size: 0x8000, readOnly: true)
+    let basicROM = MemoryBlock(size: 0x4000, readOnly: false)
+    let pakROM = MemoryBlock(size: 0x2000, readOnly: false)
+    let netROM = MemoryBlock(size: 0x1000, readOnly: false)
+    let videoRAM = MemoryBlock(size: 0x800, readOnly: true)
+    let pcgRAM = MemoryBlock(size: 0x800, readOnly: true)
+    let colourRAM = MemoryBlock(size: 0x800, readOnly: true)
+    let fontROM = MemoryBlock(size: 0x1000, readOnly: false)
+    
     init()
     {
+        MemoryManager.map(device: mainRAM, sourceOffset: 0, destinationStart: 0x0000, length: 0x8000, writable: true, label: "Main RAM")       // 32K System RAM
+        MemoryManager.map(device: basicROM , sourceOffset: 0, destinationStart: 0x8000, length: 0x4000, writable: false, label: "BASIC")    // 16K BASIC ROM
+        MemoryManager.map(device: pakROM, sourceOffset: 0, destinationStart: 0xC000, length: 0x2000, writable: false, label: "PAK")       // 8K Optional ROM
+        MemoryManager.map(device: netROM , sourceOffset: 0, destinationStart: 0xE000, length: 0x1000, writable: false, label: "Net"  )      // 4K Net ROM
+        MemoryManager.map(device: videoRAM, sourceOffset: 0, destinationStart: 0xF000, length: 0x800, writable: true, label: "Video" )       // 2K Video RAM
+        MemoryManager.map(device: pcgRAM , sourceOffset: 0, destinationStart: 0xF800, length: 0x800, writable: true, label: "PCG")        // 2K PCG RAM
+        MemoryManager.map(device: colourRAM, sourceOffset: 0, destinationStart: 0xF800, length: 0x800, writable: true, label: "Colour")      // 2K Colour RAM
+        MemoryManager.map(device: fontROM , sourceOffset: 0, destinationStart: 0xF000, length: 0x1000, writable: false, label: "Font")     // 4K Font ROM
+        
+        videoRAM.load([128,129,130,131,132,133,134,135,
+                       136,137,138,139,140,141,142,143])  // doesn't load at any offset
+        
         MOS6545.SetCursorDutyCycle()
         VDURAM.LoadMemoryFromArray(MemoryAddress : 88,
                                    MemoryData :  [Character("W").asciiValue!,Character("e").asciiValue!,Character("l").asciiValue!,Character("c").asciiValue!,Character("o").asciiValue!,Character("m").asciiValue!,Character("e").asciiValue!,Character(" ").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!,Character(" ").asciiValue!,Character("N").asciiValue!,Character("o").asciiValue!,Character("v").asciiValue!,Character("a").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!])
