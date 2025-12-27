@@ -7,13 +7,13 @@ Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.mi
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/9c6fc378-3184-44ff-a0e7-11361103483c"/>
 </div>
 
-It runs on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe ( Intel and Apple Silicon ).
+It runs on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe.
 
 Universal binaries can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
 
 At some point,  I may build iOS and iPadOS versions off the same codebase.
 
-And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly ( though unlikely to be written in Swift ) 
+And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 
 ## Ackowledgements
 
@@ -39,15 +39,19 @@ This emulator is still in what could charitably called *alpha* status.
   - Supports selection of Character ROM address.
   - Supports selection of cursor start and end scanline.
   - Supports cursor flash mode ( On/Off/slow flash/fast flash ).
+* Working MMU has been implemented
+  - An arbitrary number of memory devices can be defined
+  - Each memory device can be tagged as read-only or read/write
+  - Devices can be switched into and out of memory ranges in RAM
+  - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram into memory
 * Splash screen displaying the application logo as PCG characters
 
 ## On the to-do list
 
-* Refactor the MMU unit.
-  - Needs to support bank switching for font ROM, PCG RAM and colour RAM
+* Bank switching code to access font rom and colour ram
+* Colour support in shader
 * Full emulator of Z80 including undocumented instructions
 * Capture keyboard input
-* Colour support
 * Cassette load/save functionality
 * Sound output
 
