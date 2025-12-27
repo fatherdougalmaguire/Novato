@@ -63,7 +63,7 @@ This emulator is still in what could charitably called *alpha* status.
 
 ### Status window
 
-<img width="2024" height="1402" alt="image" src="https://github.com/user-attachments/assets/c1e3d2a7-12fe-4920-88c1-a79f214a0603" />
+<img width="2264" height="1456" alt="image" src="https://github.com/user-attachments/assets/4e50c089-6906-4af5-9bbb-53c3ab0ed5eb" />
 
 ## Demo Screens
 
