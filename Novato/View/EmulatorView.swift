@@ -70,7 +70,7 @@ struct EmulatorView: View
             VStack {
                 Rectangle()
                     .frame(width: baseWidth, height: baseHeight, alignment: .center)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(cursorFlashLimit),.float(phosphorColour),.floatArray(vm.VDU),.floatArray(vm.CharRom)))
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(cursorFlashLimit),.float(phosphorColour),.floatArray(vm.VDU),.floatArray(vm.CharRom),.floatArray(vm.PcgRam),.floatArray(vm.ColourRam)))
                     .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
                     .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
                 HStack

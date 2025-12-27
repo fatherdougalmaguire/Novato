@@ -124,7 +124,7 @@ struct Registers
     var IY : UInt16 = 0         // Index Register IY - 16 bit
     
     var SP : UInt16 = 0xFFFF    // Stack Pointer - 16 bit
-    var PC : UInt16 = 0x0000    // Program Counter - 16 bit
+    var PC : UInt16 = 0x0000  // Program Counter - 16 bit
 }
 
 struct CPUState
@@ -167,6 +167,8 @@ struct CPUState
     let memoryDump : [UInt8]
     let VDU : [Float]
     let CharRom : [Float]
+    var PcgRam: [Float]
+    var ColourRam : [Float]
     
     let vmR1_HorizDisplayed : UInt8
     let vmR6_VertDisplayed : UInt8

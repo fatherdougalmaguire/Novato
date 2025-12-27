@@ -56,72 +56,51 @@ actor Z80CPU
 
     var MOS6545 = CRTC()
     
-    var AddressSpace = MMU(MemorySize : 0x10000, MemoryValue : 0x00)
-    var VDURAM = MMU(MemorySize : 0x800, MemoryValue : 0x20)
-    var CharGenROM = MMU(MemorySize : 0x1000, MemoryValue : 0x00)
-    
-    let MemoryManager = MemoryMapper()
+    var mmu = memoryMapper()
 
-    let mainRAM = MemoryBlock(size: 0x8000, readOnly: true)
-    let basicROM = MemoryBlock(size: 0x4000, readOnly: false)
-    let pakROM = MemoryBlock(size: 0x2000, readOnly: false)
-    let netROM = MemoryBlock(size: 0x1000, readOnly: false)
-    let videoRAM = MemoryBlock(size: 0x800, readOnly: true)
-    let pcgRAM = MemoryBlock(size: 0x800, readOnly: true)
-    let colourRAM = MemoryBlock(size: 0x800, readOnly: true)
-    let fontROM = MemoryBlock(size: 0x1000, readOnly: false)
+    var mainRAM = memoryBlock(size: 0x8000, label: "mainRAM")
+    var basicROM = memoryBlock(size: 0x4000, deviceType : .ROM, label: "basicROM")
+    var wordbeeROM = memoryBlock(size: 0x2000, deviceType : .ROM, label: "wordbeeROM")
+    var netROM = memoryBlock(size: 0x1000, deviceType : .ROM, label: "netROM")
+    var videoRAM = memoryBlock(size: 0x800, label: "videoRAM", fillValue: 0x20)
+    var pcgRAM = memoryBlock(size: 0x800, label: "pcgRAM")
+    var colourRAM = memoryBlock(size: 0x800,  label: "colourRAM")
+    var fontROM = memoryBlock(size: 0x1000, deviceType : .ROM,  label: "fontROM")
     
     init()
     {
-        MemoryManager.map(device: mainRAM, sourceOffset: 0, destinationStart: 0x0000, length: 0x8000, writable: true, label: "Main RAM")       // 32K System RAM
-        MemoryManager.map(device: basicROM , sourceOffset: 0, destinationStart: 0x8000, length: 0x4000, writable: false, label: "BASIC")    // 16K BASIC ROM
-        MemoryManager.map(device: pakROM, sourceOffset: 0, destinationStart: 0xC000, length: 0x2000, writable: false, label: "PAK")       // 8K Optional ROM
-        MemoryManager.map(device: netROM , sourceOffset: 0, destinationStart: 0xE000, length: 0x1000, writable: false, label: "Net"  )      // 4K Net ROM
-        MemoryManager.map(device: videoRAM, sourceOffset: 0, destinationStart: 0xF000, length: 0x800, writable: true, label: "Video" )       // 2K Video RAM
-        MemoryManager.map(device: pcgRAM , sourceOffset: 0, destinationStart: 0xF800, length: 0x800, writable: true, label: "PCG")        // 2K PCG RAM
-        MemoryManager.map(device: colourRAM, sourceOffset: 0, destinationStart: 0xF800, length: 0x800, writable: true, label: "Colour")      // 2K Colour RAM
-        MemoryManager.map(device: fontROM , sourceOffset: 0, destinationStart: 0xF000, length: 0x1000, writable: false, label: "Font")     // 4K Font ROM
-        
-        videoRAM.load([128,129,130,131,132,133,134,135,
-                       136,137,138,139,140,141,142,143])  // doesn't load at any offset
+        mmu.map(readDevice: [mainRAM], writeDevice: [mainRAM], memoryLocation: 0x0000)       // 32K System RAM
+        mmu.map(readDevice: [basicROM], writeDevice: [basicROM], memoryLocation: 0x8000)      // 16K BASIC ROM
+        mmu.map(readDevice: [wordbeeROM], writeDevice: [wordbeeROM] , memoryLocation: 0xC000)    // 8K Optional ROM
+        mmu.map(readDevice: [netROM], writeDevice: [netROM], memoryLocation: 0xE000)        // 4K Net ROM
+        mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)      // 2K Video RAM
+        mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // 2K PCG RAM
         
         MOS6545.SetCursorDutyCycle()
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 88,
-                                   MemoryData :  [Character("W").asciiValue!,Character("e").asciiValue!,Character("l").asciiValue!,Character("c").asciiValue!,Character("o").asciiValue!,Character("m").asciiValue!,Character("e").asciiValue!,Character(" ").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!,Character(" ").asciiValue!,Character("N").asciiValue!,Character("o").asciiValue!,Character("v").asciiValue!,Character("a").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 280,
-                                   MemoryData :  [128,129,130,131,132,133,134,135,
-                                                  136,137,138,139,140,141,142,143])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 344,
-                                   MemoryData :  [144,145,146,147,148,149,150,151,
-                                                  152,153,154,155,156,157,158,159])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 408,
-                                   MemoryData :  [160,161,162,163,164,165,166,167,
-                                                  168,169,170,171,172,173,174,175])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 472,
-                                   MemoryData :  [176,177,178,179,180,181,182,183,
-                                                  184,185,186,187,188,189,190,191])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 536,
-                                   MemoryData :  [192,193,194,195,196,197,198,199,
-                                                  200,201,202,203,204,205,206,207])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 600,
-                                   MemoryData :  [208,209,210,211,212,213,214,215,
-                                                  216,217,218,219,220,221,222,223])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 664,
-                                   MemoryData :  [224,225,226,227,228,229,230,231,
-                                                  232,233,234,235,236,237,238,239])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 728,
-                                   MemoryData :  [240,241,242,243,244,245,246,247,
-                                                  248,249,250,251,252,253,254,255])
-        VDURAM.LoadMemoryFromArray(MemoryAddress : 923,
-                                   MemoryData :  [Character("P").asciiValue!,Character("r").asciiValue!,Character("e").asciiValue!,Character("s").asciiValue!,Character("s").asciiValue!,Character(" ").asciiValue!,Character("S").asciiValue!,Character("t").asciiValue!,Character("a").asciiValue!,Character("r").asciiValue!,Character("t").asciiValue!])
-        AddressSpace.memory[0xf000...0xf7ff] = VDURAM.memory[0...0x7ff]
-        AddressSpace.LoadROM(FileName: "basic_5.22e", FileExtension: "rom",MemoryAddress : 0x8000)
-        AddressSpace.LoadROM(FileName: "wordbee_1.2", FileExtension: "rom",MemoryAddress : 0xC000)
-        AddressSpace.LoadROM(FileName: "telcom_1.0", FileExtension: "rom",MemoryAddress : 0xE000)
-        CharGenROM.LoadROM(FileName: "charrom", FileExtension: "bin", MemoryAddress : 0x0000)
-        AddressSpace.LoadROM(FileName: "hello", FileExtension: "bin",MemoryAddress : 0x0000)
-        CharGenROM.LoadMemoryFromArray(MemoryAddress : 2048,
-                                   MemoryData :
+        videoRAM.fillMemoryFromArray(memValues: [Character("W").asciiValue!,Character("e").asciiValue!,Character("l").asciiValue!,Character("c").asciiValue!,Character("o").asciiValue!,Character("m").asciiValue!,Character("e").asciiValue!,Character(" ").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!,Character(" ").asciiValue!,Character("N").asciiValue!,Character("o").asciiValue!,Character("v").asciiValue!,Character("a").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!], memOffset : 88)
+        videoRAM.fillMemoryFromArray(memValues :  [128,129,130,131,132,133,134,135,
+                                                  136,137,138,139,140,141,142,143], memOffset : 280)
+        videoRAM.fillMemoryFromArray(memValues :  [144,145,146,147,148,149,150,151,
+                                                  152,153,154,155,156,157,158,159], memOffset : 344)
+        videoRAM.fillMemoryFromArray(memValues :  [160,161,162,163,164,165,166,167,
+                                                  168,169,170,171,172,173,174,175], memOffset : 408)
+        videoRAM.fillMemoryFromArray(memValues :  [176,177,178,179,180,181,182,183,
+                                                  184,185,186,187,188,189,190,191], memOffset : 472)
+        videoRAM.fillMemoryFromArray(memValues :  [192,193,194,195,196,197,198,199,
+                                                  200,201,202,203,204,205,206,207], memOffset : 536)
+        videoRAM.fillMemoryFromArray(memValues :  [208,209,210,211,212,213,214,215,
+                                                  216,217,218,219,220,221,222,223], memOffset : 600)
+        videoRAM.fillMemoryFromArray(memValues :  [224,225,226,227,228,229,230,231,
+                                                  232,233,234,235,236,237,238,239], memOffset : 664)
+        videoRAM.fillMemoryFromArray(memValues :  [240,241,242,243,244,245,246,247,
+                                                  248,249,250,251,252,253,254,255], memOffset : 728)
+        videoRAM.fillMemoryFromArray(memValues :  [Character("P").asciiValue!,Character("r").asciiValue!,Character("e").asciiValue!,Character("s").asciiValue!,Character("s").asciiValue!,Character(" ").asciiValue!,Character("S").asciiValue!,Character("t").asciiValue!,Character("a").asciiValue!,Character("r").asciiValue!,Character("t").asciiValue!], memOffset : 923)
+        basicROM.fillMemoryFromFile(FileName: "basic_5.22e", FileExtension: "rom")
+        wordbeeROM.fillMemoryFromFile(FileName: "wordbee_1.2", FileExtension: "rom")
+        netROM.fillMemoryFromFile(FileName: "telcom_1.0", FileExtension: "rom")
+        fontROM.fillMemoryFromFile(FileName: "charrom", FileExtension: "bin")
+        mainRAM.fillMemoryFromFile(FileName: "hello", FileExtension: "bin")
+        pcgRAM.fillMemoryFromArray(memValues :
                                         [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -257,9 +236,7 @@ actor Z80CPU
 
     func ClearVideoMemory()
     {
-      VDURAM.memory = Array(repeating: 0x20, count: 0x800)
-      AddressSpace.memory[0xf000...0xf7ff] = VDURAM.memory[0...0x7ff]
-      CharGenROM.LoadROM(FileName: "charrom", FileExtension: "bin", MemoryAddress : 0x0000)
+        videoRAM.fillMemory(memValue : 0x20)
     }
     
     func start()
@@ -299,10 +276,10 @@ actor Z80CPU
 
     private func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
     {
-        return ( opcode1 : AddressSpace.ReadMemory(MemoryAddress : ProgramCounter),
-                 opcode2 : AddressSpace.ReadMemory(MemoryAddress : IncrementRegPair(BaseValue : ProgramCounter,Increment : 1)),
-                 opcode3 : AddressSpace.ReadMemory(MemoryAddress : IncrementRegPair(BaseValue : ProgramCounter,Increment : 2)),
-                 opcode4 : AddressSpace.ReadMemory(MemoryAddress : IncrementRegPair(BaseValue : ProgramCounter,Increment : 3))
+        return ( opcode1 : mmu.readByte(address: ProgramCounter),
+                 opcode2 : mmu.readByte(address: IncrementRegPair(BaseValue : ProgramCounter,Increment : 1)),
+                 opcode3 : mmu.readByte(address: IncrementRegPair(BaseValue : ProgramCounter,Increment : 2)),
+                 opcode4 : mmu.readByte(address: IncrementRegPair(BaseValue : ProgramCounter,Increment : 3))
                 )
     }
 
@@ -420,11 +397,7 @@ actor Z80CPU
             emulatorHalted = true
         case 0x77: // LD (HL), A
             print("Executed LD (HL), A @ "+String(format:"%04X",registers.PC))
-            if (0xF000...0xF7FF).contains(registers.HL)
-            {
-                VDURAM.WriteMemory(MemoryAddress : registers.HL-0xF000, MemoryValue : registers.A)
-            }
-            AddressSpace.WriteMemory(MemoryAddress : registers.HL, MemoryValue : registers.A)
+            mmu.writeByte(address: registers.HL, value: registers.A)
             registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
         case 0x78: // LD A, B
             print("Executed LD A, B @ "+String(format:"%04X",registers.PC))
@@ -562,8 +535,7 @@ actor Z80CPU
                 }
                 while registers.BC > 0
                 {
-                    AddressSpace.WriteMemory(MemoryAddress : registers.DE, MemoryValue : AddressSpace.ReadMemory(MemoryAddress : registers.HL))
-                    VDURAM.WriteMemory(MemoryAddress : registers.DE-0xF000, MemoryValue : AddressSpace.ReadMemory(MemoryAddress : registers.HL))
+                    mmu.writeByte(address: registers.DE, value : mmu.readByte(address: registers.HL))
                     registers.HL = IncrementRegPair(BaseValue:registers.HL,Increment:1)
                     registers.DE = IncrementRegPair(BaseValue:registers.DE,Increment:1)
                     registers.BC = DecrementRegPair(BaseValue:registers.BC,Decrement:1)
@@ -618,54 +590,6 @@ actor Z80CPU
 
     func getState() async -> CPUState
     {
-        guard Int(registers.PC)+0x0ff < 0x10000
-        else
-        {
-            return CPUState( PC: registers.PC,
-                             SP: registers.SP,
-                             BC : registers.BC,
-                             DE : registers.DE,
-                             HL : registers.HL,
-                             AltBC : registers.AltBC,
-                             AltDE : registers.AltDE,
-                             AltHL : registers.AltHL,
-                             IX : registers.IX,
-                             IY : registers.IY,
-                             I: registers.I,
-                             R: registers.R,
-                             A: registers.A,
-                             F: registers.F,
-                             B: registers.B,
-                             C: registers.C,
-                             D: registers.D,
-                             E: registers.E,
-                             H: registers.H,
-                             L: registers.L,
-                             AltA: registers.AltA,
-                             AltF: registers.AltF,
-                             AltB: registers.AltB,
-                             AltC: registers.AltC,
-                             AltD: registers.AltD,
-                             AltE: registers.AltE,
-                             AltH: registers.AltH,
-                             AltL: registers.AltL,
-                             memoryDump: Array(AddressSpace.memory[Int(registers.PC)..<0xffff]),
-                             VDU : VDURAM.memory.map { Float($0) },
-                             CharRom : CharGenROM.memory.map { Float($0) },
-                             
-                             vmR1_HorizDisplayed : MOS6545.ReadRegister(RegNum: 1),
-                             vmR6_VertDisplayed : MOS6545.ReadRegister(RegNum: 6),
-                             vmR9_ScanLinesMinus1 : MOS6545.ReadRegister(RegNum: 9),
-                             vmR10_CursorStartAndBlinkMode : MOS6545.ReadRegister(RegNum: 10),
-                             vmR11_CursorEnd : MOS6545.ReadRegister(RegNum: 11),
-                             vmR12_DisplayStartAddrH : MOS6545.ReadRegister(RegNum: 12),
-                             vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
-                             vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
-                             vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
-                             vmCursorBlinkCounter: MOS6545.crtcRegisters.CursorBlinkCounter,
-                             vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit
-            )
-        }
         return CPUState( PC: registers.PC,
                          SP: registers.SP,
                          BC : registers.BC,
@@ -695,10 +619,12 @@ actor Z80CPU
                          AltH: registers.AltH,
                          AltL: registers.AltL,
                          
-                         memoryDump: Array(AddressSpace.memory[Int(registers.PC)..<Int(registers.PC)+0x0ff]),
-                         VDU : VDURAM.memory.map { Float($0) },
-                         CharRom : CharGenROM.memory.map { Float($0) },
-        
+                         memoryDump: mmu.memorySlice(address: registers.PC, size: 0x100),
+                         VDU : videoRAM.bufferTransform(),
+                         CharRom : fontROM.bufferTransform(),
+                         PcgRam : pcgRAM.bufferTransform(),
+                         ColourRam : colourRAM.bufferTransform(),
+                             
                          vmR1_HorizDisplayed : MOS6545.ReadRegister(RegNum: 1),
                          vmR6_VertDisplayed : MOS6545.ReadRegister(RegNum: 6),
                          vmR9_ScanLinesMinus1 : MOS6545.ReadRegister(RegNum: 9),
@@ -710,7 +636,7 @@ actor Z80CPU
                          vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
                          vmCursorBlinkCounter: MOS6545.crtcRegisters.CursorBlinkCounter,
                          vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit
-        )
+            )
     }
 }
 

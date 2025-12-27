@@ -182,7 +182,7 @@ struct DebugView: View
                             { row in
                                 let address = row * 16
                                 let bytes = vm.memoryDump[address..<address+16]
-                                let dispaddress = Int(vm.pcReg)+address
+                                let dispaddress = vm.pcReg &+ UInt16(address)
                                 let hexBytes = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
                                 let charBytes = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
                                 Text(String(format: "0x%04X: %@ %@", dispaddress, hexBytes,charBytes))

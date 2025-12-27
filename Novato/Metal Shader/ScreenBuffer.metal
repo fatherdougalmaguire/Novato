@@ -1,15 +1,17 @@
 #include <metal_stdlib>
 using namespace metal;
 
-[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float CursorBlinkCounter, float CursorFlashLimit, float PhosphorColour, device const float *screenram, int screenramsize, device const float *pcgchar, int pcgcharsize)
+[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float CursorBlinkCounter, float CursorFlashLimit, float PhosphorColour, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize)
 {
     half4 ForegroundColour;
     half4 BackgroundColour;
     int screenpos;
-    int pcgpos;
+    int fontpos;
     int xcursor;
     int ycursor;
     bool pixelset;
+    
+    int pixelLocation;
     
     const int CellWidth = 8;            // each character in font ROM is 8 pixels wide
     const int CellHeight = 16;          // each character in font ROM is 16 pixels high
@@ -47,11 +49,22 @@ using namespace metal;
     xcursor = int(position.x) % CellWidth;              // calculate x pixel position in cell
         
     screenpos = trunc(position.y/int(ScanLineHeight))*int(DisplayColumns)+trunc(position.x/CellWidth);  // return linear co-ordinates of character location based on pixel position
-    pcgpos = int(FontLocationOffset)+int(screenram[screenpos])*CellHeight+int(ycursor);                 // return linear co-ordinates of font rom data
+    //fontpos = int(FontLocationOffset)+int(screenram[screenpos])*CellHeight+int(ycursor);                 // return linear co-ordinates of font rom data
     
     int bitmask = (128 >> int(xcursor));
     
-    if ((int(pcgchar[pcgpos]) & bitmask)  > 0 )  // test for pixel set in character definition in font rom
+    if (screenram[screenpos] < 128)
+    {
+        fontpos = int(FontLocationOffset)+int(screenram[screenpos])*CellHeight+int(ycursor);
+        pixelLocation = int(fontrom[fontpos]);
+    }
+    else
+    {
+        fontpos = int(screenram[screenpos]-128)*CellHeight+int(ycursor);
+        pixelLocation = int(pcgram[fontpos]);
+    }
+    
+    if ( (pixelLocation & bitmask)  > 0 )  // test for pixel set in character definition in font rom/pcg ram
     {
         pixelset = true;
     }
