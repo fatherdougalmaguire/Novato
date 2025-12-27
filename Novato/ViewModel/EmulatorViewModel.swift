@@ -42,6 +42,8 @@ class EmulatorViewModel
     var memoryDump: [UInt8] = []
     var VDU: [Float] = []
     var CharRom : [Float] = []
+    var PcgRam: [Float] = []
+    var ColourRam : [Float] = []
     
     var vmR1_HorizDisplayed : UInt8 = 0
     var vmR6_VertDisplayed : UInt8 = 0
@@ -128,6 +130,8 @@ class EmulatorViewModel
                 self.memoryDump = state.memoryDump
                 self.VDU = state.VDU
                 self.CharRom = state.CharRom
+                self.PcgRam = state.PcgRam
+                self.ColourRam = state.ColourRam
                 
                 self.vmR1_HorizDisplayed = state.vmR1_HorizDisplayed
                 self.vmR6_VertDisplayed = state.vmR6_VertDisplayed

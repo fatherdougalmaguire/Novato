@@ -3,15 +3,7 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "closure #1 in closure #1 in closure #1 in closure #3 in closure #1 in DebugView.body.getter:DebugView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "vm.memoryDump.count">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "Z80CPU.execute(opcodes:):Z80CPU.swift">
+         contextName = "Registers.HL.setter:Registers.swift">
       </ContextState>
       <ContextState
          contextName = "CRTC.SetCursorDutyCycle():CRTC.swift">
@@ -28,24 +20,12 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
-      </ContextState>
-      <ContextState
-         contextName = "CRTC.WriteRegister(RegNum:RegValue:):CRTC.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
-      </ContextState>
-      <ContextState
          contextName = "EmulatorView.VDURam(_:_:):EmulatorView.swift">
          <PersistentStrings>
             <PersistentString
                value = "(myrow*64)+mycol+0xf000">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "Registers.HL.setter:Registers.swift">
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
@@ -56,7 +36,33 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "CRTC.WriteRegister(RegNum:RegValue:):CRTC.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in closure #1 in closure #3 in closure #1 in DebugView.body.getter:DebugView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "vm.memoryDump.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "memoryBlock.fillMemoryFromArray(memValues:memOffset:):MMU.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Z80CPU.execute(opcodes:):Z80CPU.swift">
+      </ContextState>
+      <ContextState
          contextName = "EmulatorView.VDUoutput(_:_:):EmulatorView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Z80CPU.init():Z80CPU.swift">
+      </ContextState>
+      <ContextState
+         contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>
