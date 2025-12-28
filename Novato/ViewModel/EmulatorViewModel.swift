@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 @Observable
-class EmulatorViewModel
+final class EmulatorViewModel
 {
     var aReg   : UInt8 = 0
     var bReg   : UInt8 = 0
@@ -54,8 +54,15 @@ class EmulatorViewModel
     var vmR13_DisplayStartAddrL : UInt8 = 0
     var vmR14_CursorPositionH : UInt8 = 0
     var vmR15_CursorPositionL : UInt8 = 0
+    
     var vmCursorBlinkCounter: Int = 0
     var vmCursorFlashLimit  : Int = 0
+    
+    var vmRedBackgroundIntensity : UInt8 = 0
+    var vmGreenBackgroundIntensity : UInt8 = 0
+    var vmBlueBackgroundIntensity : UInt8 = 0
+    
+    var vmColourMode : UInt8 = 0
     
     private let cpu: Z80CPU
 
@@ -142,8 +149,16 @@ class EmulatorViewModel
                 self.vmR13_DisplayStartAddrL = state.vmR13_DisplayStartAddrL
                 self.vmR14_CursorPositionH = state.vmR14_CursorPositionH
                 self.vmR15_CursorPositionL = state.vmR15_CursorPositionL
+                
                 self.vmCursorBlinkCounter = state.vmCursorBlinkCounter
                 self.vmCursorFlashLimit = state.vmCursorFlashLimit
+                
+                self.vmRedBackgroundIntensity = state.vmRedBackgroundIntensity
+                self.vmGreenBackgroundIntensity = state.vmGreenBackgroundIntensity
+                self.vmBlueBackgroundIntensity = state.vmBlueBackgroundIntensity
+                
+                self.vmColourMode = state.vmColourMode
+                
             }
         }
     }

@@ -30,7 +30,6 @@ struct EmulatorView: View
         
     let charScale : CGFloat = 2             // Scale for visibility on 27" screen ( 2560 x 1440 )
     let charAspect : CGFloat = 4/3          // Correction for CRT aspect ratio
-    let phosphorColour : Float = 1          // 0 - green, 1 - amber, 2 - white, 3 - blue else black on white
     
     var body: some View
     {
@@ -57,8 +56,11 @@ struct EmulatorView: View
         let cursorBlinkType = Float(Int(vm.vmR10_CursorStartAndBlinkMode >> 5))
         let fontLocationOffset = Float(Int(vm.vmR12_DisplayStartAddrH) << 8 | Int(vm.vmR13_DisplayStartAddrL))
         let cursorPosition = Float(Int(vm.vmR14_CursorPositionH) << 8 | Int(vm.vmR15_CursorPositionL))
+        
         let cursorBlinkCounter = Float(vm.vmCursorBlinkCounter)
         let cursorFlashLimit = Float(vm.vmCursorFlashLimit) / 2
+        
+        let colourMode = Float(vm.vmColourMode)
 
         let baseWidth = max(CGFloat(frameWidth), 1)
         let baseHeight = max(CGFloat(frameHeight), 1)
@@ -70,7 +72,7 @@ struct EmulatorView: View
             VStack {
                 Rectangle()
                     .frame(width: baseWidth, height: baseHeight, alignment: .center)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(cursorFlashLimit),.float(phosphorColour),.floatArray(vm.VDU),.floatArray(vm.CharRom),.floatArray(vm.PcgRam),.floatArray(vm.ColourRam)))
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(cursorFlashLimit),.float(colourMode),.floatArray(vm.VDU),.floatArray(vm.CharRom),.floatArray(vm.PcgRam),.floatArray(vm.ColourRam)))
                     .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
                     .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
                 HStack

@@ -182,6 +182,13 @@ struct CPUState
     
     let vmCursorBlinkCounter : Int
     let vmCursorFlashLimit  : Int
+    
+    let vmRedBackgroundIntensity : UInt8
+    let vmGreenBackgroundIntensity : UInt8
+    let vmBlueBackgroundIntensity : UInt8
+    
+    let vmColourMode : UInt8
+    
 }
 
 enum Z80Flags : UInt8
@@ -195,7 +202,6 @@ enum Z80Flags : UInt8
     case Zero = 0x40                // 01000000
     case Sign = 0x80                // 10000000
 }
-
 
 struct CRTCRegisters
 {
@@ -222,8 +228,14 @@ struct CRTCRegisters
     
     var StatusRegister : UInt8 = 0b10000000
     
-    var CursorBlinkCounter : Int = 0
-    var CursorFlashLimit : Int = 5000                              // Initial setting for base cursor flash limit - approx 0.5 sec duty cycle on Apple Silicon M2
+    var CursorBlinkCounter : Int = 0                                    // Counter for cursor blinks
+    var CursorFlashLimit : Int = 5000                                   // Initial setting for base cursor flash limit - approx 0.5 sec duty cycle on Apple Silicon M2
+    
+    var redBackgroundIntensity : UInt8 = 0x00                           // red background intensity 0 = half 1 = full
+    var greenBackgroundIntensity : UInt8 = 0x00                         // green background intensity 0 = half 1 = full
+    var blueBackgroundIntensity : UInt8 = 0x00                          // blue background intensity 0 = half 1 = full
+    
+    var colourMode : UInt8 = 0x04                                       // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black else colour mode
 }
 
 

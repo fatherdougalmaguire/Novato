@@ -229,6 +229,22 @@ actor Z80CPU
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+        colourRAM.fillMemoryFromArray(memValues :  [0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,0,1,2,3,4,5,6,7,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,
+                                                    16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23,16,17,18,19,20,21,22,23])
     }
 
     private(set) var isRunning = false
@@ -343,6 +359,12 @@ actor Z80CPU
     {
         let result = FlagRegister & Flag.rawValue
         return result
+    }
+    
+    func testBit (value: UInt8, bitPosition : UInt8  ) -> Bool
+    
+    {
+        return (value & (1 << bitPosition)) != 0
     }
 
     private func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8))
@@ -461,8 +483,53 @@ actor Z80CPU
             ports[Int(opcodes.opcode2)] = registers.A
             switch opcodes.opcode2
             {
+                case 0x08:
+                    if testBit(value: registers.A, bitPosition: 1)
+                    {
+                        MOS6545.crtcRegisters.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                    }
+                    if !testBit(value: registers.A, bitPosition: 1)
+                    {
+                        MOS6545.crtcRegisters.redBackgroundIntensity = 1 // set global background red intensity to 0 = half
+                    }
+                    if testBit(value: registers.A, bitPosition: 2)
+                    {
+                        MOS6545.crtcRegisters.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
+                    }
+                    if !testBit(value: registers.A, bitPosition: 2)
+                    {
+                        MOS6545.crtcRegisters.greenBackgroundIntensity = 1 // set global background blue intensity to 0 = half
+                    }
+                    if testBit(value: registers.A, bitPosition: 3)
+                    {
+                        MOS6545.crtcRegisters.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
+                    }
+                    if !testBit(value: registers.A, bitPosition: 3)
+                    {
+                        MOS6545.crtcRegisters.blueBackgroundIntensity = 1 // set global background green intensity to 0 = half
+                    }
+                    if testBit(value: registers.A, bitPosition: 6)
+                    {
+                        mmu.map(readDevice: [colourRAM], writeDevice: [colourRAM], memoryLocation: 0xF800)  // swap in colour ram
+                    }
+                    if !testBit(value: registers.A, bitPosition: 6)
+                    {
+                        mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // swap in pcg ram
+                    }
+                case 0x0A: break //PAK N selection - need some mechanism to map PAK number to memory device
+                case 0x0B:
+                    if registers.A == 0
+                    {
+                        mmu.map(readDevice: [fontROM], writeDevice: [videoRAM,pcgRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                    }
+                    if registers.A == 0
+                    {
+                        mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                        mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
+                    }
                 case 0x0C: break // writing to port 0x0C needs no further processing
                 case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+                
                 default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
             }
         
@@ -485,6 +552,9 @@ actor Z80CPU
             registers.A = ports[Int(opcodes.opcode2)]
             switch opcodes.opcode2
             {
+                case 0x08: break // registers.A contains value of colour control port
+                case 0x0A: break // NET selection INPUT from port - whatever this means
+                case 0x0B: break // registers.A contains value of font rom control port
                 case 0x0C: registers.A = MOS6545.ReadStatusRegister()
                 case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
                 default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
@@ -634,8 +704,16 @@ actor Z80CPU
                          vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
                          vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
                          vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
+                         
                          vmCursorBlinkCounter: MOS6545.crtcRegisters.CursorBlinkCounter,
-                         vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit
+                         vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit,
+                         
+                         vmRedBackgroundIntensity: MOS6545.crtcRegisters.redBackgroundIntensity,
+                         vmGreenBackgroundIntensity: MOS6545.crtcRegisters.greenBackgroundIntensity,
+                         vmBlueBackgroundIntensity: MOS6545.crtcRegisters.blueBackgroundIntensity,
+                         
+                         vmColourMode: MOS6545.crtcRegisters.colourMode
+                         
             )
     }
 }
