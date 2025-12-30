@@ -66,13 +66,15 @@ struct EmulatorView: View
         let baseHeight = max(CGFloat(frameHeight), 1)
         let scaledWidth = baseWidth * charScale * frameXScale
         let scaledHeight = baseHeight * charScale * charAspect * frameYScale
+        
+        let backGroundIntensity = Float(vm.vmRedBackgroundIntensity << 2 + vm.vmGreenBackgroundIntensity << 1 + vm.vmBlueBackgroundIntensity)
 
         ZStack {
             Color.white
             VStack {
                 Rectangle()
                     .frame(width: baseWidth, height: baseHeight, alignment: .center)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(cursorFlashLimit),.float(colourMode),.floatArray(vm.VDU),.floatArray(vm.CharRom),.floatArray(vm.PcgRam),.floatArray(vm.ColourRam)))
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float( cursorBlinkCounter),.float(cursorFlashLimit),.float(colourMode),.float(backGroundIntensity),.floatArray(vm.VDU),.floatArray(vm.CharRom),.floatArray(vm.PcgRam),.floatArray(vm.ColourRam)))
                     .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
                     .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
                 HStack
