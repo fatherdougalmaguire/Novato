@@ -3,6 +3,14 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "memoryMapper.readByte(address:):MMU.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "addr==">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "Registers.HL.setter:Registers.swift">
       </ContextState>
       <ContextState
@@ -36,6 +44,12 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "EmulatorView.body.getter:EmulatorView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "memoryMapper.writeByte(address:value:):MMU.swift">
+      </ContextState>
+      <ContextState
          contextName = "closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
       </ContextState>
       <ContextState
@@ -54,6 +68,14 @@
       </ContextState>
       <ContextState
          contextName = "Z80CPU.execute(opcodes:):Z80CPU.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "mmu.readByte(address: registers.HL)">
+            </PersistentString>
+            <PersistentString
+               value = "registers.de == 63783">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "EmulatorView.VDUoutput(_:_:):EmulatorView.swift">

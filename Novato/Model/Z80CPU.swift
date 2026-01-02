@@ -229,7 +229,7 @@ actor Z80CPU
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-            colourRAM.fillMemory(memValue: 39)
+            colourRAM.fillMemory(memValue: 2)
     }
 
     private(set) var isRunning = false
@@ -275,45 +275,13 @@ actor Z80CPU
         stepTask?.cancel()
     }
 
-    private func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
+    func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
     {
         return ( opcode1 : mmu.readByte(address: ProgramCounter),
-                 opcode2 : mmu.readByte(address: IncrementRegPair(BaseValue : ProgramCounter,Increment : 1)),
-                 opcode3 : mmu.readByte(address: IncrementRegPair(BaseValue : ProgramCounter,Increment : 2)),
-                 opcode4 : mmu.readByte(address: IncrementRegPair(BaseValue : ProgramCounter,Increment : 3))
+                 opcode2 : mmu.readByte(address: ProgramCounter &+ 1),
+                 opcode3 : mmu.readByte(address: ProgramCounter &+ 2),
+                 opcode4 : mmu.readByte(address: ProgramCounter &+ 3)
                 )
-    }
-
-    func IncrementRegPair ( BaseValue  : UInt16, Increment : UInt16 ) -> UInt16
-    
-    {
-        return BaseValue &+ Increment
-    }
-    
-    func DecrementRegPair ( BaseValue  : UInt16, Decrement : UInt16 ) -> UInt16
-    
-    {
-        return BaseValue &- Decrement
-    }
-    
-    func IncrementReg ( BaseValue  : UInt8, Increment : UInt8 ) -> UInt8
-    
-    {
-        return BaseValue &+ Increment
-        // flag code goes here
-    }
-    
-    func DecrementReg ( BaseValue  : UInt8, Decrement : UInt8 ) -> UInt8
-    
-    {
-        return BaseValue &- Decrement
-        // flag code goes here
-    }
-    
-    func UpdateProgramCounter ( CurrentPC : UInt16, Offset : UInt8 ) -> UInt16
-    
-    {
-     return CurrentPC &+ UInt16(Int8(bitPattern: Offset))
     }
     
     func TestFlags ( FlagRegister : UInt8, Flag : Z80Flags ) -> Bool
@@ -334,206 +302,491 @@ actor Z80CPU
         }
     }
     
-    func SetFlags ( FlagRegister : UInt8, Flag : Z80Flags ) -> UInt8
-    {
-        let result = FlagRegister | Flag.rawValue
-        return result
-    }
-    
-    func ResetFlags ( FlagRegister : UInt8, Flag : Z80Flags ) -> UInt8
-    {
-        let result = FlagRegister & Flag.rawValue
-        return result
-    }
-    
     func testBit (value: UInt8, bitPosition : UInt8  ) -> Bool
-    
     {
         return (value & (1 << bitPosition)) != 0
     }
 
-    private func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8))
+    func returnParity(value: UInt8) -> Bool
+    {
+        var tempValue : UInt8 = value
+        tempValue = tempValue ^ tempValue >> 4
+        tempValue = tempValue ^ tempValue >> 2
+        tempValue = tempValue ^ tempValue >> 1
+        return ((~tempValue) & 1) == 1
+    }
+    
+    func printInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
+    {
+        var instructionString : String = instructionDetails
+        
+        switch values.count
+        {
+            case 1 :
+                instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
+                instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
+            case 2 :
+                instructionString = instructionString.replacingOccurrences(of: "$nn", with: "0x"+String(format:"%04X",UInt16(values[1]) << 8 | UInt16(values[0])))
+                instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
+                instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
+            default: break
+        }
+        
+        let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: ",")
+        print(instructionString+" ["+opcodeString+"] @ 0x"+String(format:"%04X",registers.PC))
+    }
+    
+    func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8))
     {
         switch opcodes.opcode1
         {
-        case 0x00: // NOP
-            print("Executed NOP @ "+String(format:"%04X",registers.PC))
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x01: // LD BC, nn
-            print("Executed LD BC, nn @ "+String(format:"%04X",registers.PC))
+        case 0x00: // NOP - 00 - No operation is performed
+            printInstructionDetails(instructionDetails: "NOP", opcode: [0x00], programCounter: registers.PC)
+  //          registers.PC = registers.PC &+ 1
+        case 0x01: // LD BC,nn - 01 n n - Loads $nn into BC
+            printInstructionDetails(instructionDetails: "LD BC,$nn", opcode: [0x01,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.BC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+            registers.PC = registers.PC &+ 3
+        case 0x02: // LD (BC),A - 02 - Stores A into the memory location pointed to by BC
+            printInstructionDetails(instructionDetails: "LD (BC),A", opcode: [0x02], programCounter: registers.PC)
+            mmu.writeByte(address: registers.BC, value: registers.A)
+            registers.PC = registers.PC &+ 1
+        case 0x03: // INC BC - 03 - Adds one to BC
+            printInstructionDetails(instructionDetails: "INC BE", opcode: [0x03], programCounter: registers.PC)
+            registers.DE = registers.BC &+ 1
+            registers.PC = registers.PC &+ 1
         case 0x04: // INC B
-            print("Unimplemented opcode "+String(format: "%02X", opcodes.opcode1) + " @ "+String(format:"%04X",registers.PC))
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
+            printInstructionDetails(instructionDetails: "INC B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.B = registers.B &+ 1
+//            H    Half-Carry    Set if there was a carry from bit 3 to bit 4 (useful for BCD math).
+//            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.B & 0x80) != 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.B == 0)
+            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcodes.opcode2 & 0x0F)))
+            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcodes.opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+            registers.PC = registers.PC &+ 1
         case 0x05: // DEC B
-            print("Unimplemented opcode "+String(format: "%02X", opcodes.opcode1) + " @ "+String(format:"%04X",registers.PC))
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x11: // LD DE, nn
-            print("Executed LD DE, nn @ "+String(format:"%04X",registers.PC))
-            registers.DE = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
-        case 0x21: // LD HL, nn
-            print("Executed LD HL, nn @ "+String(format:"%04X",registers.PC))
-            registers.HL = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
-        case 0x28: // JR Z,n
-            print("Executed JR Z, n @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            printInstructionDetails(instructionDetails: "DEC B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.B = registers.B &- 1
+//            H    Half-Carry    Set if there was a borrow from bit 4 to bit 3.
+//            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.B & 0x80) != 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.B == 0)
+            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcodes.opcode2 & 0x0F)))
+            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcodes.opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
+            registers.PC = registers.PC &+ 1
+        case 0x06: // LD B,$n - 06 n - Loads $n into B
+            printInstructionDetails(instructionDetails: "LD B,$n", opcode: [0x06,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            registers.B = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x08: // EX AF,AF' - 08 - Adds one to Exchanges the 16-bit contents of AF and AF'
+            printInstructionDetails(instructionDetails: "EX AF,AF'", opcode: [0x08], programCounter: registers.PC)
+            let tempResult = registers.AF
+            registers.AF = registers.AltAF
+            registers.AltAF = tempResult
+            registers.PC = registers.PC &+ 1
+        case 0x0A: // LD A,(BC) - 0A - Loads the value pointed to by BC into A
+            printInstructionDetails(instructionDetails: "LD A,(BC)", opcode: [0x0A], programCounter: registers.PC)
+            registers.A = mmu.readByte(address: registers.BC)
+            registers.PC = registers.PC &+ 1
+        case 0x0B: // DEC BC - 0B - Subtracts one from BC
+            printInstructionDetails(instructionDetails: "DEC BC", opcode: [0x0B], programCounter: registers.PC)
+            registers.BC = registers.BC &- 1
+            registers.PC = registers.PC &+ 1
+        case 0x0E: // LD C,$n - 0E n - Loads n into C
+            printInstructionDetails(instructionDetails: "LD C,$n", opcode: [0x0E,opcodes.opcode2], programCounter: registers.PC)
+            registers.C = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x10: // DJNZ $d - 10 d - The B register is decremented, and if not zero, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode.
+            printInstructionDetails(instructionDetails: "DJNZ $d", opcode: [0x10,opcodes.opcode2], programCounter: registers.PC)
+            registers.B = registers.B &- 1
+            if registers.B != 0
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:opcodes.opcode2+2)
+                let signedOffset = Int8(bitPattern: opcodes.opcode2)
+                let displacement = Int16(signedOffset)
+                registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
             }
             else
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+                registers.PC = registers.PC &+ 2
             }
-        case 0x23: // INC HL
-            print("Executed INC HL @ "+String(format:"%04X",registers.PC))
-            registers.HL = IncrementRegPair(BaseValue:registers.HL,Increment:1)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x3C: // INC A
-            print("Executed INC A @ "+String(format:"%04X",registers.PC))
-            registers.A = IncrementReg(BaseValue:registers.A,Increment:1)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x3E: // LD A, n
-            print("Executed LD A, n @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
-            registers.A = opcodes.opcode2
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
-        case 0x76: // HALT
-            print("Executed HALT @ "+String(format:"%04X",registers.PC))
-            emulatorHalted = true
-        case 0x77: // LD (HL), A
-            print("Executed LD (HL), A @ "+String(format:"%04X",registers.PC))
-            mmu.writeByte(address: registers.HL, value: registers.A)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x78: // LD A, B
-            print("Executed LD A, B @ "+String(format:"%04X",registers.PC))
-            registers.A = registers.B
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x79: // LD A,C
-            print("Executed LD A, C @ "+String(format:"%04X",registers.PC))
-            registers.A = registers.C
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x7A: // LD A,D
-            print("Executed LD A, D @ "+String(format:"%04X",registers.PC))
-            registers.A = registers.D
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x7B: // LD A,E
-            print("Executed LD A, E @ "+String(format:"%04X",registers.PC))
-            registers.A = registers.E
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x7C: // LD A,H
-            print("Executed LD A, H @ "+String(format:"%04X",registers.PC))
-            registers.A = registers.H
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0x7D: // LD A,L
-            print("Executed LD A, L @ "+String(format:"%04X",registers.PC))
-            registers.A = registers.L
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        case 0xC2: // JP NZ,nn
-            print("Executed JP NZ,nn @ "+String(format:"%04X",registers.PC))
+        case 0x11: // LD DE,$nn - 11 n n - Loads $nn into DE
+            printInstructionDetails(instructionDetails: "LD DE,$nn", opcode: [0x11,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            registers.DE = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            registers.PC = registers.PC &+ 3
+        case 0x12: // LD (DE),A - 12 - Stores A into the memory location pointed to by DE
+            printInstructionDetails(instructionDetails: "LD (DE),A", opcode: [0x12], programCounter: registers.PC)
+            mmu.writeByte(address: registers.DE, value: registers.A)
+            registers.PC = registers.PC &+ 1
+        case 0x13: // INC DE - 13 - Adds one to DE
+            printInstructionDetails(instructionDetails: "INC DE", opcode: [0x13], programCounter: registers.PC)
+            registers.DE = registers.DE &+ 1
+            registers.PC = registers.PC &+ 1
+        case 0x16: // LD D,$n - 16 n - Loads $n into D
+            printInstructionDetails(instructionDetails: "LD D,$n", opcode: [0x16,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            registers.D = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x18: // JR d - 18 d - The signed value $d is added to PC. The jump is measured from the start of the instruction opcode
+            printInstructionDetails(instructionDetails: "JR $d", opcode: [0x18,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            let signedOffset = Int8(bitPattern: opcodes.opcode2)
+            let displacement = Int16(signedOffset)
+            registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+        case 0x1A: // LD A,(DE) - 1A - Loads the value pointed to by DE into A
+            printInstructionDetails(instructionDetails: "LD A,(DE)", opcode: [0x1A], programCounter: registers.PC)
+            registers.A = mmu.readByte(address: registers.DE)
+            registers.PC = registers.PC &+ 1
+        case 0x1B: // DEC DE - 1B - Subtracts one from DE
+            printInstructionDetails(instructionDetails: "DEC DE", opcode: [0x1B], programCounter: registers.PC)
+            registers.DE = registers.DE &- 1
+            registers.PC = registers.PC &+ 1
+        case 0x1E: // LD E,$n - 1E n - Loads $n into E
+            printInstructionDetails(instructionDetails: "LD E,$n", opcode: [0x1E,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            registers.E = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x20: // JR NZ,$d - 20 d - If the zero flag is unset, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
+            printInstructionDetails(instructionDetails: "JR NZ,$d", opcode: [0x20,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 2
+            }
+            else
+            {
+                let signedOffset = Int8(bitPattern: opcodes.opcode2)
+                let displacement = Int16(signedOffset)
+                registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+            }
+        case 0x21: // LD HL,$nn - 21 n n - Loads $nn into HL
+            printInstructionDetails(instructionDetails: "LD HL,$nn", opcode: [0x21,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            registers.HL = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            registers.PC = registers.PC &+ 3
+        case 0x22: // LD ($nn),HL - 22 n n - Stores HL into the memory location pointed to by $nn.
+            printInstructionDetails(instructionDetails: "LD ($nn),HL", opcode: [0x22,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            let tempResult = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            mmu.writeByte(address: tempResult, value: registers.L)
+            mmu.writeByte(address: tempResult &+ 1, value: registers.H)
+            registers.PC = registers.PC &+ 3
+        case 0x23: // INC HL - 23 - Adds one to HL
+            printInstructionDetails(instructionDetails: "INC HL", opcode: [0x23], programCounter: registers.PC)
+            registers.HL = registers.HL &+ 1
+            registers.PC = registers.PC &+ 1
+        case 0x26: // LD H,$n - 26 n - Loads $n into H
+            printInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x26,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            registers.H = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x28: // JR Z,$d - 28 d - If the zero flag is set, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
+            printInstructionDetails(instructionDetails: "JR Z,$d", opcode: [0x28,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            {
+                let signedOffset = Int8(bitPattern: opcodes.opcode2)
+                let displacement = Int16(signedOffset)
+                registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+            }
+            else
+            {
+                registers.PC = registers.PC &+ 2
+            }
+        case 0x2A: // LD HL,($nn) - 2A n n - Loads the value pointed to by $nn into HL.
+            printInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0x2A,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            let tempResult = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            registers.HL = UInt16(mmu.readByte(address: tempResult))
+            registers.PC = registers.PC &+ 3
+        case 0x2B: // DEC HL - 2B - Subtracts one from HL
+            printInstructionDetails(instructionDetails: "DEC HL", opcode: [0x2B], programCounter: registers.PC)
+            registers.HL = registers.HL &- 1
+            registers.PC = registers.PC &+ 1
+        case 0x2E: // LD L,$n - 2E n - Loads n into L.
+            printInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x2E,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            registers.L = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x2F: // CPL
+            printInstructionDetails(instructionDetails: "CPL", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = ~registers.A
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
+            registers.PC = registers.PC &+ 1
+        case 0x30: // JR NC,d
+            printInstructionDetails(instructionDetails: "JR NC,$d", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            {
+                registers.PC = registers.PC &+ 2
+            }
+            else
+            {
+                let signedOffset = Int8(bitPattern: opcodes.opcode2)
+                let displacement = Int16(signedOffset)
+                registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+            }
+        case 0x38: // JR C,d
+            printInstructionDetails(instructionDetails: "JR C,$d", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            {
+                let signedOffset = Int8(bitPattern: opcodes.opcode2)
+                let displacement = Int16(signedOffset)
+                registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+            }
+            else
+            {
+                registers.PC = registers.PC &+ 2
+            }
+        case 0x3C: // INC A
+            printInstructionDetails(instructionDetails: "INC A", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            // flags
+            registers.A = registers.A &+ 1
+            registers.PC = registers.PC &+ 1
+        case 0x3E: // LD A,n
+            printInstructionDetails(instructionDetails: "LD A,$n", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            registers.A = opcodes.opcode2
+            registers.PC = registers.PC &+ 2
+        case 0x70: // LD (HL),B
+            printInstructionDetails(instructionDetails: "LD (HL),B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.B)
+            registers.PC = registers.PC &+ 1
+        case 0x71: // LD (HL),C
+            printInstructionDetails(instructionDetails: "LD (HL),C", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.C)
+            registers.PC = registers.PC &+ 1
+        case 0x72: // LD (HL),D
+            printInstructionDetails(instructionDetails: "LD (HL),D", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.D)
+            registers.PC = registers.PC &+ 1
+        case 0x73: // LD (HL),E
+            printInstructionDetails(instructionDetails: "LD (HL),E", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.E)
+            registers.PC = registers.PC &+ 1
+        case 0x74: // LD (HL),H
+            printInstructionDetails(instructionDetails: "LD (HL),H", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.H)
+            registers.PC = registers.PC &+ 1
+        case 0x75: // LD (HL),L
+            printInstructionDetails(instructionDetails: "LD (HL),L", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.L)
+            registers.PC = registers.PC &+ 1
+        case 0x76: // HALT
+            printInstructionDetails(instructionDetails: "HALT", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            emulatorHalted = true
+        case 0x77: // LD (HL),A
+            printInstructionDetails(instructionDetails: "LD (HL),A", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            mmu.writeByte(address: registers.HL, value: registers.A)
+            registers.PC = registers.PC &+ 1
+        case 0x78: // LD A,B
+            printInstructionDetails(instructionDetails: "LD A, B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.B
+            registers.PC = registers.PC &+ 1
+        case 0x79: // LD A,C
+            printInstructionDetails(instructionDetails: "LD A,C", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.C
+            registers.PC = registers.PC &+ 1
+        case 0x7A: // LD A,D
+            printInstructionDetails(instructionDetails: "LD A,D", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.D
+            registers.PC = registers.PC &+ 1
+        case 0x7B: // LD A,E
+            printInstructionDetails(instructionDetails: "LD A,E", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.E
+            registers.PC = registers.PC &+ 1
+        case 0x7C: // LD A,H
+            printInstructionDetails(instructionDetails: "LD A,H", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.H
+            registers.PC = registers.PC &+ 1
+        case 0x7D: // LD A,L
+            printInstructionDetails(instructionDetails: "LD A,L", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.L
+            registers.PC = registers.PC &+ 1
+        case 0x7E: // LD A,(HL)
+            printInstructionDetails(instructionDetails: "LD A,(HL)", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = mmu.readByte(address: registers.HL)
+            registers.PC = registers.PC &+ 1
+        case 0xB1: // OR C
+            printInstructionDetails(instructionDetails: "OR C", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.A = registers.C | registers.A
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0x80) != 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.A == 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:returnParity(value: registers.A))
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry,SetFlag:false)
+            registers.PC = registers.PC &+ 1
+        case 0xC2: // JP NZ,nn
+            printInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            {
+                registers.PC = registers.PC &+ 3
             }
             else
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
         case 0xC3: // JP nn
-            print("Executed JP nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP $nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
         case 0xCA: // JP Z,nn
-            print("Executed JP Z,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
             else
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
+        case 0xCB: //start CB opcodes
+            switch opcodes.opcode2
+            {
+                case 0x47: // BIT 0, A
+                printInstructionDetails(instructionDetails: "BIT 0, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000001) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x4F: // BIT 1, A
+                    printInstructionDetails(instructionDetails: "BIT 1, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000010) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x57: // BIT 2, A
+                printInstructionDetails(instructionDetails: "BIT 2, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000100) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x5F: // BIT 3, A
+                printInstructionDetails(instructionDetails: "BIT 3, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00001000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x67: // BIT 4, A
+                printInstructionDetails(instructionDetails: "BIT 4, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00010000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x6F: // BIT 5, A
+                printInstructionDetails(instructionDetails: "BIT 5, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b0010000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x77: // BIT 6, A
+                printInstructionDetails(instructionDetails: "BIT 6, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b01000000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0x7F: // BIT 7, A
+                printInstructionDetails(instructionDetails: "BIT 7, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b10000000) == 1))
+                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                case 0xC7: // SET 0, A
+                    printInstructionDetails(instructionDetails: "SET 0, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b00000001
+                case 0xCF: // SET 1, A
+                    printInstructionDetails(instructionDetails: "SET 1, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b00000010
+                case 0xD7: // SET 2, A
+                    printInstructionDetails(instructionDetails: "SET 2, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b00000100
+                case 0xDF: // SET 3, A
+                    printInstructionDetails(instructionDetails: "SET 3, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b00001000
+                case 0xE7: // SET 4, A
+                    printInstructionDetails(instructionDetails: "SET 4, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b00010000
+                case 0xEF: // SET 5, A
+                    printInstructionDetails(instructionDetails: "SET 5, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b00100000
+                case 0xF7: // SET 6, A
+                    printInstructionDetails(instructionDetails: "SET 6, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b01000000
+                case 0xFF: // SET 7, A
+                    printInstructionDetails(instructionDetails: "SET 7, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    registers.A = registers.A | 0b10000000
+                default:
+                    printInstructionDetails(opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+            } // end CB opcodes
+            registers.PC = registers.PC &+ 2
         case 0xD2: // JP NC,nn
-            print("Executed JP NC,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
             else
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
         case 0xD3: // OUT (n),A
-            print("Executed OUT (n),A @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
+            printInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             ports[Int(opcodes.opcode2)] = registers.A
             switch opcodes.opcode2
             {
-                case 0x08:
-                    if testBit(value: registers.A, bitPosition: 1)
-                    {
-                        MOS6545.crtcRegisters.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
-                    }
-                    if !testBit(value: registers.A, bitPosition: 1)
-                    {
-                        MOS6545.crtcRegisters.redBackgroundIntensity = 1 // set global background red intensity to 0 = half
-                    }
-                    if testBit(value: registers.A, bitPosition: 2)
-                    {
-                        MOS6545.crtcRegisters.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
-                    }
-                    if !testBit(value: registers.A, bitPosition: 2)
-                    {
-                        MOS6545.crtcRegisters.greenBackgroundIntensity = 1 // set global background blue intensity to 0 = half
-                    }
-                    if testBit(value: registers.A, bitPosition: 3)
-                    {
-                        MOS6545.crtcRegisters.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
-                    }
-                    if !testBit(value: registers.A, bitPosition: 3)
-                    {
-                        MOS6545.crtcRegisters.blueBackgroundIntensity = 1 // set global background green intensity to 0 = half
-                    }
-                    if testBit(value: registers.A, bitPosition: 6)
-                    {
-                        mmu.map(readDevice: [colourRAM], writeDevice: [colourRAM], memoryLocation: 0xF800)  // swap in colour ram
-                    }
-                    if !testBit(value: registers.A, bitPosition: 6)
-                    {
-                        mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // swap in pcg ram
-                    }
-                case 0x0A: break //PAK N selection - need some mechanism to map PAK number to memory device
-                case 0x0B:
-                    if registers.A == 0
-                    {
-                        mmu.map(readDevice: [fontROM], writeDevice: [videoRAM,pcgRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                    }
-                    if registers.A == 0
-                    {
-                        mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                        mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
-                    }
-                case 0x0C: break // writing to port 0x0C needs no further processing
-                case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
-                
-                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
+            case 0x08:
+                if testBit(value: registers.A, bitPosition: 1)
+                {
+                    MOS6545.crtcRegisters.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                }
+                if !testBit(value: registers.A, bitPosition: 1)
+                {
+                    MOS6545.crtcRegisters.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
+                }
+                if testBit(value: registers.A, bitPosition: 2)
+                {
+                    MOS6545.crtcRegisters.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
+                }
+                if !testBit(value: registers.A, bitPosition: 2)
+                {
+                    MOS6545.crtcRegisters.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
+                }
+                if testBit(value: registers.A, bitPosition: 3)
+                {
+                    MOS6545.crtcRegisters.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
+                }
+                if !testBit(value: registers.A, bitPosition: 3)
+                {
+                    MOS6545.crtcRegisters.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
+                }
+                if testBit(value: registers.A, bitPosition: 6)
+                {
+                    mmu.map(readDevice: [colourRAM], writeDevice: [colourRAM], memoryLocation: 0xF800)  // swap in colour ram
+                }
+                if !testBit(value: registers.A, bitPosition: 6)
+                {
+                    mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // swap in pcg ram
+                }
+            case 0x0A: break //PAK N selection - need some mechanism to map PAK number to memory device
+            case 0x0B:
+                if registers.A == 1
+                {
+                    mmu.map(readDevice: [fontROM], writeDevice: [videoRAM,pcgRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                }
+                if registers.A == 0
+                {
+                    mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                    mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
+                }
+            case 0x0C: break // writing to port 0x0C needs no further processing
+            case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+            default: printInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
             }
-        
-            //Writing to port 0x0C writes a register number
-            //Writing port 0x0D writes the register selected on port 0x0C
-            
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+            registers.PC = registers.PC &+ 2
         case 0xDA: // JP C,nn
-            print("Executed JP C,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP C,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
             else
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
         case 0xDB: // IN A,(n)
-            print("Executed IN A,(n) @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
+            printInstructionDetails(instructionDetails: "IN A,($n)", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.A = ports[Int(opcodes.opcode2)]
             switch opcodes.opcode2
             {
@@ -542,92 +795,72 @@ actor Z80CPU
                 case 0x0B: break // registers.A contains value of font rom control port
                 case 0x0C: registers.A = MOS6545.ReadStatusRegister()
                 case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
-                default: print("Whicha port ? Disaport !"+String(opcodes.opcode2))
+                default: printInstructionDetails(instructionDetails: "Executed LD BC, nn", opcode: [opcodes.opcode1], programCounter: registers.PC)
             }
-            
-            //Reading port 0x0D reads the register selected on port 0x0C
-            //Reading from port 0x0C reads the status register
-            
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+            registers.PC = registers.PC &+ 2
         case 0xE2: // JP PO,nn
-            print("Executed JP PO,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP PO,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
             else
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
         case 0xEA: // JP PE,nn
-            print("Executed JP PE,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP PE,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
             else
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
         case 0xED: // ED instructions
             switch opcodes.opcode2
             {
             case 0xB0:  // LDIR
-                // doesn't cater for transfers to non VDU RAM
-                // needs flags to be updated
-                // S is not affected.
-                // Z is not affected.
-                // H is reset.
-                // P/V is set if BC-1 != 0; otherwise, it is reset.
-                // N is reset.
-                // C is not affected.
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
-             //   registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcodes.opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                if registers.BC == 0
-                {
-                    registers.BC = 0xFFFF
-                }
-                while registers.BC > 0
+                printInstructionDetails(instructionDetails: "LDIR", opcode: [opcodes.opcode1], programCounter: registers.PC)
+                repeat
                 {
                     mmu.writeByte(address: registers.DE, value : mmu.readByte(address: registers.HL))
-                    registers.HL = IncrementRegPair(BaseValue:registers.HL,Increment:1)
-                    registers.DE = IncrementRegPair(BaseValue:registers.DE,Increment:1)
-                    registers.BC = DecrementRegPair(BaseValue:registers.BC,Decrement:1)
+                    registers.HL = registers.HL &+ 1
+                    registers.DE = registers.DE &+ 1
+                    registers.BC = registers.BC &- 1
                 }
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+                while registers.BC != 0
+                        
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:registers.BC == 0)
             default:
-                print("Unknown opcode "+String(format: "%02X", opcodes.opcode1)+String(format: "%02X", opcodes.opcode2) + " @ "+String(format:"%04X",registers.PC))
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+                printInstructionDetails(opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
             }
+            registers.PC = registers.PC &+ 2
         case 0xF2: // JP P,nn
-            print("Executed JP P,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP P,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
             else
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
         case 0xFA: // JP M,nn
-            print("Executed JP M,nn @ "+String(format:"%04X",registers.PC))
+            printInstructionDetails(instructionDetails: "JP M,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
             else
             {
-                registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:3)
+                registers.PC = registers.PC &+ 3
             }
         case 0xFE: // CP n
-            print("Executed CP n @ "+String(format:"%04X",registers.PC) + " ["+String(format:"%02X",opcodes.opcode1)+","+String(format:"%02X",opcodes.opcode2)+"]")
-//            sign: (res8 & 0x80) != 0,
-//            zero: a == n,
-//            halfCarry: ((a & 0x0F) < (n & 0x0F)),
-//            parityOverflow: ((a ^ n) & (a ^ res8) & 0x80) != 0,
-//            subtract: true,
-//            carry: a < n
+            printInstructionDetails(instructionDetails: "CP $n", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             let temporaryResult = registers.A &- opcodes.opcode2
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(temporaryResult & 0x80) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:temporaryResult == 0)
@@ -635,11 +868,11 @@ actor Z80CPU
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcodes.opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry,SetFlag:registers.A < opcodes.opcode2)
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:2)
+            registers.PC = registers.PC &+ 2
         default:
-            print("Unknown opcode "+String(format: "%02X", opcodes.opcode1) + " @ "+String(format:"%04X",registers.PC))
-            registers.PC = UpdateProgramCounter(CurrentPC:registers.PC,Offset:1)
-        }
+            printInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
+            registers.PC = registers.PC &+ 1
+        } // end single opcodes
         runcycles = runcycles+1
     }
 

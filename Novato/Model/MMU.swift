@@ -166,10 +166,11 @@ final class memoryMapper
     {
         let addr = Int(address)
         let pageIndex = addr/pageSize
+        let blockSize = memoryStorage[pageIndex][0].size
         
-        guard memoryStorage[pageIndex][0].size > 0 else { return 0xFF }
+        guard blockSize > 0 else { return 0xFF }
         
-        let localOffset = addr & (pageSize-1)
+        let localOffset = addr & (blockSize-1)
         return memoryStorage[pageIndex][0].addressBlock[localOffset]
     }
     
@@ -178,12 +179,13 @@ final class memoryMapper
     {
         let addr = Int(address)
         let pageIndex = addr/pageSize
+        let blockSize = memoryStorage[pageIndex][0].size
 
-        guard memoryStorage[pageIndex][1].size > 0 else { return }
+        guard blockSize > 0 else { return }
 
         guard (memoryStorage[pageIndex][1].deviceType == .RAM) else { return }
 
-        let localOffset = addr & (pageSize-1)
+        let localOffset = addr & (blockSize-1)
         memoryStorage[pageIndex][1].addressBlock[localOffset] = value
     }
 }

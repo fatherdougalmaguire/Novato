@@ -13,8 +13,6 @@ using namespace metal;
     
     int pixelLocation;
     
-    backGroundIntensity = 3.0;
-    
     const int CellWidth = 8;            // each character in font ROM is 8 pixels wide
     const int CellHeight = 16;          // each character in font ROM is 16 pixels high
     

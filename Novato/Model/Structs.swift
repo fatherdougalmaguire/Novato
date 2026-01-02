@@ -233,7 +233,7 @@ struct CRTCRegisters
     
     var redBackgroundIntensity : UInt8 = 0x00                           // red background intensity 0 = half 1 = full
     var greenBackgroundIntensity : UInt8 = 0x00                         // green background intensity 0 = half 1 = full
-    var blueBackgroundIntensity : UInt8 = 0x00                          // blue background intensity 0 = half 1 = full
+    var blueBackgroundIntensity : UInt8 = 0x00                         // blue background intensity 0 = half 1 = full
     
     var colourMode : UInt8 = 0x04                                       // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black else colour mode
 }
