@@ -99,7 +99,7 @@ actor Z80CPU
         wordbeeROM.fillMemoryFromFile(FileName: "wordbee_1.2", FileExtension: "rom")
         netROM.fillMemoryFromFile(FileName: "telcom_1.0", FileExtension: "rom")
         fontROM.fillMemoryFromFile(FileName: "charrom", FileExtension: "bin")
-        mainRAM.fillMemoryFromFile(FileName: "hello", FileExtension: "bin")
+        mainRAM.fillMemoryFromFile(FileName: "demo", FileExtension: "bin")
         pcgRAM.fillMemoryFromArray(memValues :
                                         [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -342,7 +342,7 @@ actor Z80CPU
         {
         case 0x00: // NOP - 00 - No operation is performed
             printInstructionDetails(instructionDetails: "NOP", opcode: [0x00], programCounter: registers.PC)
-  //          registers.PC = registers.PC &+ 1
+            registers.PC = registers.PC &+ 1
         case 0x01: // LD BC,nn - 01 n n - Loads $nn into BC
             printInstructionDetails(instructionDetails: "LD BC,$nn", opcode: [0x01,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.BC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
@@ -907,7 +907,8 @@ actor Z80CPU
                          AltH: registers.AltH,
                          AltL: registers.AltL,
                          
-                         memoryDump: mmu.memorySlice(address: registers.PC, size: 0x100),
+                         memoryDump: mmu.memorySlice(address: registers.PC & 0xFF00, size: 0x100),
+                         //memoryDump: mmu.memorySlice(address: registers.PC, size: 0x100),
                          VDU : videoRAM.bufferTransform(),
                          CharRom : fontROM.bufferTransform(),
                          PcgRam : pcgRAM.bufferTransform(),

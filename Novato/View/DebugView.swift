@@ -4,24 +4,6 @@ struct DebugView: View
 {
     @Environment(EmulatorViewModel.self) private var vm
     
-    func getAppVersion() -> String
-    {
-        if let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
-        {
-            return appVersion
-        }
-        return "Unknown"
-    }
-    
-    func getBuildNumber() -> String
-    {
-        if let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
-        {
-            return buildNumber
-        }
-        return "Unknown"
-    }
-    
     func mapascii (ascii : UInt8) -> String
     {
         switch ascii
@@ -31,6 +13,20 @@ struct DebugView: View
         default:
             return "."
         }
+    }
+    
+    func highlightString(originalString : String, numDigits : Int, offset : Int) -> AttributedString
+    
+    {
+        var tempResult = AttributedString(originalString)
+        
+        let beginindex = tempResult.characters.index(tempResult.startIndex, offsetBy: offset)
+        let finalindex = tempResult.characters.index(tempResult.startIndex, offsetBy: offset+numDigits)
+        
+        tempResult[beginindex..<finalindex].backgroundColor = .orange
+        tempResult[beginindex..<finalindex].foregroundColor = .white
+        
+        return tempResult
     }
     
     @ViewBuilder
@@ -178,16 +174,29 @@ struct DebugView: View
                     {
                         VStack(alignment: .leading, spacing: 2)
                         {
-                            ForEach(0..<vm.memoryDump.count / 16, id: \.self)
+                            let startAddress = vm.pcReg & 0xFF00
+                            let limit = vm.memoryDump.count / 16
+                            ForEach(0..<limit, id: \.self)
                             { row in
                                 let address = row * 16
+                                let nextaddress = (row+1)*16
+                                let dispaddress = startAddress &+ UInt16(address)
                                 let bytes = vm.memoryDump[address..<address+16]
-                                let dispaddress = vm.pcReg &+ UInt16(address)
                                 let hexBytes = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
                                 let charBytes = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
-                                Text(String(format: "0x%04X: %@ %@", dispaddress, hexBytes,charBytes))
-                                    .font(.system(.body, design: .monospaced))
-                                    .foregroundColor(.orange)
+                                if (vm.pcReg >= address) && (vm.pcReg < nextaddress)
+                                {
+                                    let bill = vm.pcReg &- UInt16(address)
+                                    (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(highlightString(originalString: hexBytes, numDigits: 2, offset: Int(bill*3))) + Text(" "+highlightString(originalString: charBytes, numDigits: 1, offset: Int(bill))))
+                                        .font(.system(.body, design: .monospaced))
+                                        .foregroundColor(.orange)
+                                }
+                                else
+                                {
+                                    (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(String(hexBytes)) + Text(" "+String(charBytes)))
+                                        .font(.system(.body, design: .monospaced))
+                                        .foregroundColor(.orange)
+                                }
                             }
                         }
                         .padding()
