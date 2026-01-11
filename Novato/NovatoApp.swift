@@ -4,9 +4,6 @@ import SwiftUI
 struct NovatoApp: App
 {
     @State private var vm = EmulatorViewModel(cpu: Z80CPU())
-    @State private var colourOutputMode = "Colour"
-    @State private var modelSelection = "model32IC"
-    @State private var demoMode = "demoMode6416"
     
     var body: some Scene
     {
@@ -14,13 +11,19 @@ struct NovatoApp: App
         {
             EmulatorView().environment(vm)
         }
-        WindowGroup("Novato -  Debug", id: "DebugWindow")
+        WindowGroup("Novato - Debug Registers", id: "RegisterWindow")
         {
-            DebugView().environment(vm)
+            RegisterView().environment(vm)
         }
-        Settings {
-                    SettingsView()
-                }
+        WindowGroup("Novato - Debug Ports", id: "PortWindow")
+        {
+            PortView().environment(vm)
+        }
+        WindowGroup("Novato - Debug Memory", id: "MemoryWindow")
+        {
+            MemoryView().environment(vm)
+        }
+        Settings { SettingsView() }
         .commands
         {
             AboutMenu(
@@ -40,6 +43,33 @@ struct NovatoApp: App
                 {
                 }.keyboardShortcut("A")
             }
+            CommandMenu("Disk")
+            {
+                Button("Create disk image")
+                {
+                }
+                Button("Open disk image")
+                {
+                }
+                Button("View disk image")
+                {
+                }
+            }
+            CommandMenu("Tape")
+            {
+                Button("Create tape")
+                {
+                }
+                Button("Open tape")
+                {
+                }
+                Button("Rewind tape")
+                {
+                }
+                Button("Record tape")
+                {
+                }
+            }
             CommandMenu("Emulator")
             {
                 Button("Start Emulator")
@@ -52,6 +82,9 @@ struct NovatoApp: App
                 {
                 }
                 Button("Save Emulator State")
+                {
+                }
+                Button("Restore Emulator State")
                 {
                 }
             }

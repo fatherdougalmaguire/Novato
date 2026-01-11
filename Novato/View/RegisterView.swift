@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct DebugView: View
+struct RegisterView: View
 {
     @Environment(EmulatorViewModel.self) private var vm
     
@@ -137,7 +137,7 @@ struct DebugView: View
                         Text(String(format: "%04X",vm.althlReg)).font(.system(.title3, design: .monospaced))
                     }
                 }
-                LazyVGrid(columns: Array(repeating: GridItem(.fixed(60)), count: 10), spacing: 10)
+                LazyVGrid(columns: Array(repeating: GridItem(.fixed(60)), count: 8), spacing: 10)
                 {
                     Group
                     {
@@ -149,8 +149,6 @@ struct DebugView: View
                         registerRow(label: "E", value: vm.eReg)
                         registerRow(label: "H", value: vm.hReg)
                         registerRow(label: "L", value: vm.lReg)
-                        registerRow(label: "I", value: vm.iReg)
-                        registerRow(label: "R", value: vm.rReg)
                     }
                     Group
                     {
@@ -163,44 +161,67 @@ struct DebugView: View
                         registerRow(label: "H'", value: vm.althReg)
                         registerRow(label: "L'", value: vm.altlReg)
                     }
+                    Group
+                    {
+                        registerRow(label: "I", value: vm.altaReg)
+                        registerRow(label: "R", value: vm.altfReg)
+                        registerRow(label: "IM", value: vm.altbReg)
+                        registerRow(label: "IFF1", value: vm.altcReg)
+                        registerRow(label: "IFF2", value: vm.altdReg)
+                    }
                 }
                 FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.fReg)
                 
-                VStack(alignment: .leading)
+                Spacer()
+                
+                ScrollView
                 {
-                    Text("Memory View")
-                        .font(.headline)
-                    ScrollView
+                    VStack(alignment: .leading)
                     {
-                        VStack(alignment: .leading, spacing: 2)
-                        {
-                            let startAddress = vm.pcReg & 0xFF00
-                            let limit = vm.memoryDump.count / 16
-                            ForEach(0..<limit, id: \.self)
-                            { row in
-                                let address = row * 16
-                                let nextaddress = (row+1)*16
-                                let dispaddress = startAddress &+ UInt16(address)
-                                let bytes = vm.memoryDump[address..<address+16]
-                                let hexBytes = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
-                                let charBytes = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
-                                if (vm.pcReg >= address) && (vm.pcReg < nextaddress)
-                                {
-                                    let bill = vm.pcReg &- UInt16(address)
-                                    (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(highlightString(originalString: hexBytes, numDigits: 2, offset: Int(bill*3))) + Text(" "+highlightString(originalString: charBytes, numDigits: 1, offset: Int(bill))))
-                                        .font(.system(.body, design: .monospaced))
-                                        .foregroundColor(.orange)
-                                }
-                                else
-                                {
-                                    (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(String(hexBytes)) + Text(" "+String(charBytes)))
-                                        .font(.system(.body, design: .monospaced))
-                                        .foregroundColor(.orange)
-                                }
+                        Text("Memory View")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        let startAddress = vm.pcReg & 0xFF00
+                        let limit = vm.memoryDump.count / 16
+                        ForEach(0..<limit, id: \.self)
+                        { row in
+                            let address = row * 16
+                            let nextaddress = (row+1)*16
+                            let dispaddress = startAddress &+ UInt16(address)
+                            let bytes = vm.memoryDump[address..<address+16]
+                            let hexBytes = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
+                            let charBytes = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
+                            if (vm.pcReg >= address) && (vm.pcReg < nextaddress)
+                            {
+                                let offset = vm.pcReg &- UInt16(address)
+                                (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(highlightString(originalString: hexBytes, numDigits: 2, offset: Int(offset*3))) + Text(" "+highlightString(originalString: charBytes, numDigits: 1, offset: Int(offset))))
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundColor(.orange)
+                            }
+                            else
+                            {
+                                (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(String(hexBytes)) + Text(" "+String(charBytes)))
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundColor(.orange)
                             }
                         }
-                        .padding()
-                    }
+                        
+                        Spacer()
+                        
+                        Text("Instruction view")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        ForEach(1..<10, id: \.self)
+                        { row in
+                            Text("0x1000: 21 00 F0   LD HL,0XF000")
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.orange)
+                        }
+                    }.padding(.leading,25)
                 }
             }
         }

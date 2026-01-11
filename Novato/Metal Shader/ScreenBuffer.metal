@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float CursorBlinkCounter, float CursorFlashLimit, float colorMode, float backGroundIntensity, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize)
+[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float colorMode, float backGroundIntensity, float timeElapsed, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize)
 {
     half4 ForegroundColour;
     half4 BackgroundColour;
@@ -10,6 +10,12 @@ using namespace metal;
     int xcursor;
     int ycursor;
     bool pixelset;
+    
+    float interval = 0.5;
+   // bool blink = (int(floor(timeElapsed/interval)) & 1) != 0;
+    float remainder = fmod(timeElapsed, interval);
+   
+        bool blink = remainder < 0.01;
     
     int pixelLocation;
     
@@ -89,23 +95,28 @@ using namespace metal;
     
     if (screenpos == int(CursorPosition))
     {
+        
+        bool cursorInside = (ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine));
+        
         switch (int(CursorBlinkType))
         {
             case 0: // 0 = always on
-                    if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)))
+                    if (cursorInside)
                     {
                         pixelset = !pixelset;
                     }
                     break;
             case 1: break; // 1 = always off
             case 2: // 2 = normal flash 1/16 frame rate
-                    if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
+                    // if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
+                    if (cursorInside && blink)
                     {
                         pixelset = !pixelset;
                     }
                     break;
             case 3: // 3 = fast flash 1/32 frame rate
-                    if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
+                    if (cursorInside && blink)
+                    //if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
                     {
                         pixelset = !pixelset;
                     }
@@ -115,23 +126,27 @@ using namespace metal;
     
     switch (int(colorMode))
     {
-        case 0 :    // green
+        case 0 :    // Green on Black
             ForegroundColour = monoGreenColour;
             BackgroundColour = monoBlackColour;
             break;
-        case 1 :    // amber
+        case 1 :    // Amber on Black
             ForegroundColour = monoAmberColour;
             BackgroundColour = monoBlackColour;
             break;
-        case 2 :    // white
+        case 2 :    // White on Black
             ForegroundColour = monoWhiteColour;
             BackgroundColour = monoBlackColour;
             break;
-        case 3 :    // blue
+        case 3 :    // Blue on Black
             ForegroundColour = monoBlueColour;
             BackgroundColour = monoBlackColour;
             break;
-        default :   // colour mode
+        case 4 :    // Colour
+            ForegroundColour = foregroundColourArray[int(colourram[screenpos]) & 0x1F];
+            BackgroundColour = backgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
+            break;
+        default :   // Premium Colour
             ForegroundColour = foregroundColourArray[int(colourram[screenpos]) & 0x1F];
             BackgroundColour = backgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
     }

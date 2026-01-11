@@ -1,7 +1,162 @@
 import Foundation
+import OSLog
+
+extension Logger {
+    private static var subsystem = Bundle.main.bundleIdentifier ?? "com.emulator.novato"
+
+    static let cpu = Logger(subsystem: subsystem, category: "CPU")
+    
+    static let pio = Logger(subsystem: subsystem, category: "PIO")
+    
+    static let video = Logger(subsystem: subsystem, category: "Video")
+}
 
 actor Z80CPU
 {
+    enum Z80Flags : UInt8
+    {
+        case Carry = 0x01               // 00000001
+        case Negative = 0x02            // 00000010
+        case Parity_Overflow = 0x04     // 00000100
+        case Y = 0x08                   // 00001000
+        case Half_Carry = 0x10          // 00010000
+        case X = 0x20                   // 00100000
+        case Zero = 0x40                // 01000000
+        case Sign = 0x80                // 10000000
+    }
+    
+    struct Registers
+    {
+        var A : UInt8 = 0           // Accumulator - 8 bit
+        var F : UInt8 = 0           // Flags Register - 8 bit
+        var B : UInt8 = 0           // General Purpose Register B - 8 bit
+        var C : UInt8 = 0           // General Purpose Register C - 8 bit
+        var D : UInt8 = 0           // General Purpose Register D - 8 bit
+        var E : UInt8 = 0           // General Purpose Register E - 8 bit
+        var H : UInt8 = 0           // General Purpose Register H - 8 bit
+        var L : UInt8 = 0           // General Purpose Register L - 8 bit
+        
+        var AltA : UInt8 = 0        // Alternate Accumulator - 8 bit
+        var AltF : UInt8 = 0        // Alternate Flags Register - 8 bit
+        var AltB : UInt8 = 0        // Alternate General Purpose Register B - 8 bit
+        var AltC : UInt8 = 0        // Alternate General Purpose Register C - 8 bit
+        var AltD : UInt8 = 0        // Alternate General Purpose Register D - 8 bit
+        var AltE : UInt8 = 0        // Alternate General Purpose Register E - 8 bit
+        var AltH : UInt8 = 0        // Alternate General Purpose Register H - 8 bit
+        var AltL : UInt8 = 0        // Alternate General Purpose Register L - 8 bit
+     
+        var AF : UInt16             // General Purpose Register Pair AF - 16 bit
+        {
+            get
+            {
+                return UInt16(A) << 8 | UInt16(F)
+            }
+            set
+            {
+                A = UInt8(newValue >> 8)
+                F = UInt8(newValue & 0xFF)
+            }
+        }
+        var BC : UInt16             // General Purpose Register Pair BC - 16 bit
+        {
+            get
+            {
+                return UInt16(B) << 8 | UInt16(C)
+            }
+            set
+            {
+                B = UInt8(newValue >> 8)
+                C = UInt8(newValue & 0xFF)
+            }
+        }
+        var DE : UInt16         // General Purpose Register Pair DE - 16 bit
+        {
+            get
+            {
+                return UInt16(D) << 8 | UInt16(E)
+            }
+            set
+            {
+                D = UInt8(newValue >> 8)
+                E = UInt8(newValue & 0xFF)
+            }
+        }
+        var HL : UInt16         // General Purpose Register Pair HL - 16 bit
+        {
+            get
+            {
+                return UInt16(H) << 8 | UInt16(L)
+            }
+            set
+            {
+                H = UInt8(newValue >> 8)
+                L = UInt8(newValue & 0xFF)
+            }
+        }
+        
+        var AltAF : UInt16             // Alternate General Purpose Register Pair AF - 16 bit
+        {
+            get
+            {
+                return UInt16(AltA) << 8 | UInt16(AltF)
+            }
+            set
+            {
+                AltA = UInt8(newValue >> 8)
+                AltF = UInt8(newValue & 0xFF)
+            }
+        }
+        var AltBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bit
+        {
+            get
+            {
+                return UInt16(AltB) << 8 | UInt16(AltC)
+            }
+            set
+            {
+                AltB = UInt8(newValue >> 8)
+                AltC = UInt8(newValue & 0xFF)
+            }
+        }
+        var AltDE : UInt16       // Alternate General Purpose Register Pair DE - 16 bit
+        {
+            get
+            {
+                return UInt16(AltD) << 8 | UInt16(AltE)
+            }
+            set
+            {
+                AltD = UInt8(newValue >> 8)
+                AltC = UInt8(newValue & 0xFF)
+            }
+        }
+        var AltHL : UInt16      // Alternate General Purpose Register Pair HL - 16 bit
+        {
+            get
+            {
+                return UInt16(AltH) << 8 | UInt16(AltL)
+            }
+            set
+            {
+                AltH = UInt8(newValue >> 8)
+                AltL = UInt8(newValue & 0xFF)
+            }
+        }
+        
+        var I : UInt8 = 0           // Interrupt Page Address Register - 8 bit
+        var R : UInt8 = 0           // Memory Refresh Register - 8 bit
+        
+        var IM : UInt8 = 0          // Interrupt Mode
+        var IFF1 : UInt8 = 0        // Interrupt Flip-flop 1
+        var IFF2 : UInt8 = 0        // Interrupt Flip-flop 2
+        
+        var IX : UInt16 = 0         // Index Register IX - 16 bit
+        var IY : UInt16 = 0         // Index Register IY - 16 bit
+        
+        var SP : UInt16 = 0xFFFF    // Stack Pointer - 16 bit
+        var PC : UInt16 = 0x0000  // Program Counter - 16 bit
+    }
+    
     var registers = Registers()
  
     var ports = [UInt8](repeating: 0, count: 256)
@@ -48,11 +203,13 @@ actor Z80CPU
     //    bit 3 BLUE background intensity
     //    bit 6 COLOUR RAM enable (0 = PCG, 1= RAM)
     
-    var runcycles : UInt64 = 0
+    var tStates : UInt64 = 0
     var CPUstarttime : Date = Date()
     var CPUendtime : Date = Date()
     
     var emulatorHalted : Bool = false
+    
+    var mnemonicQueue = instructionQueue(instructionLimit: 10)
 
     var MOS6545 = CRTC()
     
@@ -76,7 +233,6 @@ actor Z80CPU
         mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)      // 2K Video RAM
         mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // 2K PCG RAM
         
-        MOS6545.SetCursorDutyCycle()
         videoRAM.fillMemoryFromArray(memValues: [Character("W").asciiValue!,Character("e").asciiValue!,Character("l").asciiValue!,Character("c").asciiValue!,Character("o").asciiValue!,Character("m").asciiValue!,Character("e").asciiValue!,Character(" ").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!,Character(" ").asciiValue!,Character("N").asciiValue!,Character("o").asciiValue!,Character("v").asciiValue!,Character("a").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!], memOffset : 88)
         videoRAM.fillMemoryFromArray(memValues :  [128,129,130,131,132,133,134,135,
                                                   136,137,138,139,140,141,142,143], memOffset : 280)
@@ -256,23 +412,23 @@ actor Z80CPU
     
     func step()
     {
-        CPUstarttime = Date()
         let prefetch = fetch(ProgramCounter : registers.PC)
-        MOS6545.ResetCursorDutyCycle()
         if !emulatorHalted
         {
             execute(opcodes : prefetch)
         }
-        CPUendtime = Date()
-        let ken = CPUendtime.timeIntervalSince1970-CPUstarttime.timeIntervalSince1970
-        print("Instruction took ",ken / Double(runcycles)*1000*1000," microseconds to execute")
-        runcycles = 0
+        Logger.cpu.debug("Cumulative T states: \(String(self.tStates))")
     }
 
     func stop()
     {
         isRunning = false
         stepTask?.cancel()
+    }
+    
+    func writeToMemory(address: UInt16, value: UInt8)
+    {
+        mmu.writeByte(address: address, value: value)
     }
 
     func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
@@ -316,12 +472,13 @@ actor Z80CPU
         return ((~tempValue) & 1) == 1
     }
     
-    func printInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
+    func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
-        var instructionString : String = instructionDetails
-        
-        switch values.count
-        {
+        #if DEBUG
+            var instructionString : String = instructionDetails
+            
+            switch values.count
+            {
             case 1 :
                 instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
                 instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
@@ -330,10 +487,13 @@ actor Z80CPU
                 instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
                 instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
             default: break
-        }
-        
-        let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: ",")
-        print(instructionString+" ["+opcodeString+"] @ 0x"+String(format:"%04X",registers.PC))
+            }
+            
+            let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: ",")
+            let logString = instructionString+" ["+opcodeString+"] @ 0x"+String(format:"%04X",registers.PC)
+            Logger.cpu.debug("Instruction \(logString)")
+        #endif
+        mnemonicQueue.addInstruction(newInstruction: instructionString, newAddress: registers.PC)
     }
     
     func execute( opcodes: ( opcode1 : UInt8, opcode2 : UInt8, opcode3 : UInt8, opcode4 : UInt8))
@@ -341,22 +501,26 @@ actor Z80CPU
         switch opcodes.opcode1
         {
         case 0x00: // NOP - 00 - No operation is performed
-            printInstructionDetails(instructionDetails: "NOP", opcode: [0x00], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "NOP", opcode: [0x00], programCounter: registers.PC)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x01: // LD BC,nn - 01 n n - Loads $nn into BC
-            printInstructionDetails(instructionDetails: "LD BC,$nn", opcode: [0x01,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD BC,$nn", opcode: [0x01,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.BC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             registers.PC = registers.PC &+ 3
+            tStates = tStates + 10
         case 0x02: // LD (BC),A - 02 - Stores A into the memory location pointed to by BC
-            printInstructionDetails(instructionDetails: "LD (BC),A", opcode: [0x02], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (BC),A", opcode: [0x02], programCounter: registers.PC)
             mmu.writeByte(address: registers.BC, value: registers.A)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x03: // INC BC - 03 - Adds one to BC
-            printInstructionDetails(instructionDetails: "INC BE", opcode: [0x03], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "INC BE", opcode: [0x03], programCounter: registers.PC)
             registers.DE = registers.BC &+ 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 6
         case 0x04: // INC B
-            printInstructionDetails(instructionDetails: "INC B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "INC B", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.B = registers.B &+ 1
 //            H    Half-Carry    Set if there was a carry from bit 3 to bit 4 (useful for BCD math).
 //            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
@@ -366,8 +530,9 @@ actor Z80CPU
             //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcodes.opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x05: // DEC B
-            printInstructionDetails(instructionDetails: "DEC B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "DEC B", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.B = registers.B &- 1
 //            H    Half-Carry    Set if there was a borrow from bit 4 to bit 3.
 //            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
@@ -377,30 +542,36 @@ actor Z80CPU
             //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcodes.opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x06: // LD B,$n - 06 n - Loads $n into B
-            printInstructionDetails(instructionDetails: "LD B,$n", opcode: [0x06,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD B,$n", opcode: [0x06,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.B = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x08: // EX AF,AF' - 08 - Adds one to Exchanges the 16-bit contents of AF and AF'
-            printInstructionDetails(instructionDetails: "EX AF,AF'", opcode: [0x08], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "EX AF,AF'", opcode: [0x08], programCounter: registers.PC)
             let tempResult = registers.AF
             registers.AF = registers.AltAF
             registers.AltAF = tempResult
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x0A: // LD A,(BC) - 0A - Loads the value pointed to by BC into A
-            printInstructionDetails(instructionDetails: "LD A,(BC)", opcode: [0x0A], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,(BC)", opcode: [0x0A], programCounter: registers.PC)
             registers.A = mmu.readByte(address: registers.BC)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x0B: // DEC BC - 0B - Subtracts one from BC
-            printInstructionDetails(instructionDetails: "DEC BC", opcode: [0x0B], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "DEC BC", opcode: [0x0B], programCounter: registers.PC)
             registers.BC = registers.BC &- 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 6
         case 0x0E: // LD C,$n - 0E n - Loads n into C
-            printInstructionDetails(instructionDetails: "LD C,$n", opcode: [0x0E,opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD C,$n", opcode: [0x0E,opcodes.opcode2], programCounter: registers.PC)
             registers.C = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x10: // DJNZ $d - 10 d - The B register is decremented, and if not zero, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode.
-            printInstructionDetails(instructionDetails: "DJNZ $d", opcode: [0x10,opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "DJNZ $d", opcode: [0x10,opcodes.opcode2], programCounter: registers.PC)
             registers.B = registers.B &- 1
             if registers.B != 0
             {
@@ -412,41 +583,50 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 2
             }
+            tStates = tStates + 13
         case 0x11: // LD DE,$nn - 11 n n - Loads $nn into DE
-            printInstructionDetails(instructionDetails: "LD DE,$nn", opcode: [0x11,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD DE,$nn", opcode: [0x11,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.DE = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             registers.PC = registers.PC &+ 3
+            tStates = tStates + 10
         case 0x12: // LD (DE),A - 12 - Stores A into the memory location pointed to by DE
-            printInstructionDetails(instructionDetails: "LD (DE),A", opcode: [0x12], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (DE),A", opcode: [0x12], programCounter: registers.PC)
             mmu.writeByte(address: registers.DE, value: registers.A)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x13: // INC DE - 13 - Adds one to DE
-            printInstructionDetails(instructionDetails: "INC DE", opcode: [0x13], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "INC DE", opcode: [0x13], programCounter: registers.PC)
             registers.DE = registers.DE &+ 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 6
         case 0x16: // LD D,$n - 16 n - Loads $n into D
-            printInstructionDetails(instructionDetails: "LD D,$n", opcode: [0x16,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD D,$n", opcode: [0x16,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.D = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x18: // JR d - 18 d - The signed value $d is added to PC. The jump is measured from the start of the instruction opcode
-            printInstructionDetails(instructionDetails: "JR $d", opcode: [0x18,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JR $d", opcode: [0x18,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             let signedOffset = Int8(bitPattern: opcodes.opcode2)
             let displacement = Int16(signedOffset)
             registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+            tStates = tStates + 12
         case 0x1A: // LD A,(DE) - 1A - Loads the value pointed to by DE into A
-            printInstructionDetails(instructionDetails: "LD A,(DE)", opcode: [0x1A], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,(DE)", opcode: [0x1A], programCounter: registers.PC)
             registers.A = mmu.readByte(address: registers.DE)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x1B: // DEC DE - 1B - Subtracts one from DE
-            printInstructionDetails(instructionDetails: "DEC DE", opcode: [0x1B], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "DEC DE", opcode: [0x1B], programCounter: registers.PC)
             registers.DE = registers.DE &- 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 6
         case 0x1E: // LD E,$n - 1E n - Loads $n into E
-            printInstructionDetails(instructionDetails: "LD E,$n", opcode: [0x1E,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD E,$n", opcode: [0x1E,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.E = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x20: // JR NZ,$d - 20 d - If the zero flag is unset, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
-            printInstructionDetails(instructionDetails: "JR NZ,$d", opcode: [0x20,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JR NZ,$d", opcode: [0x20,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
             {
                 registers.PC = registers.PC &+ 2
@@ -457,26 +637,31 @@ actor Z80CPU
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
             }
+            tStates = tStates + 12
         case 0x21: // LD HL,$nn - 21 n n - Loads $nn into HL
-            printInstructionDetails(instructionDetails: "LD HL,$nn", opcode: [0x21,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD HL,$nn", opcode: [0x21,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.HL = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             registers.PC = registers.PC &+ 3
+            tStates = tStates + 10
         case 0x22: // LD ($nn),HL - 22 n n - Stores HL into the memory location pointed to by $nn.
-            printInstructionDetails(instructionDetails: "LD ($nn),HL", opcode: [0x22,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD ($nn),HL", opcode: [0x22,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             let tempResult = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             mmu.writeByte(address: tempResult, value: registers.L)
             mmu.writeByte(address: tempResult &+ 1, value: registers.H)
             registers.PC = registers.PC &+ 3
+            tStates = tStates + 16
         case 0x23: // INC HL - 23 - Adds one to HL
-            printInstructionDetails(instructionDetails: "INC HL", opcode: [0x23], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "INC HL", opcode: [0x23], programCounter: registers.PC)
             registers.HL = registers.HL &+ 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 6
         case 0x26: // LD H,$n - 26 n - Loads $n into H
-            printInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x26,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x26,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.H = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x28: // JR Z,$d - 28 d - If the zero flag is set, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
-            printInstructionDetails(instructionDetails: "JR Z,$d", opcode: [0x28,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JR Z,$d", opcode: [0x28,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
             {
                 let signedOffset = Int8(bitPattern: opcodes.opcode2)
@@ -487,27 +672,32 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 2
             }
+            tStates = tStates + 12
         case 0x2A: // LD HL,($nn) - 2A n n - Loads the value pointed to by $nn into HL.
-            printInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0x2A,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0x2A,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             let tempResult = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             registers.HL = UInt16(mmu.readByte(address: tempResult))
             registers.PC = registers.PC &+ 3
+            tStates = tStates + 16
         case 0x2B: // DEC HL - 2B - Subtracts one from HL
-            printInstructionDetails(instructionDetails: "DEC HL", opcode: [0x2B], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "DEC HL", opcode: [0x2B], programCounter: registers.PC)
             registers.HL = registers.HL &- 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 6
         case 0x2E: // LD L,$n - 2E n - Loads n into L.
-            printInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x2E,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x2E,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.L = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x2F: // CPL
-            printInstructionDetails(instructionDetails: "CPL", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "CPL", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = ~registers.A
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x30: // JR NC,d
-            printInstructionDetails(instructionDetails: "JR NC,$d", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JR NC,$d", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
             {
                 registers.PC = registers.PC &+ 2
@@ -518,8 +708,9 @@ actor Z80CPU
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
             }
+            tStates = tStates + 12
         case 0x38: // JR C,d
-            printInstructionDetails(instructionDetails: "JR C,$d", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JR C,$d", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
             {
                 let signedOffset = Int8(bitPattern: opcodes.opcode2)
@@ -530,76 +721,94 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 2
             }
+            tStates = tStates + 12
         case 0x3C: // INC A
-            printInstructionDetails(instructionDetails: "INC A", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "INC A", opcode: [opcodes.opcode1], programCounter: registers.PC)
             // flags
             registers.A = registers.A &+ 1
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x3E: // LD A,n
-            printInstructionDetails(instructionDetails: "LD A,$n", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,$n", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.A = opcodes.opcode2
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         case 0x70: // LD (HL),B
-            printInstructionDetails(instructionDetails: "LD (HL),B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),B", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.B)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x71: // LD (HL),C
-            printInstructionDetails(instructionDetails: "LD (HL),C", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),C", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.C)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x72: // LD (HL),D
-            printInstructionDetails(instructionDetails: "LD (HL),D", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),D", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.D)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x73: // LD (HL),E
-            printInstructionDetails(instructionDetails: "LD (HL),E", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),E", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.E)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x74: // LD (HL),H
-            printInstructionDetails(instructionDetails: "LD (HL),H", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),H", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.H)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x75: // LD (HL),L
-            printInstructionDetails(instructionDetails: "LD (HL),L", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),L", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.L)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x76: // HALT
-            printInstructionDetails(instructionDetails: "HALT", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "HALT", opcode: [opcodes.opcode1], programCounter: registers.PC)
             emulatorHalted = true
+            tStates = tStates + 4
         case 0x77: // LD (HL),A
-            printInstructionDetails(instructionDetails: "LD (HL),A", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD (HL),A", opcode: [opcodes.opcode1], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: registers.A)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0x78: // LD A,B
-            printInstructionDetails(instructionDetails: "LD A, B", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A, B", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.B
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x79: // LD A,C
-            printInstructionDetails(instructionDetails: "LD A,C", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,C", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.C
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x7A: // LD A,D
-            printInstructionDetails(instructionDetails: "LD A,D", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,D", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.D
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x7B: // LD A,E
-            printInstructionDetails(instructionDetails: "LD A,E", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,E", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.E
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x7C: // LD A,H
-            printInstructionDetails(instructionDetails: "LD A,H", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,H", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.H
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x7D: // LD A,L
-            printInstructionDetails(instructionDetails: "LD A,L", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,L", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.L
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0x7E: // LD A,(HL)
-            printInstructionDetails(instructionDetails: "LD A,(HL)", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "LD A,(HL)", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = mmu.readByte(address: registers.HL)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
         case 0xB1: // OR C
-            printInstructionDetails(instructionDetails: "OR C", opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "OR C", opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.A = registers.C | registers.A
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0x80) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.A == 0)
@@ -608,8 +817,9 @@ actor Z80CPU
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry,SetFlag:false)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
         case 0xC2: // JP NZ,nn
-            printInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
             {
                 registers.PC = registers.PC &+ 3
@@ -618,11 +828,13 @@ actor Z80CPU
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
+            tStates = tStates + 10
         case 0xC3: // JP nn
-            printInstructionDetails(instructionDetails: "JP $nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP $nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
+            tStates = tStates + 10
         case 0xCA: // JP Z,nn
-            printInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
@@ -631,88 +843,106 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 3
             }
+            tStates = tStates + 10
         case 0xCB: //start CB opcodes
             switch opcodes.opcode2
             {
                 case 0x47: // BIT 0, A
-                printInstructionDetails(instructionDetails: "BIT 0, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 0, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000001) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x4F: // BIT 1, A
-                    printInstructionDetails(instructionDetails: "BIT 1, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 1, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000010) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x57: // BIT 2, A
-                printInstructionDetails(instructionDetails: "BIT 2, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 2, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000100) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x5F: // BIT 3, A
-                printInstructionDetails(instructionDetails: "BIT 3, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 3, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00001000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x67: // BIT 4, A
-                printInstructionDetails(instructionDetails: "BIT 4, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 4, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00010000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x6F: // BIT 5, A
-                printInstructionDetails(instructionDetails: "BIT 5, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 5, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b0010000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x77: // BIT 6, A
-                printInstructionDetails(instructionDetails: "BIT 6, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 6, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b01000000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0x7F: // BIT 7, A
-                printInstructionDetails(instructionDetails: "BIT 7, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "BIT 7, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b10000000) == 1))
                     registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                    tStates = tStates + 8
                 case 0xC7: // SET 0, A
-                    printInstructionDetails(instructionDetails: "SET 0, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 0, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b00000001
+                    tStates = tStates + 8
                 case 0xCF: // SET 1, A
-                    printInstructionDetails(instructionDetails: "SET 1, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 1, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b00000010
+                    tStates = tStates + 8
                 case 0xD7: // SET 2, A
-                    printInstructionDetails(instructionDetails: "SET 2, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 2, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b00000100
+                    tStates = tStates + 8
                 case 0xDF: // SET 3, A
-                    printInstructionDetails(instructionDetails: "SET 3, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 3, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b00001000
+                    tStates = tStates + 8
                 case 0xE7: // SET 4, A
-                    printInstructionDetails(instructionDetails: "SET 4, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 4, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b00010000
+                    tStates = tStates + 8
                 case 0xEF: // SET 5, A
-                    printInstructionDetails(instructionDetails: "SET 5, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 5, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b00100000
+                    tStates = tStates + 8
                 case 0xF7: // SET 6, A
-                    printInstructionDetails(instructionDetails: "SET 6, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 6, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b01000000
+                    tStates = tStates + 8
                 case 0xFF: // SET 7, A
-                    printInstructionDetails(instructionDetails: "SET 7, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(instructionDetails: "SET 7, A", opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
                     registers.A = registers.A | 0b10000000
+                    tStates = tStates + 8
                 default:
-                    printInstructionDetails(opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    logInstructionDetails(opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                    tStates = tStates + 0 // check if this is correct
             } // end CB opcodes
             registers.PC = registers.PC &+ 2
         case 0xD2: // JP NC,nn
-            printInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
             {
                 registers.PC = registers.PC &+ 3
@@ -721,8 +951,9 @@ actor Z80CPU
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
+            tStates = tStates + 10
         case 0xD3: // OUT (n),A
-            printInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             ports[Int(opcodes.opcode2)] = registers.A
             switch opcodes.opcode2
             {
@@ -772,11 +1003,12 @@ actor Z80CPU
                 }
             case 0x0C: break // writing to port 0x0C needs no further processing
             case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
-            default: printInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
+            default: logInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
             }
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 11
         case 0xDA: // JP C,nn
-            printInstructionDetails(instructionDetails: "JP C,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP C,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
@@ -785,8 +1017,9 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 3
             }
+            tStates = tStates + 10
         case 0xDB: // IN A,(n)
-            printInstructionDetails(instructionDetails: "IN A,($n)", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "IN A,($n)", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             registers.A = ports[Int(opcodes.opcode2)]
             switch opcodes.opcode2
             {
@@ -795,11 +1028,12 @@ actor Z80CPU
                 case 0x0B: break // registers.A contains value of font rom control port
                 case 0x0C: registers.A = MOS6545.ReadStatusRegister()
                 case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
-                default: printInstructionDetails(instructionDetails: "Executed LD BC, nn", opcode: [opcodes.opcode1], programCounter: registers.PC)
+                default: logInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
             }
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 11
         case 0xE2: // JP PO,nn
-            printInstructionDetails(instructionDetails: "JP PO,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP PO,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
             {
                 registers.PC = registers.PC &+ 3
@@ -808,8 +1042,9 @@ actor Z80CPU
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
+            tStates = tStates + 10
         case 0xEA: // JP PE,nn
-            printInstructionDetails(instructionDetails: "JP PE,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP PE,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
@@ -818,11 +1053,12 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 3
             }
+            tStates = tStates + 10
         case 0xED: // ED instructions
             switch opcodes.opcode2
             {
             case 0xB0:  // LDIR
-                printInstructionDetails(instructionDetails: "LDIR", opcode: [opcodes.opcode1], programCounter: registers.PC)
+                logInstructionDetails(instructionDetails: "LDIR", opcode: [opcodes.opcode1], programCounter: registers.PC)
                 repeat
                 {
                     mmu.writeByte(address: registers.DE, value : mmu.readByte(address: registers.HL))
@@ -835,12 +1071,15 @@ actor Z80CPU
                 registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
                 registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
                 registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:registers.BC == 0)
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 21
             default:
-                printInstructionDetails(opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                logInstructionDetails(opcode: [opcodes.opcode1,opcodes.opcode2], programCounter: registers.PC)
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 21  // confirm this behaviour
             }
-            registers.PC = registers.PC &+ 2
         case 0xF2: // JP P,nn
-            printInstructionDetails(instructionDetails: "JP P,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP P,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
             {
                 registers.PC = registers.PC &+ 3
@@ -849,8 +1088,9 @@ actor Z80CPU
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
             }
+            tStates = tStates + 10
         case 0xFA: // JP M,nn
-            printInstructionDetails(instructionDetails: "JP M,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP M,$nn", opcode: [opcodes.opcode1,opcodes.opcode2,opcodes.opcode3], values: [opcodes.opcode2,opcodes.opcode3], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
             {
                 registers.PC = UInt16(opcodes.opcode3) << 8 | UInt16(opcodes.opcode2)
@@ -859,8 +1099,9 @@ actor Z80CPU
             {
                 registers.PC = registers.PC &+ 3
             }
+            tStates = tStates + 10
         case 0xFE: // CP n
-            printInstructionDetails(instructionDetails: "CP $n", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "CP $n", opcode: [opcodes.opcode1,opcodes.opcode2], values: [opcodes.opcode2], programCounter: registers.PC)
             let temporaryResult = registers.A &- opcodes.opcode2
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(temporaryResult & 0x80) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:temporaryResult == 0)
@@ -869,11 +1110,12 @@ actor Z80CPU
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry,SetFlag:registers.A < opcodes.opcode2)
             registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
         default:
-            printInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
+            logInstructionDetails(opcode: [opcodes.opcode1], programCounter: registers.PC)
             registers.PC = registers.PC &+ 1
+            tStates = tStates + 0 // check this behaviour
         } // end single opcodes
-        runcycles = runcycles+1
     }
 
     func getState() async -> CPUState
@@ -890,6 +1132,9 @@ actor Z80CPU
                          IY : registers.IY,
                          I: registers.I,
                          R: registers.R,
+                         IM  : registers.IM,
+                         IFF1 : registers.IFF1,
+                         IFF2 : registers.IFF2,
                          A: registers.A,
                          F: registers.F,
                          B: registers.B,
@@ -908,7 +1153,7 @@ actor Z80CPU
                          AltL: registers.AltL,
                          
                          memoryDump: mmu.memorySlice(address: registers.PC & 0xFF00, size: 0x100),
-                         //memoryDump: mmu.memorySlice(address: registers.PC, size: 0x100),
+                         ports: ports,
                          VDU : videoRAM.bufferTransform(),
                          CharRom : fontROM.bufferTransform(),
                          PcgRam : pcgRAM.bufferTransform(),
@@ -924,14 +1169,9 @@ actor Z80CPU
                          vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
                          vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
                          
-                         vmCursorBlinkCounter: MOS6545.crtcRegisters.CursorBlinkCounter,
-                         vmCursorFlashLimit: MOS6545.crtcRegisters.CursorFlashLimit,
-                         
                          vmRedBackgroundIntensity: MOS6545.crtcRegisters.redBackgroundIntensity,
                          vmGreenBackgroundIntensity: MOS6545.crtcRegisters.greenBackgroundIntensity,
-                         vmBlueBackgroundIntensity: MOS6545.crtcRegisters.blueBackgroundIntensity,
-                         
-                         vmColourMode: MOS6545.crtcRegisters.colourMode
+                         vmBlueBackgroundIntensity: MOS6545.crtcRegisters.blueBackgroundIntensity
                          
             )
     }

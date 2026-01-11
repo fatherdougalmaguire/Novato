@@ -32,6 +32,9 @@ final class EmulatorViewModel
     
     var iReg   : UInt8 = 0
     var rReg   : UInt8 = 0
+    var imReg  : UInt8 = 0
+    var iFF1Reg  : UInt8 = 0
+    var iFF2Reg  : UInt8 = 0
     
     var ixReg  : UInt16 = 0
     var iyReg  : UInt16 = 0
@@ -40,6 +43,7 @@ final class EmulatorViewModel
     var spReg  : UInt16 = 0
     
     var memoryDump: [UInt8] = []
+    var ports: [UInt8] = Array(repeating: 0,count: 256)
     var VDU: [Float] = []
     var CharRom : [Float] = []
     var PcgRam: [Float] = []
@@ -55,14 +59,9 @@ final class EmulatorViewModel
     var vmR14_CursorPositionH : UInt8 = 0
     var vmR15_CursorPositionL : UInt8 = 0
     
-    var vmCursorBlinkCounter: Int = 0
-    var vmCursorFlashLimit  : Int = 0
-    
     var vmRedBackgroundIntensity : UInt8 = 0
     var vmGreenBackgroundIntensity : UInt8 = 0
     var vmBlueBackgroundIntensity : UInt8 = 0
-    
-    var vmColourMode : UInt8 = 0
     
     private let cpu: Z80CPU
 
@@ -75,6 +74,11 @@ final class EmulatorViewModel
     func ClearEmulationScreen() async
     {
         await cpu.ClearVideoMemory()
+    }
+    
+    func writeToMemory( address : UInt16, value : UInt8) async
+    {
+        await cpu.writeToMemory(address : address, value : value)
     }
     
     func startEmulation() async
@@ -115,6 +119,10 @@ final class EmulatorViewModel
                 
                 self.iReg = state.I
                 self.rReg = state.R
+                
+                self.imReg = state.IM
+                self.iFF1Reg = state.IFF1
+                self.iFF2Reg = state.IFF2
 
                 self.aReg = state.A
                 self.fReg = state.F
@@ -135,6 +143,7 @@ final class EmulatorViewModel
                 self.altlReg = state.AltL
 
                 self.memoryDump = state.memoryDump
+                self.ports = state.ports
                 self.VDU = state.VDU
                 self.CharRom = state.CharRom
                 self.PcgRam = state.PcgRam
@@ -150,15 +159,9 @@ final class EmulatorViewModel
                 self.vmR14_CursorPositionH = state.vmR14_CursorPositionH
                 self.vmR15_CursorPositionL = state.vmR15_CursorPositionL
                 
-                self.vmCursorBlinkCounter = state.vmCursorBlinkCounter
-                self.vmCursorFlashLimit = state.vmCursorFlashLimit
-                
                 self.vmRedBackgroundIntensity = state.vmRedBackgroundIntensity
                 self.vmGreenBackgroundIntensity = state.vmGreenBackgroundIntensity
                 self.vmBlueBackgroundIntensity = state.vmBlueBackgroundIntensity
-                
-                self.vmColourMode = state.vmColourMode
-                
             }
         }
     }

@@ -73,6 +73,9 @@ struct SettingsView: View
             colourSettingsView()
                 .tabItem { Label("Colour mode", systemImage: "gear") }
                 .tag("general")
+            screenSettingsView()
+                .tabItem { Label("Screen Settings", systemImage: "gear") }
+                .tag("general")
             
         }
         .frame(width: 450, height: 250) // Standard starting size
@@ -111,7 +114,7 @@ struct demoSettingsView: View
 
     var body: some View
     {
-        let themes = ["Microworld Basic (64x16)","CP/M (80x24)","Viatel (40x24)"]
+        let themes = ["Microworld Basic (64x16)","CP/M (80x24)","Viatel (40x25)"]
         Form
         {
             Picker("Demo Screen:", selection: $demoSelection)
@@ -151,6 +154,32 @@ struct colourSettingsView: View
             Text("Changes will be applied immediately.")
             .font(.caption)
             .foregroundColor(.secondary)
+        }
+        .padding(30)
+        .frame(width: 400, height: 150)
+    }
+}
+
+struct screenSettingsView: View
+{
+    @AppStorage("scalingSelection") private var scalingSelection: Double = 2.0
+    @AppStorage("aspectSelection") private var aspectSelection: Double = 4/3
+    
+    var body: some View
+    {
+        Form
+        {
+            Slider(value: $scalingSelection, in: 1...4, step: 1.0)
+            { Text("Screen Scaling") }
+            minimumValueLabel: { Text("1") }
+            maximumValueLabel: { Text("4") }
+            
+            Divider()
+            
+            Slider(value: $aspectSelection, in: 0...2, step: 0.1)
+            { Text("Aspect Ratio") }
+            minimumValueLabel: { Text("0") }
+            maximumValueLabel: { Text("2") }
         }
         .padding(30)
         .frame(width: 400, height: 150)
