@@ -169,7 +169,7 @@ struct screenSettingsView: View
     {
         Form
         {
-            Slider(value: $scalingSelection, in: 1...4, step: 1.0)
+            Slider(value: $scalingSelection, in: 1...4, step: 0.25)
             { Text("Screen Scaling") }
             minimumValueLabel: { Text("1") }
             maximumValueLabel: { Text("4") }

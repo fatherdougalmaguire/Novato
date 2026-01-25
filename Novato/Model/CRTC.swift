@@ -31,6 +31,7 @@ final class CRTC
         var redBackgroundIntensity : UInt8 = 0x00                         // red background intensity 0 = half 1 = full
         var greenBackgroundIntensity : UInt8 = 0x00                       // green background intensity 0 = half 1 = full
         var blueBackgroundIntensity : UInt8 = 0x00                        // blue background intensity 0 = half 1 = full
+        
     }
     
     var crtcRegisters = CRTCRegisters()

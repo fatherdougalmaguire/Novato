@@ -31,11 +31,14 @@ struct EmulatorView: View
     @AppStorage("aspectSelection") private var charAspect: Double = 4/3  // Correction for CRT aspect ratio
     @AppStorage("colorSelection") private var colourSelection = "Colour"
     @AppStorage("demoSelection") private var demoSelection = "Microworld Basic (64x16)"
-
+    
     let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4,"Premium Colour":5]
     
     // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour else Premium colour mode
-
+    
+    let startDate = Date()
+    @State private var isRunning = false
+    
     var body: some View
     {
         // Safely derive dimensions and uniforms
@@ -44,16 +47,16 @@ struct EmulatorView: View
         let rawScanLines = Int(vm.vmR9_ScanLinesMinus1 + 1)
         let scanLines = max(rawScanLines, 1)
         let vertDisplayed = max(Int(vm.vmR6_VertDisplayed), 1)
-
+        
         let frameWidth = 8 * horizDisplayed
         let frameHeight = scanLines * vertDisplayed
-
+        
         // Prevent division by zero and non-finite scaling
         let baseXScale = 512.0 / Double(max(frameWidth, 1))
         let frameXScale = baseXScale.isFinite ? baseXScale : 1.0
         let baseYScale = 256.0 / Double(max(frameHeight, 1))
         let frameYScale = baseYScale.isFinite ? baseYScale : 1.0
-
+        
         let scanLineHeight = Float(scanLines)
         let displayColumns = Float(horizDisplayed)
         let cursorStartScanLine = Float(Int(vm.vmR10_CursorStartAndBlinkMode) & 0b00011111)
@@ -63,110 +66,99 @@ struct EmulatorView: View
         let cursorPosition = Float(Int(vm.vmR14_CursorPositionH) << 8 | Int(vm.vmR15_CursorPositionL))
         
         let colourMode = Float(colourOptions[colourSelection] ?? 0)
-
+        
         let baseWidth = max(CGFloat(frameWidth), 1)
         let baseHeight = max(CGFloat(frameHeight), 1)
         let scaledWidth = baseWidth * charScale * frameXScale
         let scaledHeight = baseHeight * charScale * charAspect * frameYScale
         
         let backGroundIntensity = Float(vm.vmRedBackgroundIntensity << 2 + vm.vmGreenBackgroundIntensity << 1 + vm.vmBlueBackgroundIntensity)
-
-        let startDate = Date()
         
-        ZStack {
-            Color.white
-            VStack {
-                TimelineView(.animation)
-                { context in let elapsedTime = Float(context.date.timeIntervalSince(startDate))
-                    Rectangle()
-                        .frame(width: baseWidth, height: baseHeight, alignment: .center)
-                        .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float(colourMode), .float(backGroundIntensity),.float(elapsedTime), .floatArray(vm.VDU), .floatArray(vm.CharRom), .floatArray(vm.PcgRam), .floatArray(vm.ColourRam)))
-                        .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
-                        .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
+        NavigationStack {
+            TimelineView((.periodic(from: startDate, by: 0.02)))
+            { context in let elapsedTime = Float(context.date.timeIntervalSince(startDate))
+                Rectangle()
+                    .frame(width: baseWidth, height: baseHeight, alignment: .center)
+                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float(colourMode), .float(backGroundIntensity),.float(elapsedTime), .floatArray(vm.VDU), .floatArray(vm.CharRom), .floatArray(vm.PcgRam), .floatArray(vm.ColourRam)))
+                    .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
+                    .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
+            }
+            .toolbar {
+                ToolbarItem(placement: .principal)
+                {
+                    HStack(spacing: 40)
+                    {
+                        HStack(spacing: 12)
+                        {
+                            Button(isRunning ? "Pause" : "Start", systemImage: isRunning ? "pause.fill" : "play.fill")
+                            {
+                                Task
+                                {
+                                    isRunning.toggle()
+                                    if ClearScreen
+                                    {
+                                        await vm.ClearEmulationScreen()
+                                        ClearScreen = false
+                                    }
+                                    switch demoSelection
+                                    {
+                                    case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0001, value: 0x00)
+                                    case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0001, value: 0x01)
+                                    case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0001, value: 0x02)
+                                    default: break
+                                    }
+                                    await vm.startEmulation()
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
+                            //.buttonStyle(.borderedProminent)
+                            //.tint(Color.orange)
+                            Button("Step", systemImage: "forward.frame.fill")
+                            {
+                                Task
+                                {
+                                    if ClearScreen
+                                    {
+                                        await vm.ClearEmulationScreen()
+                                        ClearScreen = false
+                                    }
+                                    switch demoSelection
+                                    {
+                                    case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0001, value: 0x00)
+                                    case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0001, value: 0x01)
+                                    case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0001, value: 0x02)
+                                    default: break
+                                    }
+                                    await vm.stepEmulation()
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
+                            Button("Stop", systemImage: "stop.fill")
+                            {
+                                Task { await vm.stopEmulation() }
+                            }
+                            .labelStyle(.titleAndIcon)
+                        }
+                            HStack(spacing: 12)
+                            {
+                                Button("Reset", systemImage: "arrow.counterclockwise")
+                                { NSApp.terminate(nil) }
+                                    .labelStyle(.titleAndIcon)
+                                
+                                Button("Quit", systemImage: "xmark.circle")
+                                { NSApp.terminate(nil) }
+                                    .labelStyle(.titleAndIcon)
+                            }
+                        }
+                        .fixedSize() // Ensures SwiftUI doesn't truncate the labels
+                    }
                 }
-                HStack
-                {
-                    LED(isOn: powerOn, color: .red)
-                    Button("Start", systemImage:"play.fill")
-                    {
-                        Task
-                        {
-                            if ClearScreen
-                            {
-                                await vm.ClearEmulationScreen()
-                                ClearScreen = false
-                            }
-                            switch demoSelection
-                            {
-                                case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0001, value: 0x00)
-                                case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0001, value: 0x01)
-                                case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0001, value: 0x02)
-                                default: break
-                            }
-                            await vm.startEmulation()
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.orange)
-                    .symbolEffect(.pulse, value: true)
-                    
-                    Button("Stop", systemImage:"stop.fill")
-                    {
-                        Task { await vm.stopEmulation() }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.orange)
-                    
-                    Button("Step", systemImage:"play.square.fill")
-                    {
-                       Task
-                        {
-                            if ClearScreen
-                            {
-                                await vm.ClearEmulationScreen()
-                                ClearScreen = false
-                            }
-                            switch demoSelection
-                            {
-                                case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0001, value: 0x00)
-                                case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0001, value: 0x01)
-                                case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0001, value: 0x02)
-                                default: break
-                            }
-                            await vm.stepEmulation()
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.orange)
-                } //hstack
-                
-                HStack
-                {
-                    Button("Reset", systemImage:"arrow.trianglehead.clockwise.rotate.90")
-                    {
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.orange)
-                    .disabled(true)
-                    
-                    Button("Quit", systemImage:"power")
-                    {
-                        NSApp.terminate(nil)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.orange)
-                } //hstack
-                
-                Spacer()
-                
             } //vstack
-        }  //zstack
-        .onAppear
-        {
-            openWindow(id: "RegisterWindow")
-            openWindow(id: "PortWindow")
-            openWindow(id: "MemoryWindow")
-        }
+            .onAppear
+            {
+                openWindow(id: "RegisterWindow")
+                openWindow(id: "PortWindow")
+                openWindow(id: "MemoryWindow")
+            }
     }
-} // struct
-
+}

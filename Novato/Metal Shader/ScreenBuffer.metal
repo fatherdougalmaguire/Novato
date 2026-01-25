@@ -11,11 +11,19 @@ using namespace metal;
     int ycursor;
     bool pixelset;
     
-    float interval = 0.5;
-   // bool blink = (int(floor(timeElapsed/interval)) & 1) != 0;
-    float remainder = fmod(timeElapsed, interval);
-   
-        bool blink = remainder < 0.01;
+    float cursorblinkInterval;
+    
+    if (int(CursorBlinkType) == 2)
+    {
+        cursorblinkInterval = 0.25;  // not sure how this is 50zhz/16 but it appears to work
+    }
+    else
+    {
+        cursorblinkInterval = 0.125; // not sure how this is 50zhz/32 but it appears to work
+    }
+    
+    uint cursorStep = (uint)floor(timeElapsed/cursorblinkInterval);
+    bool cursorOn = (cursorStep & 1u) == 0u;
     
     int pixelLocation;
     
@@ -109,13 +117,13 @@ using namespace metal;
             case 1: break; // 1 = always off
             case 2: // 2 = normal flash 1/16 frame rate
                     // if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
-                    if (cursorInside && blink)
+                    if (cursorInside && cursorOn)
                     {
                         pixelset = !pixelset;
                     }
                     break;
             case 3: // 3 = fast flash 1/32 frame rate
-                    if (cursorInside && blink)
+                    if (cursorInside && cursorOn)
                     //if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
                     {
                         pixelset = !pixelset;

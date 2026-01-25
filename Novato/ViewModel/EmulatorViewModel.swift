@@ -1,5 +1,4 @@
 import Foundation
-import Combine
 
 @Observable
 final class EmulatorViewModel
@@ -40,6 +39,7 @@ final class EmulatorViewModel
     var iyReg  : UInt16 = 0
     
     var pcReg  : UInt16 = 0
+    var lastpcReg  : UInt16 = 0
     var spReg  : UInt16 = 0
     
     var memoryDump: [UInt8] = []
@@ -63,8 +63,10 @@ final class EmulatorViewModel
     var vmGreenBackgroundIntensity : UInt8 = 0
     var vmBlueBackgroundIntensity : UInt8 = 0
     
+    var Z80Queue : Z80Queue? = nil
+    
     private let cpu: Z80CPU
-
+        
     init(cpu: Z80CPU)
     {
         self.cpu = cpu
@@ -104,6 +106,7 @@ final class EmulatorViewModel
             await MainActor.run
             {
                 self.pcReg  = state.PC
+                self.lastpcReg  = state.lastPC
                 self.spReg  = state.SP
                 
                 self.bcReg  = state.BC
@@ -162,6 +165,8 @@ final class EmulatorViewModel
                 self.vmRedBackgroundIntensity = state.vmRedBackgroundIntensity
                 self.vmGreenBackgroundIntensity = state.vmGreenBackgroundIntensity
                 self.vmBlueBackgroundIntensity = state.vmBlueBackgroundIntensity
+                
+                self.Z80Queue = state.Z80Queue
             }
         }
     }

@@ -7,19 +7,20 @@ struct NovatoApp: App
     
     var body: some Scene
     {
-        WindowGroup("Novato - Emulator",id: "EmulatorWindow")
+        Window("Novato - Emulator",id: "EmulatorWindow")
         {
             EmulatorView().environment(vm)
         }
-        WindowGroup("Novato - Debug Registers", id: "RegisterWindow")
+        .windowResizability(.contentSize)
+        Window("Novato - Debug Registers", id: "RegisterWindow")
         {
             RegisterView().environment(vm)
         }
-        WindowGroup("Novato - Debug Ports", id: "PortWindow")
+        Window("Novato - Debug Ports", id: "PortWindow")
         {
             PortView().environment(vm)
         }
-        WindowGroup("Novato - Debug Memory", id: "MemoryWindow")
+        Window("Novato - Debug Memory", id: "MemoryWindow")
         {
             MemoryView().environment(vm)
         }

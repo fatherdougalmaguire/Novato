@@ -4,6 +4,8 @@ struct MemoryView: View
 {
     @Environment(EmulatorViewModel.self) private var vm
     
+    let shizz = Z80Opcodes()
+    
     func mapascii (ascii : UInt8) -> String
     {
         switch ascii
@@ -39,7 +41,7 @@ struct MemoryView: View
 
             ScrollView
             {
-                VStack(alignment: .leading)
+                VStack()
                 {
                     Text("Memory View")
                         .font(.headline)
@@ -64,11 +66,12 @@ struct MemoryView: View
                         let byteString = highlightString(originalString: hexBytes, numDigits: 2, offset: Int(offset)*3, activate: highlight)
                         let charString = highlightString(originalString: charBytes, numDigits: 1, offset: Int(offset), activate: highlight)
                         
-                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        HStack(alignment: .firstTextBaseline, spacing: 8)
+                        {
                             Text(addressString)
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.orange)
-                            Text(":")
+                            Text("   ")
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.orange)
                             Text(byteString)
@@ -85,18 +88,46 @@ struct MemoryView: View
                     
                     Text("Instruction view")
                         .font(.headline)
-                    
+
                     Spacer()
                     
-                    ForEach(1..<10, id: \.self)
-                    { row in
-                        Text("0x1000: 21 00 F0   LD HL,0XF000")
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundColor(.orange)
+                    if let ken = vm.Z80Queue
+                    {
+                            ForEach(0...15, id: \.self)
+                            { row in
+                      
+                                    let outputString = ken.decodeAddress(index: row) + "   " + ken.decodeBytes(index: row) + "    " + shizz.decodeInstructions(opCodes: ken.returnOpcodes(index: row), dataBytes: ken.returnDataBytes(index: row))
+                                    let alternateRow = (row % 2) == 1
+                                    
+                                if ken.checkEmptyQueue(index: row)
+                                {
+                                    Text("")
+                                }
+                                else
+                                {
+                                    if vm.lastpcReg == ken.returnAddress(index: row)
+                                    {
+                                        Text(outputString)
+                                            .font(.system(.body, design: .monospaced))
+                                            .foregroundColor(.white)
+                                            .background(Color.orange)
+                                    }
+                                    else
+                                    {
+                                        Text(outputString)
+                                            .font(.system(.body, design: .monospaced))
+                                            .foregroundColor(.orange)
+                                            .background(alternateRow ? Color(red: 0.95, green: 0.95, blue: 0.97) : Color.clear)
+                                    }
+                                }
+
+                            }
                     }
-                }.padding(.leading,25)
+                }
             }
         }
+        .fixedSize()
+        .padding(10)
     }
     
 }

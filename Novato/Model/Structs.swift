@@ -1,6 +1,8 @@
 struct CPUState
 {
     let PC : UInt16
+    let lastPC : UInt16
+    
     let SP : UInt16
     
     let BC : UInt16
@@ -60,33 +62,8 @@ struct CPUState
     let vmRedBackgroundIntensity : UInt8
     let vmGreenBackgroundIntensity : UInt8
     let vmBlueBackgroundIntensity : UInt8
+    
+    let Z80Queue : Z80Queue
 }
 
-final class instructionQueue
-
-{
-    var instruction : [String]
-    var address : [UInt16]
-    var instructionLimit : Int
-    
-    init(instructionLimit: Int)
-    {
-        self.instruction = []
-        self.address = []
-        self.instructionLimit = instructionLimit
-    }
-    
-    func addInstruction(newInstruction: String, newAddress: UInt16)
-    {
-        if instruction.count >= instructionLimit
-        {
-            instruction.removeFirst()
-            address.removeFirst()
-        }
-        instruction.append(newInstruction)
-        address.append(newAddress)
-    }
-    
-    
-}
 

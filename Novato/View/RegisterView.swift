@@ -82,8 +82,6 @@ struct RegisterView: View
             Color.white
             VStack(spacing: 20)
             {
-                Spacer()
-                
                 HStack(spacing: 40)
                 {
                     VStack
@@ -172,59 +170,12 @@ struct RegisterView: View
                 }
                 FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.fReg)
                 
-                Spacer()
                 
-                ScrollView
-                {
-                    VStack(alignment: .leading)
-                    {
-                        Text("Memory View")
-                            .font(.headline)
-                        
-                        Spacer()
-                        
-                        let startAddress = vm.pcReg & 0xFF00
-                        let limit = vm.memoryDump.count / 16
-                        ForEach(0..<limit, id: \.self)
-                        { row in
-                            let address = row * 16
-                            let nextaddress = (row+1)*16
-                            let dispaddress = startAddress &+ UInt16(address)
-                            let bytes = vm.memoryDump[address..<address+16]
-                            let hexBytes = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
-                            let charBytes = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
-                            if (vm.pcReg >= address) && (vm.pcReg < nextaddress)
-                            {
-                                let offset = vm.pcReg &- UInt16(address)
-                                (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(highlightString(originalString: hexBytes, numDigits: 2, offset: Int(offset*3))) + Text(" "+highlightString(originalString: charBytes, numDigits: 1, offset: Int(offset))))
-                                    .font(.system(.body, design: .monospaced))
-                                    .foregroundColor(.orange)
-                            }
-                            else
-                            {
-                                (Text(String(format:"0x%04X", dispaddress) + ": ") + Text(String(hexBytes)) + Text(" "+String(charBytes)))
-                                    .font(.system(.body, design: .monospaced))
-                                    .foregroundColor(.orange)
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        Text("Instruction view")
-                            .font(.headline)
-                        
-                        Spacer()
-                        
-                        ForEach(1..<10, id: \.self)
-                        { row in
-                            Text("0x1000: 21 00 F0   LD HL,0XF000")
-                                .font(.system(.body, design: .monospaced))
-                                .foregroundColor(.orange)
-                        }
-                    }.padding(.leading,25)
-                }
+                
             }
         }
+        .fixedSize()
+        .padding(10)
     }
 }
 
