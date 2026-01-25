@@ -1,7 +1,7 @@
 # Introduction
 Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee) family of home computers.
 
-© Tony Sanchez 2025 All Rights Reserved
+© Tony Sanchez 2025-2026 All Rights Reserved
 
 <div align=left>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/9c6fc378-3184-44ff-a0e7-11361103483c"/>
@@ -17,7 +17,7 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 
 ## Ackowledgements
 
-The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM are used within this emulator have been made available with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
+The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled inside the applicstion with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
 
 ## Current status
 
@@ -25,16 +25,15 @@ Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.
 
 This emulator is still in what could charitably called *alpha* status.
 
-It is not cycle accurate by any means.
-
 * You can start and stop the emulator via button control.
 * You can quit the emulator via button control.
 * A small number of Z80 instructions are decoded.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
+* The last 16 instructions are decoded and displayed
 * The screen buffer is output to the display using a metal shader.
 * Shader will automatically scale the output resolution to the same display size.
-* Shader can magnify output up to 3x
+* Colour support has been added ( green mono, amber mono, blue mono, white mono and colour )
 * Rudimentary 6545 functionality is emulated:
   - Supports definition of the nummber of display rows and columns.
   - Supports definition of cursor position.
@@ -45,42 +44,69 @@ It is not cycle accurate by any means.
   - An arbitrary number of memory devices can be defined
   - Each memory device can be tagged as read-only or read/write
   - Devices can be switched into and out of memory ranges in RAM
-  - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram into memory
+  - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
 * Splash screen displaying the application logo as PCG characters
+* Settings module to set
+  - Demo screen ( basic, CP/M, Viatel )
+  - Colour mode
+  - Aspect ratio
+  - Screen scaling
 
 ## On the to-do list
 
-* Bank switching code to access font rom and colour ram
-* Colour support in shader
-* Full emulator of Z80 including undocumented instructions
-* Capture keyboard input
-* Cassette load/save functionality
+* ROM selecton and load
+* Machine state saving
+* Full emulation of Z80 including undocumented instructions
+* Interrupt processing
 * Sound output
+* Capture keyboard input
+* Proper emulator state machine
+  - rejig the basic state machine to allow start/pause, step, stop and stopping the emulator actor burning cycles when paused 
+* Frame based emulation
+  - The emulator now captures t-states
+  - rewrite the emulator loop to run 50hz worth of cycles before emitting CPU state to view model
+  - rewrite the emulator loop to process interrupts
+  - rewrite the emulator loop to fill sound buffer
+  - rewrite the emulator loop to trigger vblank update of 6545 for video and keypressed
+* Cassette load/save functionality
 
 ## Emulator screenshots
 
-### Splash Screen
+### Emulator Window
 
-<img width="2184" height="1752" alt="image" src="https://github.com/user-attachments/assets/bfb79869-5219-453f-8923-a18545b397f2" />
+<img width="2184" height="1674" alt="image" src="https://github.com/user-attachments/assets/c667e574-e824-4102-91d0-9f971adfb4e5" />
 
-### Status window
+### Port View
 
-<img width="2264" height="1456" alt="image" src="https://github.com/user-attachments/assets/4e50c089-6906-4af5-9bbb-53c3ab0ed5eb" />
+<img width="1084" height="680" alt="image" src="https://github.com/user-attachments/assets/c39654bf-9042-4d3e-829b-07a1920f5b38" />
+
+### Memory AND Instruction View
+
+<img width="1486" height="1524" alt="image" src="https://github.com/user-attachments/assets/e78bd374-7af8-4057-934d-efb6c90087c1" />
+
+### Register View
+
+<img width="1734" height="788" alt="image" src="https://github.com/user-attachments/assets/bcffe28c-aaad-477c-9b00-c78181f478b6" />
 
 ## Demo Screens
 
 Below are demo screens for the three video modes ( 64x16, 80x24, 40x24 ).  
 These screens are drawn using internally loaded Z80 assembler.
-The emulator is **NOT** currently booting BASIC nor CP/M
+The emulator is **NOT** currently booting BASIC, CP/M or Viatel
 
 ### 64 columns x 16 rows 
-<img width="2272" height="1840" alt="image" src="https://github.com/user-attachments/assets/df230844-a809-446d-95f1-64558da7077f" />
+
+<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/81dd522f-89c3-4c3f-b6ae-14ba894d46c5" />
 
 ### 80 columns x 24 rows 
-<img width="2272" height="1840" alt="image" src="https://github.com/user-attachments/assets/8d3923a5-c4fa-4062-bd3d-59c4ec5dabf9" />
 
-### 40 columns x 24 rows 
-<img width="2272" height="1840" alt="image" src="https://github.com/user-attachments/assets/d7ac5e81-c878-46c8-b2b6-b99dfb4bb360" />
+<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/16ba1cf3-c614-4a84-b14f-a1cd00e932ea" />
+
+### 40 columns x 25 rows 
+
+<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/efd6f9a3-c37c-4c86-b1d8-644cd0b9c090" />
+
+
 
 
 
