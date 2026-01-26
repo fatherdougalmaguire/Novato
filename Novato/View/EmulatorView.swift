@@ -1,21 +1,35 @@
 import SwiftUI
+import AppKit
 
-struct LED: View
+struct StatusLED: View
 {
     let isOn: Bool
-    let color: Color   // e.g. .green, .red, .yellow
+    
+    private let ledOnColor = Color.green
+    private let ledOffColor = Color.red
     
     var body: some View
     {
         Circle()
-            .fill(isOn ? color : color.opacity(0.15))
+            .fill(isOn ? ledOnColor : ledOffColor)
             .frame(width: 15, height: 15)
             .overlay(
                 Circle()
-                    .strokeBorder(Color.black.opacity(0.2), lineWidth: 1)
+                    .fill(Color.white.opacity(isOn ? 0.4 : 0.1))
+                    .frame(width: 3, height: 3)
+                    .offset(x: -2, y: -2)
             )
-            .shadow(color: isOn ? color.opacity(0.6) : .clear,
-                    radius: isOn ? 6 : 0, x: 0, y: 0)
+            .shadow(color: isOn ? ledOnColor.opacity(0.8) : .clear, radius: 3)
+            .animation(.easeInOut(duration: 0.1), value: isOn)
+    }
+}
+
+func focusWindow(withId id: String)
+{
+    if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == id })
+    {
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        window.makeKeyAndOrderFront(nil)
     }
 }
 
@@ -83,7 +97,12 @@ struct EmulatorView: View
                     .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
                     .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
             }
-            .toolbar {
+            .toolbar
+            {
+                ToolbarItem(placement: .primaryAction)
+                {
+                    StatusLED(isOn: isRunning)
+                }
                 ToolbarItem(placement: .principal)
                 {
                     HStack(spacing: 40)
@@ -139,26 +158,27 @@ struct EmulatorView: View
                             }
                             .labelStyle(.titleAndIcon)
                         }
-                            HStack(spacing: 12)
-                            {
-                                Button("Reset", systemImage: "arrow.counterclockwise")
-                                { NSApp.terminate(nil) }
-                                    .labelStyle(.titleAndIcon)
-                                
-                                Button("Quit", systemImage: "xmark.circle")
-                                { NSApp.terminate(nil) }
-                                    .labelStyle(.titleAndIcon)
-                            }
+                        HStack(spacing: 12)
+                        {
+                            Button("Reset", systemImage: "arrow.counterclockwise")
+                            { NSApp.terminate(nil) }
+                                .labelStyle(.titleAndIcon)
+                            
+                            Button("Quit", systemImage: "xmark.circle")
+                            { NSApp.terminate(nil) }
+                                .labelStyle(.titleAndIcon)
                         }
-                        .fixedSize() // Ensures SwiftUI doesn't truncate the labels
                     }
+                    .fixedSize() // Ensures SwiftUI doesn't truncate the labels
                 }
-            } //vstack
-            .onAppear
-            {
-                openWindow(id: "RegisterWindow")
-                openWindow(id: "PortWindow")
-                openWindow(id: "MemoryWindow")
             }
+        } //vstack
+        .onAppear
+        {
+            openWindow(id: "RegisterWindow")
+            openWindow(id: "PortWindow")
+            openWindow(id: "MemoryWindow")
+            focusWindow(withId: "EmulatorWindow")
+        }
     }
 }

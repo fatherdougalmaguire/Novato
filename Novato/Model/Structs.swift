@@ -66,4 +66,6 @@ struct CPUState
     let Z80Queue : Z80Queue
 }
 
-
+enum EmulatorState {
+    case stopped, running, paused, halted
+}
