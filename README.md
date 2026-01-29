@@ -17,7 +17,7 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 
 ## Ackowledgements
 
-The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled inside the applicstion with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
+The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
 
 ## Current status
 
