@@ -74,7 +74,7 @@ This emulator is still in what could charitably called *alpha* status.
 
 ### Emulator Window
 
-<img width="2184" height="1674" alt="image" src="https://github.com/user-attachments/assets/c667e574-e824-4102-91d0-9f971adfb4e5" />
+<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/b1a3c31c-8eac-42bb-b47f-28bfd4c665a4" />
 
 ### Port View
 
@@ -86,7 +86,7 @@ This emulator is still in what could charitably called *alpha* status.
 
 ### Register View
 
-<img width="1734" height="788" alt="image" src="https://github.com/user-attachments/assets/bcffe28c-aaad-477c-9b00-c78181f478b6" />
+<img width="1734" height="864" alt="image" src="https://github.com/user-attachments/assets/109da83a-c6a6-460b-a139-f000c27897ee" />
 
 ## Demo Screens
 
@@ -96,15 +96,16 @@ The emulator is **NOT** currently booting BASIC, CP/M or Viatel
 
 ### 64 columns x 16 rows 
 
-<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/81dd522f-89c3-4c3f-b6ae-14ba894d46c5" />
+<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/bd0b2fe5-2e51-49bf-b18c-0474af1833bd" />
 
 ### 80 columns x 24 rows 
 
-<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/16ba1cf3-c614-4a84-b14f-a1cd00e932ea" />
+<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/da0b5472-400d-4b5b-9e4b-31c0a41e1b85" />
 
 ### 40 columns x 25 rows 
 
-<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/efd6f9a3-c37c-4c86-b1d8-644cd0b9c090" />
+<img width="2184" height="1674" alt="image" src="https://github.com/user-attachments/assets/bf22f597-08ff-4a0e-b575-316c8aa3178c" />
+
 
 
 
