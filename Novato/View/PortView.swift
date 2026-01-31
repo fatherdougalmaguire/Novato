@@ -14,9 +14,9 @@ struct PortView: View
     
     var body: some View
     {
-        ZStack
-        {
-            Color.white
+      //  ZStack
+     //  {
+       //     Color.white
                 VStack(alignment: .leading)
                 {
                     Text("Port View")
@@ -82,9 +82,10 @@ struct PortView: View
                         .foregroundColor(Color.orange)
                         .font(.system(.body, design: .monospaced))
                 }
-        }
+        //}
         .fixedSize()
         .padding(10)
+        .background(.white)
     }
 }
 

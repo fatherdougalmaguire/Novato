@@ -20,8 +20,8 @@ struct CPUState
     let R : UInt8
     
     let IM : UInt8        
-    let IFF1 : UInt8
-    let IFF2 : UInt8
+    let IFF1 : Bool
+    let IFF2 : Bool
     
     let A : UInt8
     let F : UInt8
@@ -64,8 +64,16 @@ struct CPUState
     let vmBlueBackgroundIntensity : UInt8
     
     let Z80Queue : Z80Queue
+    
+    let emulatorState : emulatorState
+
+    var tStates  : UInt64
 }
 
-enum EmulatorState {
+enum emulatorState {
     case stopped, running, paused, halted
+}
+
+enum executionMode {
+    case continuous,singleStep
 }

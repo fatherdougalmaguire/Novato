@@ -32,8 +32,8 @@ final class EmulatorViewModel
     var iReg   : UInt8 = 0
     var rReg   : UInt8 = 0
     var imReg  : UInt8 = 0
-    var iFF1Reg  : UInt8 = 0
-    var iFF2Reg  : UInt8 = 0
+    var iFF1Reg  : Bool = false
+    var iFF2Reg  : Bool = false
     
     var ixReg  : UInt16 = 0
     var iyReg  : UInt16 = 0
@@ -64,6 +64,10 @@ final class EmulatorViewModel
     var vmBlueBackgroundIntensity : UInt8 = 0
     
     var Z80Queue : Z80Queue? = nil
+    
+    var emulatorState : emulatorState = .stopped
+    
+    var tStates  : UInt64 = 0
     
     private let cpu: Z80CPU
         
@@ -126,7 +130,7 @@ final class EmulatorViewModel
                 self.imReg = state.IM
                 self.iFF1Reg = state.IFF1
                 self.iFF2Reg = state.IFF2
-
+                
                 self.aReg = state.A
                 self.fReg = state.F
                 self.bReg = state.B
@@ -144,7 +148,7 @@ final class EmulatorViewModel
                 self.alteReg = state.AltE
                 self.althReg = state.AltH
                 self.altlReg = state.AltL
-
+                
                 self.memoryDump = state.memoryDump
                 self.ports = state.ports
                 self.VDU = state.VDU
@@ -167,7 +171,9 @@ final class EmulatorViewModel
                 self.vmBlueBackgroundIntensity = state.vmBlueBackgroundIntensity
                 
                 self.Z80Queue = state.Z80Queue
+                self.tStates = state.tStates
             }
+            try? await Task.sleep(nanoseconds: 20_000_000) // 20 ms
         }
     }
 }

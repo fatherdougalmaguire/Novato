@@ -35,9 +35,9 @@ struct MemoryView: View
     
     var body: some View
     {
-        ZStack
-        {
-            Color.white
+      //  ZStack
+     //   {
+      //      Color.white
 
             ScrollView
             {
@@ -125,9 +125,10 @@ struct MemoryView: View
                     }
                 }
             }
-        }
+      //  }
         .fixedSize()
         .padding(10)
+        .background(.white)
     }
     
 }

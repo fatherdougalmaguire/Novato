@@ -53,6 +53,18 @@ struct RegisterView: View
         }
     }
     
+    @ViewBuilder
+    func booleanRow(label: String, value: Bool) -> some View
+    {
+        VStack
+        {
+            Text(label)
+                .font(.system(.body, design: .monospaced))
+            Text(String(value))
+                .font(.system(.body, design: .monospaced))
+        }
+    }
+    
     func getFlags( flag : UInt8) -> String
     {
         
@@ -77,9 +89,9 @@ struct RegisterView: View
     
     var body: some View
     {
-        ZStack
-        {
-            Color.white
+        //ZStack
+        //{
+         //   Color.white
             VStack(spacing: 20)
             {
                 HStack(spacing: 40)
@@ -161,21 +173,21 @@ struct RegisterView: View
                     }
                     Group
                     {
-                        registerRow(label: "I", value: vm.altaReg)
-                        registerRow(label: "R", value: vm.altfReg)
-                        registerRow(label: "IM", value: vm.altbReg)
-                        registerRow(label: "IFF1", value: vm.altcReg)
-                        registerRow(label: "IFF2", value: vm.altdReg)
+                        registerRow(label: "I", value: vm.iReg)
+                        registerRow(label: "R", value: vm.rReg)
+                        registerRow(label: "IM", value: vm.imReg)
+                        booleanRow(label: "IFF1", value: vm.iFF1Reg)
+                        booleanRow(label: "IFF2", value: vm.iFF2Reg)
                     }
                 }
                 FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.fReg)
                 
-                
-                
+                Text("T-States : "+vm.tStates.formatted())
             }
-        }
+     //   }
         .fixedSize()
         .padding(10)
+        .background(.white)
     }
 }
 
