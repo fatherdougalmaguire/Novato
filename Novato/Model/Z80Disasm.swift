@@ -1,8 +1,8 @@
 import Foundation
 
-struct Z80Queue
+struct Z80Queue: Sendable, Equatable
 {
-    struct singleInstruction
+    struct singleInstruction: Sendable, Equatable
     {
         var address : UInt16
         var opCodes : [UInt8]

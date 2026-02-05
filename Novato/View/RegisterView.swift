@@ -89,9 +89,6 @@ struct RegisterView: View
     
     var body: some View
     {
-        //ZStack
-        //{
-         //   Color.white
             VStack(spacing: 20)
             {
                 HStack(spacing: 40)
@@ -99,95 +96,93 @@ struct RegisterView: View
                     VStack
                     {
                         Text("PC").font(.headline)
-                        Text(String(format: "%04X",vm.pcReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.PC ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("SP").font(.headline)
-                        Text(String(format: "%04X",vm.spReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.SP ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("IX").font(.headline)
-                        Text(String(format: "%04X",vm.ixReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.IX ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("IY").font(.headline)
-                        Text(String(format: "%04X",vm.iyReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.IY ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("BC").font(.headline)
-                        Text(String(format: "%04X",vm.bcReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.BC ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("DE").font(.headline)
-                        Text(String(format: "%04X",vm.deReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.DE ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("HL").font(.headline)
-                        Text(String(format: "%04X",vm.hlReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.HL ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("BC'").font(.headline)
-                        Text(String(format: "%04X",vm.altbcReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.AltBC ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("DE'").font(.headline)
-                        Text(String(format: "%04X",vm.altdeReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.AltDE ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                     VStack
                     {
                         Text("HL'").font(.headline)
-                        Text(String(format: "%04X",vm.althlReg)).font(.system(.title3, design: .monospaced))
+                        Text(String(format: "%04X",vm.snapshot?.z80Snapshot.AltHL ?? 0)).font(.system(.title3, design: .monospaced))
                     }
                 }
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(60)), count: 8), spacing: 10)
                 {
                     Group
                     {
-                        registerRow(label: "A", value: vm.aReg)
-                        registerRow(label: "F", value: vm.fReg)
-                        registerRow(label: "B", value: vm.bReg)
-                        registerRow(label: "C", value: vm.cReg)
-                        registerRow(label: "D", value: vm.dReg)
-                        registerRow(label: "E", value: vm.eReg)
-                        registerRow(label: "H", value: vm.hReg)
-                        registerRow(label: "L", value: vm.lReg)
+                        registerRow(label: "A", value: vm.snapshot?.z80Snapshot.A ?? 0)
+                        registerRow(label: "F", value: vm.snapshot?.z80Snapshot.F ?? 0)
+                        registerRow(label: "B", value: vm.snapshot?.z80Snapshot.B ?? 0)
+                        registerRow(label: "C", value: vm.snapshot?.z80Snapshot.C ?? 0)
+                        registerRow(label: "D", value: vm.snapshot?.z80Snapshot.D ?? 0)
+                        registerRow(label: "E", value: vm.snapshot?.z80Snapshot.E ?? 0)
+                        registerRow(label: "H", value: vm.snapshot?.z80Snapshot.H ?? 0)
+                        registerRow(label: "L", value: vm.snapshot?.z80Snapshot.L ?? 0)
                     }
                     Group
                     {
-                        registerRow(label: "A'", value: vm.altaReg)
-                        registerRow(label: "F'", value: vm.altfReg)
-                        registerRow(label: "B'", value: vm.altbReg)
-                        registerRow(label: "C'", value: vm.altcReg)
-                        registerRow(label: "D'", value: vm.altdReg)
-                        registerRow(label: "E'", value: vm.alteReg)
-                        registerRow(label: "H'", value: vm.althReg)
-                        registerRow(label: "L'", value: vm.altlReg)
+                        registerRow(label: "A'", value: vm.snapshot?.z80Snapshot.AltA ?? 0)
+                        registerRow(label: "F'", value: vm.snapshot?.z80Snapshot.AltF ?? 0)
+                        registerRow(label: "B'", value: vm.snapshot?.z80Snapshot.AltB ?? 0)
+                        registerRow(label: "C'", value: vm.snapshot?.z80Snapshot.AltC ?? 0)
+                        registerRow(label: "D'", value: vm.snapshot?.z80Snapshot.AltD ?? 0)
+                        registerRow(label: "E'", value: vm.snapshot?.z80Snapshot.AltE ?? 0)
+                        registerRow(label: "H'", value: vm.snapshot?.z80Snapshot.AltH ?? 0)
+                        registerRow(label: "L'", value: vm.snapshot?.z80Snapshot.AltL ?? 0)
                     }
                     Group
                     {
-                        registerRow(label: "I", value: vm.iReg)
-                        registerRow(label: "R", value: vm.rReg)
-                        registerRow(label: "IM", value: vm.imReg)
-                        booleanRow(label: "IFF1", value: vm.iFF1Reg)
-                        booleanRow(label: "IFF2", value: vm.iFF2Reg)
+                        registerRow(label: "I", value: vm.snapshot?.z80Snapshot.I ?? 0)
+                        registerRow(label: "R", value: vm.snapshot?.z80Snapshot.R ?? 0)
+                        registerRow(label: "IM", value: vm.snapshot?.z80Snapshot.IM ?? 0)
+                        booleanRow(label: "IFF1", value: vm.snapshot?.z80Snapshot.IFF1 ?? 0)
+                        booleanRow(label: "IFF2", value: vm.vm.snapshot?.z80Snapshot.IFF2 ?? 0)
                     }
                 }
-                FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.fReg)
+                FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.snapshot?.z80Snapshot.F ?? 0)
                 
-                Text("T-States : "+vm.tStates.formatted())
+                Text("T-States : "+vm.snapshot?.z80Snapshot.tStates.formatted())
             }
-     //   }
-        .fixedSize()
-        .padding(10)
-        .background(.white)
+            .fixedSize()
+            .padding(10)
+            .background(.white)
+        }
     }
-}
-

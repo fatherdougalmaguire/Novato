@@ -15,7 +15,7 @@ final class CRTC
         var R7_VertSyncPosition : UInt8 = 0x00                              // Ignored by emulator - Position of the vertical sync pulse in character lines.
         var R8_ModeControl : UInt8 = 0x00                                   // Ignored by emulator
         var R9_ScanLinesMinus1 : UInt8 = 0x0F                               // Number of scanlines per character minus 1
-        var R10_CursorStartAndBlinkMode : UInt8 = (0x01 << 5) & 0b01100000  // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no c
+        var R10_CursorStartAndBlinkMode : UInt8 = (0x01 << 5) & 0b01100000  // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no cursor
         var R11_CursorEnd : UInt8 = 0b00000000 & 0b0011111                  // Cursor scanline end ( bits 0-4 )
         var R12_DisplayStartAddrH : UInt8 = 0x00                            // Character Generator Rom start address ( high byte )
         var R13_DisplayStartAddrL : UInt8 = 0x00                            // Character Generator Rom start address ( low byte )

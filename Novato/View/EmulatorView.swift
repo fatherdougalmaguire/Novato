@@ -55,45 +55,71 @@ struct EmulatorView: View
     
     var body: some View
     {
-        // Safely derive dimensions and uniforms
-        let rawHorizDisplayed = Int(vm.vmR1_HorizDisplayed)
-        let horizDisplayed = max(rawHorizDisplayed, 1)
-        let rawScanLines = Int(vm.vmR9_ScanLinesMinus1 + 1)
-        let scanLines = max(rawScanLines, 1)
-        let vertDisplayed = max(Int(vm.vmR6_VertDisplayed), 1)
+        let rawR1 = Int(vm.snapshot?.crtcSnapshot.R1 ?? 64)
+        let rawR9 = Int(vm.snapshot?.crtcSnapshot.R9 ?? 15)
+        let rawR6 = Int(vm.snapshot?.crtcSnapshot.R6 ??  17)
+        let rawR11 = Int(vm.snapshot?.crtcSnapshot.R11 ?? 15)
+        let rawR10 = Int(vm.snapshot?.crtcSnapshot.R10 ?? 0)
+        let rawR12 = Int(vm.snapshot?.crtcSnapshot.R12 ?? 0)
+        let rawR13 = Int(vm.snapshot?.crtcSnapshot.R13 ?? 0)
+        let rawR14 = Int(vm.snapshot?.crtcSnapshot.R14 ?? 0)
+        let rawR15 = Int(vm.snapshot?.crtcSnapshot.R15 ?? 0)
+        let rawRBI = Int(vm.snapshot?.crtcSnapshot.redBackgroundIntensity ?? 0)
+        let rawGBI = Int(vm.snapshot?.crtcSnapshot.greenBackgroundIntensity ?? 0)
+        let rawBBI = Int(vm.snapshot?.crtcSnapshot.blueBackgroundIntensity ?? 0)
         
+        let horizDisplayed = max(rawR1, 1)
+        let scanLines = max(rawR9+1, 1)
+        let vertDisplayed = max(rawR6, 1)
+            
         let frameWidth = 8 * horizDisplayed
         let frameHeight = scanLines * vertDisplayed
-        
-        // Prevent division by zero and non-finite scaling
+            
         let baseXScale = 512.0 / Double(max(frameWidth, 1))
         let frameXScale = baseXScale.isFinite ? baseXScale : 1.0
         let baseYScale = 256.0 / Double(max(frameHeight, 1))
         let frameYScale = baseYScale.isFinite ? baseYScale : 1.0
-        
+            
         let scanLineHeight = Float(scanLines)
         let displayColumns = Float(horizDisplayed)
-        let cursorStartScanLine = Float(Int(vm.vmR10_CursorStartAndBlinkMode) & 0b00011111)
-        let cursorEndScanLine = Float(vm.vmR11_CursorEnd)
-        let cursorBlinkType = Float(Int(vm.vmR10_CursorStartAndBlinkMode >> 5))
-        let fontLocationOffset = Float(Int(vm.vmR12_DisplayStartAddrH) << 8 | Int(vm.vmR13_DisplayStartAddrL))
-        let cursorPosition = Float(Int(vm.vmR14_CursorPositionH) << 8 | Int(vm.vmR15_CursorPositionL))
-        
+        let cursorStartScanLine = 0 //Float(rawR10 & 0b00011111)
+        let cursorEndScanLine = Float(rawR11)
+        let cursorBlinkType = 0 //Float(rawR10 >> 5)
+        let fontLocationOffset = 0 //Float(rawR12 << 8 | rawR13)
+        let cursorPosition = 0 //Float(rawR14 << 8 | rawR15)
+            
         let colourMode = Float(colourOptions[colourSelection] ?? 0)
-        
+            
         let baseWidth = max(CGFloat(frameWidth), 1)
         let baseHeight = max(CGFloat(frameHeight), 1)
         let scaledWidth = baseWidth * charScale * frameXScale
         let scaledHeight = baseHeight * charScale * charAspect * frameYScale
+            
+        let backGroundIntensity = 0 //Float(rawRBI << 2 + rawGBI << 1 + rawBBI)
         
-        let backGroundIntensity = Float(vm.vmRedBackgroundIntensity << 2 + vm.vmGreenBackgroundIntensity << 1 + vm.vmBlueBackgroundIntensity)
-        
-        NavigationStack {
-            TimelineView((.periodic(from: startDate, by: 0.02)))
-            { context in let elapsedTime = Float(context.date.timeIntervalSince(startDate))
+        NavigationStack
+        {
+            TimelineView(.periodic(from: startDate, by: 0.02))
+            { context in
+                let elapsedTime = Float(context.date.timeIntervalSince(startDate))
                 Rectangle()
                     .frame(width: baseWidth, height: baseHeight, alignment: .center)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(.float(scanLineHeight), .float(displayColumns), .float(fontLocationOffset), .float(cursorPosition), .float(cursorStartScanLine), .float(cursorEndScanLine), .float(cursorBlinkType), .float(colourMode), .float(backGroundIntensity),.float(elapsedTime), .floatArray(vm.VDU), .floatArray(vm.CharRom), .floatArray(vm.PcgRam), .floatArray(vm.ColourRam)))
+                    .colorEffect(ShaderLibrary.ScreenBuffer(
+                        .float(scanLineHeight),
+                        .float(displayColumns),
+                        .float(fontLocationOffset),
+                        .float(cursorPosition),
+                        .float(cursorStartScanLine),
+                        .float(cursorEndScanLine),
+                        .float(cursorBlinkType),
+                        .float(colourMode),
+                        .float(backGroundIntensity),
+                        .float(elapsedTime),
+                        .floatArray(vm.VDU),
+                        .floatArray(vm.CharRom),
+                        .floatArray(vm.PcgRam),
+                        .floatArray(vm.ColourRam)
+                    ))
                     .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
                     .frame(width: scaledWidth, height: scaledHeight, alignment: .center)
             }
@@ -152,17 +178,16 @@ struct EmulatorView: View
                                 }
                             }
                             .labelStyle(.titleAndIcon)
-                            Button("Stop", systemImage: "stop.fill")
-                            {
-                                Task { await vm.stopEmulation() }
-                            }
-                            .labelStyle(.titleAndIcon)
                         }
                         HStack(spacing: 12)
                         {
                             Button("Reset", systemImage: "arrow.counterclockwise")
-                            { NSApp.terminate(nil) }
-                                .labelStyle(.titleAndIcon)
+                            {
+                                Task
+                                {
+                                    await vm.stopEmulation()
+                                }
+                            }.labelStyle(.titleAndIcon)
                             
                             Button("Quit", systemImage: "xmark.circle")
                             { NSApp.terminate(nil) }
@@ -172,13 +197,15 @@ struct EmulatorView: View
                     .fixedSize() // Ensures SwiftUI doesn't truncate the labels
                 }
             }
-        } //vstack
+        } 
         .onAppear
         {
+            vm.startSnapshots()
             openWindow(id: "RegisterWindow")
             openWindow(id: "PortWindow")
             openWindow(id: "MemoryWindow")
             focusWindow(withId: "EmulatorWindow")
         }
+        .onDisappear { vm.stopSnapshots() }
     }
 }

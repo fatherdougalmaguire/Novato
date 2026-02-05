@@ -35,10 +35,6 @@ struct MemoryView: View
     
     var body: some View
     {
-      //  ZStack
-     //   {
-      //      Color.white
-
             ScrollView
             {
                 VStack()
@@ -48,19 +44,19 @@ struct MemoryView: View
                     
                     Spacer()
                     
-                    let startAddress = vm.pcReg & 0xFF00
-                    let limit = vm.memoryDump.count / 16
+                    let startAddress = UInt16((vm.snapshot?.z80Snapshot.PC ?? 0) & 0xFF00)
+                    let limit = Int((vm.snapshot?.memorySnapshot.memoryDump.count ?? 0) / 16)
                     ForEach(0..<limit, id: \.self)
                     { row in
                         let address = row * 16
                         let nextaddress = (row+1)*16
                         let dispaddress = startAddress &+ UInt16(address)
-                        let bytes: ArraySlice<UInt8> = vm.memoryDump[address..<(address+16)]
+                        let bytes: ArraySlice<UInt8> = vm.snapshot?.memorySnapshot.memoryDump[address..<(address+16)] ?? []
                         let hexBytes: String = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
                         let charBytes: String = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
-                        let highlight = (vm.pcReg >= address) && (vm.pcReg < nextaddress)
+                        let highlight = ((vm.snapshot?.z80Snapshot.PC ?? 0) >= address) && (vm.pcReg < nextaddress)
                         let alternateRow = (row % 2) == 1
-                        let offset = vm.pcReg &- UInt16(address)
+                        let offset = (vm.snapshot?.z80Snapshot.PC ?? 0) &- UInt16(address)
                         let addressString = String(format:"0x%04X", dispaddress)
                         
                         let byteString = highlightString(originalString: hexBytes, numDigits: 2, offset: Int(offset)*3, activate: highlight)
@@ -125,7 +121,6 @@ struct MemoryView: View
                     }
                 }
             }
-      //  }
         .fixedSize()
         .padding(10)
         .background(.white)
