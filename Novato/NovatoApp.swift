@@ -3,26 +3,26 @@ import SwiftUI
 @main
 struct NovatoApp: App
 {
-    @State private var vm = EmulatorViewModel(cpu: Z80CPU())
+    @State private var vm = emulatorViewModel(cpu: microbee())
     
     var body: some Scene
     {
-        Window("Novato - Emulator",id: "EmulatorWindow")
+        Window("Emulator",id: "emulatorWindow")
         {
-            EmulatorView().environment(vm)
+            emulatorView().environment(vm)
         }
         .windowResizability(.contentSize)
-        Window("Novato - Debug Registers", id: "RegisterWindow")
+        Window("Registers", id: "registerWindow")
         {
-            RegisterView().environment(vm)
+            registerView().environment(vm)
         }
-        Window("Novato - Debug Ports", id: "PortWindow")
+        Window("Ports and CRTC", id: "portAndCrtcWindow")
         {
-            PortView().environment(vm)
+            portAndCrtcView().environment(vm)
         }
-        Window("Novato - Debug Memory", id: "MemoryWindow")
+        Window("Memory and Instructions", id: "memoryAndInstructionWindow")
         {
-            MemoryView().environment(vm)
+            memoryAndInstructionView().environment(vm)
         }
         Settings { SettingsView() }
         .commands

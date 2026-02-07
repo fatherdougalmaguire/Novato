@@ -1,6 +1,6 @@
 import Foundation
 
-actor Z80CPU
+actor microbee
 {
     enum Z80Flags : UInt8
     {
@@ -25,15 +25,15 @@ actor Z80CPU
         var H : UInt8 = 0           // General Purpose Register H - 8 bit
         var L : UInt8 = 0           // General Purpose Register L - 8 bit
         
-        var AltA : UInt8 = 0        // Alternate Accumulator - 8 bit
-        var AltF : UInt8 = 0        // Alternate Flags Register - 8 bit
-        var AltB : UInt8 = 0        // Alternate General Purpose Register B - 8 bit
-        var AltC : UInt8 = 0        // Alternate General Purpose Register C - 8 bit
-        var AltD : UInt8 = 0        // Alternate General Purpose Register D - 8 bit
-        var AltE : UInt8 = 0        // Alternate General Purpose Register E - 8 bit
-        var AltH : UInt8 = 0        // Alternate General Purpose Register H - 8 bit
-        var AltL : UInt8 = 0        // Alternate General Purpose Register L - 8 bit
-     
+        var altA : UInt8 = 0        // Alternate Accumulator - 8 bit
+        var altF : UInt8 = 0        // Alternate Flags Register - 8 bit
+        var altB : UInt8 = 0        // Alternate General Purpose Register B - 8 bit
+        var altC : UInt8 = 0        // Alternate General Purpose Register C - 8 bit
+        var altD : UInt8 = 0        // Alternate General Purpose Register D - 8 bit
+        var altE : UInt8 = 0        // Alternate General Purpose Register E - 8 bit
+        var altH : UInt8 = 0        // Alternate General Purpose Register H - 8 bit
+        var altL : UInt8 = 0        // Alternate General Purpose Register L - 8 bit
+        
         var AF : UInt16             // General Purpose Register Pair AF - 16 bit
         {
             get
@@ -83,52 +83,52 @@ actor Z80CPU
             }
         }
         
-        var AltAF : UInt16             // Alternate General Purpose Register Pair AF - 16 bit
+        var altAF : UInt16             // Alternate General Purpose Register Pair AF - 16 bit
         {
             get
             {
-                return UInt16(AltA) << 8 | UInt16(AltF)
+                return UInt16(altA) << 8 | UInt16(altF)
             }
             set
             {
-                AltA = UInt8(newValue >> 8)
-                AltF = UInt8(newValue & 0xFF)
+                altA = UInt8(newValue >> 8)
+                altF = UInt8(newValue & 0xFF)
             }
         }
-        var AltBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bit
+        var altBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bit
         {
             get
             {
-                return UInt16(AltB) << 8 | UInt16(AltC)
+                return UInt16(altB) << 8 | UInt16(altC)
             }
             set
             {
-                AltB = UInt8(newValue >> 8)
-                AltC = UInt8(newValue & 0xFF)
+                altB = UInt8(newValue >> 8)
+                altC = UInt8(newValue & 0xFF)
             }
         }
-        var AltDE : UInt16       // Alternate General Purpose Register Pair DE - 16 bit
+        var altDE : UInt16       // Alternate General Purpose Register Pair DE - 16 bit
         {
             get
             {
-                return UInt16(AltD) << 8 | UInt16(AltE)
+                return UInt16(altD) << 8 | UInt16(altE)
             }
             set
             {
-                AltD = UInt8(newValue >> 8)
-                AltC = UInt8(newValue & 0xFF)
+                altD = UInt8(newValue >> 8)
+                altC = UInt8(newValue & 0xFF)
             }
         }
-        var AltHL : UInt16      // Alternate General Purpose Register Pair HL - 16 bit
+        var altHL : UInt16      // Alternate General Purpose Register Pair HL - 16 bit
         {
             get
             {
-                return UInt16(AltH) << 8 | UInt16(AltL)
+                return UInt16(altH) << 8 | UInt16(altL)
             }
             set
             {
-                AltH = UInt8(newValue >> 8)
-                AltL = UInt8(newValue & 0xFF)
+                altH = UInt8(newValue >> 8)
+                altL = UInt8(newValue & 0xFF)
             }
         }
         
@@ -151,22 +151,22 @@ actor Z80CPU
     struct Stack
     {
         private var elements = ContiguousArray<UInt8>()
-
+        
         mutating func push(value: UInt8)
         {
             elements.append(value)
         }
-
+        
         mutating func pop() -> UInt8?
         {
             return elements.popLast()
         }
     }
     
-    var myz80Queue = Z80Queue()
+    var myz80Queue = z80Queue()
     
     var registers = Registers()
- 
+    
     var ports = [UInt8](repeating: 0, count: 256)
     
     //    00 or 10 PIO port A data port
@@ -184,7 +184,7 @@ actor Z80CPU
     //    46 FDC sector register
     //    47 FDC data register
     //    48 Controller select/side/DD latch
-        
+    
     //    PORT B DATA PORT BIT ASSIGNMENTS
     //    bit 0 Cassette data in
     //    bit 1 Cassette data outddd
@@ -194,7 +194,7 @@ actor Z80CPU
     //    bit 5 RS232 output (1 = mark)
     //    bit 6 Speaker bit (1 = on)
     //    bit 7 Network interrupt bit
-
+    
     //    FLOPPY DISC CONTROLLER
     //    Controller select/side/DD latch bit assignments (write only)
     //    bit 0 LSB of drive address
@@ -203,7 +203,7 @@ actor Z80CPU
     //    bit 3 DD select (0 = single density)
     //
     //    Controller TRANSFER status bit - bit 7 when port 48H is read gives (INTRQ or DRQ)
-
+    
     //    COLOUR PORT BIT ASSIGNMENT
     //    bit 0 Not used
     //    bit 1 RED background intensity (1 = full)
@@ -219,11 +219,11 @@ actor Z80CPU
     private(set) var executionMode : executionMode = .continuous
     
     private var interruptPending = false
-
-    var MOS6545 = CRTC()
+    
+    var crtc = CRTC()
     
     var mmu = memoryMapper()
-
+    
     var mainRAM = memoryBlock(size: 0x8000, label: "mainRAM")
     var basicROM = memoryBlock(size: 0x4000, deviceType : .ROM, label: "basicROM")
     var wordbeeROM = memoryBlock(size: 0x2000, deviceType : .ROM, label: "wordbeeROM")
@@ -244,21 +244,21 @@ actor Z80CPU
         
         videoRAM.fillMemoryFromArray(memValues: [Character("W").asciiValue!,Character("e").asciiValue!,Character("l").asciiValue!,Character("c").asciiValue!,Character("o").asciiValue!,Character("m").asciiValue!,Character("e").asciiValue!,Character(" ").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!,Character(" ").asciiValue!,Character("N").asciiValue!,Character("o").asciiValue!,Character("v").asciiValue!,Character("a").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!], memOffset : 88)
         videoRAM.fillMemoryFromArray(memValues :  [128,129,130,131,132,133,134,135,
-                                                  136,137,138,139,140,141,142,143], memOffset : 280)
+                                                   136,137,138,139,140,141,142,143], memOffset : 280)
         videoRAM.fillMemoryFromArray(memValues :  [144,145,146,147,148,149,150,151,
-                                                  152,153,154,155,156,157,158,159], memOffset : 344)
+                                                   152,153,154,155,156,157,158,159], memOffset : 344)
         videoRAM.fillMemoryFromArray(memValues :  [160,161,162,163,164,165,166,167,
-                                                  168,169,170,171,172,173,174,175], memOffset : 408)
+                                                   168,169,170,171,172,173,174,175], memOffset : 408)
         videoRAM.fillMemoryFromArray(memValues :  [176,177,178,179,180,181,182,183,
-                                                  184,185,186,187,188,189,190,191], memOffset : 472)
+                                                   184,185,186,187,188,189,190,191], memOffset : 472)
         videoRAM.fillMemoryFromArray(memValues :  [192,193,194,195,196,197,198,199,
-                                                  200,201,202,203,204,205,206,207], memOffset : 536)
+                                                   200,201,202,203,204,205,206,207], memOffset : 536)
         videoRAM.fillMemoryFromArray(memValues :  [208,209,210,211,212,213,214,215,
-                                                  216,217,218,219,220,221,222,223], memOffset : 600)
+                                                   216,217,218,219,220,221,222,223], memOffset : 600)
         videoRAM.fillMemoryFromArray(memValues :  [224,225,226,227,228,229,230,231,
-                                                  232,233,234,235,236,237,238,239], memOffset : 664)
+                                                   232,233,234,235,236,237,238,239], memOffset : 664)
         videoRAM.fillMemoryFromArray(memValues :  [240,241,242,243,244,245,246,247,
-                                                  248,249,250,251,252,253,254,255], memOffset : 728)
+                                                   248,249,250,251,252,253,254,255], memOffset : 728)
         videoRAM.fillMemoryFromArray(memValues :  [Character("P").asciiValue!,Character("r").asciiValue!,Character("e").asciiValue!,Character("s").asciiValue!,Character("s").asciiValue!,Character(" ").asciiValue!,Character("S").asciiValue!,Character("t").asciiValue!,Character("a").asciiValue!,Character("r").asciiValue!,Character("t").asciiValue!], memOffset : 923)
         basicROM.fillMemoryFromFile(FileName: "basic_5.22e", FileExtension: "rom")
         wordbeeROM.fillMemoryFromFile(FileName: "wordbee_1.2", FileExtension: "rom")
@@ -266,140 +266,140 @@ actor Z80CPU
         fontROM.fillMemoryFromFile(FileName: "charrom", FileExtension: "bin")
         mainRAM.fillMemoryFromFile(FileName: "demo", FileExtension: "bin")
         pcgRAM.fillMemoryFromArray(memValues :
-                                        [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x04, 0x04,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x80, 0x00, 0x55, 0x02, 0xA8, 0x02,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x41, 0x14, 0x42, 0x11, 0x88,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x20, 0x10, 0x50, 0x08, 0x4C, 0x10,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x77, 0x80, 0x2A, 0x00, 0x54, 0x01,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBD, 0x00, 0x55, 0x80, 0x2A, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0x10, 0x10, 0x48, 0x24, 0x88,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x15, 0x10, 0x12, 0x20, 0x4A, 0x40,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x92, 0x55, 0x00, 0xAA, 0x00, 0xAA, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x56, 0x02, 0xA9, 0x04, 0xA1, 0x14,
-                                         0x09, 0x08, 0x12, 0x20, 0x2A, 0x40, 0x4A, 0x90, 0x85, 0xA0, 0x4A, 0x41, 0x28, 0xA4, 0x12, 0x88,
-                                         0x50, 0x0A, 0xA1, 0x08, 0xA5, 0x10, 0x85, 0x50, 0x0A, 0x40, 0x2A, 0x01, 0xA8, 0x05, 0xA8, 0x02,
-                                         0x45, 0x28, 0x42, 0x10, 0x4A, 0x21, 0x08, 0xA4, 0x11, 0x84, 0x51, 0x04, 0x52, 0x08, 0xA2, 0x08,
-                                         0x46, 0x12, 0x89, 0x41, 0x2A, 0x00, 0xAA, 0x00, 0x55, 0x08, 0x52, 0x00, 0xAA, 0x01, 0xAA, 0x02,
-                                         0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x40, 0xA0, 0x20, 0x20, 0xA5, 0x8A, 0x88, 0x11, 0x24, 0x21,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x92, 0x20, 0x0A, 0x40, 0x2A,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x4A, 0x81, 0x2A, 0x80, 0x2A,
-                                         0x04, 0x04, 0x09, 0x10, 0x15, 0x20, 0x25, 0x40, 0x95, 0x80, 0x55, 0x40, 0x2A, 0xA0, 0x95, 0x48,
-                                         0xA8, 0x04, 0x52, 0x00, 0x55, 0x00, 0x55, 0x00, 0x55, 0x00, 0x55, 0x00, 0xAA, 0x10, 0x45, 0x20,
-                                         0xAA, 0x00, 0xAA, 0x01, 0x54, 0x02, 0x50, 0x8A, 0x21, 0x08, 0x52, 0x04, 0xA1, 0x14, 0x42, 0x90,
-                                         0x26, 0x89, 0x22, 0x11, 0x88, 0x25, 0x90, 0x05, 0x50, 0x0A, 0xA0, 0x15, 0x40, 0x2A, 0x80, 0x2A,
-                                         0x00, 0x00, 0x00, 0x00, 0x80, 0x40, 0x40, 0x20, 0x20, 0x90, 0x20, 0x40, 0x40, 0x80, 0x80, 0x80,
-                                         0x00, 0x00, 0x01, 0x02, 0x02, 0x04, 0x04, 0x09, 0x10, 0x0A, 0x08, 0x04, 0x05, 0x02, 0x01, 0x01,
-                                         0x95, 0x80, 0x2A, 0x40, 0x15, 0x80, 0x55, 0x00, 0x55, 0x00, 0xAA, 0x41, 0x14, 0x42, 0x10, 0x4A,
-                                         0x55, 0x00, 0xAA, 0x00, 0x55, 0x02, 0x54, 0x01, 0x54, 0x22, 0x88, 0x22, 0x08, 0xA2, 0x11, 0x8A,
-                                         0x40, 0x2A, 0x80, 0x55, 0x00, 0x54, 0x02, 0x50, 0x0A, 0xA0, 0x15, 0x80, 0x54, 0x02, 0x50, 0x0A,
-                                         0x4A, 0xA4, 0x25, 0x12, 0xA9, 0x09, 0xA4, 0x14, 0x82, 0x54, 0x04, 0xA8, 0x09, 0xA9, 0x12, 0xA2,
-                                         0xA8, 0x04, 0x52, 0x08, 0x42, 0x28, 0x82, 0xBB, 0x00, 0x24, 0xD5, 0x82, 0x28, 0x02, 0x51, 0x08,
-                                         0xA2, 0x08, 0xA5, 0x10, 0x85, 0x50, 0x05, 0xF5, 0x00, 0x12, 0xD5, 0x08, 0x42, 0x28, 0x02, 0xA8,
-                                         0xAA, 0x04, 0x54, 0x08, 0x51, 0x12, 0x52, 0x44, 0x04, 0xA9, 0x44, 0x35, 0x88, 0x2A, 0x85, 0x25,
-                                         0x54, 0x42, 0x90, 0x8A, 0x20, 0x4A, 0x00, 0xAA, 0x00, 0x55, 0x20, 0x0A, 0xA1, 0x14, 0x41, 0x14,
-                                         0x01, 0xA8, 0x04, 0xA9, 0x02, 0xA8, 0x04, 0xA2, 0x10, 0x4A, 0x80, 0x2A, 0x01, 0x54, 0x09, 0xA0,
-                                         0x00, 0xAA, 0x00, 0x55, 0x00, 0xAA, 0x00, 0xAA, 0x04, 0xA9, 0x00, 0xAA, 0x00, 0x55, 0x02, 0xA8,
-                                         0x4A, 0xA4, 0x15, 0x52, 0x09, 0xA9, 0x04, 0xA4, 0x12, 0x45, 0x12, 0x8A, 0x44, 0x28, 0x08, 0xA8,
-                                         0x94, 0x42, 0x10, 0x45, 0x10, 0x24, 0x82, 0xA9, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x25, 0x88, 0x42, 0x14, 0x80, 0x55, 0x00, 0x55, 0xAB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x01, 0xAA, 0x04, 0xA4, 0x14, 0x48, 0x10, 0x50, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x80, 0xAA, 0x41, 0x28, 0x22, 0x11, 0x14, 0x0A, 0x04, 0x00, 0x05, 0x0A, 0x08, 0x12, 0x20, 0x2A,
-                                         0x40, 0x2A, 0x01, 0xA8, 0x05, 0x50, 0x0A, 0xD5, 0x48, 0x00, 0xAA, 0x55, 0x00, 0xAA, 0x00, 0xA4,
-                                         0xA0, 0x15, 0x40, 0x15, 0x41, 0x2A, 0x82, 0x5A, 0xA4, 0x00, 0xAA, 0x25, 0x41, 0x14, 0x82, 0x50,
-                                         0x44, 0x49, 0x88, 0x12, 0x29, 0x20, 0x4A, 0x40, 0x95, 0x40, 0x54, 0x22, 0x28, 0x92, 0x90, 0x4A,
-                                         0xA2, 0x08, 0x44, 0x22, 0x10, 0x8A, 0x40, 0x2A, 0x01, 0xAA, 0x00, 0xAA, 0x10, 0x85, 0x50, 0x0A,
-                                         0x02, 0xA8, 0x05, 0xA0, 0x15, 0xA0, 0x0A, 0xA0, 0x0A, 0x41, 0x28, 0x85, 0x50, 0x04, 0xA2, 0x14,
-                                         0x92, 0x44, 0x12, 0x41, 0x14, 0x82, 0x28, 0x84, 0x52, 0x01, 0x54, 0x02, 0xA8, 0x02, 0xA9, 0x05,
-                                         0xA0, 0x8A, 0x40, 0x6A, 0x91, 0x50, 0x8A, 0x68, 0x27, 0x20, 0xA5, 0x4A, 0x90, 0x94, 0x21, 0x24,
-                                         0x14, 0x82, 0x50, 0x0A, 0x50, 0x05, 0xA0, 0x15, 0xD5, 0x00, 0x6F, 0x10, 0xA4, 0x02, 0x50, 0x0A,
-                                         0x04, 0xA2, 0x10, 0xA5, 0x08, 0x42, 0x29, 0x42, 0x5A, 0x00, 0x76, 0x8A, 0x21, 0x89, 0x22, 0x88,
-                                         0x10, 0xA0, 0x20, 0x40, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x40,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x04, 0x04, 0x09, 0x04, 0x04, 0x02, 0x02, 0x01, 0x00,
-                                         0x40, 0x4A, 0x90, 0x85, 0x20, 0x4A, 0x10, 0x85, 0x50, 0x0A, 0x40, 0x2A, 0x81, 0x28, 0x45, 0x90,
-                                         0x12, 0x81, 0x54, 0x02, 0x50, 0x8A, 0x20, 0x0A, 0xA1, 0x14, 0x81, 0x54, 0x02, 0x50, 0x0A, 0xA0,
-                                         0x0A, 0x51, 0x04, 0xA1, 0x14, 0x82, 0x54, 0x01, 0x54, 0x02, 0x54, 0x01, 0xA8, 0x12, 0x84, 0x51,
-                                         0x49, 0x24, 0x25, 0x52, 0x09, 0xA9, 0x04, 0x52, 0x04, 0xA3, 0x14, 0x42, 0x14, 0x89, 0x52, 0x15,
-                                         0x40, 0x2A, 0x01, 0x54, 0x02, 0x54, 0x80, 0x6F, 0x10, 0x00, 0xEF, 0x00, 0xA9, 0x04, 0x51, 0x04,
-                                         0x81, 0x54, 0x02, 0x50, 0x0A, 0xA0, 0x0A, 0xEA, 0x01, 0x10, 0xDF, 0x00, 0x24, 0x42, 0x10, 0x4A,
-                                         0x52, 0x04, 0xA4, 0x15, 0x89, 0x52, 0x12, 0xE4, 0x04, 0x09, 0x64, 0x2A, 0x92, 0x2A, 0x89, 0x24,
-                                         0x42, 0x50, 0x8A, 0x20, 0x0A, 0x41, 0x28, 0x85, 0x50, 0x04, 0x52, 0x08, 0xA2, 0x09, 0x50, 0x85,
-                                         0xA0, 0x15, 0x80, 0x55, 0x00, 0x55, 0x08, 0x52, 0x80, 0x2A, 0x81, 0x54, 0x02, 0x50, 0x0A, 0x51,
-                                         0x22, 0x49, 0x04, 0x51, 0x08, 0x45, 0x20, 0x95, 0x40, 0x15, 0x40, 0x2A, 0x81, 0x54, 0x02, 0x51,
-                                         0x40, 0x20, 0x50, 0x10, 0x48, 0x10, 0x4C, 0x02, 0x54, 0x02, 0xAA, 0x04, 0x55, 0x09, 0x52, 0x14,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xDD, 0x82, 0x28, 0x02, 0x50, 0x0A,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xDD, 0x22, 0x88, 0x22, 0x88, 0x22,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x20, 0x90, 0x28, 0x88, 0x24,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x84, 0x51, 0x44, 0x29, 0x20, 0x15, 0x08, 0x0A, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x0A, 0x50, 0x05, 0x50, 0x0A, 0x40, 0x2A, 0x91, 0x6D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x84, 0x29, 0x00, 0xAA, 0x01, 0xA8, 0x05, 0x52, 0x6D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x52, 0x24, 0x89, 0x52, 0x50, 0x8A, 0x20, 0x54, 0x42, 0x90, 0x4A, 0x20, 0x2A, 0x10, 0x12, 0x08,
-                                         0x51, 0x04, 0x51, 0x08, 0xA4, 0x02, 0xA8, 0x05, 0xA0, 0x15, 0x80, 0x55, 0x00, 0xAA, 0x11, 0xA4,
-                                         0x00, 0x54, 0x02, 0xA9, 0x04, 0xA1, 0x14, 0x42, 0x28, 0x02, 0xA8, 0x04, 0x51, 0x04, 0x52, 0x08,
-                                         0x84, 0x52, 0x09, 0x45, 0x20, 0x14, 0x82, 0x28, 0x84, 0x22, 0x90, 0x4A, 0x00, 0x54, 0x02, 0xA9,
-                                         0x90, 0x8A, 0x50, 0x22, 0xA8, 0x92, 0x48, 0xAA, 0x25, 0xA0, 0x24, 0x8A, 0xC8, 0x92, 0x90, 0x25,
-                                         0x04, 0xA2, 0x10, 0xA5, 0x08, 0xA2, 0x08, 0xA5, 0x5A, 0x00, 0x92, 0xAA, 0x00, 0xAA, 0x00, 0x55,
-                                         0x08, 0xA4, 0x12, 0x40, 0x2A, 0x81, 0x54, 0x03, 0xFC, 0x00, 0x44, 0xB6, 0x01, 0xA9, 0x02, 0x50,
-                                         0xA5, 0x28, 0x92, 0xD0, 0x0A, 0xA0, 0x4A, 0x41, 0x94, 0x81, 0xAA, 0x40, 0x2A, 0x20, 0xA4, 0x92,
-                                         0x40, 0x2A, 0x81, 0x28, 0x84, 0x52, 0x01, 0x54, 0x02, 0x50, 0x0A, 0xA1, 0x08, 0xA5, 0x10, 0x85,
-                                         0x88, 0x22, 0x10, 0x8A, 0x41, 0x28, 0x44, 0x12, 0x80, 0x55, 0x00, 0x55, 0x08, 0x52, 0x01, 0x54,
-                                         0x88, 0x26, 0x82, 0x29, 0x05, 0xA0, 0x14, 0x82, 0x54, 0x01, 0xA8, 0x04, 0x52, 0x08, 0x42, 0x29,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x40, 0x60, 0x20, 0x80, 0x40, 0x80, 0x80, 0x80, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x0A, 0x04, 0x02, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x02, 0xA8, 0x05, 0xA0, 0x15, 0x20, 0x8A, 0xD5, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0xA2, 0x11, 0x44, 0x12, 0x48, 0x22, 0x88, 0x55, 0x4A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x12, 0x44, 0x14, 0x89, 0x49, 0x29, 0x92, 0x44, 0x49, 0x08, 0x0A, 0x04, 0x02, 0x02, 0x01, 0x01,
-                                         0x48, 0x42, 0x90, 0x4A, 0x00, 0x2A, 0x40, 0x95, 0x00, 0x55, 0x00, 0xAA, 0x00, 0xAA, 0x04, 0x29,
-                                         0x00, 0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x04, 0x51, 0x88, 0x22, 0x09, 0xA4, 0x11, 0xA4, 0x01, 0x54,
-                                         0x0A, 0xA0, 0x14, 0x82, 0x51, 0x88, 0x25, 0x10, 0x85, 0x50, 0x04, 0x52, 0x08, 0x42, 0x28, 0x02,
-                                         0x50, 0x8A, 0x68, 0x15, 0x52, 0x0A, 0x49, 0x24, 0x0A, 0xA2, 0x0A, 0xA4, 0x04, 0xA8, 0x10, 0x90,
-                                         0x50, 0x8A, 0x20, 0x0A, 0x50, 0x05, 0x50, 0x85, 0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x02, 0xA8, 0x12, 0xA0, 0x0A, 0x40, 0x2A, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x85, 0x22, 0x8C, 0x24, 0x88, 0x28, 0x90, 0x20, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x80, 0xAA, 0x40, 0x2A, 0x20, 0x15, 0x10, 0x0A, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x02, 0xA8, 0x05, 0xA0, 0x15, 0x40, 0x2A, 0x80, 0xBF, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0xA8, 0x05, 0x50, 0x0A, 0x40, 0x2A, 0x81, 0x55, 0x56, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x50, 0x20, 0x40, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-            colourRAM.fillMemory(memValue: 2)
+                                    [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x04, 0x04,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x80, 0x00, 0x55, 0x02, 0xA8, 0x02,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0x00, 0x41, 0x14, 0x42, 0x11, 0x88,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x20, 0x10, 0x50, 0x08, 0x4C, 0x10,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x77, 0x80, 0x2A, 0x00, 0x54, 0x01,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xBD, 0x00, 0x55, 0x80, 0x2A, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0x10, 0x10, 0x48, 0x24, 0x88,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x15, 0x10, 0x12, 0x20, 0x4A, 0x40,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x92, 0x55, 0x00, 0xAA, 0x00, 0xAA, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x48, 0x56, 0x02, 0xA9, 0x04, 0xA1, 0x14,
+                                     0x09, 0x08, 0x12, 0x20, 0x2A, 0x40, 0x4A, 0x90, 0x85, 0xA0, 0x4A, 0x41, 0x28, 0xA4, 0x12, 0x88,
+                                     0x50, 0x0A, 0xA1, 0x08, 0xA5, 0x10, 0x85, 0x50, 0x0A, 0x40, 0x2A, 0x01, 0xA8, 0x05, 0xA8, 0x02,
+                                     0x45, 0x28, 0x42, 0x10, 0x4A, 0x21, 0x08, 0xA4, 0x11, 0x84, 0x51, 0x04, 0x52, 0x08, 0xA2, 0x08,
+                                     0x46, 0x12, 0x89, 0x41, 0x2A, 0x00, 0xAA, 0x00, 0x55, 0x08, 0x52, 0x00, 0xAA, 0x01, 0xAA, 0x02,
+                                     0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x40, 0xA0, 0x20, 0x20, 0xA5, 0x8A, 0x88, 0x11, 0x24, 0x21,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x55, 0x92, 0x20, 0x0A, 0x40, 0x2A,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x54, 0x4A, 0x81, 0x2A, 0x80, 0x2A,
+                                     0x04, 0x04, 0x09, 0x10, 0x15, 0x20, 0x25, 0x40, 0x95, 0x80, 0x55, 0x40, 0x2A, 0xA0, 0x95, 0x48,
+                                     0xA8, 0x04, 0x52, 0x00, 0x55, 0x00, 0x55, 0x00, 0x55, 0x00, 0x55, 0x00, 0xAA, 0x10, 0x45, 0x20,
+                                     0xAA, 0x00, 0xAA, 0x01, 0x54, 0x02, 0x50, 0x8A, 0x21, 0x08, 0x52, 0x04, 0xA1, 0x14, 0x42, 0x90,
+                                     0x26, 0x89, 0x22, 0x11, 0x88, 0x25, 0x90, 0x05, 0x50, 0x0A, 0xA0, 0x15, 0x40, 0x2A, 0x80, 0x2A,
+                                     0x00, 0x00, 0x00, 0x00, 0x80, 0x40, 0x40, 0x20, 0x20, 0x90, 0x20, 0x40, 0x40, 0x80, 0x80, 0x80,
+                                     0x00, 0x00, 0x01, 0x02, 0x02, 0x04, 0x04, 0x09, 0x10, 0x0A, 0x08, 0x04, 0x05, 0x02, 0x01, 0x01,
+                                     0x95, 0x80, 0x2A, 0x40, 0x15, 0x80, 0x55, 0x00, 0x55, 0x00, 0xAA, 0x41, 0x14, 0x42, 0x10, 0x4A,
+                                     0x55, 0x00, 0xAA, 0x00, 0x55, 0x02, 0x54, 0x01, 0x54, 0x22, 0x88, 0x22, 0x08, 0xA2, 0x11, 0x8A,
+                                     0x40, 0x2A, 0x80, 0x55, 0x00, 0x54, 0x02, 0x50, 0x0A, 0xA0, 0x15, 0x80, 0x54, 0x02, 0x50, 0x0A,
+                                     0x4A, 0xA4, 0x25, 0x12, 0xA9, 0x09, 0xA4, 0x14, 0x82, 0x54, 0x04, 0xA8, 0x09, 0xA9, 0x12, 0xA2,
+                                     0xA8, 0x04, 0x52, 0x08, 0x42, 0x28, 0x82, 0xBB, 0x00, 0x24, 0xD5, 0x82, 0x28, 0x02, 0x51, 0x08,
+                                     0xA2, 0x08, 0xA5, 0x10, 0x85, 0x50, 0x05, 0xF5, 0x00, 0x12, 0xD5, 0x08, 0x42, 0x28, 0x02, 0xA8,
+                                     0xAA, 0x04, 0x54, 0x08, 0x51, 0x12, 0x52, 0x44, 0x04, 0xA9, 0x44, 0x35, 0x88, 0x2A, 0x85, 0x25,
+                                     0x54, 0x42, 0x90, 0x8A, 0x20, 0x4A, 0x00, 0xAA, 0x00, 0x55, 0x20, 0x0A, 0xA1, 0x14, 0x41, 0x14,
+                                     0x01, 0xA8, 0x04, 0xA9, 0x02, 0xA8, 0x04, 0xA2, 0x10, 0x4A, 0x80, 0x2A, 0x01, 0x54, 0x09, 0xA0,
+                                     0x00, 0xAA, 0x00, 0x55, 0x00, 0xAA, 0x00, 0xAA, 0x04, 0xA9, 0x00, 0xAA, 0x00, 0x55, 0x02, 0xA8,
+                                     0x4A, 0xA4, 0x15, 0x52, 0x09, 0xA9, 0x04, 0xA4, 0x12, 0x45, 0x12, 0x8A, 0x44, 0x28, 0x08, 0xA8,
+                                     0x94, 0x42, 0x10, 0x45, 0x10, 0x24, 0x82, 0xA9, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x25, 0x88, 0x42, 0x14, 0x80, 0x55, 0x00, 0x55, 0xAB, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x01, 0xAA, 0x04, 0xA4, 0x14, 0x48, 0x10, 0x50, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x80, 0xAA, 0x41, 0x28, 0x22, 0x11, 0x14, 0x0A, 0x04, 0x00, 0x05, 0x0A, 0x08, 0x12, 0x20, 0x2A,
+                                     0x40, 0x2A, 0x01, 0xA8, 0x05, 0x50, 0x0A, 0xD5, 0x48, 0x00, 0xAA, 0x55, 0x00, 0xAA, 0x00, 0xA4,
+                                     0xA0, 0x15, 0x40, 0x15, 0x41, 0x2A, 0x82, 0x5A, 0xA4, 0x00, 0xAA, 0x25, 0x41, 0x14, 0x82, 0x50,
+                                     0x44, 0x49, 0x88, 0x12, 0x29, 0x20, 0x4A, 0x40, 0x95, 0x40, 0x54, 0x22, 0x28, 0x92, 0x90, 0x4A,
+                                     0xA2, 0x08, 0x44, 0x22, 0x10, 0x8A, 0x40, 0x2A, 0x01, 0xAA, 0x00, 0xAA, 0x10, 0x85, 0x50, 0x0A,
+                                     0x02, 0xA8, 0x05, 0xA0, 0x15, 0xA0, 0x0A, 0xA0, 0x0A, 0x41, 0x28, 0x85, 0x50, 0x04, 0xA2, 0x14,
+                                     0x92, 0x44, 0x12, 0x41, 0x14, 0x82, 0x28, 0x84, 0x52, 0x01, 0x54, 0x02, 0xA8, 0x02, 0xA9, 0x05,
+                                     0xA0, 0x8A, 0x40, 0x6A, 0x91, 0x50, 0x8A, 0x68, 0x27, 0x20, 0xA5, 0x4A, 0x90, 0x94, 0x21, 0x24,
+                                     0x14, 0x82, 0x50, 0x0A, 0x50, 0x05, 0xA0, 0x15, 0xD5, 0x00, 0x6F, 0x10, 0xA4, 0x02, 0x50, 0x0A,
+                                     0x04, 0xA2, 0x10, 0xA5, 0x08, 0x42, 0x29, 0x42, 0x5A, 0x00, 0x76, 0x8A, 0x21, 0x89, 0x22, 0x88,
+                                     0x10, 0xA0, 0x20, 0x40, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x40,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x02, 0x04, 0x04, 0x09, 0x04, 0x04, 0x02, 0x02, 0x01, 0x00,
+                                     0x40, 0x4A, 0x90, 0x85, 0x20, 0x4A, 0x10, 0x85, 0x50, 0x0A, 0x40, 0x2A, 0x81, 0x28, 0x45, 0x90,
+                                     0x12, 0x81, 0x54, 0x02, 0x50, 0x8A, 0x20, 0x0A, 0xA1, 0x14, 0x81, 0x54, 0x02, 0x50, 0x0A, 0xA0,
+                                     0x0A, 0x51, 0x04, 0xA1, 0x14, 0x82, 0x54, 0x01, 0x54, 0x02, 0x54, 0x01, 0xA8, 0x12, 0x84, 0x51,
+                                     0x49, 0x24, 0x25, 0x52, 0x09, 0xA9, 0x04, 0x52, 0x04, 0xA3, 0x14, 0x42, 0x14, 0x89, 0x52, 0x15,
+                                     0x40, 0x2A, 0x01, 0x54, 0x02, 0x54, 0x80, 0x6F, 0x10, 0x00, 0xEF, 0x00, 0xA9, 0x04, 0x51, 0x04,
+                                     0x81, 0x54, 0x02, 0x50, 0x0A, 0xA0, 0x0A, 0xEA, 0x01, 0x10, 0xDF, 0x00, 0x24, 0x42, 0x10, 0x4A,
+                                     0x52, 0x04, 0xA4, 0x15, 0x89, 0x52, 0x12, 0xE4, 0x04, 0x09, 0x64, 0x2A, 0x92, 0x2A, 0x89, 0x24,
+                                     0x42, 0x50, 0x8A, 0x20, 0x0A, 0x41, 0x28, 0x85, 0x50, 0x04, 0x52, 0x08, 0xA2, 0x09, 0x50, 0x85,
+                                     0xA0, 0x15, 0x80, 0x55, 0x00, 0x55, 0x08, 0x52, 0x80, 0x2A, 0x81, 0x54, 0x02, 0x50, 0x0A, 0x51,
+                                     0x22, 0x49, 0x04, 0x51, 0x08, 0x45, 0x20, 0x95, 0x40, 0x15, 0x40, 0x2A, 0x81, 0x54, 0x02, 0x51,
+                                     0x40, 0x20, 0x50, 0x10, 0x48, 0x10, 0x4C, 0x02, 0x54, 0x02, 0xAA, 0x04, 0x55, 0x09, 0x52, 0x14,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xDD, 0x82, 0x28, 0x02, 0x50, 0x0A,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xDD, 0x22, 0x88, 0x22, 0x88, 0x22,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x20, 0x90, 0x28, 0x88, 0x24,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x84, 0x51, 0x44, 0x29, 0x20, 0x15, 0x08, 0x0A, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x0A, 0x50, 0x05, 0x50, 0x0A, 0x40, 0x2A, 0x91, 0x6D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x84, 0x29, 0x00, 0xAA, 0x01, 0xA8, 0x05, 0x52, 0x6D, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x52, 0x24, 0x89, 0x52, 0x50, 0x8A, 0x20, 0x54, 0x42, 0x90, 0x4A, 0x20, 0x2A, 0x10, 0x12, 0x08,
+                                     0x51, 0x04, 0x51, 0x08, 0xA4, 0x02, 0xA8, 0x05, 0xA0, 0x15, 0x80, 0x55, 0x00, 0xAA, 0x11, 0xA4,
+                                     0x00, 0x54, 0x02, 0xA9, 0x04, 0xA1, 0x14, 0x42, 0x28, 0x02, 0xA8, 0x04, 0x51, 0x04, 0x52, 0x08,
+                                     0x84, 0x52, 0x09, 0x45, 0x20, 0x14, 0x82, 0x28, 0x84, 0x22, 0x90, 0x4A, 0x00, 0x54, 0x02, 0xA9,
+                                     0x90, 0x8A, 0x50, 0x22, 0xA8, 0x92, 0x48, 0xAA, 0x25, 0xA0, 0x24, 0x8A, 0xC8, 0x92, 0x90, 0x25,
+                                     0x04, 0xA2, 0x10, 0xA5, 0x08, 0xA2, 0x08, 0xA5, 0x5A, 0x00, 0x92, 0xAA, 0x00, 0xAA, 0x00, 0x55,
+                                     0x08, 0xA4, 0x12, 0x40, 0x2A, 0x81, 0x54, 0x03, 0xFC, 0x00, 0x44, 0xB6, 0x01, 0xA9, 0x02, 0x50,
+                                     0xA5, 0x28, 0x92, 0xD0, 0x0A, 0xA0, 0x4A, 0x41, 0x94, 0x81, 0xAA, 0x40, 0x2A, 0x20, 0xA4, 0x92,
+                                     0x40, 0x2A, 0x81, 0x28, 0x84, 0x52, 0x01, 0x54, 0x02, 0x50, 0x0A, 0xA1, 0x08, 0xA5, 0x10, 0x85,
+                                     0x88, 0x22, 0x10, 0x8A, 0x41, 0x28, 0x44, 0x12, 0x80, 0x55, 0x00, 0x55, 0x08, 0x52, 0x01, 0x54,
+                                     0x88, 0x26, 0x82, 0x29, 0x05, 0xA0, 0x14, 0x82, 0x54, 0x01, 0xA8, 0x04, 0x52, 0x08, 0x42, 0x29,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x40, 0x60, 0x20, 0x80, 0x40, 0x80, 0x80, 0x80, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x0A, 0x04, 0x02, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x02, 0xA8, 0x05, 0xA0, 0x15, 0x20, 0x8A, 0xD5, 0x22, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0xA2, 0x11, 0x44, 0x12, 0x48, 0x22, 0x88, 0x55, 0x4A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x12, 0x44, 0x14, 0x89, 0x49, 0x29, 0x92, 0x44, 0x49, 0x08, 0x0A, 0x04, 0x02, 0x02, 0x01, 0x01,
+                                     0x48, 0x42, 0x90, 0x4A, 0x00, 0x2A, 0x40, 0x95, 0x00, 0x55, 0x00, 0xAA, 0x00, 0xAA, 0x04, 0x29,
+                                     0x00, 0xAA, 0x00, 0xAA, 0x00, 0xAA, 0x04, 0x51, 0x88, 0x22, 0x09, 0xA4, 0x11, 0xA4, 0x01, 0x54,
+                                     0x0A, 0xA0, 0x14, 0x82, 0x51, 0x88, 0x25, 0x10, 0x85, 0x50, 0x04, 0x52, 0x08, 0x42, 0x28, 0x02,
+                                     0x50, 0x8A, 0x68, 0x15, 0x52, 0x0A, 0x49, 0x24, 0x0A, 0xA2, 0x0A, 0xA4, 0x04, 0xA8, 0x10, 0x90,
+                                     0x50, 0x8A, 0x20, 0x0A, 0x50, 0x05, 0x50, 0x85, 0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x02, 0xA8, 0x12, 0xA0, 0x0A, 0x40, 0x2A, 0x00, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x85, 0x22, 0x8C, 0x24, 0x88, 0x28, 0x90, 0x20, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x80, 0xAA, 0x40, 0x2A, 0x20, 0x15, 0x10, 0x0A, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x02, 0xA8, 0x05, 0xA0, 0x15, 0x40, 0x2A, 0x80, 0xBF, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0xA8, 0x05, 0x50, 0x0A, 0x40, 0x2A, 0x81, 0x55, 0x56, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x50, 0x20, 0x40, 0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+                                     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+        colourRAM.fillMemory(memValue: 2)
     }
-
+    
     //private(set) var isRunning = false
     private var runTask: Task<Void, Never>?
-
+    
     func ClearVideoMemory()
     {
         videoRAM.fillMemory(memValue : 0x20)
@@ -427,7 +427,7 @@ actor Z80CPU
         runTask?.cancel()
         runTask = nil
     }
-
+    
     func step()
     {
         guard emulatorState == .paused || emulatorState == .stopped else { return }
@@ -449,17 +449,17 @@ actor Z80CPU
             {
                 switch emulatorState
                 {
-                    case .running:
-                        guard executionMode == .continuous else { break }
-                        for _ in 0..<instructionsPerChunk
-                        {
-                            guard !Task.isCancelled, emulatorState == .running, executionMode == .continuous else { break }
-                            nextInstruction()
-                        }
-                    case .halted:
+                case .running:
+                    guard executionMode == .continuous else { break }
+                    for _ in 0..<instructionsPerChunk
+                    {
+                        guard !Task.isCancelled, emulatorState == .running, executionMode == .continuous else { break }
                         nextInstruction()
-                        appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
-                    case .paused, .stopped: break
+                    }
+                case .halted:
+                    nextInstruction()
+                    appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
+                case .paused, .stopped: break
                 }
                 await Task.yield()
             }
@@ -479,14 +479,14 @@ actor Z80CPU
     private func serviceInterrupt() {
         // Interrupts disabled → ignore
         guard registers.IFF1 else { return }
-
+        
         interruptPending = false
         emulatorState = .running   // ← EXIT HALT
-
+        
         // Z80 interrupt entry
         registers.IFF1 = false
         registers.IFF2 = false
-
+        
         // check this
         registers.SP &-= 2
         mmu.writeByte(address: registers.SP, value: UInt8((registers.PC >> 8) & 0xFF))
@@ -498,14 +498,14 @@ actor Z80CPU
     {
         mmu.writeByte(address: address, value: value)
     }
-
+    
     func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
     {
         return ( opcode1 : mmu.readByte(address: ProgramCounter),
                  opcode2 : mmu.readByte(address: ProgramCounter &+ 1),
                  opcode3 : mmu.readByte(address: ProgramCounter &+ 2),
                  opcode4 : mmu.readByte(address: ProgramCounter &+ 3)
-                )
+        )
     }
     
     func TestFlags ( FlagRegister : UInt8, Flag : Z80Flags ) -> Bool
@@ -530,7 +530,7 @@ actor Z80CPU
     {
         return (value & (1 << bitPosition)) != 0
     }
-
+    
     func returnParity(value: UInt8) -> Bool
     {
         var tempValue : UInt8 = value
@@ -542,25 +542,25 @@ actor Z80CPU
     
     func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
-        #if DEBUG
-            var instructionString : String = instructionDetails
-            
-            switch values.count
-            {
-            case 1 :
-                instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
-                instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
-            case 2 :
-                instructionString = instructionString.replacingOccurrences(of: "$nn", with: "0x"+String(format:"%04X",UInt16(values[1]) << 8 | UInt16(values[0])))
-                instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
-                instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
-            default: break
-            }
-            let noValues = values.count == 0
-            let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: " ") + (noValues ? "" : " ") + values.map { String(format:"%02X",$0) }.joined(separator: " ")
-            let logString = String(format:"0x%04X",registers.PC) + "   " + opcodeString + "    " + instructionString
-            appLog.cpu.debug("\(logString)")
-        #endif
+#if DEBUG
+        var instructionString : String = instructionDetails
+        
+        switch values.count
+        {
+        case 1 :
+            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
+            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
+        case 2 :
+            instructionString = instructionString.replacingOccurrences(of: "$nn", with: "0x"+String(format:"%04X",UInt16(values[1]) << 8 | UInt16(values[0])))
+            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
+            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
+        default: break
+        }
+        let noValues = values.count == 0
+        let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: " ") + (noValues ? "" : " ") + values.map { String(format:"%02X",$0) }.joined(separator: " ")
+        let logString = String(format:"0x%04X",registers.PC) + "   " + opcodeString + "    " + instructionString
+        appLog.cpu.debug("\(logString)")
+#endif
     }
     
     func nextInstruction()
@@ -568,9 +568,9 @@ actor Z80CPU
     {
         if emulatorState == .halted
         {
-                tStates &+= 4
-                pollInterrupt()
-                return
+            tStates &+= 4
+            pollInterrupt()
+            return
         }
         executeInstruction()
         appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
@@ -583,7 +583,7 @@ actor Z80CPU
         let lsb = ( registers.R & 0x7F) &+ opcodeCount
         registers.R  = msb | (lsb & 0x7F)
     }
-
+    
     
     func executeInstruction()
     {
@@ -623,8 +623,8 @@ actor Z80CPU
             incrementR(opcodeCount:1)
         case 0x04: // INC B
             registers.B = registers.B &+ 1
-//            H    Half-Carry    Set if there was a carry from bit 3 to bit 4 (useful for BCD math).
-//            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
+            //            H    Half-Carry    Set if there was a carry from bit 3 to bit 4 (useful for BCD math).
+            //            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.B & 0x80) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.B == 0)
             //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcode2 & 0x0F)))
@@ -637,8 +637,8 @@ actor Z80CPU
             incrementR(opcodeCount:1)
         case 0x05: // DEC B
             registers.B = registers.B &- 1
-//            H    Half-Carry    Set if there was a borrow from bit 4 to bit 3.
-//            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
+            //            H    Half-Carry    Set if there was a borrow from bit 4 to bit 3.
+            //            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.B & 0x80) != 0)
             registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.B == 0)
             //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcode2 & 0x0F)))
@@ -658,8 +658,8 @@ actor Z80CPU
             incrementR(opcodeCount:1)
         case 0x08: // EX AF,AF' - 08 - Adds one to Exchanges the 16-bit contents of AF and AF'
             let tempResult = registers.AF
-            registers.AF = registers.AltAF
-            registers.AltAF = tempResult
+            registers.AF = registers.altAF
+            registers.altAF = tempResult
             logInstructionDetails(instructionDetails: "EX AF,AF'", opcode: [0x08], programCounter: registers.PC)
             myz80Queue.addToQueue(address: registers.PC, opCodes: [0x08])
             registers.PC = registers.PC &+ 1
@@ -1046,131 +1046,131 @@ actor Z80CPU
         case 0xCB: //start CB opcodes
             switch opcode2
             {
-                case 0x47: // BIT 0, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000001) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    logInstructionDetails(instructionDetails: "BIT 0, A", opcode: [0xCB,0x47], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x47])
-                    tStates = tStates + 8
-                    incrementR(opcodeCount:2)
-                case 0x4F: // BIT 1, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000010) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 1, A", opcode: [0xCB,0x4F], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x4F])
-                    incrementR(opcodeCount:2)
-                case 0x57: // BIT 2, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000100) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 2, A", opcode: [0xCB,0x57], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x57])
-                    incrementR(opcodeCount:2)
-                case 0x5F: // BIT 3, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00001000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 3, A", opcode: [0xCB,0x5F], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x5F])
-                    incrementR(opcodeCount:2)
-                case 0x67: // BIT 4, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00010000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 4, A", opcode: [0xCB,0x67], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x67])
-                    incrementR(opcodeCount:2)
+            case 0x47: // BIT 0, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000001) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                logInstructionDetails(instructionDetails: "BIT 0, A", opcode: [0xCB,0x47], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x47])
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x4F: // BIT 1, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000010) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 1, A", opcode: [0xCB,0x4F], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x4F])
+                incrementR(opcodeCount:2)
+            case 0x57: // BIT 2, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000100) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 2, A", opcode: [0xCB,0x57], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x57])
+                incrementR(opcodeCount:2)
+            case 0x5F: // BIT 3, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00001000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 3, A", opcode: [0xCB,0x5F], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x5F])
+                incrementR(opcodeCount:2)
+            case 0x67: // BIT 4, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 4, A", opcode: [0xCB,0x67], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x67])
+                incrementR(opcodeCount:2)
             case 0x6F: // BIT 5, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b0010000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 5, A", opcode: [0xCB,0x6F], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x6F])
-                    incrementR(opcodeCount:2)
-                case 0x77: // BIT 6, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b01000000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 6, A", opcode: [0xCB,0x77], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x77])
-                    incrementR(opcodeCount:2)
-                case 0x7F: // BIT 7, A
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b10000000) == 1))
-                    registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "BIT 7, A", opcode: [0xCB,0x7F], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x7F])
-                    incrementR(opcodeCount:2)
-                case 0xC7: // SET 0, A
-                    registers.A = registers.A | 0b00000001
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 0, A", opcode: [0xCB,0xC7], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xC7])
-                    incrementR(opcodeCount:2)
-                case 0xCF: // SET 1, A
-                    registers.A = registers.A | 0b00000010
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 1, A", opcode: [0xCB,0xCF], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xCF])
-                    incrementR(opcodeCount:2)
-                case 0xD7: // SET 2, A
-                    registers.A = registers.A | 0b00000100
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 2, A", opcode: [0xCB,0xD7], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xD7])
-                    incrementR(opcodeCount:2)
-                case 0xDF: // SET 3, A
-                    registers.A = registers.A | 0b00001000
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 3, A", opcode: [0xCB,0xDF], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xDF])
-                    incrementR(opcodeCount:2)
-                case 0xE7: // SET 4, A
-                    registers.A = registers.A | 0b00010000
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 4, A", opcode: [0xCB,0xE7], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xE7])
-                    incrementR(opcodeCount:2)
-                case 0xEF: // SET 5, A
-                    registers.A = registers.A | 0b00100000
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 5, A", opcode: [0xCB,0xEF], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xEF])
-                    incrementR(opcodeCount:2)
-                case 0xF7: // SET 6, A
-                    registers.A = registers.A | 0b01000000
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 6, A", opcode: [0xCB,0xF7], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xF7])
-                case 0xFF: // SET 7, A
-                    registers.A = registers.A | 0b10000000
-                    tStates = tStates + 8
-                    logInstructionDetails(instructionDetails: "SET 7, A", opcode: [0xCB,0xFF], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xFF])
-                    incrementR(opcodeCount:2)
-                default:
-                    tStates = tStates + 0 // check if this is correct
-                    logInstructionDetails(opcode: [0xCB,opcode2], programCounter: registers.PC)
-                    myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,opcode2])
-                    incrementR(opcodeCount:2)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b0010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 5, A", opcode: [0xCB,0x6F], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x6F])
+                incrementR(opcodeCount:2)
+            case 0x77: // BIT 6, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b01000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 6, A", opcode: [0xCB,0x77], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x77])
+                incrementR(opcodeCount:2)
+            case 0x7F: // BIT 7, A
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b10000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "BIT 7, A", opcode: [0xCB,0x7F], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x7F])
+                incrementR(opcodeCount:2)
+            case 0xC7: // SET 0, A
+                registers.A = registers.A | 0b00000001
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 0, A", opcode: [0xCB,0xC7], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xC7])
+                incrementR(opcodeCount:2)
+            case 0xCF: // SET 1, A
+                registers.A = registers.A | 0b00000010
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 1, A", opcode: [0xCB,0xCF], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xCF])
+                incrementR(opcodeCount:2)
+            case 0xD7: // SET 2, A
+                registers.A = registers.A | 0b00000100
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 2, A", opcode: [0xCB,0xD7], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xD7])
+                incrementR(opcodeCount:2)
+            case 0xDF: // SET 3, A
+                registers.A = registers.A | 0b00001000
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 3, A", opcode: [0xCB,0xDF], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xDF])
+                incrementR(opcodeCount:2)
+            case 0xE7: // SET 4, A
+                registers.A = registers.A | 0b00010000
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 4, A", opcode: [0xCB,0xE7], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xE7])
+                incrementR(opcodeCount:2)
+            case 0xEF: // SET 5, A
+                registers.A = registers.A | 0b00100000
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 5, A", opcode: [0xCB,0xEF], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xEF])
+                incrementR(opcodeCount:2)
+            case 0xF7: // SET 6, A
+                registers.A = registers.A | 0b01000000
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 6, A", opcode: [0xCB,0xF7], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xF7])
+            case 0xFF: // SET 7, A
+                registers.A = registers.A | 0b10000000
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "SET 7, A", opcode: [0xCB,0xFF], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xFF])
+                incrementR(opcodeCount:2)
+            default:
+                tStates = tStates + 0 // check if this is correct
+                logInstructionDetails(opcode: [0xCB,opcode2], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,opcode2])
+                incrementR(opcodeCount:2)
             } // end CB opcodes
             registers.PC = registers.PC &+ 2
         case 0xD2: // JP NC,nn
@@ -1193,27 +1193,27 @@ actor Z80CPU
             case 0x08:
                 if testBit(value: registers.A, bitPosition: 1)
                 {
-                    MOS6545.crtcRegisters.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                 }
                 if !testBit(value: registers.A, bitPosition: 1)
                 {
-                    MOS6545.crtcRegisters.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
+                    crtc.registers.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
                 }
                 if testBit(value: registers.A, bitPosition: 2)
                 {
-                    MOS6545.crtcRegisters.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
+                    crtc.registers.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
                 }
                 if !testBit(value: registers.A, bitPosition: 2)
                 {
-                    MOS6545.crtcRegisters.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
+                    crtc.registers.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
                 }
                 if testBit(value: registers.A, bitPosition: 3)
                 {
-                    MOS6545.crtcRegisters.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
+                    crtc.registers.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
                 }
                 if !testBit(value: registers.A, bitPosition: 3)
                 {
-                    MOS6545.crtcRegisters.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
+                    crtc.registers.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
                 }
                 if testBit(value: registers.A, bitPosition: 6)
                 {
@@ -1235,7 +1235,7 @@ actor Z80CPU
                     mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                 }
             case 0x0C: break // writing to port 0x0C needs no further processing
-            case 0x0D: MOS6545.WriteRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+            case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
             default: break // other ports go here
             }
             logInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [0xD3], values: [opcode2], programCounter: registers.PC)
@@ -1260,12 +1260,12 @@ actor Z80CPU
             registers.A = ports[Int(opcode2)]
             switch opcode2
             {
-                case 0x08: break // registers.A contains value of colour control port
-                case 0x0A: break // NET selection INPUT from port - whatever this means
-                case 0x0B: break // registers.A contains value of font rom control port
-                case 0x0C: registers.A = MOS6545.ReadStatusRegister()
-                case 0x0D: registers.A = MOS6545.ReadRegister(RegNum:ports[0x0C])
-                default: break // other ports go here
+            case 0x08: break // registers.A contains value of colour control port
+            case 0x0A: break // NET selection INPUT from port - whatever this means
+            case 0x0B: break // registers.A contains value of font rom control port
+            case 0x0C: registers.A = crtc.readStatusRegister()
+            case 0x0D: registers.A = crtc.readRegister(RegNum:ports[0x0C])
+            default: break // other ports go here
             }
             logInstructionDetails(instructionDetails: "IN A,($n)", opcode: [0xDB], values: [opcode2], programCounter: registers.PC)
             myz80Queue.addToQueue(address: registers.PC, opCodes: [0xDB], dataBytes: [opcode2])
@@ -1310,21 +1310,21 @@ actor Z80CPU
                     registers.BC = registers.BC &- 1
                 }
                 while registers.BC != 0
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:registers.BC == 0)
-                logInstructionDetails(instructionDetails: "LDIR", opcode: [0xED,0xB0], programCounter: registers.PC)
-                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,0xB0])
-                registers.PC = registers.PC &+ 2
-                tStates = tStates + 21
-                incrementR(opcodeCount:2)
-            case 0x4F: //  LD R, A    ED 4F
+                        registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
+                        registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                        registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:registers.BC == 0)
+                        logInstructionDetails(instructionDetails: "LDIR", opcode: [0xED,0xB0], programCounter: registers.PC)
+                        myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,0xB0])
+                        registers.PC = registers.PC &+ 2
+                        tStates = tStates + 21
+                        incrementR(opcodeCount:2)
+                        case 0x4F: //  LD R, A    ED 4F
                         registers.R = (registers.A & 0x7F) | (registers.R & 0x80)
                         logInstructionDetails(instructionDetails: "LD R,A", opcode: [0xED,0x4F], programCounter: registers.PC)
                         myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,0x4F])
                         registers.PC = registers.PC &+ 2
                         tStates = tStates + 9
-            case 0x5F:  // LD A, R
+                        case 0x5F:  // LD A, R
                         //             LD A,R
                         //            Loads the refresh register R into A
                         //            Flags affected:
@@ -1343,12 +1343,12 @@ actor Z80CPU
                         myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,0x5F])
                         registers.PC = registers.PC &+ 2
                         tStates = tStates + 9
-            default:
-                logInstructionDetails(opcode: [0xED,opcode2], programCounter: registers.PC)
-                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,opcode2], dataBytes: [opcode2])
-                registers.PC = registers.PC &+ 2
-                tStates = tStates + 21  // confirm this behaviour
-                incrementR(opcodeCount:2) // confirm this behaviour for ED codes
+                        default:
+                            logInstructionDetails(opcode: [0xED,opcode2], programCounter: registers.PC)
+                        myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,opcode2], dataBytes: [opcode2])
+                        registers.PC = registers.PC &+ 2
+                        tStates = tStates + 21  // confirm this behaviour
+                        incrementR(opcodeCount:2) // confirm this behaviour for ED codes
             }
         case 0xF2: // JP P,nn
             logInstructionDetails(instructionDetails: "JP P,$nn", opcode: [0xF2], values: [opcode2,opcode3], programCounter: registers.PC)
@@ -1397,68 +1397,89 @@ actor Z80CPU
             incrementR(opcodeCount:1)
         } // end single opcodes
     }
-
-    func getState() async -> CPUState
+    
+    func returnSnapshot() async -> microbeeSnapshot
     {
-        return CPUState( PC: registers.PC,
-                         lastPC : registers.lastPC,
-                         SP: registers.SP,
-                         BC : registers.BC,
-                         DE : registers.DE,
-                         HL : registers.HL,
-                         AltBC : registers.AltBC,
-                         AltDE : registers.AltDE,
-                         AltHL : registers.AltHL,
-                         IX : registers.IX,
-                         IY : registers.IY,
-                         I: registers.I,
-                         R: registers.R,
-                         IM  : registers.IM,
-                         IFF1 : registers.IFF1,
-                         IFF2 : registers.IFF2,
-                         A: registers.A,
-                         F: registers.F,
-                         B: registers.B,
-                         C: registers.C,
-                         D: registers.D,
-                         E: registers.E,
-                         H: registers.H,
-                         L: registers.L,
-                         AltA: registers.AltA,
-                         AltF: registers.AltF,
-                         AltB: registers.AltB,
-                         AltC: registers.AltC,
-                         AltD: registers.AltD,
-                         AltE: registers.AltE,
-                         AltH: registers.AltH,
-                         AltL: registers.AltL,
-                         
-                         memoryDump: mmu.memorySlice(address: registers.PC & 0xFF00, size: 0x100),
-                         ports: ports,
-                         VDU : videoRAM.bufferTransform(),
-                         CharRom : fontROM.bufferTransform(),
-                         PcgRam : pcgRAM.bufferTransform(),
-                         ColourRam : colourRAM.bufferTransform(),
-                             
-                         vmR1_HorizDisplayed : MOS6545.ReadRegister(RegNum: 1),
-                         vmR6_VertDisplayed : MOS6545.ReadRegister(RegNum: 6),
-                         vmR9_ScanLinesMinus1 : MOS6545.ReadRegister(RegNum: 9),
-                         vmR10_CursorStartAndBlinkMode : MOS6545.ReadRegister(RegNum: 10),
-                         vmR11_CursorEnd : MOS6545.ReadRegister(RegNum: 11),
-                         vmR12_DisplayStartAddrH : MOS6545.ReadRegister(RegNum: 12),
-                         vmR13_DisplayStartAddrL : MOS6545.ReadRegister(RegNum: 13),
-                         vmR14_CursorPositionH : MOS6545.ReadRegister(RegNum: 14),
-                         vmR15_CursorPositionL : MOS6545.ReadRegister(RegNum: 15),
-                         
-                         vmRedBackgroundIntensity: MOS6545.crtcRegisters.redBackgroundIntensity,
-                         vmGreenBackgroundIntensity: MOS6545.crtcRegisters.greenBackgroundIntensity,
-                         vmBlueBackgroundIntensity: MOS6545.crtcRegisters.blueBackgroundIntensity,
-                         
-                         Z80Queue : myz80Queue,
-                         emulatorState : emulatorState,
-                         tStates: tStates
-                         
+        return microbeeSnapshot(
+            id: UUID(),
+            timestamp: Date(),
+            z80Snapshot: z80Snapshot(
+                PC: registers.PC,
+                SP: registers.SP,
+                
+                BC: registers.BC,
+                DE: registers.DE,
+                HL: registers.HL,
+                
+                altAF: registers.altAF,
+                altBC: registers.altBC,
+                altDE: registers.altDE,
+                altHL: registers.altHL,
+                IX: registers.IX,
+                IY: registers.IY,
+                I: registers.I,
+                R: registers.R,
+                IM: registers.IM,
+                IFF1: registers.IFF1,
+                IFF2: registers.IFF2,
+                A: registers.A,
+                F: registers.F,
+                B: registers.B,
+                C: registers.C,
+                D: registers.D,
+                E: registers.E,
+                H: registers.H,
+                L: registers.L,
+                altA: registers.altA,
+                altF: registers.altF,
+                altB: registers.altB,
+                altC: registers.altC,
+                altD: registers.altD,
+                altE: registers.altE,
+                altH: registers.altH,
+                altL: registers.altL
+            ),
+            crtcSnapshot: crtcSnapshot(
+                R0: crtc.registers.R0,
+                R1: crtc.registers.R1,
+                R2: crtc.registers.R2,
+                R3: crtc.registers.R3,
+                R4: crtc.registers.R4,
+                R5: crtc.registers.R5,
+                R6: crtc.registers.R6,
+                R7: crtc.registers.R7,
+                R8: crtc.registers.R8,
+                R9: crtc.registers.R9,
+                R10: crtc.registers.R10,
+                R11: crtc.registers.R11,
+                R12: crtc.registers.R12,
+                R13: crtc.registers.R13,
+                R14: crtc.registers.R14,
+                R15: crtc.registers.R15,
+                R16: crtc.registers.R16,
+                R17: crtc.registers.R17,
+                R18: crtc.registers.R18,
+                R19: crtc.registers.R19,
+                statusRegister: crtc.registers.statusRegister,
+                redBackgroundIntensity: crtc.registers.redBackgroundIntensity,
+                greenBackgroundIntensity: crtc.registers.greenBackgroundIntensity,
+                blueBackgroundIntensity: crtc.registers.blueBackgroundIntensity
+            ),
+            executionSnapshot: executionSnapshot(
+                tStates: tStates,
+                emulatorState: emulatorState,
+                executionMode: executionMode,
+                ports: ports,
+                z80Queue : myz80Queue,
+                lastPC : registers.lastPC),
+            memorySnapshot: memorySnapshot(
+                VDU: videoRAM.bufferTransform(),
+                CharRom: fontROM.bufferTransform(),
+                PcgRam: pcgRAM.bufferTransform(),
+                ColourRam: colourRAM.bufferTransform(),
+                memoryDump: mmu.memorySlice(address: registers.PC & 0xFF00, size: 0x100)
             )
+        )
     }
 }
 

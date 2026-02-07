@@ -1,8 +1,8 @@
 import SwiftUI
 
-struct RegisterView: View
+struct registerView: View
 {
-    @Environment(EmulatorViewModel.self) private var vm
+    @Environment(emulatorViewModel.self) private var vm
     
     func mapascii (ascii : UInt8) -> String
     {
@@ -35,9 +35,12 @@ struct RegisterView: View
         VStack
         {
             Text(label)
+                .foregroundColor(.orange)
+               // .font(.headline)
                 .font(.system(.body, design: .monospaced))
             Text(getFlags(flag: value))
                 .font(.system(.body, design: .monospaced))
+                .foregroundColor(.orange)
         }
     }
     
@@ -47,9 +50,11 @@ struct RegisterView: View
         VStack
         {
             Text(label)
-                .font(.system(.body, design: .monospaced))
+                .foregroundColor(.orange)
+                .font(.headline)
             Text(String(format:"%02X", value))
                 .font(.system(.body, design: .monospaced))
+                .foregroundColor(.orange)
         }
     }
     
@@ -59,9 +64,11 @@ struct RegisterView: View
         VStack
         {
             Text(label)
-                .font(.system(.body, design: .monospaced))
+                .foregroundColor(.orange)
+                .font(.headline)
             Text(String(value))
                 .font(.system(.body, design: .monospaced))
+                .foregroundColor(.orange)
         }
     }
     
@@ -89,105 +96,102 @@ struct RegisterView: View
     
     var body: some View
     {
-        //ZStack
-        //{
-         //   Color.white
+        if let snapshot = vm.snapshot
+        {
             VStack(spacing: 20)
             {
                 HStack(spacing: 40)
                 {
                     VStack
                     {
-                        Text("PC").font(.headline)
-                        Text(String(format: "%04X",vm.pcReg)).font(.system(.title3, design: .monospaced))
+                        Text("PC").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.PC)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("SP").font(.headline)
-                        Text(String(format: "%04X",vm.spReg)).font(.system(.title3, design: .monospaced))
+                        Text("SP").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.SP)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("IX").font(.headline)
-                        Text(String(format: "%04X",vm.ixReg)).font(.system(.title3, design: .monospaced))
+                        Text("IX").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.IX)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("IY").font(.headline)
-                        Text(String(format: "%04X",vm.iyReg)).font(.system(.title3, design: .monospaced))
+                        Text("IY").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.IY)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("BC").font(.headline)
-                        Text(String(format: "%04X",vm.bcReg)).font(.system(.title3, design: .monospaced))
+                        Text("BC").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.BC)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("DE").font(.headline)
-                        Text(String(format: "%04X",vm.deReg)).font(.system(.title3, design: .monospaced))
+                        Text("DE").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.DE)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("HL").font(.headline)
-                        Text(String(format: "%04X",vm.hlReg)).font(.system(.title3, design: .monospaced))
+                        Text("HL").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.HL)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("BC'").font(.headline)
-                        Text(String(format: "%04X",vm.altbcReg)).font(.system(.title3, design: .monospaced))
+                        Text("BC'").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.altBC)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("DE'").font(.headline)
-                        Text(String(format: "%04X",vm.altdeReg)).font(.system(.title3, design: .monospaced))
+                        Text("DE'").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.altDE)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                     VStack
                     {
-                        Text("HL'").font(.headline)
-                        Text(String(format: "%04X",vm.althlReg)).font(.system(.title3, design: .monospaced))
+                        Text("HL'").font(.headline).foregroundColor(.orange)
+                        Text(String(format: "%04X",snapshot.z80Snapshot.altHL)).font(.system(.title3, design: .monospaced)).foregroundColor(.orange)
                     }
                 }
                 LazyVGrid(columns: Array(repeating: GridItem(.fixed(60)), count: 8), spacing: 10)
                 {
-                    Group
-                    {
-                        registerRow(label: "A", value: vm.aReg)
-                        registerRow(label: "F", value: vm.fReg)
-                        registerRow(label: "B", value: vm.bReg)
-                        registerRow(label: "C", value: vm.cReg)
-                        registerRow(label: "D", value: vm.dReg)
-                        registerRow(label: "E", value: vm.eReg)
-                        registerRow(label: "H", value: vm.hReg)
-                        registerRow(label: "L", value: vm.lReg)
-                    }
-                    Group
-                    {
-                        registerRow(label: "A'", value: vm.altaReg)
-                        registerRow(label: "F'", value: vm.altfReg)
-                        registerRow(label: "B'", value: vm.altbReg)
-                        registerRow(label: "C'", value: vm.altcReg)
-                        registerRow(label: "D'", value: vm.altdReg)
-                        registerRow(label: "E'", value: vm.alteReg)
-                        registerRow(label: "H'", value: vm.althReg)
-                        registerRow(label: "L'", value: vm.altlReg)
-                    }
-                    Group
-                    {
-                        registerRow(label: "I", value: vm.iReg)
-                        registerRow(label: "R", value: vm.rReg)
-                        registerRow(label: "IM", value: vm.imReg)
-                        booleanRow(label: "IFF1", value: vm.iFF1Reg)
-                        booleanRow(label: "IFF2", value: vm.iFF2Reg)
-                    }
+                    registerRow(label: "A", value: snapshot.z80Snapshot.A)
+                    registerRow(label: "F", value: snapshot.z80Snapshot.F)
+                    registerRow(label: "B", value: snapshot.z80Snapshot.B)
+                    registerRow(label: "C", value: snapshot.z80Snapshot.C)
+                    registerRow(label: "D", value: snapshot.z80Snapshot.D)
+                    registerRow(label: "E", value: snapshot.z80Snapshot.E)
+                    registerRow(label: "H", value: snapshot.z80Snapshot.H)
+                    registerRow(label: "L", value: snapshot.z80Snapshot.L)
+
+                    registerRow(label: "A'", value: snapshot.z80Snapshot.altA)
+                    registerRow(label: "F'", value: snapshot.z80Snapshot.altF)
+                    registerRow(label: "B'", value: snapshot.z80Snapshot.altB)
+                    registerRow(label: "C'", value: snapshot.z80Snapshot.altC)
+                    registerRow(label: "D'", value: snapshot.z80Snapshot.altD)
+                    registerRow(label: "E'", value: snapshot.z80Snapshot.altE)
+                    registerRow(label: "H'", value: snapshot.z80Snapshot.altH)
+                    registerRow(label: "L'", value: snapshot.z80Snapshot.altL)
+
+                    registerRow(label: "I", value: snapshot.z80Snapshot.I)
+                    registerRow(label: "R", value: snapshot.z80Snapshot.R)
+                    registerRow(label: "IM", value: snapshot.z80Snapshot.IM)
+                    booleanRow(label: "IFF1", value: snapshot.z80Snapshot.IFF1)
+                    booleanRow(label: "IFF2", value: snapshot.z80Snapshot.IFF2)
                 }
-                FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: vm.fReg)
+                FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: snapshot.z80Snapshot.F)
                 
-                Text("T-States : "+vm.tStates.formatted())
+                Text("T-States").font(.headline).foregroundColor(.orange)
+                Text(snapshot.executionSnapshot.tStates.formatted()).foregroundColor(.orange)
             }
-     //   }
-        .fixedSize()
-        .padding(10)
-        .background(.white)
+            .fixedSize()
+            .padding(10)
+            .background(.white)
+        }
+        else
+        {
+            Text("Nothing to see here folks")
+        }
     }
 }
 

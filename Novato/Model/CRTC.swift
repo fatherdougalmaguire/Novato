@@ -3,30 +3,30 @@ import Foundation
 final class CRTC
 {
     
-    struct CRTCRegisters
+    struct crtcRegisters
     {
-        var R0_HorizTotalMinus1 : UInt8 = 0x00                              // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
-        var R1_HorizDisplayed : UInt8 = 0x40                                // Number of characters displayed in a line
-        var R2_HorizSyncPosition : UInt8 = 0x00                             // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
-        var R3_VSynchHSynchWidths : UInt8 = 0x00                            // Ignored by emulator
-        var R4_VertTotalMinus1 : UInt8 = 0x12                               // The number of character lines of the screen minus 1
-        var R5_VertTotalAdjust : UInt8 = 0x00                               // Ignored by emulator - The additional number of scanlines to complete a screen
-        var R6_VertDisplayed : UInt8 = 0x10                                 // Number character lines that are displayed
-        var R7_VertSyncPosition : UInt8 = 0x00                              // Ignored by emulator - Position of the vertical sync pulse in character lines.
-        var R8_ModeControl : UInt8 = 0x00                                   // Ignored by emulator
-        var R9_ScanLinesMinus1 : UInt8 = 0x0F                               // Number of scanlines per character minus 1
-        var R10_CursorStartAndBlinkMode : UInt8 = (0x01 << 5) & 0b01100000  // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no c
-        var R11_CursorEnd : UInt8 = 0b00000000 & 0b0011111                  // Cursor scanline end ( bits 0-4 )
-        var R12_DisplayStartAddrH : UInt8 = 0x00                            // Character Generator Rom start address ( high byte )
-        var R13_DisplayStartAddrL : UInt8 = 0x00                            // Character Generator Rom start address ( low byte )
-        var R14_CursorPositionH : UInt8 = 0x00                              // Cursor address ( high byte )
-        var R15_CursorPositionL : UInt8 = 0x00                              // Cursor address ( low byte )
-        var R16_LightPenRegH : UInt8 = 0x00                                 // Ignored by emulator
-        var R17_LightPenRegL : UInt8 = 0x00                                 // Ignored by emulator
-        var R18_UpdateAddressRegH : UInt8 = 0x00                            // Ignored by emulator
-        var R19_UpdateAddressRegL : UInt8 = 0x00                            // Ignored by emulator
+        var R0 : UInt8 = 0x00                              // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
+        var R1 : UInt8 = 0x40                                // Number of characters displayed in a line
+        var R2 : UInt8 = 0x00                             // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
+        var R3 : UInt8 = 0x00                            // Ignored by emulator
+        var R4 : UInt8 = 0x12                               // The number of character lines of the screen minus 1
+        var R5 : UInt8 = 0x00                               // Ignored by emulator - The additional number of scanlines to complete a screen
+        var R6 : UInt8 = 0x10                                 // Number character lines that are displayed
+        var R7 : UInt8 = 0x00                              // Ignored by emulator - Position of the vertical sync pulse in character lines.
+        var R8 : UInt8 = 0x00                                   // Ignored by emulator
+        var R9 : UInt8 = 0x0F                               // Number of scanlines per character minus 1
+        var R10 : UInt8 = (0x01 << 5) & 0b01100000  // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no c
+        var R11 : UInt8 = 0b00000000 & 0b0011111                  // Cursor scanline end ( bits 0-4 )
+        var R12 : UInt8 = 0x00                            // Character Generator Rom start address ( high byte )
+        var R13 : UInt8 = 0x00                            // Character Generator Rom start address ( low byte )
+        var R14 : UInt8 = 0x00                              // Cursor address ( high byte )
+        var R15 : UInt8 = 0x00                              // Cursor address ( low byte )
+        var R16 : UInt8 = 0x00                                 // Ignored by emulator
+        var R17 : UInt8 = 0x00                                 // Ignored by emulator
+        var R18 : UInt8 = 0x00                            // Ignored by emulator
+        var R19 : UInt8 = 0x00                            // Ignored by emulator
         
-        var StatusRegister : UInt8 = 0b10000000
+        var statusRegister : UInt8 = 0b10000000
         
         var redBackgroundIntensity : UInt8 = 0x00                         // red background intensity 0 = half 1 = full
         var greenBackgroundIntensity : UInt8 = 0x00                       // green background intensity 0 = half 1 = full
@@ -34,65 +34,65 @@ final class CRTC
         
     }
     
-    var crtcRegisters = CRTCRegisters()
+    var registers = crtcRegisters()
     
-    func ReadStatusRegister() -> UInt8
+    func readStatusRegister() -> UInt8
     {
-     return crtcRegisters.StatusRegister
+     return registers.statusRegister
     }
     
-    func WriteRegister(RegNum:UInt8, RegValue:UInt8)
+    func writeRegister(RegNum:UInt8, RegValue:UInt8)
     {
         switch RegNum
         {
-        case 0: crtcRegisters.R0_HorizTotalMinus1 = RegValue
-        case 1: crtcRegisters.R1_HorizDisplayed = RegValue
-        case 2: crtcRegisters.R2_HorizSyncPosition = RegValue
-        case 3: crtcRegisters.R3_VSynchHSynchWidths = RegValue
-        case 4: crtcRegisters.R4_VertTotalMinus1 = RegValue
-        case 5: crtcRegisters.R5_VertTotalAdjust = RegValue
-        case 6: crtcRegisters.R6_VertDisplayed = RegValue
-        case 7: crtcRegisters.R7_VertSyncPosition = RegValue
-        case 8: crtcRegisters.R8_ModeControl = RegValue
-        case 9: crtcRegisters.R9_ScanLinesMinus1 = RegValue
-        case 10: crtcRegisters.R10_CursorStartAndBlinkMode = RegValue
-        case 11: crtcRegisters.R11_CursorEnd = RegValue
-        case 12: crtcRegisters.R12_DisplayStartAddrH = RegValue
-        case 13: crtcRegisters.R13_DisplayStartAddrL = RegValue
-        case 14: crtcRegisters.R14_CursorPositionH = RegValue
-        case 15: crtcRegisters.R15_CursorPositionL = RegValue
-        case 16: crtcRegisters.R16_LightPenRegH  = RegValue
-        case 17: crtcRegisters.R17_LightPenRegL = RegValue
-        case 18: crtcRegisters.R18_UpdateAddressRegH = RegValue
-        case 19: crtcRegisters.R19_UpdateAddressRegL = RegValue
+        case 0: registers.R0 = RegValue
+        case 1: registers.R1 = RegValue
+        case 2: registers.R2 = RegValue
+        case 3: registers.R3 = RegValue
+        case 4: registers.R4 = RegValue
+        case 5: registers.R5 = RegValue
+        case 6: registers.R6 = RegValue
+        case 7: registers.R7 = RegValue
+        case 8: registers.R8 = RegValue
+        case 9: registers.R9 = RegValue
+        case 10: registers.R10 = RegValue
+        case 11: registers.R11 = RegValue
+        case 12: registers.R12 = RegValue
+        case 13: registers.R13 = RegValue
+        case 14: registers.R14 = RegValue
+        case 15: registers.R15 = RegValue
+        case 16: registers.R16 = RegValue
+        case 17: registers.R17 = RegValue
+        case 18: registers.R18 = RegValue
+        case 19: registers.R19 = RegValue
         default: break
         }
     }
     
-    func ReadRegister(RegNum:UInt8) -> UInt8
+    func readRegister(RegNum:UInt8) -> UInt8
     {
         switch RegNum
         {
-        case 0: return crtcRegisters.R0_HorizTotalMinus1
-        case 1: return crtcRegisters.R1_HorizDisplayed
-        case 2: return crtcRegisters.R2_HorizSyncPosition
-        case 3: return crtcRegisters.R3_VSynchHSynchWidths
-        case 4: return crtcRegisters.R4_VertTotalMinus1
-        case 5: return crtcRegisters.R5_VertTotalAdjust
-        case 6: return crtcRegisters.R6_VertDisplayed
-        case 7: return crtcRegisters.R7_VertSyncPosition
-        case 8: return crtcRegisters.R8_ModeControl
-        case 9: return crtcRegisters.R9_ScanLinesMinus1
-        case 10: return crtcRegisters.R10_CursorStartAndBlinkMode
-        case 11: return crtcRegisters.R11_CursorEnd
-        case 12: return crtcRegisters.R12_DisplayStartAddrH
-        case 13: return crtcRegisters.R13_DisplayStartAddrL
-        case 14: return crtcRegisters.R14_CursorPositionH
-        case 15: return crtcRegisters.R15_CursorPositionL
-        case 16: return crtcRegisters.R16_LightPenRegH
-        case 17: return crtcRegisters.R17_LightPenRegL
-        case 18: return crtcRegisters.R18_UpdateAddressRegH
-        case 19: return crtcRegisters.R19_UpdateAddressRegL
+        case 0: return registers.R0
+        case 1: return registers.R1
+        case 2: return registers.R2
+        case 3: return registers.R3
+        case 4: return registers.R4
+        case 5: return registers.R5
+        case 6: return registers.R6
+        case 7: return registers.R7
+        case 8: return registers.R8
+        case 9: return registers.R9
+        case 10: return registers.R10
+        case 11: return registers.R11
+        case 12: return registers.R12
+        case 13: return registers.R13
+        case 14: return registers.R14
+        case 15: return registers.R15
+        case 16: return registers.R16
+        case 17: return registers.R17
+        case 18: return registers.R18
+        case 19: return registers.R19
         default: return 0
         }
     }
