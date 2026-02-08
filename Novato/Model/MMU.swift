@@ -6,21 +6,38 @@ enum memoryDeviceType: CaseIterable
     case RAM
 }
 
+enum memoryConstant
+{
+    static let memorySize = 0x10000
+    static let pageSize = 0x800
+    static let pageCount = memorySize/pageSize
+    static let pageShift = pageSize.trailingZeroBitCount
+    static let pageMask = pageSize - 1
+}
+
 final class memoryBlock
 {
-    public var addressBlock: ContiguousArray<UInt8>
-    public let size: Int
-    public let deviceType : memoryDeviceType
-    public let uuid: String
-    public let label: String
+    var addressBlock: ContiguousArray<UInt8>
+    let size: Int
+    let deviceType : memoryDeviceType
+    let uuid: String
+    let label: String
+    var pageStart : Int
     
-    init( size: Int, deviceType: memoryDeviceType = .RAM,label: String = "", fillValue: UInt8 = 0 )
+    init(size: UInt, deviceType: memoryDeviceType = .RAM,label: String = "", fillValue: UInt8 = 0)
     {
-        self.size = size
+        let clampedSize = min((Int(size) + memoryConstant.pageMask) & ~memoryConstant.pageMask,memoryConstant.memorySize)
+        self.size = Int(clampedSize)
         self.deviceType  = deviceType
         self.label  = label
-        self.addressBlock = ContiguousArray(repeating: fillValue, count: size)
+        self.addressBlock = ContiguousArray(repeating: fillValue, count: clampedSize)
         self.uuid = UUID().uuidString
+        self.pageStart = 0
+    }
+    
+    func setPageStart(pageStart: Int)
+    {
+        self.pageStart = pageStart
     }
     
     func printBlockContents(offset: Int = 0)
@@ -33,7 +50,7 @@ final class memoryBlock
         }
     }
     
-    func fillMemory( memValue: UInt8 )
+    func fillMemory(memValue: UInt8)
     {
         for counter in addressBlock.indices
         {
@@ -47,11 +64,11 @@ final class memoryBlock
         addressBlock.replaceSubrange(Int(memOffset)..<Int(memOffset)+count, with: memValues[0..<count])
     }
     
-    func fillMemoryFromFile(FileName: String, FileExtension: String )
+    func fillMemoryFromFile(fileName: String, fileExtension: String, memOffset : UInt16 = 0)
     {
-        var LoadCounter : Int = 0
+        var LoadCounter : Int = Int(memOffset)
         
-        if let urlPath = Bundle.main.url(forResource: FileName, withExtension: FileExtension )
+        if let urlPath = Bundle.main.url(forResource: fileName, withExtension: fileExtension )
         {
             do {
                 let fileContents = try Data(contentsOf: urlPath)
@@ -81,71 +98,46 @@ final class memoryBlock
 
 final class memoryMapper
 {
-    private var memoryStorage: [[memoryBlock]]
-    
-    let pageSize = 2048
-    let pageCount = 32
-    let bankCount = 2
+    private var readPages: [memoryBlock]
+    private var writePages: [memoryBlock]
     
     init()
     {
-        let emptyBlock = memoryBlock(size: 0)
-        self.memoryStorage = Array(repeating: Array(repeating: emptyBlock, count: bankCount),count: pageCount)
+        let emptyBlock = memoryBlock(size: UInt(memoryConstant.pageSize))
+        self.readPages = Array(repeating: emptyBlock,count: memoryConstant.pageCount)
+        self.writePages = Array(repeating: emptyBlock, count: memoryConstant.pageCount)
     }
     
     func printMemoryMap()
     {
-        for counter1 in 0...31
+        for counter in 0...7
         {
-            print("*",counter1,"0",String(format: "0x%04X", counter1*pageSize),String(format: "0x%04X", memoryStorage[counter1][0].size),memoryStorage[counter1][0].label,terminator: " | ")
-            print(counter1,"0",String(format: "0x%04X", counter1*pageSize),String(format: "0x%04X", memoryStorage[counter1][1].size),memoryStorage[counter1][1].label)
+            print(String(format: "%02d",counter*4) + "  " + readPages[counter*4].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " + writePages[counter*4].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " +
+                  String(format: "%02d",counter*4+1) + "  " + readPages[counter*4+1].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " + writePages[counter*4+1].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " + String(format: "%02d",counter*4+2) + "  " + readPages[counter*4+2].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " + writePages[counter*4+2].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " + String(format: "%02d",counter*4+3) + "  " + readPages[counter*4+3].label.padding(toLength: 8, withPad: " ", startingAt: 0) + "  " + writePages[counter*4+3].label.padding(toLength: 8, withPad: " ", startingAt: 0))
         }
     }
     
-    func map(readDevice: [memoryBlock], writeDevice: [memoryBlock], memoryLocation: UInt16)
+    func map(readDevice: memoryBlock, writeDevice: memoryBlock, memoryLocation: UInt16)
     {
-        var startPage : Int
-        var endPage : Int
-        var pageIndex : Int
-        var pageOffset : Int
+        let pageIndex = Int(memoryLocation) >> memoryConstant.pageShift
+
+        let endReadPage = (Int(memoryLocation)+readDevice.size-1) >> memoryConstant.pageShift
+        let endWritePage = (Int(memoryLocation)+writeDevice.size-1) >> memoryConstant.pageShift
         
-        pageOffset = Int(memoryLocation) / pageSize
+        readDevice.pageStart = pageIndex
+        writeDevice.pageStart = pageIndex
         
-        guard readDevice.count > 0 else { return }
-        guard writeDevice.count > 0 else { return }
-        
-        for counter in 0...readDevice.count-1
+        for counter in pageIndex...endReadPage
         {
-            startPage = pageOffset
-            endPage = min(startPage-1+readDevice[counter].size/pageSize, pageCount-1)
-            pageIndex = startPage
-            while pageIndex <= endPage
-            {
-                memoryStorage[pageIndex][0] = readDevice[counter]
-                pageIndex = pageIndex+1
-            }
-            pageOffset = pageIndex
+            guard counter <= memoryConstant.pageCount-1 else { break }
+            readPages[counter] = readDevice
         }
         
-        pageOffset = Int(memoryLocation) / pageSize
-        
-        for counter in 0...writeDevice.count-1
+        for counter in pageIndex...endWritePage
         {
-            startPage = pageOffset
-            endPage = min(startPage-1+writeDevice[counter].size/pageSize, pageCount-1)
-            pageIndex = startPage
-            while pageIndex <= endPage
-            {
-                memoryStorage[pageIndex][1] = writeDevice[counter]
-                pageIndex = pageIndex+1
-            }
-            pageOffset = pageIndex
+            guard counter <= memoryConstant.pageCount-1 else { break }
+            writePages[counter] = writeDevice
         }
-    }
-    
-    func deallocate(device: memoryBlock)
-    {
-    // may not be implemented
     }
     
     func memorySlice(address: UInt16, size: UInt16) -> [UInt8]
@@ -164,29 +156,28 @@ final class memoryMapper
     @inline(__always)
     func readByte(address: UInt16) -> UInt8
     {
-        let addr = Int(address)
-        let pageIndex = addr/pageSize
-        let blockSize = memoryStorage[pageIndex][0].size
+        let pageIndex = Int(address) >> memoryConstant.pageShift
+        let pageOffset = (pageIndex - readPages[pageIndex].pageStart) << memoryConstant.pageShift + (Int(address) & memoryConstant.pageMask)
+        
+        let blockSize = readPages[pageIndex].size
         
         guard blockSize > 0 else { return 0xFF }
         
-        let localOffset = addr & (blockSize-1)
-        return memoryStorage[pageIndex][0].addressBlock[localOffset]
+        return readPages[pageIndex].addressBlock[pageOffset]
     }
     
     @inline(__always)
     func writeByte(address: UInt16, value: UInt8)
     {
-        let addr = Int(address)
-        let pageIndex = addr/pageSize
-        let blockSize = memoryStorage[pageIndex][0].size
-
+        let pageIndex = Int(address) >> memoryConstant.pageShift
+        let pageOffset = (pageIndex - writePages[pageIndex].pageStart) << memoryConstant.pageShift + (Int(address) & memoryConstant.pageMask)
+        
+        let blockSize = writePages[pageIndex].size
+        
         guard blockSize > 0 else { return }
-
-        guard (memoryStorage[pageIndex][1].deviceType == .RAM) else { return }
-
-        let localOffset = addr & (blockSize-1)
-        memoryStorage[pageIndex][1].addressBlock[localOffset] = value
+        guard writePages[pageIndex].deviceType == .RAM else { return }
+        
+        writePages[pageIndex].addressBlock[pageOffset] = value
     }
 }
 

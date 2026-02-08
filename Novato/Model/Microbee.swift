@@ -143,7 +143,7 @@ actor microbee
         var IY : UInt16 = 0         // Index Register IY - 16 bit
         
         var SP : UInt16 = 0x0000    // Stack Pointer - 16 bit
-        var PC : UInt16 = 0x0000  // Program Counter - 16 bit
+        var PC : UInt16 = 0x0900  // Program Counter - 16 bit
         
         var lastPC : UInt16 = 0x0000 // Program Counter - 16 bit
     }
@@ -224,47 +224,47 @@ actor microbee
     
     var mmu = memoryMapper()
     
-    var mainRAM = memoryBlock(size: 0x8000, label: "mainRAM")
-    var basicROM = memoryBlock(size: 0x4000, deviceType : .ROM, label: "basicROM")
-    var wordbeeROM = memoryBlock(size: 0x2000, deviceType : .ROM, label: "wordbeeROM")
-    var netROM = memoryBlock(size: 0x1000, deviceType : .ROM, label: "netROM")
-    var videoRAM = memoryBlock(size: 0x800, label: "videoRAM", fillValue: 0x20)
-    var pcgRAM = memoryBlock(size: 0x800, label: "pcgRAM")
-    var colourRAM = memoryBlock(size: 0x800,  label: "colourRAM")
-    var fontROM = memoryBlock(size: 0x1000, deviceType : .ROM,  label: "fontROM")
+    let mainRAM = memoryBlock(size: 0x8000, label: "mainRAM")
+    let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM, label: "basicROM")
+    let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM, label: "pakROM")
+    let netROM = memoryBlock(size: 0x1000, deviceType : .ROM, label: "netROM")
+    let videoRAM = memoryBlock(size: 0x800, label: "videoRAM", fillValue: 0x20)
+    let pcgRAM = memoryBlock(size: 0x800, label: "pcgRAM")
+    let colourRAM = memoryBlock(size: 0x800,  label: "colourRAM", fillValue: 0x02)
+    let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM,  label: "fontROM")
     
     init()
     {
-        mmu.map(readDevice: [mainRAM], writeDevice: [mainRAM], memoryLocation: 0x0000)       // 32K System RAM
-        mmu.map(readDevice: [basicROM], writeDevice: [basicROM], memoryLocation: 0x8000)      // 16K BASIC ROM
-        mmu.map(readDevice: [wordbeeROM], writeDevice: [wordbeeROM] , memoryLocation: 0xC000)    // 8K Optional ROM
-        mmu.map(readDevice: [netROM], writeDevice: [netROM], memoryLocation: 0xE000)        // 4K Net ROM
-        mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)      // 2K Video RAM
-        mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // 2K PCG RAM
-        
-        videoRAM.fillMemoryFromArray(memValues: [Character("W").asciiValue!,Character("e").asciiValue!,Character("l").asciiValue!,Character("c").asciiValue!,Character("o").asciiValue!,Character("m").asciiValue!,Character("e").asciiValue!,Character(" ").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!,Character(" ").asciiValue!,Character("N").asciiValue!,Character("o").asciiValue!,Character("v").asciiValue!,Character("a").asciiValue!,Character("t").asciiValue!,Character("o").asciiValue!], memOffset : 88)
-        videoRAM.fillMemoryFromArray(memValues :  [128,129,130,131,132,133,134,135,
+        mmu.map(readDevice: mainRAM, writeDevice: mainRAM, memoryLocation: 0x0000)       // 32K System RAM
+        mmu.map(readDevice: basicROM, writeDevice: basicROM, memoryLocation: 0x8000)     // 16K BASIC ROM
+        mmu.map(readDevice: pakROM, writeDevice: pakROM , memoryLocation: 0xC000)        // 8K Optional ROM
+        mmu.map(readDevice: netROM, writeDevice: netROM, memoryLocation: 0xE000)         // 4K Net ROM
+        mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)     // 2K Video RAM
+        mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)         // 2K PCG RAM
+    
+        videoRAM.fillMemoryFromArray(memValues: [87,101,108,99,111,109,101,32,116,111,32,78,111,118,97,116,111], memOffset: 88) // Welome to Novato
+        videoRAM.fillMemoryFromArray(memValues:  [128,129,130,131,132,133,134,135,
                                                    136,137,138,139,140,141,142,143], memOffset : 280)
-        videoRAM.fillMemoryFromArray(memValues :  [144,145,146,147,148,149,150,151,
+        videoRAM.fillMemoryFromArray(memValues:  [144,145,146,147,148,149,150,151,
                                                    152,153,154,155,156,157,158,159], memOffset : 344)
-        videoRAM.fillMemoryFromArray(memValues :  [160,161,162,163,164,165,166,167,
+        videoRAM.fillMemoryFromArray(memValues:  [160,161,162,163,164,165,166,167,
                                                    168,169,170,171,172,173,174,175], memOffset : 408)
-        videoRAM.fillMemoryFromArray(memValues :  [176,177,178,179,180,181,182,183,
+        videoRAM.fillMemoryFromArray(memValues:  [176,177,178,179,180,181,182,183,
                                                    184,185,186,187,188,189,190,191], memOffset : 472)
-        videoRAM.fillMemoryFromArray(memValues :  [192,193,194,195,196,197,198,199,
+        videoRAM.fillMemoryFromArray(memValues:  [192,193,194,195,196,197,198,199,
                                                    200,201,202,203,204,205,206,207], memOffset : 536)
-        videoRAM.fillMemoryFromArray(memValues :  [208,209,210,211,212,213,214,215,
+        videoRAM.fillMemoryFromArray(memValues:  [208,209,210,211,212,213,214,215,
                                                    216,217,218,219,220,221,222,223], memOffset : 600)
-        videoRAM.fillMemoryFromArray(memValues :  [224,225,226,227,228,229,230,231,
+        videoRAM.fillMemoryFromArray(memValues:  [224,225,226,227,228,229,230,231,
                                                    232,233,234,235,236,237,238,239], memOffset : 664)
-        videoRAM.fillMemoryFromArray(memValues :  [240,241,242,243,244,245,246,247,
+        videoRAM.fillMemoryFromArray(memValues:  [240,241,242,243,244,245,246,247,
                                                    248,249,250,251,252,253,254,255], memOffset : 728)
-        videoRAM.fillMemoryFromArray(memValues :  [Character("P").asciiValue!,Character("r").asciiValue!,Character("e").asciiValue!,Character("s").asciiValue!,Character("s").asciiValue!,Character(" ").asciiValue!,Character("S").asciiValue!,Character("t").asciiValue!,Character("a").asciiValue!,Character("r").asciiValue!,Character("t").asciiValue!], memOffset : 923)
-        basicROM.fillMemoryFromFile(FileName: "basic_5.22e", FileExtension: "rom")
-        wordbeeROM.fillMemoryFromFile(FileName: "wordbee_1.2", FileExtension: "rom")
-        netROM.fillMemoryFromFile(FileName: "telcom_1.0", FileExtension: "rom")
-        fontROM.fillMemoryFromFile(FileName: "charrom", FileExtension: "bin")
-        mainRAM.fillMemoryFromFile(FileName: "demo", FileExtension: "bin")
+        videoRAM.fillMemoryFromArray(memValues: [80,114,101,115,115,32,83,116,97,114,116], memOffset: 923) // Press Start
+        basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
+        //pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
+        //netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
         pcgRAM.fillMemoryFromArray(memValues :
                                     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -394,7 +394,6 @@ actor microbee
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-        colourRAM.fillMemory(memValue: 2)
     }
     
     //private(set) var isRunning = false
@@ -1217,22 +1216,23 @@ actor microbee
                 }
                 if testBit(value: registers.A, bitPosition: 6)
                 {
-                    mmu.map(readDevice: [colourRAM], writeDevice: [colourRAM], memoryLocation: 0xF800)  // swap in colour ram
+                    mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram
                 }
                 if !testBit(value: registers.A, bitPosition: 6)
                 {
-                    mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)        // swap in pcg ram
+                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)        // swap in pcg ram
                 }
             case 0x0A: break //PAK N selection - need some mechanism to map PAK number to memory device
             case 0x0B:
                 if registers.A == 1
                 {
-                    mmu.map(readDevice: [fontROM], writeDevice: [videoRAM,pcgRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                    mmu.map(readDevice: fontROM, writeDevice: videoRAM, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                    mmu.map(readDevice: fontROM, writeDevice: pcgRAM, memoryLocation: 0xF800)
                 }
                 if registers.A == 0
                 {
-                    mmu.map(readDevice: [videoRAM], writeDevice: [videoRAM], memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                    mmu.map(readDevice: [pcgRAM], writeDevice: [pcgRAM], memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
+                    mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                 }
             case 0x0C: break // writing to port 0x0C needs no further processing
             case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])

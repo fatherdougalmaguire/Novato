@@ -3,18 +3,16 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "memoryMapper.writeByte(address:value:):MMU.swift">
+      </ContextState>
+      <ContextState
          contextName = "Z80CPU.init():Z80CPU.swift">
       </ContextState>
       <ContextState
-         contextName = "Registers.HL.setter:Registers.swift">
+         contextName = "Z80Disasm.addToQueue(address:opCodes:):Z80Disasm.swift">
       </ContextState>
       <ContextState
-         contextName = "DebugView.highlightString(originalString:numDigits:offset:):DebugView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "originalString.count">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
@@ -25,24 +23,30 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "EmulatorView.body.getter:EmulatorView.swift">
+         contextName = "CRTC.WriteRegister(RegNum:RegValue:):CRTC.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
+         contextName = "EmulatorView.VDUoutput(_:_:):EmulatorView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "DebugView.highlightString(originalString:numDigits:offset:):DebugView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "0 &amp;- 16">
+               value = "originalString.count">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "memoryMapper.writeByte(address:value:):MMU.swift">
+         contextName = "memoryBlock.fillMemoryFromArray(memValues:memOffset:):MMU.swift">
       </ContextState>
       <ContextState
-         contextName = "EmulatorView.VDURam(_:_:):EmulatorView.swift">
+         contextName = "memoryMapper.map(readDevice:writeDevice:memoryLocation:):MMU.swift">
+      </ContextState>
+      <ContextState
+         contextName = "memoryMapper.readByte(address:):MMU.swift">
          <PersistentStrings>
             <PersistentString
-               value = "(myrow*64)+mycol+0xf000">
+               value = "readPages[pageIndex].pageStart">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -61,7 +65,15 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "Z80Disasm.addToQueue(address:opCodes:):Z80Disasm.swift">
+         contextName = "Registers.HL.setter:Registers.swift">
+      </ContextState>
+      <ContextState
+         contextName = "EmulatorView.VDURam(_:_:):EmulatorView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "(myrow*64)+mycol+0xf000">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
@@ -70,7 +82,12 @@
          contextName = "closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
       </ContextState>
       <ContextState
-         contextName = "CRTC.WriteRegister(RegNum:RegValue:):CRTC.swift">
+         contextName = "closure #1 in closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "0 &amp;- 16">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in closure #1 in closure #3 in closure #1 in DebugView.body.getter:DebugView.swift">
@@ -81,21 +98,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "memoryBlock.fillMemoryFromArray(memValues:memOffset:):MMU.swift">
+         contextName = "EmulatorView.body.getter:EmulatorView.swift">
       </ContextState>
       <ContextState
-         contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
-      </ContextState>
-      <ContextState
-         contextName = "EmulatorView.VDUoutput(_:_:):EmulatorView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "memoryMapper.readByte(address:):MMU.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "addr==">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):MMU.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

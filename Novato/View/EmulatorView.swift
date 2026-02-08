@@ -177,9 +177,9 @@ struct emulatorView: View
                                         }
                                         switch demoSelection
                                         {
-                                        case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0001, value: 0x00)
-                                        case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0001, value: 0x01)
-                                        case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0001, value: 0x02)
+                                        case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0901, value: 0x00)
+                                        case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0901, value: 0x01)
+                                        case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0901, value: 0x02)
                                         default: break
                                         }
                                         await vm.startEmulation()
