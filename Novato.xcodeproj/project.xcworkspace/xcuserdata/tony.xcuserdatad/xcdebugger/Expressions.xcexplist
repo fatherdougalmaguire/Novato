@@ -43,14 +43,6 @@
          contextName = "memoryMapper.map(readDevice:writeDevice:memoryLocation:):MMU.swift">
       </ContextState>
       <ContextState
-         contextName = "memoryMapper.readByte(address:):MMU.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "readPages[pageIndex].pageStart">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
          contextName = "CRTC.SetCursorDutyCycle():CRTC.swift">
          <PersistentStrings>
             <PersistentString
@@ -66,6 +58,9 @@
       </ContextState>
       <ContextState
          contextName = "Registers.HL.setter:Registers.swift">
+      </ContextState>
+      <ContextState
+         contextName = "microbee.executeInstruction():Microbee.swift">
       </ContextState>
       <ContextState
          contextName = "EmulatorView.VDURam(_:_:):EmulatorView.swift">

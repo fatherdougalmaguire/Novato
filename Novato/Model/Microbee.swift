@@ -224,14 +224,14 @@ actor microbee
     
     var mmu = memoryMapper()
     
-    let mainRAM = memoryBlock(size: 0x8000, label: "mainRAM")
-    let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM, label: "basicROM")
-    let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM, label: "pakROM")
-    let netROM = memoryBlock(size: 0x1000, deviceType : .ROM, label: "netROM")
-    let videoRAM = memoryBlock(size: 0x800, label: "videoRAM", fillValue: 0x20)
-    let pcgRAM = memoryBlock(size: 0x800, label: "pcgRAM")
-    let colourRAM = memoryBlock(size: 0x800,  label: "colourRAM", fillValue: 0x02)
-    let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM,  label: "fontROM")
+    let mainRAM = memoryBlock(size: 0x8000)
+    let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
+    let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM)
+    let netROM = memoryBlock(size: 0x1000, deviceType : .ROM)
+    let videoRAM = memoryBlock(size: 0x800, fillValue: 0x20)
+    let pcgRAM = memoryBlock(size: 0x800)
+    let colourRAM = memoryBlock(size: 0x800, fillValue: 0x02)
+    let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM)
     
     init()
     {
@@ -1226,8 +1226,7 @@ actor microbee
             case 0x0B:
                 if registers.A == 1
                 {
-                    mmu.map(readDevice: fontROM, writeDevice: videoRAM, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                    mmu.map(readDevice: fontROM, writeDevice: pcgRAM, memoryLocation: 0xF800)
+                    mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                 }
                 if registers.A == 0
                 {

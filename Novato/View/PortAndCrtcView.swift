@@ -15,12 +15,12 @@ struct portAndCrtcView: View
     @ViewBuilder
     func displayPort(portLabel: String, portDescription: String, portValue: UInt8, alternateRow: Bool) -> some View
     {
-        let portHex: String = String(format: "0x%02X", portValue)
-        let portBinary: String = padBinary(value: portValue)
-        Text(portLabel+"   " + portHex + " " + portBinary + " " + portDescription)
-            .foregroundColor(Color.orange)
-            .font(.system(.body, design: .monospaced))
-            .background(alternateRow ? Color(red: 0.95, green: 0.95, blue: 0.97) : Color.clear)
+//        let portHex: String = String(format: "0x%02X", portValue)
+//        let portBinary: String = padBinary(value: portValue)
+//        Text(portLabel+"   " + portHex + " " + portBinary + " " + portDescription)
+//            .foregroundColor(Color.orange)
+//            .font(.system(.body, design: .monospaced))
+//            .background(alternateRow ? Color(red: 0.95, green: 0.95, blue: 0.97) : Color.clear)
     }
     
     var body: some View
