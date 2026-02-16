@@ -64,14 +64,11 @@ struct SettingsView: View
     {
         TabView
         {
-            modelSettingsView()
-                .tabItem { Label("Pick your model", systemImage: "gear") }
-                .tag("model")
-            demoSettingsView()
-                .tabItem { Label("Demo screen", systemImage: "gear") }
-                .tag("general")
-            colourSettingsView()
-                .tabItem { Label("Colour mode", systemImage: "gear") }
+//            modelSettingsView()
+//                .tabItem { Label("Pick your model", systemImage: "gear") }
+//                .tag("model")
+            bootSettingsView()
+                .tabItem { Label("Boot Settings", systemImage: "gear") }
                 .tag("general")
             screenSettingsView()
                 .tabItem { Label("Screen Settings", systemImage: "gear") }
@@ -108,16 +105,17 @@ struct modelSettingsView: View
     }
 }
 
-struct demoSettingsView: View
+struct bootSettingsView: View
 {
-    @AppStorage("demoSelection") private var demoSelection = "Microworld Basic (64x16)"
+    @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
+    @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
 
     var body: some View
     {
-        let themes = ["Microworld Basic (64x16)","CP/M (80x24)","Viatel (40x25)"]
+        let themes = ["Demo #1 - Basic","Demo #2 - CP/M","Demo #3 - Viatel","MicroWorld Basic 5.22e"]
         Form
         {
-            Picker("Demo Screen:", selection: $demoSelection)
+            Picker("Demo Screen:", selection: $bootModeSelection)
             {
                 ForEach(themes, id: \.self) { theme in Text(theme) }
             }
@@ -125,35 +123,11 @@ struct demoSettingsView: View
             
             Divider()
                         
-            Text("Changes will be applied immediately.")
-            .font(.caption)
-            .foregroundColor(.secondary)
-        }
-        .padding(30)
-        .frame(width: 400, height: 150)
-    }
-}
-
-struct colourSettingsView: View
-{
-    @AppStorage("colorSelection") private var colourSelection = "Colour"
-
-    var body: some View
-    {
-        let themes = ["Green","Amber","White","Blue","Colour","Premium Colour"]
-        Form
-        {
-            Picker("Colour Mode:", selection: $colourSelection)
-            {
-                ForEach(themes, id: \.self) { theme in Text(theme) }
-            }
-            .pickerStyle(.menu) // Standard macOS pop-up button
-            
-            Divider()
-                        
-            Text("Changes will be applied immediately.")
-            .font(.caption)
-            .foregroundColor(.secondary)
+            Picker("Operation Mode", selection: $autoStartSelection) {
+                            Text("Splash Screen").tag(false)
+                            Text("Auto-Start").tag(true)
+                        }
+                        .pickerStyle(.menu) // Works great on macOS and iOS
         }
         .padding(30)
         .frame(width: 400, height: 150)
@@ -164,9 +138,12 @@ struct screenSettingsView: View
 {
     @AppStorage("scalingSelection") private var scalingSelection: Double = 2.0
     @AppStorage("aspectSelection") private var aspectSelection: Double = 4/3
+    @AppStorage("colorSelection") private var colourSelection = "Colour"
     
     var body: some View
     {
+        let themes = ["Green","Amber","White","Blue","Colour"]
+        
         Form
         {
             Slider(value: $scalingSelection, in: 1...4, step: 0.25)
@@ -180,6 +157,14 @@ struct screenSettingsView: View
             { Text("Aspect Ratio") }
             minimumValueLabel: { Text("0") }
             maximumValueLabel: { Text("2") }
+            
+            Divider()
+            
+            Picker("Colour Mode:", selection: $colourSelection)
+            {
+                ForEach(themes, id: \.self) { theme in Text(theme) }
+            }
+            .pickerStyle(.menu) // Standard macOS pop-up button
         }
         .padding(30)
         .frame(width: 400, height: 150)

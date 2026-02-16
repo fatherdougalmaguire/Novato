@@ -382,9 +382,9 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "267"
-            endingLineNumber = "267"
-            landmarkName = "init()"
+            startingLineNumber = "276"
+            endingLineNumber = "276"
+            landmarkName = "splashScreen()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -398,9 +398,9 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "589"
-            endingLineNumber = "589"
-            landmarkName = "executeInstruction()"
+            startingLineNumber = "646"
+            endingLineNumber = "646"
+            landmarkName = "logInstructionDetails(instructionDetails:opcode:values:programCounter:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -414,26 +414,10 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "238"
-            endingLineNumber = "238"
-            landmarkName = "init()"
+            startingLineNumber = "265"
+            endingLineNumber = "265"
+            landmarkName = "splashScreen()"
             landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "BF7529F6-C8E9-4FA0-B97F-6E15D5E33FB4"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Microbee.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "227"
-            endingLineNumber = "227"
-            landmarkName = "microbee"
-            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -446,9 +430,9 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "590"
-            endingLineNumber = "590"
-            landmarkName = "executeInstruction()"
+            startingLineNumber = "647"
+            endingLineNumber = "647"
+            landmarkName = "logInstructionDetails(instructionDetails:opcode:values:programCounter:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

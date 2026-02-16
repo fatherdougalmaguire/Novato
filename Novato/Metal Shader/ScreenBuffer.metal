@@ -154,7 +154,7 @@ using namespace metal;
             ForegroundColour = foregroundColourArray[int(colourram[screenpos]) & 0x1F];
             BackgroundColour = backgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
             break;
-        default :   // Premium Colour
+        default :   // Colour
             ForegroundColour = foregroundColourArray[int(colourram[screenpos]) & 0x1F];
             BackgroundColour = backgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
     }

@@ -31,9 +31,19 @@ final class emulatorViewModel
         await cpu.ClearVideoMemory()
     }
     
+    func splashScreen() async
+    {
+        await cpu.splashScreen()
+    }
+    
     func writeToMemory( address : UInt16, value : UInt8) async
     {
         await cpu.writeToMemory(address : address, value : value)
+    }
+    
+    func updateProgramCounter(address: UInt16) async
+    {
+        await cpu.updatePC(address : address)
     }
     
     func startEmulation() async
@@ -51,6 +61,16 @@ final class emulatorViewModel
         await cpu.stop()
     }
 
+    func pauseEmulation() async
+    {
+        await cpu.pause()
+    }
+    
+    func resetEmulation() async
+    {
+        await cpu.reset()
+    }
+    
     private func takeSnapshot() async
     {
         while !Task.isCancelled

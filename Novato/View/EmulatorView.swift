@@ -42,14 +42,13 @@ struct emulatorView: View
     @AppStorage("scalingSelection") private var charScale: Double = 2.0 // Scale for visibility on 27" screen ( 2560 x 1440 )
     @AppStorage("aspectSelection") private var charAspect: Double = 4/3  // Correction for CRT aspect ratio
     @AppStorage("colorSelection") private var colourSelection = "Colour"
-    @AppStorage("demoSelection") private var demoSelection = "Microworld Basic (64x16)"
+    @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
+    @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
     
-   // @State private var powerOn = true
-    @State private var ClearScreen = true
     @State private var isRunning = false
     
-    let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4,"Premium Colour":5]
-    // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour else Premium colour mode
+    let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
+    // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
     
     let startDate = Date()
     
@@ -62,7 +61,7 @@ struct emulatorView: View
         let colourOptions: [String: Int]
         let charScale: CGFloat
         let charAspect: CGFloat
-
+        
         var body: some View
         {
             let rawHorizDisplayed = Int(snapshot.crtcSnapshot.R1)
@@ -142,7 +141,7 @@ struct emulatorView: View
             }
         }
     }
-   
+    
     var body: some View
     {
         if let snapshot = vm.snapshot
@@ -169,41 +168,23 @@ struct emulatorView: View
                                 {
                                     Task
                                     {
+                                        
+                                        if isRunning
+                                        {
+                                            await vm.pauseEmulation()
+                                        }
+                                        else
+                                        {
+                                            await vm.startEmulation()
+                                        }
                                         isRunning.toggle()
-                                        if ClearScreen
-                                        {
-                                            await vm.ClearEmulationScreen()
-                                            ClearScreen = false
-                                        }
-                                        switch demoSelection
-                                        {
-                                        case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0901, value: 0x00)
-                                        case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0901, value: 0x01)
-                                        case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0901, value: 0x02)
-                                        default: break
-                                        }
-                                        await vm.startEmulation()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
-                                //.buttonStyle(.borderedProminent)
-                                //.tint(Color.orange)
                                 Button("Step", systemImage: "forward.frame.fill")
                                 {
                                     Task
                                     {
-                                        if ClearScreen
-                                        {
-                                            await vm.ClearEmulationScreen()
-                                            ClearScreen = false
-                                        }
-                                        switch demoSelection
-                                        {
-                                        case "Microworld Basic (64x16)" : await vm.writeToMemory(address: 0x0001, value: 0x00)
-                                        case "CP/M (80x24)" : await vm.writeToMemory(address: 0x0001, value: 0x01)
-                                        case "Viatel (40x25)" : await vm.writeToMemory(address: 0x0001, value: 0x02)
-                                        default: break
-                                        }
                                         await vm.stepEmulation()
                                     }
                                 }
@@ -213,7 +194,31 @@ struct emulatorView: View
                             {
                                 Button("Reset", systemImage: "arrow.counterclockwise")
                                 {
-                                    Task { await vm.stopEmulation() }
+                                    Task
+                                    {
+                                        await vm.stopEmulation()
+                                        await vm.resetEmulation()
+                                        
+                                        switch bootModeSelection
+                                        {
+                                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
+                                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
+                                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
+                                            case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
+                                            default: break
+                                        }
+                                        if autoStartSelection
+                                        {
+                                            isRunning =  true
+                                            await vm.startEmulation()
+                                        }
+                                        else
+                                        {
+                                            isRunning =  false
+                                            await vm.ClearEmulationScreen()
+                                            await vm.splashScreen()
+                                        }
+                                    }
                                 }
                                 .labelStyle(.titleAndIcon)
                                 Button("Quit", systemImage: "xmark.circle")
@@ -221,7 +226,7 @@ struct emulatorView: View
                                     .labelStyle(.titleAndIcon)
                             }
                         }
-                        .fixedSize() // Ensures SwiftUI doesn't truncate the labels
+                        .fixedSize()
                     }
                 }
                 .onAppear
@@ -230,6 +235,25 @@ struct emulatorView: View
                     openWindow(id: "portAndCrtcWindow")
                     openWindow(id: "memoryAndInstructionWindow")
                     focusWindow(withId: "emulatorWindow")
+                    Task
+                    {
+                        switch bootModeSelection
+                        {
+                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
+                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
+                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
+                            case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
+                            default: break
+                        }
+                        if autoStartSelection
+                        {
+                            await vm.startEmulation()
+                        }
+                        else
+                        {
+                            await vm.splashScreen()
+                        }
+                    }
                 }
             }
         }

@@ -142,8 +142,8 @@ actor microbee
         var IX : UInt16 = 0         // Index Register IX - 16 bit
         var IY : UInt16 = 0         // Index Register IY - 16 bit
         
-        var SP : UInt16 = 0x0000    // Stack Pointer - 16 bit
-        var PC : UInt16 = 0x0900  // Program Counter - 16 bit
+        var SP : UInt16 = 0x7F00    // Stack Pointer - 16 bit
+        var PC : UInt16 = 0x0000  // Program Counter - 16 bit
         
         var lastPC : UInt16 = 0x0000 // Program Counter - 16 bit
     }
@@ -212,8 +212,6 @@ actor microbee
     //    bit 6 COLOUR RAM enable (0 = PCG, 1= RAM)
     
     var tStates : UInt64 = 0
-    var CPUstarttime : Date = Date()
-    var CPUendtime : Date = Date()
     
     private(set) var emulatorState : emulatorState = .stopped
     private(set) var executionMode : executionMode = .continuous
@@ -228,9 +226,9 @@ actor microbee
     let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
     let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM)
     let netROM = memoryBlock(size: 0x1000, deviceType : .ROM)
-    let videoRAM = memoryBlock(size: 0x800, fillValue: 0x20)
+    let videoRAM = memoryBlock(size: 0x800)
     let pcgRAM = memoryBlock(size: 0x800)
-    let colourRAM = memoryBlock(size: 0x800, fillValue: 0x02)
+    let colourRAM = memoryBlock(size: 0x800)
     let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM)
     
     init()
@@ -241,7 +239,25 @@ actor microbee
         mmu.map(readDevice: netROM, writeDevice: netROM, memoryLocation: 0xE000)         // 4K Net ROM
         mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)     // 2K Video RAM
         mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)         // 2K PCG RAM
+        
+        basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
+        pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
+        netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        
+        mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
+    }
+    private var runTask: Task<Void, Never>?
     
+    func ClearVideoMemory()
+    {
+        videoRAM.fillMemory(memValue : 0x20)
+    }
+    
+    func splashScreen()
+    {
+        videoRAM.fillMemory(memValue: 0x20)
+        colourRAM.fillMemory(memValue: 0x02)
         videoRAM.fillMemoryFromArray(memValues: [87,101,108,99,111,109,101,32,116,111,32,78,111,118,97,116,111], memOffset: 88) // Welome to Novato
         videoRAM.fillMemoryFromArray(memValues:  [128,129,130,131,132,133,134,135,
                                                    136,137,138,139,140,141,142,143], memOffset : 280)
@@ -260,11 +276,6 @@ actor microbee
         videoRAM.fillMemoryFromArray(memValues:  [240,241,242,243,244,245,246,247,
                                                    248,249,250,251,252,253,254,255], memOffset : 728)
         videoRAM.fillMemoryFromArray(memValues: [80,114,101,115,115,32,83,116,97,114,116], memOffset: 923) // Press Start
-        basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
-        //pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-        //netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
-        fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
-        mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
         pcgRAM.fillMemoryFromArray(memValues :
                                     [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -396,14 +407,6 @@ actor microbee
                                      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
     }
     
-    //private(set) var isRunning = false
-    private var runTask: Task<Void, Never>?
-    
-    func ClearVideoMemory()
-    {
-        videoRAM.fillMemory(memValue : 0x20)
-    }
-    
     func start()
     {
         guard emulatorState == .paused || emulatorState == .stopped else { return }
@@ -437,6 +440,92 @@ actor microbee
         executionMode = .singleStep
         nextInstruction()
         appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
+    }
+    
+    func reset()
+    {
+        //confirm Z80 and 6545 reset behaviour
+        registers.A =  0
+        registers.F =  0
+        registers.B =  0
+        registers.C =  0
+        registers.D =  0
+        registers.E =  0
+        registers.H =  0
+        registers.L =  0
+        
+        registers.altA =  0
+        registers.altF =  0
+        registers.altB =  0
+        registers.altC =  0
+        registers.altD =  0
+        registers.altE =  0
+        registers.altH =  0
+        registers.altL =  0
+        
+        registers.AF =  0
+        registers.BC =  0
+        registers.DE =  0
+        registers.HL =  0
+        
+        registers.altAF = 0
+        registers.altBC = 0
+        registers.altDE =  0
+        registers.altHL =  0
+
+        registers.I =  0
+        registers.R =  0
+        
+        registers.IM =  0
+        registers.IFF1 = false
+        registers.IFF2 = false
+        
+        registers.IX =  0
+        registers.IY =  0
+        
+        registers.PC =  0
+        registers.SP =  0x7F00
+        
+        registers.lastPC = 0
+        
+        tStates = 0
+        
+        emulatorState = .stopped
+        executionMode = .continuous
+        
+        interruptPending = false
+        
+        ports.indices.forEach { ports[$0] = 0 }
+  
+        crtc.registers.R0 = 0x00
+        crtc.registers.R1 = 0x40
+        crtc.registers.R2 = 0x00
+        crtc.registers.R3 = 0x00
+        crtc.registers.R4 = 0x12
+        crtc.registers.R5 = 0x00
+        crtc.registers.R6 = 0x10
+        crtc.registers.R7 = 0x00
+        crtc.registers.R8 = 0x00
+        crtc.registers.R9 = 0x0F
+        crtc.registers.R10 = 0x20
+        crtc.registers.R11 = 0x00
+        crtc.registers.R12 = 0x00
+        crtc.registers.R13 = 0x00
+        crtc.registers.R14 = 0x00
+        crtc.registers.R15 = 0x00
+        crtc.registers.R16 = 0x00
+        crtc.registers.R17 = 0x00
+        crtc.registers.R18 = 0x00
+        crtc.registers.R19 = 0x00
+        
+        crtc.registers.statusRegister = 0b10000000
+        
+        crtc.registers.redBackgroundIntensity = 0x00
+        crtc.registers.greenBackgroundIntensity = 0x00
+        crtc.registers.blueBackgroundIntensity = 0x00
+        
+        mainRAM.fillMemory(memValue: 0)
+        mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
     }
     
     private func runLoop()
@@ -496,6 +585,11 @@ actor microbee
     func writeToMemory(address: UInt16, value: UInt8)
     {
         mmu.writeByte(address: address, value: value)
+    }
+    
+    func updatePC(address: UInt16)
+    {
+        registers.PC = address
     }
     
     func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
@@ -862,6 +956,13 @@ actor microbee
             }
             tStates = tStates + 12
             incrementR(opcodeCount:1)
+        case 0x36: // LD (HL),$n - 36 n - Loads $n into address at HL
+            mmu.writeByte(address: registers.HL, value: opcode2)
+            logInstructionDetails(instructionDetails: "LD (HL),$n", opcode: [0x36], values: [opcode2], programCounter: registers.PC)
+            myz80Queue.addToQueue(address: registers.PC, opCodes: [0x36], dataBytes: [opcode2])
+            registers.PC = registers.PC &+ 2
+            tStates = tStates + 10
+            incrementR(opcodeCount:1)
         case 0x38: // JR C,d
             logInstructionDetails(instructionDetails: "JR C,$d", opcode: [0x38], values: [opcode2], programCounter: registers.PC)
             myz80Queue.addToQueue(address: registers.PC, opCodes: [0x38], dataBytes: [opcode2])
@@ -1029,6 +1130,13 @@ actor microbee
             registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
             tStates = tStates + 10
             incrementR(opcodeCount:1)
+        case 0xC9: // RET - Return from subroutine
+            logInstructionDetails(instructionDetails: "RET", opcode: [0xC9], values: [], programCounter: registers.PC)
+            myz80Queue.addToQueue(address: registers.PC, opCodes: [0xC9], dataBytes: [])
+            registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
+            registers.SP = registers.SP &+ 2
+            tStates = tStates + 10
+            incrementR(opcodeCount:1)
         case 0xCA: // JP Z,nn
             logInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [0xCA], values: [opcode2,opcode3], programCounter: registers.PC)
             myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCA], dataBytes: [opcode2,opcode3])
@@ -1118,6 +1226,12 @@ actor microbee
                 logInstructionDetails(instructionDetails: "BIT 7, A", opcode: [0xCB,0x7F], programCounter: registers.PC)
                 myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x7F])
                 incrementR(opcodeCount:2)
+            case 0xB7: // RES 6,A
+                registers.A = registers.A & 0b10111111
+                tStates = tStates + 8
+                logInstructionDetails(instructionDetails: "RES 6, A", opcode: [0xCB,0xB7], programCounter: registers.PC)
+                myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0xB7])
+                incrementR(opcodeCount:2)
             case 0xC7: // SET 0, A
                 registers.A = registers.A | 0b00000001
                 tStates = tStates + 8
@@ -1172,6 +1286,17 @@ actor microbee
                 incrementR(opcodeCount:2)
             } // end CB opcodes
             registers.PC = registers.PC &+ 2
+        case 0xCD: // CALL nn - CD n n - Jump to subroutine at nn
+            tStates = tStates + 17
+            logInstructionDetails(instructionDetails: "CALL $nn",opcode: [0xCD,opcode2,opcode3], programCounter: registers.PC)
+            myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCD,opcode2,opcode3])
+            registers.PC = registers.PC &+ 3
+            registers.SP = registers.SP &- 1
+            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+            registers.SP = registers.SP &- 1
+            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+            registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
+            incrementR(opcodeCount:1)
         case 0xD2: // JP NC,nn
             logInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [0xD2], values: [opcode2,opcode3], programCounter: registers.PC)
             myz80Queue.addToQueue(address: registers.PC, opCodes: [0xD2], dataBytes: [opcode2,opcode3])
@@ -1481,4 +1606,3 @@ actor microbee
         )
     }
 }
-

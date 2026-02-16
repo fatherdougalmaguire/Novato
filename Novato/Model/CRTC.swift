@@ -5,26 +5,26 @@ final class CRTC
     
     struct crtcRegisters
     {
-        var R0 : UInt8 = 0x00                              // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
-        var R1 : UInt8 = 0x40                                // Number of characters displayed in a line
-        var R2 : UInt8 = 0x00                             // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
-        var R3 : UInt8 = 0x00                            // Ignored by emulator
-        var R4 : UInt8 = 0x12                               // The number of character lines of the screen minus 1
+        var R0 : UInt8 = 0x00                               // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
+        var R1 : UInt8 = 0x40                               // Number of characters displayed in a line - initialise as 64
+        var R2 : UInt8 = 0x00                               // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
+        var R3 : UInt8 = 0x00                               // Ignored by emulator
+        var R4 : UInt8 = 0x12                               // The number of character lines of the screen minus 1 - initialise as 18
         var R5 : UInt8 = 0x00                               // Ignored by emulator - The additional number of scanlines to complete a screen
-        var R6 : UInt8 = 0x10                                 // Number character lines that are displayed
-        var R7 : UInt8 = 0x00                              // Ignored by emulator - Position of the vertical sync pulse in character lines.
-        var R8 : UInt8 = 0x00                                   // Ignored by emulator
-        var R9 : UInt8 = 0x0F                               // Number of scanlines per character minus 1
-        var R10 : UInt8 = (0x01 << 5) & 0b01100000  // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no c
-        var R11 : UInt8 = 0b00000000 & 0b0011111                  // Cursor scanline end ( bits 0-4 )
-        var R12 : UInt8 = 0x00                            // Character Generator Rom start address ( high byte )
-        var R13 : UInt8 = 0x00                            // Character Generator Rom start address ( low byte )
+        var R6 : UInt8 = 0x10                               // Number character lines that are displayed - initialise as 16
+        var R7 : UInt8 = 0x00                               // Ignored by emulator - Position of the vertical sync pulse in character lines.
+        var R8 : UInt8 = 0x00                               // Ignored by emulator
+        var R9 : UInt8 = 0x0F                               // Number of scanlines per character minus 1 - initialise as 15
+        var R10 : UInt8 = 0x20                              // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no cursor and scanline start of 0
+        var R11 : UInt8 = 0x00                              // Cursor scanline end ( bits 0-4 ) - initialise as scanlin end of 0
+        var R12 : UInt8 = 0x00                              // Character Generator Rom start address ( high byte )
+        var R13 : UInt8 = 0x00                              // Character Generator Rom start address ( low byte )
         var R14 : UInt8 = 0x00                              // Cursor address ( high byte )
         var R15 : UInt8 = 0x00                              // Cursor address ( low byte )
-        var R16 : UInt8 = 0x00                                 // Ignored by emulator
-        var R17 : UInt8 = 0x00                                 // Ignored by emulator
-        var R18 : UInt8 = 0x00                            // Ignored by emulator
-        var R19 : UInt8 = 0x00                            // Ignored by emulator
+        var R16 : UInt8 = 0x00                              // Ignored by emulator
+        var R17 : UInt8 = 0x00                              // Ignored by emulator
+        var R18 : UInt8 = 0x00                              // Ignored by emulator
+        var R19 : UInt8 = 0x00                              // Ignored by emulator
         
         var statusRegister : UInt8 = 0b10000000
         
