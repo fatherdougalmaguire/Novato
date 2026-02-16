@@ -12,8 +12,7 @@ It runs on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe.
 Universal binaries can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
 
 At some point,  I may build iOS and iPadOS versions off the same codebase.
-
-And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
+( And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly. )
 
 ## Ackowledgements
 
@@ -26,11 +25,12 @@ Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.
 This emulator is still in what could charitably called *alpha* status.
 
 * You can start and stop the emulator via button control.
+* You can restart the emulator via button control.
 * You can quit the emulator via button control.
 * A small number of Z80 instructions are decoded.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
-* The last 16 instructions are decoded and displayed
+* ~The last 16 instructions are decoded and displayed~ Disassembly is currently broken.
 * The screen buffer is output to the display using a metal shader.
 * Shader will automatically scale the output resolution to the same display size.
 * Colour support has been added ( green mono, amber mono, blue mono, white mono and colour )
@@ -47,7 +47,8 @@ This emulator is still in what could charitably called *alpha* status.
   - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
 * Splash screen displaying the application logo as PCG characters
 * Settings module to set
-  - Demo screen ( basic, CP/M, Viatel )
+  - Start-up mode ( automatic or splash screen )
+  - Select boot code (  Basic demo, CP/M demo, Viatel demo, Microworld Basic 5.22e )
   - Colour mode
   - Aspect ratio
   - Screen scaling
@@ -78,7 +79,7 @@ This emulator is still in what could charitably called *alpha* status.
 
 ### Port View
 
-<img width="1084" height="680" alt="image" src="https://github.com/user-attachments/assets/c39654bf-9042-4d3e-829b-07a1920f5b38" />
+<img width="1084" height="1578" alt="image" src="https://github.com/user-attachments/assets/fab9d30d-6937-4fe0-b5e1-b4974aa21e3f" />
 
 ### Memory AND Instruction View
 
@@ -86,13 +87,13 @@ This emulator is still in what could charitably called *alpha* status.
 
 ### Register View
 
-<img width="1734" height="864" alt="image" src="https://github.com/user-attachments/assets/109da83a-c6a6-460b-a139-f000c27897ee" />
+<img width="1734" height="924" alt="image" src="https://github.com/user-attachments/assets/4ee67221-22d3-4699-b9c9-dae6de76b8bf" />
 
 ## Demo Screens
 
 Below are demo screens for the three video modes ( 64x16, 80x24, 40x24 ).  
 These screens are drawn using internally loaded Z80 assembler.
-The emulator is **NOT** currently booting BASIC, CP/M or Viatel
+The emulator is **NOT** currently booting BASIC, CP/M or Viatel ( as you can tell when you try the MicroWorld Basic 5.22e option )
 
 ### 64 columns x 16 rows 
 
