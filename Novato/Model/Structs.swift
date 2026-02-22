@@ -97,11 +97,9 @@ struct executionSnapshot: Sendable, Equatable
     let emulatorState: emulatorState
     let executionMode: executionMode
     
-    let ports : [UInt8]
+    let ports: [UInt8]
 
-    let z80Queue : z80Queue
-    
-    let lastPC: UInt16
+    let orderedZ80Queue: [String]
 }
 
 struct microbeeSnapshot: Sendable, Equatable, Identifiable

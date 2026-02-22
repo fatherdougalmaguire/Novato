@@ -98,5 +98,13 @@
       <ContextState
          contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):MMU.swift">
       </ContextState>
+      <ContextState
+         contextName = "closure #2 in closure #1 in closure #1 in memoryAndInstructionView.body.getter:MemoryAndInstructionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "String(format: &quot;0x%04X&quot;, snapshot.z80Snapshot.PC)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
    </ContextStates>
 </VariablesViewState>

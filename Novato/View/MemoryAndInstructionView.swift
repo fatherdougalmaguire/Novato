@@ -4,8 +4,6 @@ struct memoryAndInstructionView: View
 {
     @Environment(emulatorViewModel.self) private var vm
     
-    let shizz = Z80Opcodes()
-    
     struct MemoryRowView: View
     {
         let row: Int
@@ -43,19 +41,19 @@ struct memoryAndInstructionView: View
         var body: some View
         {
             let address = row * 16
-            let nextaddress = (row+1)*16
-            let dispaddress = startAddress &+ UInt16(address)
+            let nextAddress = (row+1)*16
+            let dispAddress = startAddress &+ UInt16(address)
+            let dispNextAddress = startAddress &+ UInt16(nextAddress)
             let bytes: ArraySlice<UInt8> = snapshot.memorySnapshot.memoryDump[address..<(address+16)]
             let hexBytes: String = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
             let charBytes: String = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
-            let highlight = (snapshot.z80Snapshot.PC >= address) && (snapshot.z80Snapshot.PC < nextaddress)
+            let highlight = (snapshot.z80Snapshot.PC >= dispAddress) && (snapshot.z80Snapshot.PC < dispNextAddress)
             let alternateRow = (row % 2) == 1
-            let offset = Int(snapshot.z80Snapshot.PC) - address
-            
-            let addressString = String(format:"0x%04X", dispaddress)
+            let offset = abs(Int(snapshot.z80Snapshot.PC) - Int(dispAddress))
+            let addressString = String(format:"0x%04X", dispAddress)
             let byteString = highlightString(originalString: hexBytes, numDigits: 2, offset: offset * 3, activate: highlight)
             let charString = highlightString(originalString: charBytes, numDigits: 1, offset: offset, activate: highlight)
-            
+        
             HStack(alignment: .firstTextBaseline, spacing: 8)
             {
                 Text(addressString)
@@ -101,30 +99,39 @@ struct memoryAndInstructionView: View
                         .font(.headline)
                     
                     Spacer()
-                    
-                    let ken = snapshot.executionSnapshot.z80Queue
-                    Group {
-                        ForEach(0...15, id: \.self) { row in
-                            let outputString = ken.decodeAddress(index: row) + "   " + ken.decodeBytes(index: row) + "    " + shizz.decodeInstructions(opCodes: ken.returnOpcodes(index: row), dataBytes: ken.returnDataBytes(index: row))
-                            let alternateRow = (row % 2) == 1
+                
+                    let queue = snapshot.executionSnapshot.orderedZ80Queue
+                    let indices = queue.indices
 
-                            if ken.checkEmptyQueue(index: row) {
-                                Text("")
-                            } else {
-                                if snapshot.executionSnapshot.lastPC == ken.returnAddress(index: row) {
-                                    Text(outputString)
-                                        .font(.system(.body, design: .monospaced))
-                                        .foregroundColor(.white)
-                                        .background(Color.orange)
-                                } else {
-                                    Text(outputString)
-                                        .font(.system(.body, design: .monospaced))
-                                        .foregroundColor(.orange)
-                                        .background(alternateRow ? Color(red: 0.95, green: 0.95, blue: 0.97) : Color.clear)
-                                }
+                    ForEach(indices, id: \.self)
+                    { counter in
+                            let isLast = counter == queue.count - 1
+                            let isAlternate = counter % 2 == 1
+                            let alternateColor = Color(red: 0.95, green: 0.95, blue: 0.97)
+                            
+                            Text(queue[counter])
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(isLast ? .white : .orange)
+                                .background
+                        {
+                            if isLast
+                            {
+                                Color.orange
+                            }
+                            else if isAlternate
+                            {
+                                alternateColor
+                            }
+                            else
+                            {
+                                Color.white
                             }
                         }
                     }
+
+                    let instructionsToPad = 16-snapshot.executionSnapshot.orderedZ80Queue.count
+                    ForEach(0...instructionsToPad, id: \.self)
+                    { counter in Text(" ") }
                 }
             }
             .fixedSize()
