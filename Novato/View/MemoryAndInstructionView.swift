@@ -81,7 +81,7 @@ struct memoryAndInstructionView: View
             {
                 VStack()
                 {
-                    Text("Memory")
+                    Text("Memory Dump")
                         .font(.headline)
                     
                     Spacer()
@@ -95,7 +95,7 @@ struct memoryAndInstructionView: View
                     
                     Spacer()
                     
-                    Text("Instructions")
+                    Text("Instruction History")
                         .font(.headline)
                     
                     Spacer()

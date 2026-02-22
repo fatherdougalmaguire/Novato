@@ -5,1836 +5,1837 @@ struct Z80Disassembler
     struct opCode
     {
         var mnemonic: String
-        var instructionEnd: Int
-        var countDataBytes: Int
+        var instructionLength : Int
+        var dataStart: Int
+        var dataEnd: Int
     }
     
         let singleOpcode: [opCode] =
         [
-            opCode(mnemonic: "NOP", instructionEnd: 0, countDataBytes: 0),          // 0x00
-            opCode(mnemonic: "LD BC,$nn", instructionEnd: 0, countDataBytes: 2),    // 0x01
-            opCode(mnemonic: "LD (BC),A", instructionEnd: 0, countDataBytes: 0),    // 0x02
-            opCode(mnemonic: "INC BC", instructionEnd: 0, countDataBytes: 0),       // 0x03
-            opCode(mnemonic: "INC B", instructionEnd: 0, countDataBytes: 0),        // 0x04
-            opCode(mnemonic: "DEC B", instructionEnd: 0, countDataBytes: 0),        // 0x05
-            opCode(mnemonic: "LD B,$n", instructionEnd: 0, countDataBytes: 1),      // 0x06
-            opCode(mnemonic: "RLCA", instructionEnd: 0, countDataBytes: 0),         // 0x07
-            opCode(mnemonic: "EX AF,AF'", instructionEnd: 0, countDataBytes: 0),    // 0x08
-            opCode(mnemonic: "ADD HL,BC", instructionEnd: 0, countDataBytes: 0),    // 0x09
-            opCode(mnemonic: "LD A,(BC)", instructionEnd: 0, countDataBytes: 0),    // 0x0A
-            opCode(mnemonic: "DEC BC", instructionEnd: 0, countDataBytes: 0),       // 0x0B
-            opCode(mnemonic: "INC C", instructionEnd: 0, countDataBytes: 0),        // 0x0C
-            opCode(mnemonic: "DEC C", instructionEnd: 0, countDataBytes: 0),        // 0x0D
-            opCode(mnemonic: "LD C,$n", instructionEnd: 0, countDataBytes: 1),      // 0x0E
-            opCode(mnemonic: "RRCA", instructionEnd: 0, countDataBytes: 0),         // 0x0F
-            opCode(mnemonic: "DJNZ $d", instructionEnd: 0, countDataBytes: 1),      // 0x10
-            opCode(mnemonic: "LD DE,$nn", instructionEnd: 0, countDataBytes: 2),    // 0x11
-            opCode(mnemonic: "LD (DE),A", instructionEnd: 0, countDataBytes: 0),    // 0x12
-            opCode(mnemonic: "INC DE", instructionEnd: 0, countDataBytes: 0),       // 0x13
-            opCode(mnemonic: "INC D", instructionEnd: 0, countDataBytes: 0),        // 0x14
-            opCode(mnemonic: "DEC D", instructionEnd: 0, countDataBytes: 0),        // 0x15
-            opCode(mnemonic: "LD D,$n", instructionEnd: 0, countDataBytes: 1),      // 0x16
-            opCode(mnemonic: "RLA", instructionEnd: 0, countDataBytes: 0),          // 0x17
-            opCode(mnemonic: "JR $d", instructionEnd: 0, countDataBytes: 1) ,        // 0x18
-            opCode(mnemonic: "ADD HL,DE", instructionEnd: 0, countDataBytes: 0),    // 0x19
-            opCode(mnemonic: "LD A,(DE)", instructionEnd: 0, countDataBytes: 0),    // 0x1A
-            opCode(mnemonic: "DEC DE", instructionEnd: 0, countDataBytes: 0),       // 0x1B
-            opCode(mnemonic: "INC E", instructionEnd: 0, countDataBytes: 0),        // 0x1C
-            opCode(mnemonic: "DEC E", instructionEnd: 0, countDataBytes: 0),        // 0x1D
-            opCode(mnemonic: "LD E,$n", instructionEnd: 0, countDataBytes: 1),       // 0x1E
-            opCode(mnemonic: "RRA", instructionEnd: 0, countDataBytes: 0),          // 0x1F
-            opCode(mnemonic: "JR NZ,$d", instructionEnd: 0, countDataBytes: 0),     // 0x20
-            opCode(mnemonic: "LD HL,$nn", instructionEnd: 0, countDataBytes: 2),    // 0x21
-            opCode(mnemonic: "LD ($nn),HL", instructionEnd: 0, countDataBytes: 2),  // 0x22
-            opCode(mnemonic: "INC HL", instructionEnd: 0, countDataBytes: 0),       // 0x23
-            opCode(mnemonic: "INC H", instructionEnd: 0, countDataBytes: 0),        // 0x24
-            opCode(mnemonic: "DEC H", instructionEnd: 0, countDataBytes: 0),        // 0x25
-            opCode(mnemonic: "LD H,$n", instructionEnd: 0, countDataBytes: 1),      // 0x26
-            opCode(mnemonic: "DAA", instructionEnd: 0, countDataBytes: 0),          // 0x27
-            opCode(mnemonic: "JR Z,$d", instructionEnd: 0, countDataBytes: 1),     // 0x28
-            opCode(mnemonic: "ADD HL,HL", instructionEnd: 0, countDataBytes: 0),    // 0x29
-            opCode(mnemonic: "LD HL,($nn)", instructionEnd: 0, countDataBytes: 2),  // 0x2A
-            opCode(mnemonic: "DEC HL", instructionEnd: 0, countDataBytes: 0),       // 0x2B
-            opCode(mnemonic: "INC L", instructionEnd: 0, countDataBytes: 0),        // 0x2C
-            opCode(mnemonic: "DEC L", instructionEnd: 0, countDataBytes: 0),        // 0x2D
-            opCode(mnemonic: "LD L,$n", instructionEnd: 0, countDataBytes: 1),     // 0x2E
-            opCode(mnemonic: "CPL", instructionEnd: 0, countDataBytes: 0),          // 0x2F
-            opCode(mnemonic: "JR NC,$d", instructionEnd: 0, countDataBytes: 1),     // 0x30
-            opCode(mnemonic: "LD SP,$nn", instructionEnd: 0, countDataBytes: 2),    // 0x31
-            opCode(mnemonic: "LD ($nn),A", instructionEnd: 0, countDataBytes: 2),   // 0x32
-            opCode(mnemonic: "INC SP", instructionEnd: 0, countDataBytes: 0),       // 0x33
-            opCode(mnemonic: "INC (HL)", instructionEnd: 0, countDataBytes: 0),     // 0x34
-            opCode(mnemonic: "DEC (HL)", instructionEnd: 0, countDataBytes: 0),     // 0x35
-            opCode(mnemonic: "LD (HL),$n", instructionEnd: 0, countDataBytes: 1),    // 0x36
-            opCode(mnemonic: "SCF", instructionEnd: 0, countDataBytes: 0),          // 0x37
-            opCode(mnemonic: "JR C,$d", instructionEnd: 0, countDataBytes: 1),      // 0x38
-            opCode(mnemonic: "ADD HL,SP", instructionEnd: 0, countDataBytes: 0),    // 0x39
-            opCode(mnemonic: "LD A,($nn)", instructionEnd: 0, countDataBytes: 2),   // 0x3A
-            opCode(mnemonic: "DEC SP", instructionEnd: 0, countDataBytes: 0),       // 0x3B
-            opCode(mnemonic: "INC A", instructionEnd: 0, countDataBytes: 0),        // 0x3C
-            opCode(mnemonic: "DEC A", instructionEnd: 0, countDataBytes: 0),      // 0x3D
-            opCode(mnemonic: "LD A,$n", instructionEnd: 0, countDataBytes: 1),    // 0x3E
-            opCode(mnemonic: "CCF", instructionEnd: 0, countDataBytes: 0),       // 0x3F
-            opCode(mnemonic: "LD B,B", instructionEnd: 0, countDataBytes: 0),    // 0x40
-            opCode(mnemonic: "LD B,C", instructionEnd: 0, countDataBytes: 0),    // 0x41
-            opCode(mnemonic: "LD B,D", instructionEnd: 0, countDataBytes: 0),    // 0x42
-            opCode(mnemonic: "LD B,E", instructionEnd: 0, countDataBytes: 0),    // 0x43
-            opCode(mnemonic: "LD B,H", instructionEnd: 0, countDataBytes: 0),    // 0x44
-            opCode(mnemonic: "LD B,L", instructionEnd: 0, countDataBytes: 0),    // 0x45
-            opCode(mnemonic: "LD B,(HL)", instructionEnd: 0, countDataBytes: 0), // 0x46
-            opCode(mnemonic: "LD B,A", instructionEnd: 0, countDataBytes: 0),    // 0x47
-            opCode(mnemonic: "LD C,B", instructionEnd: 0, countDataBytes: 0),    // 0x48
-            opCode(mnemonic: "LD C,C", instructionEnd: 0, countDataBytes: 0),    // 0x49
-            opCode(mnemonic: "LD C,D", instructionEnd: 0, countDataBytes: 0),    // 0x4A
-            opCode(mnemonic: "LD C,E", instructionEnd: 0, countDataBytes: 0),    // 0x4B
-            opCode(mnemonic: "LD C,H", instructionEnd: 0, countDataBytes: 0),    // 0x4C
-            opCode(mnemonic: "LD C,L", instructionEnd: 0, countDataBytes: 0),    // 0x4D
-            opCode(mnemonic: "LD C,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x4E
-            opCode(mnemonic: "LD C,A", instructionEnd: 0, countDataBytes: 0),    // 0x4F
-            opCode(mnemonic: "LD D,B", instructionEnd: 0, countDataBytes: 0),    // 0x50
-            opCode(mnemonic: "LD D,C", instructionEnd: 0, countDataBytes: 0),    // 0x51
-            opCode(mnemonic: "LD D,D", instructionEnd: 0, countDataBytes: 0),    // 0x52
-            opCode(mnemonic: "LD D,E", instructionEnd: 0, countDataBytes: 0),    // 0x53
-            opCode(mnemonic: "LD D,H", instructionEnd: 0, countDataBytes: 0),    // 0x54
-            opCode(mnemonic: "LD D,L", instructionEnd: 0, countDataBytes: 0),    // 0x55
-            opCode(mnemonic: "LD D,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x56
-            opCode(mnemonic: "LD D,A", instructionEnd: 0, countDataBytes: 0),    // 0x57
-            opCode(mnemonic: "LD E,B", instructionEnd: 0, countDataBytes: 0),    // 0x58
-            opCode(mnemonic: "LD E,C", instructionEnd: 0, countDataBytes: 0),    // 0x59
-            opCode(mnemonic: "LD E,D", instructionEnd: 0, countDataBytes: 0),    // 0x5A
-            opCode(mnemonic: "LD E,E", instructionEnd: 0, countDataBytes: 0),    // 0x5B
-            opCode(mnemonic: "LD E,H", instructionEnd: 0, countDataBytes: 0),    // 0x5C
-            opCode(mnemonic: "LD E,L", instructionEnd: 0, countDataBytes: 0),    // 0x5D
-            opCode(mnemonic: "LD E,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x5E
-            opCode(mnemonic: "LD E,A", instructionEnd: 0, countDataBytes: 0),    // 0x5F
-            opCode(mnemonic: "LD H,B", instructionEnd: 0, countDataBytes: 0),    // 0x60
-            opCode(mnemonic: "LD H,C", instructionEnd: 0, countDataBytes: 0),    // 0x61
-            opCode(mnemonic: "LD H,D", instructionEnd: 0, countDataBytes: 0),    // 0x62
-            opCode(mnemonic: "LD H,E", instructionEnd: 0, countDataBytes: 0),    // 0x63
-            opCode(mnemonic: "LD H,H", instructionEnd: 0, countDataBytes: 0),    // 0x64
-            opCode(mnemonic: "LD H,L", instructionEnd: 0, countDataBytes: 0),    // 0x65
-            opCode(mnemonic: "LD H,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x66
-            opCode(mnemonic: "LD H,A", instructionEnd: 0, countDataBytes: 0),    // 0x67
-            opCode(mnemonic: "LD L,B", instructionEnd: 0, countDataBytes: 0),    // 0x68
-            opCode(mnemonic: "LD L,C", instructionEnd: 0, countDataBytes: 0),    // 0x69
-            opCode(mnemonic: "LD L,D", instructionEnd: 0, countDataBytes: 0),    // 0x6A
-            opCode(mnemonic: "LD L,E", instructionEnd: 0, countDataBytes: 0),    // 0x6B
-            opCode(mnemonic: "LD L,H", instructionEnd: 0, countDataBytes: 0),    // 0x6C
-            opCode(mnemonic: "LD L,L", instructionEnd: 0, countDataBytes: 0),    // 0x6D
-            opCode(mnemonic: "LD L,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x6E
-            opCode(mnemonic: "LD L,A", instructionEnd: 0, countDataBytes: 0),    // 0x6F
-            opCode(mnemonic: "LD (HL),B", instructionEnd: 0, countDataBytes: 0),    // 0x70
-            opCode(mnemonic: "LD (HL),C", instructionEnd: 0, countDataBytes: 0),    // 0x71
-            opCode(mnemonic: "LD (HL),D", instructionEnd: 0, countDataBytes: 0),    // 0x72
-            opCode(mnemonic: "LD (HL),E", instructionEnd: 0, countDataBytes: 0),    // 0x73
-            opCode(mnemonic: "LD (HL),H", instructionEnd: 0, countDataBytes: 0),    // 0x74
-            opCode(mnemonic: "LD (HL),L", instructionEnd: 0, countDataBytes: 0),    // 0x75
-            opCode(mnemonic: "HALT", instructionEnd: 0, countDataBytes: 0),    // 0x76
-            opCode(mnemonic: "LD (HL),A", instructionEnd: 0, countDataBytes: 0),    // 0x77
-            opCode(mnemonic: "LD A,B", instructionEnd: 0, countDataBytes: 0),    // 0x78
-            opCode(mnemonic: "LD A,C", instructionEnd: 0, countDataBytes: 0),    // 0x79
-            opCode(mnemonic: "LD A,D", instructionEnd: 0, countDataBytes: 0),    // 0x7A
-            opCode(mnemonic: "LD A,E", instructionEnd: 0, countDataBytes: 0),    // 0x7B
-            opCode(mnemonic: "LD A,H", instructionEnd: 0, countDataBytes: 0),    // 0x7C
-            opCode(mnemonic: "LD A,L", instructionEnd: 0, countDataBytes: 0),    // 0x7D
-            opCode(mnemonic: "LD A,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x7E
-            opCode(mnemonic: "LD A,A", instructionEnd: 0, countDataBytes: 0),    // 0x7F
-            opCode(mnemonic: "ADD A,B", instructionEnd: 0, countDataBytes: 0),    // 0x80
-            opCode(mnemonic: "ADD A,C", instructionEnd: 0, countDataBytes: 0),    // 0x81
-            opCode(mnemonic: "ADD A,D", instructionEnd: 0, countDataBytes: 0),    // 0x82
-            opCode(mnemonic: "ADD A,E", instructionEnd: 0, countDataBytes: 0),    // 0x83
-            opCode(mnemonic: "ADD A,H", instructionEnd: 0, countDataBytes: 0),    // 0x84
-            opCode(mnemonic: "ADD A,L", instructionEnd: 0, countDataBytes: 0),    // 0x85
-            opCode(mnemonic: "ADD A,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x86
-            opCode(mnemonic: "ADD A,A", instructionEnd: 0, countDataBytes: 0),    // 0x87
-            opCode(mnemonic: "ADC A,B", instructionEnd: 0, countDataBytes: 0),    // 0x88
-            opCode(mnemonic: "ADC A,C", instructionEnd: 0, countDataBytes: 0),    // 0x89
-            opCode(mnemonic: "ADC A,D", instructionEnd: 0, countDataBytes: 0),    // 0x8A
-            opCode(mnemonic: "ADC A,E", instructionEnd: 0, countDataBytes: 0),    // 0x8B
-            opCode(mnemonic: "ADC A,H", instructionEnd: 0, countDataBytes: 0),    // 0x8C
-            opCode(mnemonic: "ADC A,L", instructionEnd: 0, countDataBytes: 0),    // 0x8D
-            opCode(mnemonic: "ADC A,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x8E
-            opCode(mnemonic: "ADC A,A", instructionEnd: 0, countDataBytes: 0),    // 0x8F
-            opCode(mnemonic: "SUB B", instructionEnd: 0, countDataBytes: 0),    // 0x90
-            opCode(mnemonic: "SUB C", instructionEnd: 0, countDataBytes: 0),    // 0x91
-            opCode(mnemonic: "SUB D", instructionEnd: 0, countDataBytes: 0),    // 0x92
-            opCode(mnemonic: "SUB E", instructionEnd: 0, countDataBytes: 0),    // 0x93
-            opCode(mnemonic: "SUB H", instructionEnd: 0, countDataBytes: 0),        // 0x94
-            opCode(mnemonic: "SUB L", instructionEnd: 0, countDataBytes: 0),        // 0x95
-            opCode(mnemonic: "SUB (HL)", instructionEnd: 0, countDataBytes: 0),     // 0x96
-            opCode(mnemonic: "SUB A", instructionEnd: 0, countDataBytes: 0),        // 0x97
-            opCode(mnemonic: "SBC A,B", instructionEnd: 0, countDataBytes: 0),    // 0x98
-            opCode(mnemonic: "SBC A,C", instructionEnd: 0, countDataBytes: 0),    // 0x99
-            opCode(mnemonic: "SBC A,D", instructionEnd: 0, countDataBytes: 0),    // 0x9A
-            opCode(mnemonic: "SBC A,E", instructionEnd: 0, countDataBytes: 0),    // 0x9B
-            opCode(mnemonic: "SBC A,H", instructionEnd: 0, countDataBytes: 0),    // 0x9C
-            opCode(mnemonic: "SBC A,L", instructionEnd: 0, countDataBytes: 0),    // 0x9D
-            opCode(mnemonic: "SBC A,(HL)", instructionEnd: 0, countDataBytes: 0),    // 0x9E
-            opCode(mnemonic: "SBC A,A", instructionEnd: 0, countDataBytes: 0),    // 0x9F
-            opCode(mnemonic: "AND B", instructionEnd: 0, countDataBytes: 0),    // 0xA0
-            opCode(mnemonic: "AND C", instructionEnd: 0, countDataBytes: 0),    // 0xA1
-            opCode(mnemonic: "AND D", instructionEnd: 0, countDataBytes: 0),    // 0xA2
-            opCode(mnemonic: "AND E", instructionEnd: 0, countDataBytes: 0),    // 0xA3
-            opCode(mnemonic: "AND H", instructionEnd: 0, countDataBytes: 0),    // 0xA4
-            opCode(mnemonic: "AND L", instructionEnd: 0, countDataBytes: 0),    // 0xA5
-            opCode(mnemonic: "AND (HL)", instructionEnd: 0, countDataBytes: 0),    // 0xA6
-            opCode(mnemonic: "AND A", instructionEnd: 0, countDataBytes: 0),    // 0xA7
-            opCode(mnemonic: "XOR B", instructionEnd: 0, countDataBytes: 0),    // 0xA8
-            opCode(mnemonic: "XOR C", instructionEnd: 0, countDataBytes: 0),    // 0xA9
-            opCode(mnemonic: "XOR D", instructionEnd: 0, countDataBytes: 0),    // 0xAA
-            opCode(mnemonic: "XOR E", instructionEnd: 0, countDataBytes: 0),    // 0xAB
-            opCode(mnemonic: "XOR H", instructionEnd: 0, countDataBytes: 0),    // 0xAC
-            opCode(mnemonic: "XOR L", instructionEnd: 0, countDataBytes: 0),    // 0xAD
-            opCode(mnemonic: "XOR (HL)", instructionEnd: 0, countDataBytes: 0),    // 0xAE
-            opCode(mnemonic: "XOR A", instructionEnd: 0, countDataBytes: 0),    // 0xAF
-            opCode(mnemonic: "OR B", instructionEnd: 0, countDataBytes: 0),    // 0xB0
-            opCode(mnemonic: "OR C", instructionEnd: 0, countDataBytes: 0),    // 0xB1
-            opCode(mnemonic: "OR D", instructionEnd: 0, countDataBytes: 0),    // 0xB2
-            opCode(mnemonic: "OR E", instructionEnd: 0, countDataBytes: 0),    // 0xB3
-            opCode(mnemonic: "OR H", instructionEnd: 0, countDataBytes: 0),    // 0xB4
-            opCode(mnemonic: "OR L", instructionEnd: 0, countDataBytes: 0),    // 0xB5
-            opCode(mnemonic: "OR (HL)", instructionEnd: 0, countDataBytes: 0),    // 0xB6
-            opCode(mnemonic: "OR A", instructionEnd: 0, countDataBytes: 0),    // 0xB7
-            opCode(mnemonic: "CP B", instructionEnd: 0, countDataBytes: 0),    // 0xB8
-            opCode(mnemonic: "CP C", instructionEnd: 0, countDataBytes: 0),    // 0xB9
-            opCode(mnemonic: "CP D", instructionEnd: 0, countDataBytes: 0),    // 0xBA
-            opCode(mnemonic: "CP E", instructionEnd: 0, countDataBytes: 0),    // 0xBB
-            opCode(mnemonic: "CP H", instructionEnd: 0, countDataBytes: 0),    // 0xBC
-            opCode(mnemonic: "CP L", instructionEnd: 0, countDataBytes: 0),    // 0xBD
-            opCode(mnemonic: "CP (HL)", instructionEnd: 0, countDataBytes: 0),    // 0xBE
-            opCode(mnemonic: "CP A", instructionEnd: 0, countDataBytes: 0),    // 0xBF
-            opCode(mnemonic: "RET NZ", instructionEnd: 0, countDataBytes: 0),    // 0xC0
-            opCode(mnemonic: "POP BC", instructionEnd: 0, countDataBytes: 0),    // 0xC1
-            opCode(mnemonic: "JP NZ,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xC2
-            opCode(mnemonic: "JP $nn", instructionEnd: 0, countDataBytes: 2),    // 0xC3
-            opCode(mnemonic: "CALL NZ,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xC4
-            opCode(mnemonic: "PUSH BC", instructionEnd: 0, countDataBytes: 0),    // 0xC5
-            opCode(mnemonic: "ADD A,$n", instructionEnd: 0, countDataBytes: 1),     // 0xC6
-            opCode(mnemonic: "RST 0x00", instructionEnd: 0, countDataBytes: 0),    // 0xC7
-            opCode(mnemonic: "RET Z", instructionEnd: 0, countDataBytes: 0),    // 0xC8
-            opCode(mnemonic: "RET", instructionEnd: 0, countDataBytes: 0),    // 0xC9
-            opCode(mnemonic: "JP Z,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xCA
-            opCode(mnemonic: "CB prefixes", instructionEnd: 0, countDataBytes: 0),    // 0xCB
-            opCode(mnemonic: "CALL Z,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xCC
-            opCode(mnemonic: "CALL $nn", instructionEnd: 0, countDataBytes: 2),    // 0xCD
-            opCode(mnemonic: "ADC A,$n", instructionEnd: 0, countDataBytes: 1),    // 0xCE
-            opCode(mnemonic: "RST 0x08", instructionEnd: 0, countDataBytes: 0),    // 0xCF
-            opCode(mnemonic: "RET NC", instructionEnd: 0, countDataBytes: 0),    // 0xD0
-            opCode(mnemonic: "POP DE", instructionEnd: 0, countDataBytes: 0),    // 0xD1
-            opCode(mnemonic: "JP NC,$nn", instructionEnd: 0, countDataBytes: 2),   // 0xD2
-            opCode(mnemonic: "OUT ($n),A", instructionEnd: 0, countDataBytes: 1),     // 0xD3
-            opCode(mnemonic: "CALL NC,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xD4
-            opCode(mnemonic: "PUSH DE", instructionEnd: 0, countDataBytes: 0),    // 0xD5
-            opCode(mnemonic: "SUB $n", instructionEnd: 0, countDataBytes: 1),   // 0xD6
-            opCode(mnemonic: "RST 0x10", instructionEnd: 0, countDataBytes: 0),    // 0xD7
-            opCode(mnemonic: "RET C", instructionEnd: 0, countDataBytes: 0),    // 0xD8
-            opCode(mnemonic: "EXX", instructionEnd: 0, countDataBytes: 0),    // 0xD9
-            opCode(mnemonic: "JP C,$nn", instructionEnd: 0, countDataBytes: 2),   // 0xDA
-            opCode(mnemonic: "IN A,($n)", instructionEnd: 0, countDataBytes: 1),    // 0xDB
-            opCode(mnemonic: "CALL C,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xDC
-            opCode(mnemonic: "DDCB prefixes", instructionEnd: 0, countDataBytes: 0),    // 0xDD
-            opCode(mnemonic: "SBC A,$n", instructionEnd: 0, countDataBytes: 1),    // 0xDE
-            opCode(mnemonic: "RST 0x18", instructionEnd: 0, countDataBytes: 0),    // 0xDF
-            opCode(mnemonic: "RET PO", instructionEnd: 0, countDataBytes: 0),    // 0xE0
-            opCode(mnemonic: "POP HL", instructionEnd: 0, countDataBytes: 0),    // 0xE1
-            opCode(mnemonic: "JP PO,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xE2
-            opCode(mnemonic: "EX (SP),HL", instructionEnd: 0, countDataBytes: 0),    // 0xE3
-            opCode(mnemonic: "CALL PO,$nn", instructionEnd: 0, countDataBytes: 2),  // 0xE4
-            opCode(mnemonic: "PUSH HL", instructionEnd: 0, countDataBytes: 0),    // 0xE5
-            opCode(mnemonic: "AND $n", instructionEnd: 0, countDataBytes: 1),   // 0xE6
-            opCode(mnemonic: "RST 0x20", instructionEnd: 0, countDataBytes: 0),    // 0xE7
-            opCode(mnemonic: "RET PE", instructionEnd: 0, countDataBytes: 0),    // 0xE8
-            opCode(mnemonic: "JP (HL)", instructionEnd: 0, countDataBytes: 0),    // 0xE9
-            opCode(mnemonic: "JP PE,$nn", instructionEnd: 0, countDataBytes: 2),   // 0xEA
-            opCode(mnemonic: "EX DE,HL", instructionEnd: 0, countDataBytes: 0),    // 0xEB
-            opCode(mnemonic: "CALL PE,$nn", instructionEnd: 0, countDataBytes: 2),   // 0xEC
-            opCode(mnemonic: "ED prefixes", instructionEnd: 0, countDataBytes: 0),    // 0xED
-            opCode(mnemonic: "XOR $n", instructionEnd: 0, countDataBytes: 1),     // 0xEE
-            opCode(mnemonic: "RST 0x28", instructionEnd: 0, countDataBytes: 0),    // 0xEF
-            opCode(mnemonic: "RET P", instructionEnd: 0, countDataBytes: 0),    // 0xF0
-            opCode(mnemonic: "POP AF", instructionEnd: 0, countDataBytes: 0),    // 0xF1
-            opCode(mnemonic: "JP P,$nn", instructionEnd: 0, countDataBytes: 2),   // 0xF2
-            opCode(mnemonic: "DI", instructionEnd: 0, countDataBytes: 0),    // 0xF3
-            opCode(mnemonic: "CALL P,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xF4
-            opCode(mnemonic: "PUSH AF", instructionEnd: 0, countDataBytes: 0),    // 0xF5
-            opCode(mnemonic: "OR $n", instructionEnd: 0, countDataBytes: 1),    // 0xF6
-            opCode(mnemonic: "RST 0x30", instructionEnd: 0, countDataBytes: 0),    // 0xF7
-            opCode(mnemonic: "RET M", instructionEnd: 0, countDataBytes: 0),    // 0xF8
-            opCode(mnemonic: "LD SP,HL", instructionEnd: 0, countDataBytes: 0),    // 0xF9
-            opCode(mnemonic: "JP M,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xFA
-            opCode(mnemonic: "EI", instructionEnd: 0, countDataBytes: 0),    // 0xFB
-            opCode(mnemonic: "CALL M,$nn", instructionEnd: 0, countDataBytes: 2),    // 0xFC
-            opCode(mnemonic: "FD and FDCB prefixes", instructionEnd: 0, countDataBytes: 0),    // 0xFD
-            opCode(mnemonic: "CP $n", instructionEnd: 0, countDataBytes: 1),    // 0xFE
-            opCode(mnemonic: "RST 0x38", instructionEnd: 0, countDataBytes: 0)     // 0xFF
+            opCode(mnemonic: "NOP", instructionLength: 1, dataStart: 0, dataEnd: 0),          // 0x00
+            opCode(mnemonic: "LD BC,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0x01
+            opCode(mnemonic: "LD (BC),A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x02
+            opCode(mnemonic: "INC BC", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x03
+            opCode(mnemonic: "INC B", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x04
+            opCode(mnemonic: "DEC B", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x05
+            opCode(mnemonic: "LD B,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x06
+            opCode(mnemonic: "RLCA", instructionLength: 1, dataStart: 0, dataEnd: 0),         // 0x07
+            opCode(mnemonic: "EX AF,AF'", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x08
+            opCode(mnemonic: "ADD HL,BC", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x09
+            opCode(mnemonic: "LD A,(BC)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x0A
+            opCode(mnemonic: "DEC BC", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x0B
+            opCode(mnemonic: "INC C", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x0C
+            opCode(mnemonic: "DEC C", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x0D
+            opCode(mnemonic: "LD C,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x0E
+            opCode(mnemonic: "RRCA", instructionLength: 1, dataStart: 0, dataEnd: 0),         // 0x0F
+            opCode(mnemonic: "DJNZ $d", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x10
+            opCode(mnemonic: "LD DE,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0x11
+            opCode(mnemonic: "LD (DE),A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x12
+            opCode(mnemonic: "INC DE", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x13
+            opCode(mnemonic: "INC D", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x14
+            opCode(mnemonic: "DEC D", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x15
+            opCode(mnemonic: "LD D,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x16
+            opCode(mnemonic: "RLA", instructionLength: 1, dataStart: 0, dataEnd: 0),          // 0x17
+            opCode(mnemonic: "JR $d", instructionLength: 2, dataStart: 1, dataEnd: 1),       // 0x18
+            opCode(mnemonic: "ADD HL,DE", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x19
+            opCode(mnemonic: "LD A,(DE)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x1A
+            opCode(mnemonic: "DEC DE", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x1B
+            opCode(mnemonic: "INC E", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x1C
+            opCode(mnemonic: "DEC E", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x1D
+            opCode(mnemonic: "LD E,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x1E
+            opCode(mnemonic: "RRA", instructionLength: 1, dataStart: 0, dataEnd: 0),          // 0x1F
+            opCode(mnemonic: "JR NZ,$d", instructionLength: 1, dataStart: 0, dataEnd: 0),     // 0x20
+            opCode(mnemonic: "LD HL,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),     // 0x21
+            opCode(mnemonic: "LD ($nn),HL", instructionLength: 3, dataStart: 1, dataEnd: 2),  // 0x22
+            opCode(mnemonic: "INC HL", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x23
+            opCode(mnemonic: "INC H", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x24
+            opCode(mnemonic: "DEC H", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x25
+            opCode(mnemonic: "LD H,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x26
+            opCode(mnemonic: "DAA", instructionLength: 1, dataStart: 0, dataEnd: 0),          // 0x27
+            opCode(mnemonic: "JR Z,$d", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x28
+            opCode(mnemonic: "ADD HL,HL", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x29
+            opCode(mnemonic: "LD HL,($nn)", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0x2A
+            opCode(mnemonic: "DEC HL", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x2B
+            opCode(mnemonic: "INC L", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x2C
+            opCode(mnemonic: "DEC L", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x2D
+            opCode(mnemonic: "LD L,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0x2E
+            opCode(mnemonic: "CPL", instructionLength: 1, dataStart: 0, dataEnd: 0),          // 0x2F
+            opCode(mnemonic: "JR NC,$d", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x30
+            opCode(mnemonic: "LD SP,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0x31
+            opCode(mnemonic: "LD ($nn),A", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0x32
+            opCode(mnemonic: "INC SP", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x33
+            opCode(mnemonic: "INC (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),     // 0x34
+            opCode(mnemonic: "DEC (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),     // 0x35
+            opCode(mnemonic: "LD (HL),$n", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0x36
+            opCode(mnemonic: "SCF", instructionLength: 1, dataStart: 0, dataEnd: 0),          // 0x37
+            opCode(mnemonic: "JR C,$d", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0x38
+            opCode(mnemonic: "ADD HL,SP", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x39
+            opCode(mnemonic: "LD A,($nn)", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0x3A
+            opCode(mnemonic: "DEC SP", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x3B
+            opCode(mnemonic: "INC A", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x3C
+            opCode(mnemonic: "DEC A", instructionLength: 1, dataStart: 0, dataEnd: 0),      // 0x3D
+            opCode(mnemonic: "LD A,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),    // 0x3E
+            opCode(mnemonic: "CCF", instructionLength: 1, dataStart: 0, dataEnd: 0),       // 0x3F
+            opCode(mnemonic: "LD B,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x40
+            opCode(mnemonic: "LD B,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x41
+            opCode(mnemonic: "LD B,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x42
+            opCode(mnemonic: "LD B,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x43
+            opCode(mnemonic: "LD B,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x44
+            opCode(mnemonic: "LD B,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x45
+            opCode(mnemonic: "LD B,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0), // 0x46
+            opCode(mnemonic: "LD B,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x47
+            opCode(mnemonic: "LD C,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x48
+            opCode(mnemonic: "LD C,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x49
+            opCode(mnemonic: "LD C,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x4A
+            opCode(mnemonic: "LD C,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x4B
+            opCode(mnemonic: "LD C,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x4C
+            opCode(mnemonic: "LD C,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x4D
+            opCode(mnemonic: "LD C,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x4E
+            opCode(mnemonic: "LD C,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x4F
+            opCode(mnemonic: "LD D,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x50
+            opCode(mnemonic: "LD D,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x51
+            opCode(mnemonic: "LD D,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x52
+            opCode(mnemonic: "LD D,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x53
+            opCode(mnemonic: "LD D,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x54
+            opCode(mnemonic: "LD D,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x55
+            opCode(mnemonic: "LD D,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x56
+            opCode(mnemonic: "LD D,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x57
+            opCode(mnemonic: "LD E,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x58
+            opCode(mnemonic: "LD E,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x59
+            opCode(mnemonic: "LD E,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x5A
+            opCode(mnemonic: "LD E,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x5B
+            opCode(mnemonic: "LD E,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x5C
+            opCode(mnemonic: "LD E,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x5D
+            opCode(mnemonic: "LD E,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x5E
+            opCode(mnemonic: "LD E,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x5F
+            opCode(mnemonic: "LD H,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x60
+            opCode(mnemonic: "LD H,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x61
+            opCode(mnemonic: "LD H,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x62
+            opCode(mnemonic: "LD H,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x63
+            opCode(mnemonic: "LD H,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x64
+            opCode(mnemonic: "LD H,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x65
+            opCode(mnemonic: "LD H,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x66
+            opCode(mnemonic: "LD H,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x67
+            opCode(mnemonic: "LD L,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x68
+            opCode(mnemonic: "LD L,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x69
+            opCode(mnemonic: "LD L,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x6A
+            opCode(mnemonic: "LD L,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x6B
+            opCode(mnemonic: "LD L,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x6C
+            opCode(mnemonic: "LD L,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x6D
+            opCode(mnemonic: "LD L,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x6E
+            opCode(mnemonic: "LD L,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x6F
+            opCode(mnemonic: "LD (HL),B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x70
+            opCode(mnemonic: "LD (HL),C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x71
+            opCode(mnemonic: "LD (HL),D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x72
+            opCode(mnemonic: "LD (HL),E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x73
+            opCode(mnemonic: "LD (HL),H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x74
+            opCode(mnemonic: "LD (HL),L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x75
+            opCode(mnemonic: "HALT", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x76
+            opCode(mnemonic: "LD (HL),A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x77
+            opCode(mnemonic: "LD A,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x78
+            opCode(mnemonic: "LD A,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x79
+            opCode(mnemonic: "LD A,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x7A
+            opCode(mnemonic: "LD A,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x7B
+            opCode(mnemonic: "LD A,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x7C
+            opCode(mnemonic: "LD A,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x7D
+            opCode(mnemonic: "LD A,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x7E
+            opCode(mnemonic: "LD A,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x7F
+            opCode(mnemonic: "ADD A,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x80
+            opCode(mnemonic: "ADD A,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x81
+            opCode(mnemonic: "ADD A,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x82
+            opCode(mnemonic: "ADD A,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x83
+            opCode(mnemonic: "ADD A,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x84
+            opCode(mnemonic: "ADD A,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x85
+            opCode(mnemonic: "ADD A,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x86
+            opCode(mnemonic: "ADD A,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x87
+            opCode(mnemonic: "ADC A,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x88
+            opCode(mnemonic: "ADC A,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x89
+            opCode(mnemonic: "ADC A,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x8A
+            opCode(mnemonic: "ADC A,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x8B
+            opCode(mnemonic: "ADC A,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x8C
+            opCode(mnemonic: "ADC A,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x8D
+            opCode(mnemonic: "ADC A,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x8E
+            opCode(mnemonic: "ADC A,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x8F
+            opCode(mnemonic: "SUB B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x90
+            opCode(mnemonic: "SUB C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x91
+            opCode(mnemonic: "SUB D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x92
+            opCode(mnemonic: "SUB E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x93
+            opCode(mnemonic: "SUB H", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x94
+            opCode(mnemonic: "SUB L", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x95
+            opCode(mnemonic: "SUB (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),     // 0x96
+            opCode(mnemonic: "SUB A", instructionLength: 1, dataStart: 0, dataEnd: 0),        // 0x97
+            opCode(mnemonic: "SBC A,B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x98
+            opCode(mnemonic: "SBC A,C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x99
+            opCode(mnemonic: "SBC A,D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x9A
+            opCode(mnemonic: "SBC A,E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x9B
+            opCode(mnemonic: "SBC A,H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x9C
+            opCode(mnemonic: "SBC A,L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x9D
+            opCode(mnemonic: "SBC A,(HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x9E
+            opCode(mnemonic: "SBC A,A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0x9F
+            opCode(mnemonic: "AND B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA0
+            opCode(mnemonic: "AND C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA1
+            opCode(mnemonic: "AND D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA2
+            opCode(mnemonic: "AND E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA3
+            opCode(mnemonic: "AND H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA4
+            opCode(mnemonic: "AND L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA5
+            opCode(mnemonic: "AND (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA6
+            opCode(mnemonic: "AND A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA7
+            opCode(mnemonic: "XOR B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA8
+            opCode(mnemonic: "XOR C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xA9
+            opCode(mnemonic: "XOR D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xAA
+            opCode(mnemonic: "XOR E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xAB
+            opCode(mnemonic: "XOR H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xAC
+            opCode(mnemonic: "XOR L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xAD
+            opCode(mnemonic: "XOR (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xAE
+            opCode(mnemonic: "XOR A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xAF
+            opCode(mnemonic: "OR B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB0
+            opCode(mnemonic: "OR C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB1
+            opCode(mnemonic: "OR D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB2
+            opCode(mnemonic: "OR E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB3
+            opCode(mnemonic: "OR H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB4
+            opCode(mnemonic: "OR L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB5
+            opCode(mnemonic: "OR (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB6
+            opCode(mnemonic: "OR A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB7
+            opCode(mnemonic: "CP B", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB8
+            opCode(mnemonic: "CP C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xB9
+            opCode(mnemonic: "CP D", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xBA
+            opCode(mnemonic: "CP E", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xBB
+            opCode(mnemonic: "CP H", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xBC
+            opCode(mnemonic: "CP L", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xBD
+            opCode(mnemonic: "CP (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xBE
+            opCode(mnemonic: "CP A", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xBF
+            opCode(mnemonic: "RET NZ", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xC0
+            opCode(mnemonic: "POP BC", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xC1
+            opCode(mnemonic: "JP NZ,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),     // 0xC2
+            opCode(mnemonic: "JP $nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xC3
+            opCode(mnemonic: "CALL NZ,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xC4
+            opCode(mnemonic: "PUSH BC", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xC5
+            opCode(mnemonic: "ADD A,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),    // 0xC6
+            opCode(mnemonic: "RST 0x00", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xC7
+            opCode(mnemonic: "RET Z", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xC8
+            opCode(mnemonic: "RET", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xC9
+            opCode(mnemonic: "JP Z,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xCA
+            opCode(mnemonic: "CB prefixes", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xCB
+            opCode(mnemonic: "CALL Z,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xCC
+            opCode(mnemonic: "CALL $nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xCD
+            opCode(mnemonic: "ADC A,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),    // 0xCE
+            opCode(mnemonic: "RST 0x08", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xCF
+            opCode(mnemonic: "RET NC", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xD0
+            opCode(mnemonic: "POP DE", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xD1
+            opCode(mnemonic: "JP NC,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xD2
+            opCode(mnemonic: "OUT ($n),A", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0xD3
+            opCode(mnemonic: "CALL NC,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),     // 0xD4
+            opCode(mnemonic: "PUSH DE", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xD5
+            opCode(mnemonic: "SUB $n", instructionLength: 2, dataStart: 1, dataEnd: 1),   // 0xD6
+            opCode(mnemonic: "RST 0x10", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xD7
+            opCode(mnemonic: "RET C", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xD8
+            opCode(mnemonic: "EXX", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xD9
+            opCode(mnemonic: "JP C,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xDA
+            opCode(mnemonic: "IN A,($n)", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0xDB
+            opCode(mnemonic: "CALL C,$nn", instructionLength: 1, dataStart: 0, dataEnd: 2),    // 0xDC
+            opCode(mnemonic: "DD and DDCB prefixes", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xDD
+            opCode(mnemonic: "SBC A,$n", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0xDE
+            opCode(mnemonic: "RST 0x18", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xDF
+            opCode(mnemonic: "RET PO", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE0
+            opCode(mnemonic: "POP HL", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE1
+            opCode(mnemonic: "JP PO,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xE2
+            opCode(mnemonic: "EX (SP),HL", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE3
+            opCode(mnemonic: "CALL PO,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xE4
+            opCode(mnemonic: "PUSH HL", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE5
+            opCode(mnemonic: "AND $n", instructionLength: 2, dataStart: 1, dataEnd: 1),    // 0xE6
+            opCode(mnemonic: "RST 0x20", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE7
+            opCode(mnemonic: "RET PE", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE8
+            opCode(mnemonic: "JP (HL)", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xE9
+            opCode(mnemonic: "JP PE,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xEA
+            opCode(mnemonic: "EX DE,HL", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xEB
+            opCode(mnemonic: "CALL PE,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xEC
+            opCode(mnemonic: "ED prefixes", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xED
+            opCode(mnemonic: "XOR $n", instructionLength: 2, dataStart: 1, dataEnd: 1),      // 0xEE
+            opCode(mnemonic: "RST 0x28", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xEF
+            opCode(mnemonic: "RET P", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF0
+            opCode(mnemonic: "POP AF", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF1
+            opCode(mnemonic: "JP P,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xF2
+            opCode(mnemonic: "DI", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF3
+            opCode(mnemonic: "CALL P,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xF4
+            opCode(mnemonic: "PUSH AF", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF5
+            opCode(mnemonic: "OR $n", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0xF6
+            opCode(mnemonic: "RST 0x30", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF7
+            opCode(mnemonic: "RET M", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF8
+            opCode(mnemonic: "LD SP,HL", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xF9
+            opCode(mnemonic: "JP M,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),    // 0xFA
+            opCode(mnemonic: "EI", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xFB
+            opCode(mnemonic: "CALL M,$nn", instructionLength: 3, dataStart: 1, dataEnd: 2),   // 0xFC
+            opCode(mnemonic: "FD and FDCB prefixes", instructionLength: 1, dataStart: 0, dataEnd: 0),    // 0xFD
+            opCode(mnemonic: "CP $n", instructionLength: 2, dataStart: 1, dataEnd: 1),     // 0xFE
+            opCode(mnemonic: "RST 0x38", instructionLength: 1, dataStart: 0, dataEnd: 0)     // 0xFF
         ]
         
         let CBPrefixOpcode: [opCode] =
         [
-            opCode(mnemonic: "RLC B", instructionEnd: 1, countDataBytes: 0),     // 0x00
-            opCode(mnemonic: "RLC C", instructionEnd: 1, countDataBytes: 0),     // 0x01
-            opCode(mnemonic: "RLC D", instructionEnd: 1, countDataBytes: 0),     // 0x02
-            opCode(mnemonic: "RLC E", instructionEnd: 1, countDataBytes: 0),     // 0x03
-            opCode(mnemonic: "RLC H", instructionEnd: 1, countDataBytes: 0),     // 0x04
-            opCode(mnemonic: "RLC L", instructionEnd: 1, countDataBytes: 0),     // 0x05
-            opCode(mnemonic: "RLC (HL)", instructionEnd: 1, countDataBytes: 0),  // 0x06
-            opCode(mnemonic: "RLC A", instructionEnd: 1, countDataBytes: 0),     //    0x07
-            opCode(mnemonic: "RRC B", instructionEnd: 1, countDataBytes: 0),     //    0x08
-            opCode(mnemonic: "RRC C", instructionEnd: 1, countDataBytes: 0),     //    0x09
-            opCode(mnemonic: "RRC D", instructionEnd: 1, countDataBytes: 0),     //    0x0A
-            opCode(mnemonic: "RRC E", instructionEnd: 1, countDataBytes: 0),     //    0x0B
-            opCode(mnemonic: "RRC H", instructionEnd: 1, countDataBytes: 0),     //    0x0C
-            opCode(mnemonic: "RRC L", instructionEnd: 1, countDataBytes: 0),     //    0x0D
-            opCode(mnemonic: "RRC (HL)", instructionEnd: 1, countDataBytes: 0),  //    0x0E
-            opCode(mnemonic: "RRC A", instructionEnd: 1, countDataBytes: 0),     //    0x0F
-            opCode(mnemonic: "RL B", instructionEnd: 1, countDataBytes: 0),      //    0x10
-            opCode(mnemonic: "RL C", instructionEnd: 1, countDataBytes: 0),      //    0x11
-            opCode(mnemonic: "RL D", instructionEnd: 1, countDataBytes: 0),      //    0x12
-            opCode(mnemonic: "RL E", instructionEnd: 1, countDataBytes: 0), //    0x13
-            opCode(mnemonic: "RL H", instructionEnd: 1, countDataBytes: 0), //    0x14
-            opCode(mnemonic: "RL L", instructionEnd: 1, countDataBytes: 0), //    0x15
-            opCode(mnemonic: "RL (HL)", instructionEnd: 1, countDataBytes: 0), //    0x16
-            opCode(mnemonic: "RL A", instructionEnd: 1, countDataBytes: 0), //    0x17
-            opCode(mnemonic: "RR B", instructionEnd: 1, countDataBytes: 0), //    0x18
-            opCode(mnemonic: "RR C", instructionEnd: 1, countDataBytes: 0), //    0x19
-            opCode(mnemonic: "RR D", instructionEnd: 1, countDataBytes: 0), //    0x1A
-            opCode(mnemonic: "RR E", instructionEnd: 1, countDataBytes: 0), //    0x1B
-            opCode(mnemonic: "RR H", instructionEnd: 1, countDataBytes: 0), //    0x1C
-            opCode(mnemonic: "RR L", instructionEnd: 1, countDataBytes: 0), //    0x1D
-            opCode(mnemonic: "RR (HL)", instructionEnd: 1, countDataBytes: 0), //    0x1E
-            opCode(mnemonic: "RR A", instructionEnd: 1, countDataBytes: 0), //    0x1F
-            opCode(mnemonic: "SLA B", instructionEnd: 1, countDataBytes: 0), //    0x20
-            opCode(mnemonic: "SLA C", instructionEnd: 1, countDataBytes: 0), //    0x21
-            opCode(mnemonic: "SLA D", instructionEnd: 1, countDataBytes: 0), //    0x22
-            opCode(mnemonic: "SLA E", instructionEnd: 1, countDataBytes: 0), //    0x23
-            opCode(mnemonic: "SLA H", instructionEnd: 1, countDataBytes: 0), //    0x24
-            opCode(mnemonic: "SLA L", instructionEnd: 1, countDataBytes: 0), //    0x25
-            opCode(mnemonic: "SLA (HL)", instructionEnd: 1, countDataBytes: 0), //    0x26
-            opCode(mnemonic: "SLA A", instructionEnd: 1, countDataBytes: 0), //    0x27
-            opCode(mnemonic: "SRA B", instructionEnd: 1, countDataBytes: 0), //    0x28
-            opCode(mnemonic: "SRA C", instructionEnd: 1, countDataBytes: 0), //    0x29
-            opCode(mnemonic: "SRA D", instructionEnd: 1, countDataBytes: 0), //    0x2A
-            opCode(mnemonic: "SRA E", instructionEnd: 1, countDataBytes: 0), //    0x2B
-            opCode(mnemonic: "SRA H", instructionEnd: 1, countDataBytes: 0), //    0x2C
-            opCode(mnemonic: "SRA L", instructionEnd: 1, countDataBytes: 0), //    0x2D
-            opCode(mnemonic: "SRA (HL)", instructionEnd: 1, countDataBytes: 0), //    0x2E
-            opCode(mnemonic: "SRA A", instructionEnd: 1, countDataBytes: 0), //    0x2F
-            opCode(mnemonic: "SLL B", instructionEnd: 1, countDataBytes: 0), //    0x30
-            opCode(mnemonic: "SLL C", instructionEnd: 1, countDataBytes: 0), //    0x31
-            opCode(mnemonic: "SLL D", instructionEnd: 1, countDataBytes: 0), //    0x32
-            opCode(mnemonic: "SLL E", instructionEnd: 1, countDataBytes: 0), //    0x33
-            opCode(mnemonic: "SLL H", instructionEnd: 1, countDataBytes: 0), //    0x34
-            opCode(mnemonic: "SLL L", instructionEnd: 1, countDataBytes: 0), //    0x35
-            opCode(mnemonic: "SLL (HL)", instructionEnd: 1, countDataBytes: 0), //    0x36
-            opCode(mnemonic: "SLL A", instructionEnd: 1, countDataBytes: 0), //    0x37
-            opCode(mnemonic: "SRL B", instructionEnd: 1, countDataBytes: 0), //    0x38
-            opCode(mnemonic: "SRL C", instructionEnd: 1, countDataBytes: 0), //    0x39
-            opCode(mnemonic: "SRL D", instructionEnd: 1, countDataBytes: 0), //    0x3A
-            opCode(mnemonic: "SRL E", instructionEnd: 1, countDataBytes: 0), //    0x3B
-            opCode(mnemonic: "SRL H", instructionEnd: 1, countDataBytes: 0), //    0x3C
-            opCode(mnemonic: "SRL L", instructionEnd: 1, countDataBytes: 0), //    0x3D
-            opCode(mnemonic: "SRL (HL)", instructionEnd: 1, countDataBytes: 0), //    0x3E
-            opCode(mnemonic: "SRL A", instructionEnd: 1, countDataBytes: 0), //    0x3F
-            opCode(mnemonic: "BIT 0,B", instructionEnd: 1, countDataBytes: 0), //    0x40
-            opCode(mnemonic: "BIT 0,C", instructionEnd: 1, countDataBytes: 0), //    0x41
-            opCode(mnemonic: "BIT 0,D", instructionEnd: 1, countDataBytes: 0), //    0x42
-            opCode(mnemonic: "BIT 0,E", instructionEnd: 1, countDataBytes: 0), //    0x43
-            opCode(mnemonic: "BIT 0,H", instructionEnd: 1, countDataBytes: 0), //    0x44
-            opCode(mnemonic: "BIT 0,L", instructionEnd: 1, countDataBytes: 0), //    0x45
-            opCode(mnemonic: "BIT 0,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x46
-            opCode(mnemonic: "BIT 0,A", instructionEnd: 1, countDataBytes: 0), //    0x47
-            opCode(mnemonic: "BIT 1,B", instructionEnd: 1, countDataBytes: 0), //    0x48
-            opCode(mnemonic: "BIT 1,C", instructionEnd: 1, countDataBytes: 0), //    0x49
-            opCode(mnemonic: "BIT 1,D", instructionEnd: 1, countDataBytes: 0), //    0x4A
-            opCode(mnemonic: "BIT 1,E", instructionEnd: 1, countDataBytes: 0), //    0x4B
-            opCode(mnemonic: "BIT 1,H", instructionEnd: 1, countDataBytes: 0), //    0x4C
-            opCode(mnemonic: "BIT 1,L", instructionEnd: 1, countDataBytes: 0), //    0x4D
-            opCode(mnemonic: "BIT 1,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x4E
-            opCode(mnemonic: "BIT 1,A", instructionEnd: 1, countDataBytes: 0), //    0x4F
-            opCode(mnemonic: "BIT 2,B", instructionEnd: 1, countDataBytes: 0), //    0x50
-            opCode(mnemonic: "BIT 2,C", instructionEnd: 1, countDataBytes: 0), //    0x51
-            opCode(mnemonic: "BIT 2,D", instructionEnd: 1, countDataBytes: 0), //    0x52
-            opCode(mnemonic: "BIT 2,E", instructionEnd: 1, countDataBytes: 0), //    0x53
-            opCode(mnemonic: "BIT 2,H", instructionEnd: 1, countDataBytes: 0), //    0x54
-            opCode(mnemonic: "BIT 2,L", instructionEnd: 1, countDataBytes: 0), //    0x55
-            opCode(mnemonic: "BIT 2,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x56
-            opCode(mnemonic: "BIT 2,A", instructionEnd: 1, countDataBytes: 0), //    0x57
-            opCode(mnemonic: "BIT 3,B", instructionEnd: 1, countDataBytes: 0), //    0x58
-            opCode(mnemonic: "BIT 3,C", instructionEnd: 1, countDataBytes: 0), //    0x59
-            opCode(mnemonic: "BIT 3,D", instructionEnd: 1, countDataBytes: 0), //    0x5A
-            opCode(mnemonic: "BIT 3,E", instructionEnd: 1, countDataBytes: 0), //    0x5B
-            opCode(mnemonic: "BIT 3,H", instructionEnd: 1, countDataBytes: 0), //    0x5C
-            opCode(mnemonic: "BIT 3,L", instructionEnd: 1, countDataBytes: 0), //    0x5D
-            opCode(mnemonic: "BIT 3,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x5E
-            opCode(mnemonic: "BIT 3,A", instructionEnd: 1, countDataBytes: 0), //    0x5F
-            opCode(mnemonic: "BIT 4,B", instructionEnd: 1, countDataBytes: 0), //    0x60
-            opCode(mnemonic: "BIT 4,C", instructionEnd: 1, countDataBytes: 0), //    0x61
-            opCode(mnemonic: "BIT 4,D", instructionEnd: 1, countDataBytes: 0), //    0x62
-            opCode(mnemonic: "BIT 4,E", instructionEnd: 1, countDataBytes: 0), //    0x63
-            opCode(mnemonic: "BIT 4,H", instructionEnd: 1, countDataBytes: 0), //    0x64
-            opCode(mnemonic: "BIT 4,L", instructionEnd: 1, countDataBytes: 0), //    0x65
-            opCode(mnemonic: "BIT 4,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x66
-            opCode(mnemonic: "BIT 4,A", instructionEnd: 1, countDataBytes: 0), //    0x67
-            opCode(mnemonic: "BIT 5,B", instructionEnd: 1, countDataBytes: 0), //    0x68
-            opCode(mnemonic: "BIT 5,C", instructionEnd: 1, countDataBytes: 0), //    0x69
-            opCode(mnemonic: "BIT 5,D", instructionEnd: 1, countDataBytes: 0), //    0x6A
-            opCode(mnemonic: "BIT 5,E", instructionEnd: 1, countDataBytes: 0), //    0x6B
-            opCode(mnemonic: "BIT 5,H", instructionEnd: 1, countDataBytes: 0), //    0x6C
-            opCode(mnemonic: "BIT 5,L", instructionEnd: 1, countDataBytes: 0), //    0x6D
-            opCode(mnemonic: "BIT 5,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x6E
-            opCode(mnemonic: "BIT 5,A", instructionEnd: 1, countDataBytes: 0), //    0x6F
-            opCode(mnemonic: "BIT 6,B", instructionEnd: 1, countDataBytes: 0), //    0x70
-            opCode(mnemonic: "BIT 6,C", instructionEnd: 1, countDataBytes: 0), //    0x71
-            opCode(mnemonic: "BIT 6,D", instructionEnd: 1, countDataBytes: 0), //    0x72
-            opCode(mnemonic: "BIT 6,E", instructionEnd: 1, countDataBytes: 0), //    0x73
-            opCode(mnemonic: "BIT 6,H", instructionEnd: 1, countDataBytes: 0), //    0x74
-            opCode(mnemonic: "BIT 6,L", instructionEnd: 1, countDataBytes: 0), //    0x75
-            opCode(mnemonic: "BIT 6,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x76
-            opCode(mnemonic: "BIT 6,A", instructionEnd: 1, countDataBytes: 0), //    0x77
-            opCode(mnemonic: "BIT 7,B", instructionEnd: 1, countDataBytes: 0), //    0x78
-            opCode(mnemonic: "BIT 7,C", instructionEnd: 1, countDataBytes: 0), //    0x79
-            opCode(mnemonic: "BIT 7,D", instructionEnd: 1, countDataBytes: 0), //    0x7A
-            opCode(mnemonic: "BIT 7,E", instructionEnd: 1, countDataBytes: 0), //    0x7B
-            opCode(mnemonic: "BIT 7,H", instructionEnd: 1, countDataBytes: 0), //    0x7C
-            opCode(mnemonic: "BIT 7,L", instructionEnd: 1, countDataBytes: 0), //    0x7D
-            opCode(mnemonic: "BIT 7,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x7E
-            opCode(mnemonic: "BIT 7,A", instructionEnd: 1, countDataBytes: 0), //    0x7F
-            opCode(mnemonic: "RES 0,B", instructionEnd: 1, countDataBytes: 0), //    0x80
-            opCode(mnemonic: "RES 0,C", instructionEnd: 1, countDataBytes: 0), //    0x81
-            opCode(mnemonic: "RES 0,D", instructionEnd: 1, countDataBytes: 0), //    0x82
-            opCode(mnemonic: "RES 0,E", instructionEnd: 1, countDataBytes: 0), //    0x83
-            opCode(mnemonic: "RES 0,H", instructionEnd: 1, countDataBytes: 0), //    0x84
-            opCode(mnemonic: "RES 0,L", instructionEnd: 1, countDataBytes: 0), //    0x85
-            opCode(mnemonic: "RES 0,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x86
-            opCode(mnemonic: "RES 0,A", instructionEnd: 1, countDataBytes: 0), //    0x87
-            opCode(mnemonic: "RES 1,B", instructionEnd: 1, countDataBytes: 0), //    0x88
-            opCode(mnemonic: "RES 1,C", instructionEnd: 1, countDataBytes: 0), //    0x89
-            opCode(mnemonic: "RES 1,D", instructionEnd: 1, countDataBytes: 0), //    0x8A
-            opCode(mnemonic: "RES 1,E", instructionEnd: 1, countDataBytes: 0), //    0x8B
-            opCode(mnemonic: "RES 1,H", instructionEnd: 1, countDataBytes: 0), //    0x8C
-            opCode(mnemonic: "RES 1,L", instructionEnd: 1, countDataBytes: 0), //    0x8D
-            opCode(mnemonic: "RES 1,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x8E
-            opCode(mnemonic: "RES 1,A", instructionEnd: 1, countDataBytes: 0), //    0x8F
-            opCode(mnemonic: "RES 2,B", instructionEnd: 1, countDataBytes: 0), //    0x90
-            opCode(mnemonic: "RES 2,C", instructionEnd: 1, countDataBytes: 0), //    0x91
-            opCode(mnemonic: "RES 2,D", instructionEnd: 1, countDataBytes: 0), //    0x92
-            opCode(mnemonic: "RES 2,E", instructionEnd: 1, countDataBytes: 0), //    0x93
-            opCode(mnemonic: "RES 2,H", instructionEnd: 1, countDataBytes: 0), //    0x94
-            opCode(mnemonic: "RES 2,L", instructionEnd: 1, countDataBytes: 0), //    0x95
-            opCode(mnemonic: "RES 2,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x96
-            opCode(mnemonic: "RES 2,A", instructionEnd: 1, countDataBytes: 0), //    0x97
-            opCode(mnemonic: "RES 3,B", instructionEnd: 1, countDataBytes: 0), //    0x98
-            opCode(mnemonic: "RES 3,C", instructionEnd: 1, countDataBytes: 0), //    0x99
-            opCode(mnemonic: "RES 3,D", instructionEnd: 1, countDataBytes: 0), //    0x9A
-            opCode(mnemonic: "RES 3,E", instructionEnd: 1, countDataBytes: 0), //    0x9B
-            opCode(mnemonic: "RES 3,H", instructionEnd: 1, countDataBytes: 0), //    0x9C
-            opCode(mnemonic: "RES 3,L", instructionEnd: 1, countDataBytes: 0), //    0x9D
-            opCode(mnemonic: "RES 3,(HL)", instructionEnd: 1, countDataBytes: 0), //    0x9E
-            opCode(mnemonic: "RES 3,A", instructionEnd: 1, countDataBytes: 0), //    0x9F
-            opCode(mnemonic: "RES 4,B", instructionEnd: 1, countDataBytes: 0), //    0xA0
-            opCode(mnemonic: "RES 4,C", instructionEnd: 1, countDataBytes: 0), //    0xA1
-            opCode(mnemonic: "RES 4,D", instructionEnd: 1, countDataBytes: 0), //    0xA2
-            opCode(mnemonic: "RES 4,E", instructionEnd: 1, countDataBytes: 0), //    0xA3
-            opCode(mnemonic: "RES 4,H", instructionEnd: 1, countDataBytes: 0), //    0xA4
-            opCode(mnemonic: "RES 4,L", instructionEnd: 1, countDataBytes: 0), //    0xA5
-            opCode(mnemonic: "RES 4,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xA6
-            opCode(mnemonic: "RES 4,A", instructionEnd: 1, countDataBytes: 0), //    0xA7
-            opCode(mnemonic: "RES 5,B", instructionEnd: 1, countDataBytes: 0), //    0xA8
-            opCode(mnemonic: "RES 5,C", instructionEnd: 1, countDataBytes: 0), //    0xA9
-            opCode(mnemonic: "RES 5,D", instructionEnd: 1, countDataBytes: 0), //    0xAA
-            opCode(mnemonic: "RES 5,E", instructionEnd: 1, countDataBytes: 0), //    0xAB
-            opCode(mnemonic: "RES 5,H", instructionEnd: 1, countDataBytes: 0), //    0xAC
-            opCode(mnemonic: "RES 5,L", instructionEnd: 1, countDataBytes: 0), //    0xAD
-            opCode(mnemonic: "RES 5,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xAE
-            opCode(mnemonic: "RES 5,A", instructionEnd: 1, countDataBytes: 0), //    0xAF
-            opCode(mnemonic: "RES 6,B", instructionEnd: 1, countDataBytes: 0), //    0xB0
-            opCode(mnemonic: "RES 6,C", instructionEnd: 1, countDataBytes: 0), //    0xB1
-            opCode(mnemonic: "RES 6,D", instructionEnd: 1, countDataBytes: 0), //    0xB2
-            opCode(mnemonic: "RES 6,E", instructionEnd: 1, countDataBytes: 0), //    0xB3
-            opCode(mnemonic: "RES 6,H", instructionEnd: 1, countDataBytes: 0), //    0xB4
-            opCode(mnemonic: "RES 6,L", instructionEnd: 1, countDataBytes: 0), //    0xB5
-            opCode(mnemonic: "RES 6,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xB6
-            opCode(mnemonic: "RES 6,A", instructionEnd: 1, countDataBytes: 0), //    0xB7
-            opCode(mnemonic: "RES 7,B", instructionEnd: 1, countDataBytes: 0), //    0xB8
-            opCode(mnemonic: "RES 7,C", instructionEnd: 1, countDataBytes: 0), //    0xB9
-            opCode(mnemonic: "RES 7,D", instructionEnd: 1, countDataBytes: 0), //    0xBA
-            opCode(mnemonic: "RES 7,E", instructionEnd: 1, countDataBytes: 0), //    0xBB
-            opCode(mnemonic: "RES 7,H", instructionEnd: 1, countDataBytes: 0), //    0xBC
-            opCode(mnemonic: "RES 7,L", instructionEnd: 1, countDataBytes: 0), //    0xBD
-            opCode(mnemonic: "RES 7,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xBE
-            opCode(mnemonic: "RES 7,A", instructionEnd: 1, countDataBytes: 0), //    0xBF
-            opCode(mnemonic: "SET 0,B", instructionEnd: 1, countDataBytes: 0), //    0xC0
-            opCode(mnemonic: "SET 0,C", instructionEnd: 1, countDataBytes: 0), //    0xC1
-            opCode(mnemonic: "SET 0,D", instructionEnd: 1, countDataBytes: 0), //    0xC2
-            opCode(mnemonic: "SET 0,E", instructionEnd: 1, countDataBytes: 0), //    0xC3
-            opCode(mnemonic: "SET 0,H", instructionEnd: 1, countDataBytes: 0), //    0xC4
-            opCode(mnemonic: "SET 0,L", instructionEnd: 1, countDataBytes: 0), //    0xC5
-            opCode(mnemonic: "SET 0,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xC6
-            opCode(mnemonic: "SET 0,A", instructionEnd: 1, countDataBytes: 0), //    0xC7
-            opCode(mnemonic: "SET 1,B", instructionEnd: 1, countDataBytes: 0), //    0xC8
-            opCode(mnemonic: "SET 1,C", instructionEnd: 1, countDataBytes: 0), //    0xC9
-            opCode(mnemonic: "SET 1,D", instructionEnd: 1, countDataBytes: 0), //    0xCA
-            opCode(mnemonic: "SET 1,E", instructionEnd: 1, countDataBytes: 0), //    0xCB
-            opCode(mnemonic: "SET 1,H", instructionEnd: 1, countDataBytes: 0), //    0xCC
-            opCode(mnemonic: "SET 1,L", instructionEnd: 1, countDataBytes: 0), //    0xCD
-            opCode(mnemonic: "SET 1,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xCE
-            opCode(mnemonic: "SET 1,A", instructionEnd: 1, countDataBytes: 0), //    0xCF
-            opCode(mnemonic: "SET 2,B", instructionEnd: 1, countDataBytes: 0), //    0xD0
-            opCode(mnemonic: "SET 2,C", instructionEnd: 1, countDataBytes: 0), //    0xD1
-            opCode(mnemonic: "SET 2,D", instructionEnd: 1, countDataBytes: 0), //    0xD2
-            opCode(mnemonic: "SET 2,E", instructionEnd: 1, countDataBytes: 0), //    0xD3
-            opCode(mnemonic: "SET 2,H", instructionEnd: 1, countDataBytes: 0), //    0xD4
-            opCode(mnemonic: "SET 2,L", instructionEnd: 1, countDataBytes: 0), //    0xD5
-            opCode(mnemonic: "SET 2,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xD6
-            opCode(mnemonic: "SET 2,A", instructionEnd: 1, countDataBytes: 0), //    0xD7
-            opCode(mnemonic: "SET 3,B", instructionEnd: 1, countDataBytes: 0), //    0xD8
-            opCode(mnemonic: "SET 3,C", instructionEnd: 1, countDataBytes: 0), //    0xD9
-            opCode(mnemonic: "SET 3,D", instructionEnd: 1, countDataBytes: 0), //    0xDA
-            opCode(mnemonic: "SET 3,E", instructionEnd: 1, countDataBytes: 0), //    0xDB
-            opCode(mnemonic: "SET 3,H", instructionEnd: 1, countDataBytes: 0), //    0xDC
-            opCode(mnemonic: "SET 3,L", instructionEnd: 1, countDataBytes: 0), //    0xDD
-            opCode(mnemonic: "SET 3,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xDE
-            opCode(mnemonic: "SET 3,A", instructionEnd: 1, countDataBytes: 0), //    0xDF
-            opCode(mnemonic: "SET 4,B", instructionEnd: 1, countDataBytes: 0), //    0xE0
-            opCode(mnemonic: "SET 4,C", instructionEnd: 1, countDataBytes: 0), //    0xE1
-            opCode(mnemonic: "SET 4,D", instructionEnd: 1, countDataBytes: 0), //    0xE2
-            opCode(mnemonic: "SET 4,E", instructionEnd: 1, countDataBytes: 0), //    0xE3
-            opCode(mnemonic: "SET 4,H", instructionEnd: 1, countDataBytes: 0), //    0xE4
-            opCode(mnemonic: "SET 4,L", instructionEnd: 1, countDataBytes: 0), //    0xE5
-            opCode(mnemonic: "SET 4,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xE6
-            opCode(mnemonic: "SET 4,A", instructionEnd: 1, countDataBytes: 0), //    0xE7
-            opCode(mnemonic: "SET 5,B", instructionEnd: 1, countDataBytes: 0), //    0xE8
-            opCode(mnemonic: "SET 5,C", instructionEnd: 1, countDataBytes: 0), //    0xE9
-            opCode(mnemonic: "SET 5,D", instructionEnd: 1, countDataBytes: 0), //    0xEA
-            opCode(mnemonic: "SET 5,E", instructionEnd: 1, countDataBytes: 0), //    0xEB
-            opCode(mnemonic: "SET 5,H", instructionEnd: 1, countDataBytes: 0), //    0xEC
-            opCode(mnemonic: "SET 5,L", instructionEnd: 1, countDataBytes: 0), //    0xED
-            opCode(mnemonic: "SET 5,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xEE
-            opCode(mnemonic: "SET 5,A", instructionEnd: 1, countDataBytes: 0), //    0xEF
-            opCode(mnemonic: "SET 6,B", instructionEnd: 1, countDataBytes: 0), //    0xF0
-            opCode(mnemonic: "SET 6,C", instructionEnd: 1, countDataBytes: 0), //    0xF1
-            opCode(mnemonic: "SET 6,D", instructionEnd: 1, countDataBytes: 0), //    0xF2
-            opCode(mnemonic: "SET 6,E", instructionEnd: 1, countDataBytes: 0), //    0xF3
-            opCode(mnemonic: "SET 6,H", instructionEnd: 1, countDataBytes: 0), //    0xF4
-            opCode(mnemonic: "SET 6,L", instructionEnd: 1, countDataBytes: 0), //    0xF5
-            opCode(mnemonic: "SET 6,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xF6
-            opCode(mnemonic: "SET 6,A", instructionEnd: 1, countDataBytes: 0), //    0xF7
-            opCode(mnemonic: "SET 7,B", instructionEnd: 1, countDataBytes: 0), //    0xF8
-            opCode(mnemonic: "SET 7,C", instructionEnd: 1, countDataBytes: 0), //    0xF9
-            opCode(mnemonic: "SET 7,D", instructionEnd: 1, countDataBytes: 0), //    0xFA
-            opCode(mnemonic: "SET 7,E", instructionEnd: 1, countDataBytes: 0), //    0xFB
-            opCode(mnemonic: "SET 7,H", instructionEnd: 1, countDataBytes: 0), //    0xFC
-            opCode(mnemonic: "SET 7,L", instructionEnd: 1, countDataBytes: 0), //    0xFD
-            opCode(mnemonic: "SET 7,(HL)", instructionEnd: 1, countDataBytes: 0), //    0xFE
-            opCode(mnemonic: "SET 7,A", instructionEnd: 1, countDataBytes: 0) //    0xFF
+            opCode(mnemonic: "RLC B", instructionLength: 2, dataStart: 0, dataEnd: 0),     // 0x00
+            opCode(mnemonic: "RLC C", instructionLength: 2, dataStart: 0, dataEnd: 0),     // 0x01
+            opCode(mnemonic: "RLC D", instructionLength: 2, dataStart: 0, dataEnd: 0),     // 0x02
+            opCode(mnemonic: "RLC E", instructionLength: 2, dataStart: 0, dataEnd: 0),     // 0x03
+            opCode(mnemonic: "RLC H", instructionLength: 2, dataStart: 0, dataEnd: 0),     // 0x04
+            opCode(mnemonic: "RLC L", instructionLength: 2, dataStart: 0, dataEnd: 0),     // 0x05
+            opCode(mnemonic: "RLC (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0),  // 0x06
+            opCode(mnemonic: "RLC A", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x07
+            opCode(mnemonic: "RRC B", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x08
+            opCode(mnemonic: "RRC C", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x09
+            opCode(mnemonic: "RRC D", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x0A
+            opCode(mnemonic: "RRC E", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x0B
+            opCode(mnemonic: "RRC H", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x0C
+            opCode(mnemonic: "RRC L", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x0D
+            opCode(mnemonic: "RRC (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0),  //    0x0E
+            opCode(mnemonic: "RRC A", instructionLength: 2, dataStart: 0, dataEnd: 0),     //    0x0F
+            opCode(mnemonic: "RL B", instructionLength: 2, dataStart: 0, dataEnd: 0),      //    0x10
+            opCode(mnemonic: "RL C", instructionLength: 2, dataStart: 0, dataEnd: 0),      //    0x11
+            opCode(mnemonic: "RL D", instructionLength: 2, dataStart: 0, dataEnd: 0),      //    0x12
+            opCode(mnemonic: "RL E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x13
+            opCode(mnemonic: "RL H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x14
+            opCode(mnemonic: "RL L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x15
+            opCode(mnemonic: "RL (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x16
+            opCode(mnemonic: "RL A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x17
+            opCode(mnemonic: "RR B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x18
+            opCode(mnemonic: "RR C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x19
+            opCode(mnemonic: "RR D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x1A
+            opCode(mnemonic: "RR E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x1B
+            opCode(mnemonic: "RR H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x1C
+            opCode(mnemonic: "RR L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x1D
+            opCode(mnemonic: "RR (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x1E
+            opCode(mnemonic: "RR A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x1F
+            opCode(mnemonic: "SLA B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x20
+            opCode(mnemonic: "SLA C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x21
+            opCode(mnemonic: "SLA D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x22
+            opCode(mnemonic: "SLA E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x23
+            opCode(mnemonic: "SLA H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x24
+            opCode(mnemonic: "SLA L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x25
+            opCode(mnemonic: "SLA (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x26
+            opCode(mnemonic: "SLA A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x27
+            opCode(mnemonic: "SRA B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x28
+            opCode(mnemonic: "SRA C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x29
+            opCode(mnemonic: "SRA D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x2A
+            opCode(mnemonic: "SRA E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x2B
+            opCode(mnemonic: "SRA H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x2C
+            opCode(mnemonic: "SRA L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x2D
+            opCode(mnemonic: "SRA (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x2E
+            opCode(mnemonic: "SRA A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x2F
+            opCode(mnemonic: "SLL B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x30
+            opCode(mnemonic: "SLL C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x31
+            opCode(mnemonic: "SLL D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x32
+            opCode(mnemonic: "SLL E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x33
+            opCode(mnemonic: "SLL H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x34
+            opCode(mnemonic: "SLL L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x35
+            opCode(mnemonic: "SLL (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x36
+            opCode(mnemonic: "SLL A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x37
+            opCode(mnemonic: "SRL B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x38
+            opCode(mnemonic: "SRL C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x39
+            opCode(mnemonic: "SRL D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x3A
+            opCode(mnemonic: "SRL E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x3B
+            opCode(mnemonic: "SRL H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x3C
+            opCode(mnemonic: "SRL L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x3D
+            opCode(mnemonic: "SRL (HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x3E
+            opCode(mnemonic: "SRL A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x3F
+            opCode(mnemonic: "BIT 0,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x40
+            opCode(mnemonic: "BIT 0,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x41
+            opCode(mnemonic: "BIT 0,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x42
+            opCode(mnemonic: "BIT 0,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x43
+            opCode(mnemonic: "BIT 0,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x44
+            opCode(mnemonic: "BIT 0,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x45
+            opCode(mnemonic: "BIT 0,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x46
+            opCode(mnemonic: "BIT 0,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x47
+            opCode(mnemonic: "BIT 1,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x48
+            opCode(mnemonic: "BIT 1,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x49
+            opCode(mnemonic: "BIT 1,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x4A
+            opCode(mnemonic: "BIT 1,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x4B
+            opCode(mnemonic: "BIT 1,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x4C
+            opCode(mnemonic: "BIT 1,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x4D
+            opCode(mnemonic: "BIT 1,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x4E
+            opCode(mnemonic: "BIT 1,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x4F
+            opCode(mnemonic: "BIT 2,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x50
+            opCode(mnemonic: "BIT 2,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x51
+            opCode(mnemonic: "BIT 2,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x52
+            opCode(mnemonic: "BIT 2,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x53
+            opCode(mnemonic: "BIT 2,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x54
+            opCode(mnemonic: "BIT 2,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x55
+            opCode(mnemonic: "BIT 2,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x56
+            opCode(mnemonic: "BIT 2,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x57
+            opCode(mnemonic: "BIT 3,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x58
+            opCode(mnemonic: "BIT 3,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x59
+            opCode(mnemonic: "BIT 3,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x5A
+            opCode(mnemonic: "BIT 3,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x5B
+            opCode(mnemonic: "BIT 3,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x5C
+            opCode(mnemonic: "BIT 3,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x5D
+            opCode(mnemonic: "BIT 3,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x5E
+            opCode(mnemonic: "BIT 3,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x5F
+            opCode(mnemonic: "BIT 4,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x60
+            opCode(mnemonic: "BIT 4,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x61
+            opCode(mnemonic: "BIT 4,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x62
+            opCode(mnemonic: "BIT 4,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x63
+            opCode(mnemonic: "BIT 4,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x64
+            opCode(mnemonic: "BIT 4,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x65
+            opCode(mnemonic: "BIT 4,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x66
+            opCode(mnemonic: "BIT 4,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x67
+            opCode(mnemonic: "BIT 5,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x68
+            opCode(mnemonic: "BIT 5,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x69
+            opCode(mnemonic: "BIT 5,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x6A
+            opCode(mnemonic: "BIT 5,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x6B
+            opCode(mnemonic: "BIT 5,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x6C
+            opCode(mnemonic: "BIT 5,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x6D
+            opCode(mnemonic: "BIT 5,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x6E
+            opCode(mnemonic: "BIT 5,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x6F
+            opCode(mnemonic: "BIT 6,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x70
+            opCode(mnemonic: "BIT 6,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x71
+            opCode(mnemonic: "BIT 6,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x72
+            opCode(mnemonic: "BIT 6,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x73
+            opCode(mnemonic: "BIT 6,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x74
+            opCode(mnemonic: "BIT 6,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x75
+            opCode(mnemonic: "BIT 6,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x76
+            opCode(mnemonic: "BIT 6,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x77
+            opCode(mnemonic: "BIT 7,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x78
+            opCode(mnemonic: "BIT 7,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x79
+            opCode(mnemonic: "BIT 7,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x7A
+            opCode(mnemonic: "BIT 7,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x7B
+            opCode(mnemonic: "BIT 7,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x7C
+            opCode(mnemonic: "BIT 7,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x7D
+            opCode(mnemonic: "BIT 7,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x7E
+            opCode(mnemonic: "BIT 7,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x7F
+            opCode(mnemonic: "RES 0,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x80
+            opCode(mnemonic: "RES 0,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x81
+            opCode(mnemonic: "RES 0,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x82
+            opCode(mnemonic: "RES 0,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x83
+            opCode(mnemonic: "RES 0,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x84
+            opCode(mnemonic: "RES 0,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x85
+            opCode(mnemonic: "RES 0,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x86
+            opCode(mnemonic: "RES 0,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x87
+            opCode(mnemonic: "RES 1,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x88
+            opCode(mnemonic: "RES 1,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x89
+            opCode(mnemonic: "RES 1,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x8A
+            opCode(mnemonic: "RES 1,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x8B
+            opCode(mnemonic: "RES 1,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x8C
+            opCode(mnemonic: "RES 1,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x8D
+            opCode(mnemonic: "RES 1,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x8E
+            opCode(mnemonic: "RES 1,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x8F
+            opCode(mnemonic: "RES 2,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x90
+            opCode(mnemonic: "RES 2,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x91
+            opCode(mnemonic: "RES 2,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x92
+            opCode(mnemonic: "RES 2,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x93
+            opCode(mnemonic: "RES 2,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x94
+            opCode(mnemonic: "RES 2,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x95
+            opCode(mnemonic: "RES 2,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x96
+            opCode(mnemonic: "RES 2,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x97
+            opCode(mnemonic: "RES 3,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x98
+            opCode(mnemonic: "RES 3,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x99
+            opCode(mnemonic: "RES 3,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x9A
+            opCode(mnemonic: "RES 3,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x9B
+            opCode(mnemonic: "RES 3,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x9C
+            opCode(mnemonic: "RES 3,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x9D
+            opCode(mnemonic: "RES 3,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x9E
+            opCode(mnemonic: "RES 3,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0x9F
+            opCode(mnemonic: "RES 4,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA0
+            opCode(mnemonic: "RES 4,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA1
+            opCode(mnemonic: "RES 4,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA2
+            opCode(mnemonic: "RES 4,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA3
+            opCode(mnemonic: "RES 4,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA4
+            opCode(mnemonic: "RES 4,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA5
+            opCode(mnemonic: "RES 4,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA6
+            opCode(mnemonic: "RES 4,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA7
+            opCode(mnemonic: "RES 5,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA8
+            opCode(mnemonic: "RES 5,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xA9
+            opCode(mnemonic: "RES 5,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xAA
+            opCode(mnemonic: "RES 5,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xAB
+            opCode(mnemonic: "RES 5,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xAC
+            opCode(mnemonic: "RES 5,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xAD
+            opCode(mnemonic: "RES 5,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xAE
+            opCode(mnemonic: "RES 5,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xAF
+            opCode(mnemonic: "RES 6,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB0
+            opCode(mnemonic: "RES 6,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB1
+            opCode(mnemonic: "RES 6,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB2
+            opCode(mnemonic: "RES 6,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB3
+            opCode(mnemonic: "RES 6,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB4
+            opCode(mnemonic: "RES 6,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB5
+            opCode(mnemonic: "RES 6,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB6
+            opCode(mnemonic: "RES 6,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB7
+            opCode(mnemonic: "RES 7,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB8
+            opCode(mnemonic: "RES 7,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xB9
+            opCode(mnemonic: "RES 7,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xBA
+            opCode(mnemonic: "RES 7,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xBB
+            opCode(mnemonic: "RES 7,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xBC
+            opCode(mnemonic: "RES 7,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xBD
+            opCode(mnemonic: "RES 7,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xBE
+            opCode(mnemonic: "RES 7,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xBF
+            opCode(mnemonic: "SET 0,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC0
+            opCode(mnemonic: "SET 0,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC1
+            opCode(mnemonic: "SET 0,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC2
+            opCode(mnemonic: "SET 0,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC3
+            opCode(mnemonic: "SET 0,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC4
+            opCode(mnemonic: "SET 0,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC5
+            opCode(mnemonic: "SET 0,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC6
+            opCode(mnemonic: "SET 0,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC7
+            opCode(mnemonic: "SET 1,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC8
+            opCode(mnemonic: "SET 1,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xC9
+            opCode(mnemonic: "SET 1,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xCA
+            opCode(mnemonic: "SET 1,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xCB
+            opCode(mnemonic: "SET 1,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xCC
+            opCode(mnemonic: "SET 1,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xCD
+            opCode(mnemonic: "SET 1,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xCE
+            opCode(mnemonic: "SET 1,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xCF
+            opCode(mnemonic: "SET 2,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD0
+            opCode(mnemonic: "SET 2,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD1
+            opCode(mnemonic: "SET 2,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD2
+            opCode(mnemonic: "SET 2,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD3
+            opCode(mnemonic: "SET 2,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD4
+            opCode(mnemonic: "SET 2,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD5
+            opCode(mnemonic: "SET 2,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD6
+            opCode(mnemonic: "SET 2,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD7
+            opCode(mnemonic: "SET 3,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD8
+            opCode(mnemonic: "SET 3,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xD9
+            opCode(mnemonic: "SET 3,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xDA
+            opCode(mnemonic: "SET 3,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xDB
+            opCode(mnemonic: "SET 3,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xDC
+            opCode(mnemonic: "SET 3,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xDD
+            opCode(mnemonic: "SET 3,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xDE
+            opCode(mnemonic: "SET 3,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xDF
+            opCode(mnemonic: "SET 4,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE0
+            opCode(mnemonic: "SET 4,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE1
+            opCode(mnemonic: "SET 4,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE2
+            opCode(mnemonic: "SET 4,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE3
+            opCode(mnemonic: "SET 4,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE4
+            opCode(mnemonic: "SET 4,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE5
+            opCode(mnemonic: "SET 4,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE6
+            opCode(mnemonic: "SET 4,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE7
+            opCode(mnemonic: "SET 5,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE8
+            opCode(mnemonic: "SET 5,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xE9
+            opCode(mnemonic: "SET 5,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xEA
+            opCode(mnemonic: "SET 5,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xEB
+            opCode(mnemonic: "SET 5,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xEC
+            opCode(mnemonic: "SET 5,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xED
+            opCode(mnemonic: "SET 5,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xEE
+            opCode(mnemonic: "SET 5,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xEF
+            opCode(mnemonic: "SET 6,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF0
+            opCode(mnemonic: "SET 6,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF1
+            opCode(mnemonic: "SET 6,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF2
+            opCode(mnemonic: "SET 6,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF3
+            opCode(mnemonic: "SET 6,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF4
+            opCode(mnemonic: "SET 6,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF5
+            opCode(mnemonic: "SET 6,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF6
+            opCode(mnemonic: "SET 6,A", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF7
+            opCode(mnemonic: "SET 7,B", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF8
+            opCode(mnemonic: "SET 7,C", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xF9
+            opCode(mnemonic: "SET 7,D", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xFA
+            opCode(mnemonic: "SET 7,E", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xFB
+            opCode(mnemonic: "SET 7,H", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xFC
+            opCode(mnemonic: "SET 7,L", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xFD
+            opCode(mnemonic: "SET 7,(HL)", instructionLength: 2, dataStart: 0, dataEnd: 0), //    0xFE
+            opCode(mnemonic: "SET 7,A", instructionLength: 2, dataStart: 0, dataEnd: 0) //    0xFF
         ]
         
         let DDPrefixOpcode: [opCode] =
         [
-            opCode(mnemonic: "NOP", instructionEnd: 1, countDataBytes: 0),    //  0x00
-            opCode(mnemonic: "LD BC,$nn", instructionEnd: 1, countDataBytes: 2),    //  0x01
-            opCode(mnemonic: "LD (BC),A", instructionEnd: 1, countDataBytes: 0),    //  0x02
-            opCode(mnemonic: "INC BC", instructionEnd: 1, countDataBytes: 0),    //  0x03
-            opCode(mnemonic: "INC B", instructionEnd: 1, countDataBytes: 0),    //  0x04
-            opCode(mnemonic: "DEC B", instructionEnd: 1, countDataBytes: 0),    //  0x05
-            opCode(mnemonic: "LD B,$n", instructionEnd: 1, countDataBytes: 1),    //  0x06
-            opCode(mnemonic: "RLCA", instructionEnd: 1, countDataBytes: 0),    //  0x07
-            opCode(mnemonic: "EX AF,AF'", instructionEnd: 1, countDataBytes: 0),    //  0x08
-            opCode(mnemonic: "ADD IX,BC", instructionEnd: 1, countDataBytes: 0),    //  0x09
-            opCode(mnemonic: "LD A,(BC)", instructionEnd: 1, countDataBytes: 0),    //  0x0A
-            opCode(mnemonic: "DEC BC", instructionEnd: 1, countDataBytes: 0),    //  0x0B
-            opCode(mnemonic: "INC C", instructionEnd: 1, countDataBytes: 0),    //  0x0C
-            opCode(mnemonic: "DEC C", instructionEnd: 1, countDataBytes: 0),    //  0x0D
-            opCode(mnemonic: "LD C,$n", instructionEnd: 1, countDataBytes: 1),    //  0x0E
-            opCode(mnemonic: "RRCA", instructionEnd: 1, countDataBytes: 0),    //  0x0F
-            opCode(mnemonic: "DJNZ $d", instructionEnd: 1, countDataBytes: 1),   //  0x10
-            opCode(mnemonic: "LD DE,$nn", instructionEnd: 1, countDataBytes: 2),    //  0x11
-            opCode(mnemonic: "LD (DE),A", instructionEnd: 1, countDataBytes: 0),    //  0x12
-            opCode(mnemonic: "INC DE", instructionEnd: 1, countDataBytes: 0),    //  0x13
-            opCode(mnemonic: "INC D", instructionEnd: 1, countDataBytes: 0),    //  0x14
-            opCode(mnemonic: "DEC D", instructionEnd: 1, countDataBytes: 0),    //  0x15
-            opCode(mnemonic: "LD D,$n", instructionEnd: 1, countDataBytes: 1),    //  0x16
-            opCode(mnemonic: "RLA", instructionEnd: 1, countDataBytes: 0),    //  0x17
-            opCode(mnemonic: "JR $d", instructionEnd: 1, countDataBytes: 1),   //  0x18
-            opCode(mnemonic: "ADD IX,DE", instructionEnd: 1, countDataBytes: 0),    //  0x19
-            opCode(mnemonic: "LD A,(DE)", instructionEnd: 1, countDataBytes: 0),    //  0x1A
-            opCode(mnemonic: "DEC DE", instructionEnd: 1, countDataBytes: 0),    //  0x1B
-            opCode(mnemonic: "INC E", instructionEnd: 1, countDataBytes: 0),    //  0x1C
-            opCode(mnemonic: "DEC E", instructionEnd: 1, countDataBytes: 0),    //  0x1D
-            opCode(mnemonic: "LD E,$n", instructionEnd: 1, countDataBytes: 1),    //  0x1E
-            opCode(mnemonic: "RRA", instructionEnd: 1, countDataBytes: 0),    //  0x1F
-            opCode(mnemonic: "JR NZ,$d", instructionEnd: 1, countDataBytes: 1),  //  0x20
-            opCode(mnemonic: "LD IX,$nn", instructionEnd: 1, countDataBytes: 2),    //  0x21
-            opCode(mnemonic: "LD ($nn),IX", instructionEnd: 1, countDataBytes: 2),    //  0x22
-            opCode(mnemonic: "INC IX", instructionEnd: 1, countDataBytes: 0),    //  0x23
-            opCode(mnemonic: "INC IXH", instructionEnd: 1, countDataBytes: 0),    //  0x24
-            opCode(mnemonic: "DEC IXH", instructionEnd: 1, countDataBytes: 0),    //  0x25
-            opCode(mnemonic: "LD IHX,$n", instructionEnd: 1, countDataBytes: 1),   //  0x26
-            opCode(mnemonic: "DAA", instructionEnd: 1, countDataBytes: 0),    //  0x27
-            opCode(mnemonic: "JR Z,$d", instructionEnd: 1, countDataBytes: 1),  //  0x28
-            opCode(mnemonic: "ADD IX,IX", instructionEnd: 1, countDataBytes: 0),    //  0x29
-            opCode(mnemonic: "LD IX,($nn)", instructionEnd: 1, countDataBytes: 2),   //  0x2A
-            opCode(mnemonic: "DEC IX", instructionEnd: 1, countDataBytes: 0),    //  0x2B
-            opCode(mnemonic: "INC IXL", instructionEnd: 1, countDataBytes: 0),    //  0x2C
-            opCode(mnemonic: "DEC IXL", instructionEnd: 1, countDataBytes: 0),    //  0x2D
-            opCode(mnemonic: "LD IXL,$n", instructionEnd: 1, countDataBytes: 1),   //  0x2E
-            opCode(mnemonic: "CPL", instructionEnd: 1, countDataBytes: 0),    //  0x2F
-            opCode(mnemonic: "JR NC,$d", instructionEnd: 1, countDataBytes: 1),    //  0x30
-            opCode(mnemonic: "LD SP,$nn", instructionEnd: 1, countDataBytes: 2),   //  0x31
-            opCode(mnemonic: "LD ($nn),A", instructionEnd: 1, countDataBytes: 2),    //  0x32
-            opCode(mnemonic: "INC SP", instructionEnd: 1, countDataBytes: 0),    //  0x33
-            opCode(mnemonic: "INC (IX+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x34
-            opCode(mnemonic: "DEC (IX+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x35
-            opCode(mnemonic: "LD (IX+$d),$n", instructionEnd: 1, countDataBytes: 2),   //  0x36
-            opCode(mnemonic: "SCF", instructionEnd: 1, countDataBytes: 0),    //  0x37
-            opCode(mnemonic: "JR C,$d", instructionEnd: 1, countDataBytes: 1),   //  0x38
-            opCode(mnemonic: "ADD IX,SP", instructionEnd: 1, countDataBytes: 0),    //  0x39
-            opCode(mnemonic: "LD A,($nn)", instructionEnd: 1, countDataBytes: 2),   //  0x3A
-            opCode(mnemonic: "DEC SP", instructionEnd: 1, countDataBytes: 0),    //  0x3B
-            opCode(mnemonic: "INC A", instructionEnd: 1, countDataBytes: 0),    //  0x3C
-            opCode(mnemonic: "DEC A", instructionEnd: 1, countDataBytes: 0),    //  0x3D
-            opCode(mnemonic: "LD A,$n", instructionEnd: 1, countDataBytes: 1),   //  0x3E
-            opCode(mnemonic: "CCF", instructionEnd: 1, countDataBytes: 0),    //  0x3F
-            opCode(mnemonic: "LD B,B", instructionEnd: 1, countDataBytes: 0),    //  0x40
-            opCode(mnemonic: "LD B,C", instructionEnd: 1, countDataBytes: 0),    //  0x41
-            opCode(mnemonic: "LD B,D", instructionEnd: 1, countDataBytes: 0),    //  0x42
-            opCode(mnemonic: "LD B,E", instructionEnd: 1, countDataBytes: 0),    //  0x43
-            opCode(mnemonic: "LD B,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x44
-            opCode(mnemonic: "LD B,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x45
-            opCode(mnemonic: "LD B,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x46
-            opCode(mnemonic: "LD B,A", instructionEnd: 1, countDataBytes: 0),    //  0x47
-            opCode(mnemonic: "LD C,B", instructionEnd: 1, countDataBytes: 0),    //  0x48
-            opCode(mnemonic: "LD C,C", instructionEnd: 1, countDataBytes: 0),    //  0x49
-            opCode(mnemonic: "LD C,D", instructionEnd: 1, countDataBytes: 0),    //  0x4A
-            opCode(mnemonic: "LD C,E", instructionEnd: 1, countDataBytes: 0),    //  0x4B
-            opCode(mnemonic: "LD C,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x4C
-            opCode(mnemonic: "LD C,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x4D
-            opCode(mnemonic: "LD C,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x4E
-            opCode(mnemonic: "LD C,A", instructionEnd: 1, countDataBytes: 0),    //  0x4F
-            opCode(mnemonic: "LD D,B", instructionEnd: 1, countDataBytes: 0),    //  0x50
-            opCode(mnemonic: "LD D,C", instructionEnd: 1, countDataBytes: 0),    //  0x51
-            opCode(mnemonic: "LD D,D", instructionEnd: 1, countDataBytes: 0),    //  0x52
-            opCode(mnemonic: "LD D,E", instructionEnd: 1, countDataBytes: 0),    //  0x53
-            opCode(mnemonic: "LD D,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x54
-            opCode(mnemonic: "LD D,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x55
-            opCode(mnemonic: "LD D,(IX+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x56
-            opCode(mnemonic: "LD D,A", instructionEnd: 1, countDataBytes: 0),    //  0x57
-            opCode(mnemonic: "LD E,B", instructionEnd: 1, countDataBytes: 0),    //  0x58
-            opCode(mnemonic: "LD E,C", instructionEnd: 1, countDataBytes: 0),    //  0x59
-            opCode(mnemonic: "LD E,D", instructionEnd: 1, countDataBytes: 0),    //  0x5A
-            opCode(mnemonic: "LD E,E", instructionEnd: 1, countDataBytes: 0),    //  0x5B
-            opCode(mnemonic: "LD E,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x5C
-            opCode(mnemonic: "LD E,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x5D
-            opCode(mnemonic: "LD E,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x5E
-            opCode(mnemonic: "LD E,A", instructionEnd: 1, countDataBytes: 0),    //  0x5F
-            opCode(mnemonic: "LD IXH,B", instructionEnd: 1, countDataBytes: 0),    //  0x60
-            opCode(mnemonic: "LD IXH,C", instructionEnd: 1, countDataBytes: 0),    //  0x61
-            opCode(mnemonic: "LD IXH,D", instructionEnd: 1, countDataBytes: 0),    //  0x62
-            opCode(mnemonic: "LD IXH,E", instructionEnd: 1, countDataBytes: 0),    //  0x63
-            opCode(mnemonic: "LD IXH,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x64
-            opCode(mnemonic: "LD IXH,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x65
-            opCode(mnemonic: "LD H,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x66
-            opCode(mnemonic: "LD IXH,A", instructionEnd: 1, countDataBytes: 0),    //  0x67
-            opCode(mnemonic: "LD IXL,B", instructionEnd: 1, countDataBytes: 0),    //  0x68
-            opCode(mnemonic: "LD IXL,C", instructionEnd: 1, countDataBytes: 0),    //  0x69
-            opCode(mnemonic: "LD IXL,D", instructionEnd: 1, countDataBytes: 0),    //  0x6A
-            opCode(mnemonic: "LD IXL,E", instructionEnd: 1, countDataBytes: 0),    //  0x6B
-            opCode(mnemonic: "LD IXL,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x6C
-            opCode(mnemonic: "LD IXL,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x6D
-            opCode(mnemonic: "LD L,(IX+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x6E
-            opCode(mnemonic: "LD IXL,A", instructionEnd: 1, countDataBytes: 0),    //  0x6F
-            opCode(mnemonic: "LD (IX+$d),B", instructionEnd: 1, countDataBytes: 1),   //  0x70
-            opCode(mnemonic: "LD (IX+$d),C", instructionEnd: 1, countDataBytes: 1),    //  0x71
-            opCode(mnemonic: "LD (IX+$d),D", instructionEnd: 1, countDataBytes: 1),    //  0x72
-            opCode(mnemonic: "LD (IX+$d),E", instructionEnd: 1, countDataBytes: 1),   //  0x73
-            opCode(mnemonic: "LD (IX+$d),H", instructionEnd: 1, countDataBytes: 1),   //  0x74
-            opCode(mnemonic: "LD (IX+$d),L", instructionEnd: 1, countDataBytes: 1),  //  0x75
-            opCode(mnemonic: "HALT", instructionEnd: 1, countDataBytes: 0),    //  0x76
-            opCode(mnemonic: "LD (IX+$d),A", instructionEnd: 1, countDataBytes: 1),  //  0x77
-            opCode(mnemonic: "LD A,B", instructionEnd: 1, countDataBytes: 0),    //  0x78
-            opCode(mnemonic: "LD A,C", instructionEnd: 1, countDataBytes: 0),    //  0x79
-            opCode(mnemonic: "LD A,D", instructionEnd: 1, countDataBytes: 0),    //  0x7A
-            opCode(mnemonic: "LD A,E", instructionEnd: 1, countDataBytes: 0),    //  0x7B
-            opCode(mnemonic: "LD A,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x7C
-            opCode(mnemonic: "LD A,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x7D
-            opCode(mnemonic: "LD A,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x7E
-            opCode(mnemonic: "LD A,A", instructionEnd: 1, countDataBytes: 0),    //  0x7F
-            opCode(mnemonic: "ADD A,B", instructionEnd: 1, countDataBytes: 0),    //  0x80
-            opCode(mnemonic: "ADD A,C", instructionEnd: 1, countDataBytes: 0),    //  0x81
-            opCode(mnemonic: "ADD A,D", instructionEnd: 1, countDataBytes: 0),    //  0x82
-            opCode(mnemonic: "ADD A,E", instructionEnd: 1, countDataBytes: 0),    //  0x83
-            opCode(mnemonic: "ADD A,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x84
-            opCode(mnemonic: "ADD A,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x85
-            opCode(mnemonic: "ADD A,(IX+$d)", instructionEnd: 1, countDataBytes: 1),  //  0x86
-            opCode(mnemonic: "ADD A,A", instructionEnd: 1, countDataBytes: 0),    //  0x87
-            opCode(mnemonic: "ADC A,B", instructionEnd: 1, countDataBytes: 0),    //  0x88
-            opCode(mnemonic: "ADC A,C", instructionEnd: 1, countDataBytes: 0),    //  0x89
-            opCode(mnemonic: "ADC A,D", instructionEnd: 1, countDataBytes: 0),    //  0x8A
-            opCode(mnemonic: "ADC A,E", instructionEnd: 1, countDataBytes: 0),    //  0x8B
-            opCode(mnemonic: "ADC A,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x8C
-            opCode(mnemonic: "ADC A,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x8D
-            opCode(mnemonic: "ADC A,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x8E
-            opCode(mnemonic: "ADC A,A", instructionEnd: 1, countDataBytes: 0),    //  0x8F
-            opCode(mnemonic: "SUB B", instructionEnd: 1, countDataBytes: 0),    //  0x90
-            opCode(mnemonic: "SUB C", instructionEnd: 1, countDataBytes: 0),    //  0x91
-            opCode(mnemonic: "SUB D", instructionEnd: 1, countDataBytes: 0),    //  0x92
-            opCode(mnemonic: "SUB E", instructionEnd: 1, countDataBytes: 0),    //  0x93
-            opCode(mnemonic: "SUB IXH", instructionEnd: 1, countDataBytes: 0),    //  0x94
-            opCode(mnemonic: "SUB IXL", instructionEnd: 1, countDataBytes: 0),    //  0x95
-            opCode(mnemonic: "SUB (IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x96
-            opCode(mnemonic: "SUB A", instructionEnd: 1, countDataBytes: 0),    //  0x97
-            opCode(mnemonic: "SBC A,B", instructionEnd: 1, countDataBytes: 0),    //  0x98
-            opCode(mnemonic: "SBC A,C", instructionEnd: 1, countDataBytes: 0),    //  0x99
-            opCode(mnemonic: "SBC A,D", instructionEnd: 1, countDataBytes: 0),    //  0x9A
-            opCode(mnemonic: "SBC A,E", instructionEnd: 1, countDataBytes: 0),    //  0x9B
-            opCode(mnemonic: "SBC A,IXH", instructionEnd: 1, countDataBytes: 0),    //  0x9C
-            opCode(mnemonic: "SBC A,IXL", instructionEnd: 1, countDataBytes: 0),    //  0x9D
-            opCode(mnemonic: "SBC A,(IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x9E
-            opCode(mnemonic: "SBC A,A", instructionEnd: 1, countDataBytes: 0),    //  0x9F
-            opCode(mnemonic: "AND B", instructionEnd: 1, countDataBytes: 0),    //  0xA0
-            opCode(mnemonic: "AND C", instructionEnd: 1, countDataBytes: 0),    //  0xA1
-            opCode(mnemonic: "AND D", instructionEnd: 1, countDataBytes: 0),    //  0xA2
-            opCode(mnemonic: "AND E", instructionEnd: 1, countDataBytes: 0),    //  0xA3
-            opCode(mnemonic: "AND IXH", instructionEnd: 1, countDataBytes: 0),    //  0xA4
-            opCode(mnemonic: "AND IXL", instructionEnd: 1, countDataBytes: 0),    //  0xA5
-            opCode(mnemonic: "AND (IX+$d)", instructionEnd: 1, countDataBytes: 1),    //  0xA6
-            opCode(mnemonic: "AND A", instructionEnd: 1, countDataBytes: 0),    //  0xA7
-            opCode(mnemonic: "XOR B", instructionEnd: 1, countDataBytes: 0),    //  0xA8
-            opCode(mnemonic: "XOR C", instructionEnd: 1, countDataBytes: 0),    //  0xA9
-            opCode(mnemonic: "XOR D", instructionEnd: 1, countDataBytes: 0),    //  0xAA
-            opCode(mnemonic: "XOR E", instructionEnd: 1, countDataBytes: 0),    //  0xAB
-            opCode(mnemonic: "XOR IXH", instructionEnd: 1, countDataBytes: 0),    //  0xAC
-            opCode(mnemonic: "XOR IXL", instructionEnd: 1, countDataBytes: 0),    //  0xAD
-            opCode(mnemonic: "XOR (IX+$d)", instructionEnd: 1, countDataBytes: 1),   //  0xAE
-            opCode(mnemonic: "XOR A", instructionEnd: 1, countDataBytes: 0),    //  0xAF
-            opCode(mnemonic: "OR B", instructionEnd: 1, countDataBytes: 0),    //  0xB0
-            opCode(mnemonic: "OR C", instructionEnd: 1, countDataBytes: 0),    //  0xB1
-            opCode(mnemonic: "OR D", instructionEnd: 1, countDataBytes: 0),    //  0xB2
-            opCode(mnemonic: "OR E", instructionEnd: 1, countDataBytes: 0),    //  0xB3
-            opCode(mnemonic: "OR IXH", instructionEnd: 1, countDataBytes: 0),    //  0xB4
-            opCode(mnemonic: "OR IXL", instructionEnd: 1, countDataBytes: 0),    //  0xB5
-            opCode(mnemonic: "OR (IX+$d)", instructionEnd: 1, countDataBytes: 1),    //  0xB6
-            opCode(mnemonic: "OR A", instructionEnd: 1, countDataBytes: 0),    //  0xB7
-            opCode(mnemonic: "CP B", instructionEnd: 1, countDataBytes: 0),    //  0xB8
-            opCode(mnemonic: "CP C", instructionEnd: 1, countDataBytes: 0),    //  0xB9
-            opCode(mnemonic: "CP D", instructionEnd: 1, countDataBytes: 0),    //  0xBA
-            opCode(mnemonic: "CP E", instructionEnd: 1, countDataBytes: 0),    //  0xBB
-            opCode(mnemonic: "CP IXH", instructionEnd: 1, countDataBytes: 0),    //  0xBC
-            opCode(mnemonic: "CP IXL", instructionEnd: 1, countDataBytes: 0),    //  0xBD
-            opCode(mnemonic: "CP (IX+$d)", instructionEnd: 1, countDataBytes: 1),  //  0xBE
-            opCode(mnemonic: "CP A", instructionEnd: 1, countDataBytes: 0),    //  0xBF
-            opCode(mnemonic: "RET NZ", instructionEnd: 1, countDataBytes: 0),    //  0xC0
-            opCode(mnemonic: "POP BC", instructionEnd: 1, countDataBytes: 0),    //  0xC1
-            opCode(mnemonic: "JP NZ,$nn", instructionEnd: 1, countDataBytes: 2),    //  0xC2
-            opCode(mnemonic: "JP $nn", instructionEnd: 1, countDataBytes: 2),    //  0xC3
-            opCode(mnemonic: "CALL NZ,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xC4
-            opCode(mnemonic: "PUSH BC", instructionEnd: 1, countDataBytes: 0),    //  0xC5
-            opCode(mnemonic: "ADD A,$n", instructionEnd: 1, countDataBytes: 1),    //  0xC6
-            opCode(mnemonic: "RST 0x00", instructionEnd: 1, countDataBytes: 0),    //  0xC7
-            opCode(mnemonic: "RET Z", instructionEnd: 1, countDataBytes: 0),    //  0xC8
-            opCode(mnemonic: "RET", instructionEnd: 1, countDataBytes: 0),    //  0xC9
-            opCode(mnemonic: "JP Z,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xCA
-            opCode(mnemonic: "CB prefixes", instructionEnd: 1, countDataBytes: 0),    //  0xCB
-            opCode(mnemonic: "CALL Z,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xCC
-            opCode(mnemonic: "CALL $nn", instructionEnd: 1, countDataBytes: 2),   //  0xCD
-            opCode(mnemonic: "ADC A,$n", instructionEnd: 1, countDataBytes: 1),   //  0xCE
-            opCode(mnemonic: "RST 0x08", instructionEnd: 1, countDataBytes: 0),    //  0xCF
-            opCode(mnemonic: "RET NC", instructionEnd: 1, countDataBytes: 0),    //  0xD0
-            opCode(mnemonic: "POP DE", instructionEnd: 1, countDataBytes: 0),    //  0xD1
-            opCode(mnemonic: "JP NC,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xD2
-            opCode(mnemonic: "OUT ($n),A", instructionEnd: 1, countDataBytes: 1), //  0xD3
-            opCode(mnemonic: "CALL NC,$nn", instructionEnd: 1, countDataBytes: 2),    //  0xD4
-            opCode(mnemonic: "PUSH DE", instructionEnd: 1, countDataBytes: 0),    //  0xD5
-            opCode(mnemonic: "SUB $n", instructionEnd: 1, countDataBytes: 1),   //  0xD6
-            opCode(mnemonic: "RST 0x10", instructionEnd: 1, countDataBytes: 0),    //  0xD7
-            opCode(mnemonic: "RET C", instructionEnd: 1, countDataBytes: 0),    //  0xD8
-            opCode(mnemonic: "EXX", instructionEnd: 1, countDataBytes: 0),    //  0xD9
-            opCode(mnemonic: "JP C,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xDA
-            opCode(mnemonic: "IN A,($n)", instructionEnd: 1, countDataBytes: 1),    //  0xDB
-            opCode(mnemonic: "CALL C,$nn", instructionEnd: 1, countDataBytes: 2),  //  0xDC
-            opCode(mnemonic: "DD/DDCB prefixes", instructionEnd: 1, countDataBytes: 0),    //  0xDD
-            opCode(mnemonic: "SBC A,$n", instructionEnd: 1, countDataBytes: 1),    //  0xDE
-            opCode(mnemonic: "RST 0x18", instructionEnd: 1, countDataBytes: 0),    //  0xDF
-            opCode(mnemonic: "RET PO", instructionEnd: 1, countDataBytes: 0),    //  0xE0
-            opCode(mnemonic: "POP IX", instructionEnd: 1, countDataBytes: 0),    //  0xE1
-            opCode(mnemonic: "JP PO,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xE2
-            opCode(mnemonic: "EX (SP),IX", instructionEnd: 1, countDataBytes: 0),    //  0xE3
-            opCode(mnemonic: "CALL PO,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xE4
-            opCode(mnemonic: "PUSH IX", instructionEnd: 1, countDataBytes: 0),    //  0xE5
-            opCode(mnemonic: "AND $n", instructionEnd: 1, countDataBytes: 1),    //  0xE6
-            opCode(mnemonic: "RST 0x20", instructionEnd: 1, countDataBytes: 0),    //  0xE7
-            opCode(mnemonic: "RET PE", instructionEnd: 1, countDataBytes: 0),    //  0xE8
-            opCode(mnemonic: "JP (IX)", instructionEnd: 1, countDataBytes: 0),    //  0xE9
-            opCode(mnemonic: "JP PE,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xEA
-            opCode(mnemonic: "EX DE,HL", instructionEnd: 1, countDataBytes: 0),    //  0xEB
-            opCode(mnemonic: "CALL PE,$nn", instructionEnd: 1, countDataBytes: 2),  //  0xEC
-            opCode(mnemonic: "ED prefixes", instructionEnd: 1, countDataBytes: 0),    //  0xED
-            opCode(mnemonic: "XOR $n", instructionEnd: 1, countDataBytes: 1),  //  0xEE
-            opCode(mnemonic: "RST 0x28", instructionEnd: 1, countDataBytes: 0),    //  0xEF
-            opCode(mnemonic: "RET P", instructionEnd: 1, countDataBytes: 0),    //  0xF0
-            opCode(mnemonic: "POP AF", instructionEnd: 1, countDataBytes: 0),    //  0xF1
-            opCode(mnemonic: "JP P,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xF2
-            opCode(mnemonic: "DI", instructionEnd: 1, countDataBytes: 0),    //  0xF3
-            opCode(mnemonic: "CALL P,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xF4
-            opCode(mnemonic: "PUSH AF", instructionEnd: 1, countDataBytes: 0),    //  0xF5
-            opCode(mnemonic: "OR $n", instructionEnd: 1, countDataBytes: 1),   //  0xF6
-            opCode(mnemonic: "RST 0x30", instructionEnd: 1, countDataBytes: 0),    //  0xF7
-            opCode(mnemonic: "RET M", instructionEnd: 1, countDataBytes: 0),    //  0xF8
-            opCode(mnemonic: "LD SP,IX", instructionEnd: 1, countDataBytes: 0),    //  0xF9
-            opCode(mnemonic: "JP M,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xFA
-            opCode(mnemonic: "EI", instructionEnd: 1, countDataBytes: 0),    //  0xFB
-            opCode(mnemonic: "CALL M,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xFC
-            opCode(mnemonic: "FD/FDCB prefixes", instructionEnd: 1, countDataBytes: 0),    //  0xFD
-            opCode(mnemonic: "CP $n", instructionEnd: 1, countDataBytes: 1),  //  0xFE
-            opCode(mnemonic: "RST 0x38", instructionEnd: 1, countDataBytes: 0)    //  0xFF
+            opCode(mnemonic: "NOP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x00
+            opCode(mnemonic: "LD BC,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x01
+            opCode(mnemonic: "LD (BC),A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x02
+            opCode(mnemonic: "INC BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x03
+            opCode(mnemonic: "INC B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x04
+            opCode(mnemonic: "DEC B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x05
+            opCode(mnemonic: "LD B,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x06
+            opCode(mnemonic: "RLCA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x07
+            opCode(mnemonic: "EX AF,AF'", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x08
+            opCode(mnemonic: "ADD IX,BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x09
+            opCode(mnemonic: "LD A,(BC)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0A
+            opCode(mnemonic: "DEC BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0B
+            opCode(mnemonic: "INC C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0C
+            opCode(mnemonic: "DEC C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0D
+            opCode(mnemonic: "LD C,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x0E
+            opCode(mnemonic: "RRCA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0F
+            opCode(mnemonic: "DJNZ $d", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x10
+            opCode(mnemonic: "LD DE,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x11
+            opCode(mnemonic: "LD (DE),A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x12
+            opCode(mnemonic: "INC DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x13
+            opCode(mnemonic: "INC D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x14
+            opCode(mnemonic: "DEC D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x15
+            opCode(mnemonic: "LD D,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x16
+            opCode(mnemonic: "RLA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x17
+            opCode(mnemonic: "JR $d", instructionLength: 2, dataStart: 1, dataEnd: 1),   //  0x18
+            opCode(mnemonic: "ADD IX,DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x19
+            opCode(mnemonic: "LD A,(DE)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1A
+            opCode(mnemonic: "DEC DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1B
+            opCode(mnemonic: "INC E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1C
+            opCode(mnemonic: "DEC E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1D
+            opCode(mnemonic: "LD E,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x1E
+            opCode(mnemonic: "RRA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1F
+            opCode(mnemonic: "JR NZ,$d", instructionLength: 2, dataStart: 1, dataEnd: 1),  //  0x20
+            opCode(mnemonic: "LD IX,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x21
+            opCode(mnemonic: "LD ($nn),IX", instructionLength: 2, dataStart: 1, dataEnd: 2),    //  0x22
+            opCode(mnemonic: "INC IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x23
+            opCode(mnemonic: "INC IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x24
+            opCode(mnemonic: "DEC IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x25
+            opCode(mnemonic: "LD IHX,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x26
+            opCode(mnemonic: "DAA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x27
+            opCode(mnemonic: "JR Z,$d", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x28
+            opCode(mnemonic: "ADD IX,IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x29
+            opCode(mnemonic: "LD IX,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x2A
+            opCode(mnemonic: "DEC IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2B
+            opCode(mnemonic: "INC IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2C
+            opCode(mnemonic: "DEC IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2D
+            opCode(mnemonic: "LD IXL,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x2E
+            opCode(mnemonic: "CPL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2F
+            opCode(mnemonic: "JR NC,$d", instructionLength: 2, dataStart: 1, dataEnd: 1),    //  0x30
+            opCode(mnemonic: "LD SP,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x31
+            opCode(mnemonic: "LD ($nn),A", instructionLength: 4, dataStart: 2, dataEnd: 3),     //  0x32
+            opCode(mnemonic: "INC SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x33
+            opCode(mnemonic: "INC (IX+$d)", instructionLength: 2, dataStart: 1, dataEnd: 1),    //  0x34
+            opCode(mnemonic: "DEC (IX+$d)", instructionLength: 2, dataStart: 1, dataEnd: 1),    //  0x35
+            opCode(mnemonic: "LD (IX+$d),$n", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x36
+            opCode(mnemonic: "SCF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x37
+            opCode(mnemonic: "JR C,$d", instructionLength: 2, dataStart: 1, dataEnd: 1),   //  0x38
+            opCode(mnemonic: "ADD IX,SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x39
+            opCode(mnemonic: "LD A,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x3A
+            opCode(mnemonic: "DEC SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3B
+            opCode(mnemonic: "INC A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3C
+            opCode(mnemonic: "DEC A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3D
+            opCode(mnemonic: "LD A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x3E
+            opCode(mnemonic: "CCF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3F
+            opCode(mnemonic: "LD B,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x40
+            opCode(mnemonic: "LD B,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x41
+            opCode(mnemonic: "LD B,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x42
+            opCode(mnemonic: "LD B,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x43
+            opCode(mnemonic: "LD B,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x44
+            opCode(mnemonic: "LD B,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x45
+            opCode(mnemonic: "LD B,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x46
+            opCode(mnemonic: "LD B,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x47
+            opCode(mnemonic: "LD C,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x48
+            opCode(mnemonic: "LD C,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x49
+            opCode(mnemonic: "LD C,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4A
+            opCode(mnemonic: "LD C,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4B
+            opCode(mnemonic: "LD C,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4C
+            opCode(mnemonic: "LD C,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4D
+            opCode(mnemonic: "LD C,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x4E
+            opCode(mnemonic: "LD C,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4F
+            opCode(mnemonic: "LD D,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x50
+            opCode(mnemonic: "LD D,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x51
+            opCode(mnemonic: "LD D,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x52
+            opCode(mnemonic: "LD D,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x53
+            opCode(mnemonic: "LD D,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x54
+            opCode(mnemonic: "LD D,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x55
+            opCode(mnemonic: "LD D,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x56
+            opCode(mnemonic: "LD D,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x57
+            opCode(mnemonic: "LD E,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x58
+            opCode(mnemonic: "LD E,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x59
+            opCode(mnemonic: "LD E,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5A
+            opCode(mnemonic: "LD E,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5B
+            opCode(mnemonic: "LD E,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5C
+            opCode(mnemonic: "LD E,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5D
+            opCode(mnemonic: "LD E,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x5E
+            opCode(mnemonic: "LD E,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5F
+            opCode(mnemonic: "LD IXH,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x60
+            opCode(mnemonic: "LD IXH,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x61
+            opCode(mnemonic: "LD IXH,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x62
+            opCode(mnemonic: "LD IXH,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x63
+            opCode(mnemonic: "LD IXH,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x64
+            opCode(mnemonic: "LD IXH,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x65
+            opCode(mnemonic: "LD H,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x66
+            opCode(mnemonic: "LD IXH,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x67
+            opCode(mnemonic: "LD IXL,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x68
+            opCode(mnemonic: "LD IXL,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x69
+            opCode(mnemonic: "LD IXL,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6A
+            opCode(mnemonic: "LD IXL,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6B
+            opCode(mnemonic: "LD IXL,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6C
+            opCode(mnemonic: "LD IXL,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6D
+            opCode(mnemonic: "LD L,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x6E
+            opCode(mnemonic: "LD IXL,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6F
+            opCode(mnemonic: "LD (IX+$d),B", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x70
+            opCode(mnemonic: "LD (IX+$d),C", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x71
+            opCode(mnemonic: "LD (IX+$d),D", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x72
+            opCode(mnemonic: "LD (IX+$d),E", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x73
+            opCode(mnemonic: "LD (IX+$d),H", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x74
+            opCode(mnemonic: "LD (IX+$d),L", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x75
+            opCode(mnemonic: "HALT", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x76
+            opCode(mnemonic: "LD (IX+$d),A", instructionLength: 3, dataStart: 2, dataEnd: 2), //  0x77
+            opCode(mnemonic: "LD A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x78
+            opCode(mnemonic: "LD A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x79
+            opCode(mnemonic: "LD A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7A
+            opCode(mnemonic: "LD A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7B
+            opCode(mnemonic: "LD A,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7C
+            opCode(mnemonic: "LD A,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7D
+            opCode(mnemonic: "LD A,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x7E
+            opCode(mnemonic: "LD A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7F
+            opCode(mnemonic: "ADD A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x80
+            opCode(mnemonic: "ADD A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x81
+            opCode(mnemonic: "ADD A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x82
+            opCode(mnemonic: "ADD A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x83
+            opCode(mnemonic: "ADD A,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x84
+            opCode(mnemonic: "ADD A,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x85
+            opCode(mnemonic: "ADD A,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x86
+            opCode(mnemonic: "ADD A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x87
+            opCode(mnemonic: "ADC A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x88
+            opCode(mnemonic: "ADC A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x89
+            opCode(mnemonic: "ADC A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8A
+            opCode(mnemonic: "ADC A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8B
+            opCode(mnemonic: "ADC A,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8C
+            opCode(mnemonic: "ADC A,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8D
+            opCode(mnemonic: "ADC A,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x8E
+            opCode(mnemonic: "ADC A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8F
+            opCode(mnemonic: "SUB B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x90
+            opCode(mnemonic: "SUB C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x91
+            opCode(mnemonic: "SUB D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x92
+            opCode(mnemonic: "SUB E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x93
+            opCode(mnemonic: "SUB IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x94
+            opCode(mnemonic: "SUB IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x95
+            opCode(mnemonic: "SUB (IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x96
+            opCode(mnemonic: "SUB A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x97
+            opCode(mnemonic: "SBC A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x98
+            opCode(mnemonic: "SBC A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x99
+            opCode(mnemonic: "SBC A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9A
+            opCode(mnemonic: "SBC A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9B
+            opCode(mnemonic: "SBC A,IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9C
+            opCode(mnemonic: "SBC A,IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9D
+            opCode(mnemonic: "SBC A,(IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x9E
+            opCode(mnemonic: "SBC A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9F
+            opCode(mnemonic: "AND B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA0
+            opCode(mnemonic: "AND C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA1
+            opCode(mnemonic: "AND D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA2
+            opCode(mnemonic: "AND E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA3
+            opCode(mnemonic: "AND IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA4
+            opCode(mnemonic: "AND IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA5
+            opCode(mnemonic: "AND (IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0xA6
+            opCode(mnemonic: "AND A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA7
+            opCode(mnemonic: "XOR B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA8
+            opCode(mnemonic: "XOR C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA9
+            opCode(mnemonic: "XOR D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAA
+            opCode(mnemonic: "XOR E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAB
+            opCode(mnemonic: "XOR IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAC
+            opCode(mnemonic: "XOR IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAD
+            opCode(mnemonic: "XOR (IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xAE
+            opCode(mnemonic: "XOR A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAF
+            opCode(mnemonic: "OR B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB0
+            opCode(mnemonic: "OR C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB1
+            opCode(mnemonic: "OR D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB2
+            opCode(mnemonic: "OR E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB3
+            opCode(mnemonic: "OR IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB4
+            opCode(mnemonic: "OR IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB5
+            opCode(mnemonic: "OR (IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xB6
+            opCode(mnemonic: "OR A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB7
+            opCode(mnemonic: "CP B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB8
+            opCode(mnemonic: "CP C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB9
+            opCode(mnemonic: "CP D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBA
+            opCode(mnemonic: "CP E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBB
+            opCode(mnemonic: "CP IXH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBC
+            opCode(mnemonic: "CP IXL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBD
+            opCode(mnemonic: "CP (IX+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2), //  0xBE
+            opCode(mnemonic: "CP A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBF
+            opCode(mnemonic: "RET NZ", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC0
+            opCode(mnemonic: "POP BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC1
+            opCode(mnemonic: "JP NZ,$nn", instructionLength: 2, dataStart: 1, dataEnd: 2),    //  0xC2
+            opCode(mnemonic: "JP $nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xC3
+            opCode(mnemonic: "CALL NZ,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xC4
+            opCode(mnemonic: "PUSH BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC5
+            opCode(mnemonic: "ADD A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0xC6
+            opCode(mnemonic: "RST 0x00", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC7
+            opCode(mnemonic: "RET Z", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC8
+            opCode(mnemonic: "RET", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC9
+            opCode(mnemonic: "JP Z,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xCA
+            opCode(mnemonic: "CB prefixes", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCB
+            opCode(mnemonic: "CALL Z,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xCC
+            opCode(mnemonic: "CALL $nn", instructionLength: 2, dataStart: 1, dataEnd: 2),   //  0xCD
+            opCode(mnemonic: "ADC A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xCE
+            opCode(mnemonic: "RST 0x08", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCF
+            opCode(mnemonic: "RET NC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD0
+            opCode(mnemonic: "POP DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD1
+            opCode(mnemonic: "JP NC,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xD2
+            opCode(mnemonic: "OUT ($n),A", instructionLength: 3, dataStart: 2, dataEnd: 2),//  0xD3
+            opCode(mnemonic: "CALL NC,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),     //  0xD4
+            opCode(mnemonic: "PUSH DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD5
+            opCode(mnemonic: "SUB $n", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xD6
+            opCode(mnemonic: "RST 0x10", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD7
+            opCode(mnemonic: "RET C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD8
+            opCode(mnemonic: "EXX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD9
+            opCode(mnemonic: "JP C,$nn", instructionLength: 2, dataStart: 1, dataEnd: 2),   //  0xDA
+            opCode(mnemonic: "IN A,($n)", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0xDB
+            opCode(mnemonic: "CALL C,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0xDC
+            opCode(mnemonic: "???????", instructionLength: 0, dataStart: 0, dataEnd: 0),    //  0xDD
+            opCode(mnemonic: "SBC A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xDE
+            opCode(mnemonic: "RST 0x18", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDF
+            opCode(mnemonic: "RET PO", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE0
+            opCode(mnemonic: "POP IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE1
+            opCode(mnemonic: "JP PO,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xE2
+            opCode(mnemonic: "EX (SP),IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE3
+            opCode(mnemonic: "CALL PO,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xE4
+            opCode(mnemonic: "PUSH IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE5
+            opCode(mnemonic: "AND $n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xE6
+            opCode(mnemonic: "RST 0x20", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE7
+            opCode(mnemonic: "RET PE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE8
+            opCode(mnemonic: "JP (IX)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE9
+            opCode(mnemonic: "JP PE,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xEA
+            opCode(mnemonic: "EX DE,HL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEB
+            opCode(mnemonic: "CALL PE,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xEC
+            opCode(mnemonic: "??????", instructionLength: 0, dataStart: 0, dataEnd: 0),    //  0xED
+            opCode(mnemonic: "XOR $n", instructionLength: 3, dataStart: 2, dataEnd: 2), //  0xEE
+            opCode(mnemonic: "RST 0x28", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEF
+            opCode(mnemonic: "RET P", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF0
+            opCode(mnemonic: "POP AF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF1
+            opCode(mnemonic: "JP P,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xF2
+            opCode(mnemonic: "DI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF3
+            opCode(mnemonic: "CALL P,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xF4
+            opCode(mnemonic: "PUSH AF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF5
+            opCode(mnemonic: "OR $n", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xF6
+            opCode(mnemonic: "RST 0x30", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF7
+            opCode(mnemonic: "RET M", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF8
+            opCode(mnemonic: "LD SP,IX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF9
+            opCode(mnemonic: "JP M,$nn", instructionLength: 2, dataStart: 1, dataEnd: 2),   //  0xFA
+            opCode(mnemonic: "EI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFB
+            opCode(mnemonic: "CALL M,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0xFC
+            opCode(mnemonic: "???????", instructionLength: 0, dataStart: 0, dataEnd: 0),    //  0xFD
+            opCode(mnemonic: "CP $n", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xFE
+            opCode(mnemonic: "RST 0x38", instructionLength: 2, dataStart: 1, dataEnd: 0)    //  0xFF
         ]
         
         let EDPrefixOpcode: [opCode] =
         [
-            opCode(mnemonic: "DB ED,00", instructionEnd: 1, countDataBytes: 0),    //  0x00
-            opCode(mnemonic: "DB ED,01", instructionEnd: 1, countDataBytes: 0),    //  0x01
-            opCode(mnemonic: "DB ED,02", instructionEnd: 1, countDataBytes: 0),    //  0x02
-            opCode(mnemonic: "DB ED,03", instructionEnd: 1, countDataBytes: 0),    //  0x03
-            opCode(mnemonic: "DB ED,04", instructionEnd: 1, countDataBytes: 0),    //  0x04
-            opCode(mnemonic: "DB ED,05", instructionEnd: 1, countDataBytes: 0),    //  0x05
-            opCode(mnemonic: "DB ED,06", instructionEnd: 1, countDataBytes: 0),    //  0x06
-            opCode(mnemonic: "DB ED,07", instructionEnd: 1, countDataBytes: 0),    //  0x07
-            opCode(mnemonic: "DB ED,08", instructionEnd: 1, countDataBytes: 0),    //  0x08
-            opCode(mnemonic: "DB ED,09", instructionEnd: 1, countDataBytes: 0),    //  0x09
-            opCode(mnemonic: "DB ED,0A", instructionEnd: 1, countDataBytes: 0),    //  0x0A
-            opCode(mnemonic: "DB ED,0B", instructionEnd: 1, countDataBytes: 0),    //  0x0B
-            opCode(mnemonic: "DB ED,0C", instructionEnd: 1, countDataBytes: 0),    //  0x0C
-            opCode(mnemonic: "DB ED,0D", instructionEnd: 1, countDataBytes: 0),    //  0x0D
-            opCode(mnemonic: "DB ED,0E", instructionEnd: 1, countDataBytes: 0),    //  0x0E
-            opCode(mnemonic: "DB ED,0F", instructionEnd: 1, countDataBytes: 0),    //  0x0F
-            opCode(mnemonic: "DB ED,10", instructionEnd: 1, countDataBytes: 0),    //  0x10
-            opCode(mnemonic: "DB ED,11", instructionEnd: 1, countDataBytes: 0),    //  0x11
-            opCode(mnemonic: "DB ED,12", instructionEnd: 1, countDataBytes: 0),    //  0x12
-            opCode(mnemonic: "DB ED,13", instructionEnd: 1, countDataBytes: 0),    //  0x13
-            opCode(mnemonic: "DB ED,14", instructionEnd: 1, countDataBytes: 0),    //  0x14
-            opCode(mnemonic: "DB ED,15", instructionEnd: 1, countDataBytes: 0),    //  0x15
-            opCode(mnemonic: "DB ED,16", instructionEnd: 1, countDataBytes: 0),    //  0x16
-            opCode(mnemonic: "DB ED,17", instructionEnd: 1, countDataBytes: 0),    //  0x17
-            opCode(mnemonic: "DB ED,18", instructionEnd: 1, countDataBytes: 0),    //  0x18
-            opCode(mnemonic: "DB ED,19", instructionEnd: 1, countDataBytes: 0),    //  0x19
-            opCode(mnemonic: "DB ED,1A", instructionEnd: 1, countDataBytes: 0),    //  0x1A
-            opCode(mnemonic: "DB ED,1B", instructionEnd: 1, countDataBytes: 0),    //  0x1B
-            opCode(mnemonic: "DB ED,1C", instructionEnd: 1, countDataBytes: 0),    //  0x1C
-            opCode(mnemonic: "DB ED,1D", instructionEnd: 1, countDataBytes: 0),    //  0x1D
-            opCode(mnemonic: "DB ED,1E", instructionEnd: 1, countDataBytes: 0),    //  0x1E
-            opCode(mnemonic: "DB ED,1F", instructionEnd: 1, countDataBytes: 0),    //  0x1F
-            opCode(mnemonic: "DB ED,20", instructionEnd: 1, countDataBytes: 0),    //  0x20
-            opCode(mnemonic: "DB ED,21", instructionEnd: 1, countDataBytes: 0),    //  0x21
-            opCode(mnemonic: "DB ED,22", instructionEnd: 1, countDataBytes: 0),    //  0x22
-            opCode(mnemonic: "DB ED,23", instructionEnd: 1, countDataBytes: 0),    //  0x23
-            opCode(mnemonic: "DB ED,24", instructionEnd: 1, countDataBytes: 0),    //  0x24
-            opCode(mnemonic: "DB ED,25", instructionEnd: 1, countDataBytes: 0),    //  0x25
-            opCode(mnemonic: "DB ED,26", instructionEnd: 1, countDataBytes: 0),    //  0x26
-            opCode(mnemonic: "DB ED,27", instructionEnd: 1, countDataBytes: 0),    //  0x27
-            opCode(mnemonic: "DB ED,28", instructionEnd: 1, countDataBytes: 0),    //  0x28
-            opCode(mnemonic: "DB ED,29", instructionEnd: 1, countDataBytes: 0),    //  0x29
-            opCode(mnemonic: "DB ED,2A", instructionEnd: 1, countDataBytes: 0),    //  0x2A
-            opCode(mnemonic: "DB ED,2B", instructionEnd: 1, countDataBytes: 0),    //  0x2B
-            opCode(mnemonic: "DB ED,2C", instructionEnd: 1, countDataBytes: 0),    //  0x2C
-            opCode(mnemonic: "DB ED,2D", instructionEnd: 1, countDataBytes: 0),    //  0x2D
-            opCode(mnemonic: "DB ED,2E", instructionEnd: 1, countDataBytes: 0),    //  0x2E
-            opCode(mnemonic: "DB ED,2F", instructionEnd: 1, countDataBytes: 0),    //  0x2F
-            opCode(mnemonic: "DB ED,30", instructionEnd: 1, countDataBytes: 0),    //  0x30
-            opCode(mnemonic: "DB ED,31", instructionEnd: 1, countDataBytes: 0),    //  0x31
-            opCode(mnemonic: "DB ED,32", instructionEnd: 1, countDataBytes: 0),    //  0x32
-            opCode(mnemonic: "DB ED,33", instructionEnd: 1, countDataBytes: 0),    //  0x33
-            opCode(mnemonic: "DB ED,34", instructionEnd: 1, countDataBytes: 0),    //  0x34
-            opCode(mnemonic: "DB ED,35", instructionEnd: 1, countDataBytes: 0),    //  0x35
-            opCode(mnemonic: "DB ED,36", instructionEnd: 1, countDataBytes: 0),    //  0x36
-            opCode(mnemonic: "DB ED,37", instructionEnd: 1, countDataBytes: 0),    //  0x37
-            opCode(mnemonic: "DB ED,38", instructionEnd: 1, countDataBytes: 0),    //  0x38
-            opCode(mnemonic: "DB ED,39", instructionEnd: 1, countDataBytes: 0),    //  0x39
-            opCode(mnemonic: "DB ED,3A", instructionEnd: 1, countDataBytes: 0),    //  0x3A
-            opCode(mnemonic: "DB ED,3B", instructionEnd: 1, countDataBytes: 0),    //  0x3B
-            opCode(mnemonic: "DB ED,3C", instructionEnd: 1, countDataBytes: 0),    //  0x3C
-            opCode(mnemonic: "DB ED,3D", instructionEnd: 1, countDataBytes: 0),    //  0x3D
-            opCode(mnemonic: "DB ED,3E", instructionEnd: 1, countDataBytes: 0),    //  0x3E
-            opCode(mnemonic: "DB ED,3F", instructionEnd: 1, countDataBytes: 0),    //  0x3F
-            opCode(mnemonic: "IN B,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x40
-            opCode(mnemonic: "OUT (C),B", instructionEnd: 1, countDataBytes: 0),    //  0x41
-            opCode(mnemonic: "SBC HL,BC", instructionEnd: 1, countDataBytes: 0),    //  0x42
-            opCode(mnemonic: "LD ($nn),BC", instructionEnd: 1, countDataBytes: 2),   //  0x43
-            opCode(mnemonic: "NEG", instructionEnd: 1, countDataBytes: 0),    //  0x44
-            opCode(mnemonic: "RETN", instructionEnd: 1, countDataBytes: 0),    //  0x45
-            opCode(mnemonic: "IM 0", instructionEnd: 1, countDataBytes: 0),    //  0x46
-            opCode(mnemonic: "LD I,A", instructionEnd: 1, countDataBytes: 0),    //  0x47
-            opCode(mnemonic: "IN C,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x48
-            opCode(mnemonic: "OUT (C),C", instructionEnd: 1, countDataBytes: 0),    //  0x49
-            opCode(mnemonic: "ADC HL,BC", instructionEnd: 1, countDataBytes: 0),    //  0x4A
-            opCode(mnemonic: "LD BC,($nn)", instructionEnd: 1, countDataBytes: 2),    //  0x4B
-            opCode(mnemonic: "DB ED,4C", instructionEnd: 1, countDataBytes: 0),    //  0x4C
-            opCode(mnemonic: "RETI", instructionEnd: 1, countDataBytes: 0),    //  0x4D
-            opCode(mnemonic: "DB ED,4E", instructionEnd: 1, countDataBytes: 0),    //  0x4E
-            opCode(mnemonic: "LD R,A", instructionEnd: 1, countDataBytes: 0),    //  0x4F
-            opCode(mnemonic: "IN D,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x50
-            opCode(mnemonic: "OUT (C),D", instructionEnd: 1, countDataBytes: 0),    //  0x51
-            opCode(mnemonic: "SBC HL,DE", instructionEnd: 1, countDataBytes: 0),    //  0x52
-            opCode(mnemonic: "LD ($nn),DE", instructionEnd: 1, countDataBytes: 2),   //  0x53
-            opCode(mnemonic: "DB ED,54", instructionEnd: 1, countDataBytes: 0),    //  0x54
-            opCode(mnemonic: "DB ED,55", instructionEnd: 1, countDataBytes: 0),    //  0x55
-            opCode(mnemonic: "IM 1", instructionEnd: 1, countDataBytes: 0),    //  0x56
-            opCode(mnemonic: "LD A,I", instructionEnd: 1, countDataBytes: 0),    //  0x57
-            opCode(mnemonic: "IN E,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x58
-            opCode(mnemonic: "OUT (C),E", instructionEnd: 1, countDataBytes: 0),    //  0x59
-            opCode(mnemonic: "ADC HL,DE", instructionEnd: 1, countDataBytes: 0),    //  0x5A
-            opCode(mnemonic: "LD DE,($nn)", instructionEnd: 1, countDataBytes: 2),   //  0x5B
-            opCode(mnemonic: "DB ED,5C", instructionEnd: 1, countDataBytes: 0),    //  0x5C
-            opCode(mnemonic: "DB ED,5D", instructionEnd: 1, countDataBytes: 0),    //  0x5D
-            opCode(mnemonic: "IM 2", instructionEnd: 1, countDataBytes: 0),    //  0x5E
-            opCode(mnemonic: "LD A,R", instructionEnd: 1, countDataBytes: 0),    //  0x5F
-            opCode(mnemonic: "IN H,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x60
-            opCode(mnemonic: "OUT (C),H", instructionEnd: 1, countDataBytes: 0),    //  0x61
-            opCode(mnemonic: "SBC HL,HL", instructionEnd: 1, countDataBytes: 0),    //  0x62
-            opCode(mnemonic: "LD ($nn),HL", instructionEnd: 1, countDataBytes: 2),   //  0x63
-            opCode(mnemonic: "DB ED,64", instructionEnd: 1, countDataBytes: 0),    //  0x64
-            opCode(mnemonic: "DB ED,65", instructionEnd: 1, countDataBytes: 0),    //  0x65
-            opCode(mnemonic: "DB ED,66", instructionEnd: 1, countDataBytes: 0),    //  0x66
-            opCode(mnemonic: "RRD", instructionEnd: 1, countDataBytes: 0),    //  0x67
-            opCode(mnemonic: "IN L,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x68
-            opCode(mnemonic: "OUT (C),L", instructionEnd: 1, countDataBytes: 0),    //  0x69
-            opCode(mnemonic: "ADC HL,HL", instructionEnd: 1, countDataBytes: 0),    //  0x6A
-            opCode(mnemonic: "LD HL,($nn)", instructionEnd: 1, countDataBytes: 2),    //  0x6B
-            opCode(mnemonic: "DB ED,6C", instructionEnd: 1, countDataBytes: 0),    //  0x6C
-            opCode(mnemonic: "DB ED,6D", instructionEnd: 1, countDataBytes: 0),    //  0x6D
-            opCode(mnemonic: "DB ED,6E", instructionEnd: 1, countDataBytes: 0),    //  0x6E
-            opCode(mnemonic: "RLD", instructionEnd: 1, countDataBytes: 0),    //  0x6F
-            opCode(mnemonic: "IN (C)", instructionEnd: 1, countDataBytes: 0),    //  0x70
-            opCode(mnemonic: "OUT (C),0", instructionEnd: 1, countDataBytes: 0),    //  0x71
-            opCode(mnemonic: "SBC HL,SP", instructionEnd: 1, countDataBytes: 0),    //  0x72
-            opCode(mnemonic: "LD ($nn),SP", instructionEnd: 1, countDataBytes: 2),   //  0x73
-            opCode(mnemonic: "DB ED,74", instructionEnd: 1, countDataBytes: 0),    //  0x74
-            opCode(mnemonic: "DB ED,75", instructionEnd: 1, countDataBytes: 0),    //  0x75
-            opCode(mnemonic: "DB ED,76", instructionEnd: 1, countDataBytes: 0),    //  0x76
-            opCode(mnemonic: "DB ED,77", instructionEnd: 1, countDataBytes: 0),    //  0x77
-            opCode(mnemonic: "IN A,(C)", instructionEnd: 1, countDataBytes: 0),    //  0x78
-            opCode(mnemonic: "OUT (C),A", instructionEnd: 1, countDataBytes: 0),    //  0x79
-            opCode(mnemonic: "ADC HL,SP", instructionEnd: 1, countDataBytes: 0),    //  0x7A
-            opCode(mnemonic: "LD SP,($nn)", instructionEnd: 1, countDataBytes: 2),    //  0x7B
-            opCode(mnemonic: "DB ED,7C", instructionEnd: 1, countDataBytes: 0),    //  0x7C
-            opCode(mnemonic: "DB ED,7D", instructionEnd: 1, countDataBytes: 0),    //  0x7D
-            opCode(mnemonic: "DB ED,7E", instructionEnd: 1, countDataBytes: 0),    //  0x7E
-            opCode(mnemonic: "DB ED,7F", instructionEnd: 1, countDataBytes: 0),    //  0x7F
-            opCode(mnemonic: "DB ED,80", instructionEnd: 1, countDataBytes: 0),    //  0x80
-            opCode(mnemonic: "DB ED,81", instructionEnd: 1, countDataBytes: 0),    //  0x81
-            opCode(mnemonic: "DB ED,82", instructionEnd: 1, countDataBytes: 0),    //  0x82
-            opCode(mnemonic: "DB ED,83", instructionEnd: 1, countDataBytes: 0),    //  0x83
-            opCode(mnemonic: "DB ED,84", instructionEnd: 1, countDataBytes: 0),    //  0x84
-            opCode(mnemonic: "DB ED,85", instructionEnd: 1, countDataBytes: 0),    //  0x85
-            opCode(mnemonic: "DB ED,86", instructionEnd: 1, countDataBytes: 0),    //  0x86
-            opCode(mnemonic: "DB ED,87", instructionEnd: 1, countDataBytes: 0),    //  0x87
-            opCode(mnemonic: "DB ED,88", instructionEnd: 1, countDataBytes: 0),    //  0x88
-            opCode(mnemonic: "DB ED,89", instructionEnd: 1, countDataBytes: 0),    //  0x89
-            opCode(mnemonic: "DB ED,8A", instructionEnd: 1, countDataBytes: 0),    //  0x8A
-            opCode(mnemonic: "DB ED,8B", instructionEnd: 1, countDataBytes: 0),    //  0x8B
-            opCode(mnemonic: "DB ED,8C", instructionEnd: 1, countDataBytes: 0),    //  0x8C
-            opCode(mnemonic: "DB ED,8D", instructionEnd: 1, countDataBytes: 0),    //  0x8D
-            opCode(mnemonic: "DB ED,8E", instructionEnd: 1, countDataBytes: 0),    //  0x8E
-            opCode(mnemonic: "DB ED,8F", instructionEnd: 1, countDataBytes: 0),    //  0x8F
-            opCode(mnemonic: "DB ED,90", instructionEnd: 1, countDataBytes: 0),    //  0x90
-            opCode(mnemonic: "DB ED,91", instructionEnd: 1, countDataBytes: 0),    //  0x91
-            opCode(mnemonic: "DB ED,92", instructionEnd: 1, countDataBytes: 0),    //  0x92
-            opCode(mnemonic: "DB ED,93", instructionEnd: 1, countDataBytes: 0),    //  0x93
-            opCode(mnemonic: "DB ED,94", instructionEnd: 1, countDataBytes: 0),    //  0x94
-            opCode(mnemonic: "DB ED,95", instructionEnd: 1, countDataBytes: 0),    //  0x95
-            opCode(mnemonic: "DB ED,96", instructionEnd: 1, countDataBytes: 0),    //  0x96
-            opCode(mnemonic: "DB ED,97", instructionEnd: 1, countDataBytes: 0),    //  0x97
-            opCode(mnemonic: "DB ED,98", instructionEnd: 1, countDataBytes: 0),    //  0x98
-            opCode(mnemonic: "DB ED,99", instructionEnd: 1, countDataBytes: 0),    //  0x99
-            opCode(mnemonic: "DB ED,9A", instructionEnd: 1, countDataBytes: 0),    //  0x9A
-            opCode(mnemonic: "DB ED,9B", instructionEnd: 1, countDataBytes: 0),    //  0x9B
-            opCode(mnemonic: "DB ED,9C", instructionEnd: 1, countDataBytes: 0),    //  0x9C
-            opCode(mnemonic: "DB ED,9D", instructionEnd: 1, countDataBytes: 0),    //  0x9D
-            opCode(mnemonic: "DB ED,9E", instructionEnd: 1, countDataBytes: 0),    //  0x9E
-            opCode(mnemonic: "DB ED,9F", instructionEnd: 1, countDataBytes: 0),    //  0x9F
-            opCode(mnemonic: "LDI", instructionEnd: 1, countDataBytes: 0),    //  0xA0
-            opCode(mnemonic: "CPI", instructionEnd: 1, countDataBytes: 0),    //  0xA1
-            opCode(mnemonic: "INI", instructionEnd: 1, countDataBytes: 0),    //  0xA2
-            opCode(mnemonic: "OUTI", instructionEnd: 1, countDataBytes: 0),    //  0xA3
-            opCode(mnemonic: "DB ED,A4", instructionEnd: 1, countDataBytes: 0),    //  0xA4
-            opCode(mnemonic: "DB ED,A5", instructionEnd: 1, countDataBytes: 0),    //  0xA5
-            opCode(mnemonic: "DB ED,A6", instructionEnd: 1, countDataBytes: 0),    //  0xA6
-            opCode(mnemonic: "DB ED,A7", instructionEnd: 1, countDataBytes: 0),    //  0xA7
-            opCode(mnemonic: "LDD", instructionEnd: 1, countDataBytes: 0),         //  0xA8
-            opCode(mnemonic: "CPD", instructionEnd: 1, countDataBytes: 0),         //  0xA9
-            opCode(mnemonic: "IND", instructionEnd: 1, countDataBytes: 0),         //  0xAA
-            opCode(mnemonic: "OUTD", instructionEnd: 1, countDataBytes: 0),        //  0xAB
-            opCode(mnemonic: "DB ED,AC", instructionEnd: 1, countDataBytes: 0),    //  0xAC
-            opCode(mnemonic: "DB ED,AD", instructionEnd: 1, countDataBytes: 0),    //  0xAD
-            opCode(mnemonic: "DB ED,AE", instructionEnd: 1, countDataBytes: 0),    //  0xAE
-            opCode(mnemonic: "DB ED,AF", instructionEnd: 1, countDataBytes: 0),    //  0xAF
-            opCode(mnemonic: "LDIR", instructionEnd: 1, countDataBytes: 0),        //  0xB0
-            opCode(mnemonic: "CPIR", instructionEnd: 1, countDataBytes: 0),        //  0xB1
-            opCode(mnemonic: "INIR", instructionEnd: 1, countDataBytes: 0),        //  0xB2
-            opCode(mnemonic: "OTIR", instructionEnd: 1, countDataBytes: 0),        //  0xB3
-            opCode(mnemonic: "DB ED,B4", instructionEnd: 1, countDataBytes: 0),    //  0xB4
-            opCode(mnemonic: "DB ED,B5", instructionEnd: 1, countDataBytes: 0),    //  0xB5
-            opCode(mnemonic: "DB ED,B6", instructionEnd: 1, countDataBytes: 0),    //  0xB6
-            opCode(mnemonic: "DB ED,B7", instructionEnd: 1, countDataBytes: 0),    //  0xB7
-            opCode(mnemonic: "LDDR", instructionEnd: 1, countDataBytes: 0),        //  0xB8
-            opCode(mnemonic: "CPDR", instructionEnd: 1, countDataBytes: 0),        //  0xB9
-            opCode(mnemonic: "INDR", instructionEnd: 1, countDataBytes: 0),        //  0xBA
-            opCode(mnemonic: "OTDR", instructionEnd: 1, countDataBytes: 0),        //  0xBB
-            opCode(mnemonic: "DB ED,BC", instructionEnd: 1, countDataBytes: 0),    //  0xBC
-            opCode(mnemonic: "DB ED,BD", instructionEnd: 1, countDataBytes: 0),    //  0xBD
-            opCode(mnemonic: "DB ED,BE", instructionEnd: 1, countDataBytes: 0),    //  0xBE
-            opCode(mnemonic: "DB ED,BF", instructionEnd: 1, countDataBytes: 0),    //  0xBF
-            opCode(mnemonic: "DB ED,C0", instructionEnd: 1, countDataBytes: 0),    //  0xC0
-            opCode(mnemonic: "DB ED,C1", instructionEnd: 1, countDataBytes: 0),    //  0xC1
-            opCode(mnemonic: "DB ED,C2", instructionEnd: 1, countDataBytes: 0),    //  0xC2
-            opCode(mnemonic: "DB ED,C3", instructionEnd: 1, countDataBytes: 0),    //  0xC3
-            opCode(mnemonic: "DB ED,C4", instructionEnd: 1, countDataBytes: 0),    //  0xC4
-            opCode(mnemonic: "DB ED,C5", instructionEnd: 1, countDataBytes: 0),    //  0xC5
-            opCode(mnemonic: "DB ED,C6", instructionEnd: 1, countDataBytes: 0),    //  0xC6
-            opCode(mnemonic: "DB ED,C7", instructionEnd: 1, countDataBytes: 0),    //  0xC7
-            opCode(mnemonic: "DB ED,C8", instructionEnd: 1, countDataBytes: 0),    //  0xC8
-            opCode(mnemonic: "DB ED,C9", instructionEnd: 1, countDataBytes: 0),    //  0xC9
-            opCode(mnemonic: "DB ED,CA", instructionEnd: 1, countDataBytes: 0),    //  0xCA
-            opCode(mnemonic: "DB ED,CB", instructionEnd: 1, countDataBytes: 0),    //  0xCB
-            opCode(mnemonic: "DB ED,CC", instructionEnd: 1, countDataBytes: 0),    //  0xCC
-            opCode(mnemonic: "DB ED,CD", instructionEnd: 1, countDataBytes: 0),    //  0xCD
-            opCode(mnemonic: "DB ED,CE", instructionEnd: 1, countDataBytes: 0),    //  0xCE
-            opCode(mnemonic: "DB ED,CF", instructionEnd: 1, countDataBytes: 0),    //  0xCF
-            opCode(mnemonic: "DB ED,D0", instructionEnd: 1, countDataBytes: 0),    //  0xD0
-            opCode(mnemonic: "DB ED,D1", instructionEnd: 1, countDataBytes: 0),    //  0xD1
-            opCode(mnemonic: "DB ED,D2", instructionEnd: 1, countDataBytes: 0),    //  0xD2
-            opCode(mnemonic: "DB ED,D3", instructionEnd: 1, countDataBytes: 0),    //  0xD3
-            opCode(mnemonic: "DB ED,D4", instructionEnd: 1, countDataBytes: 0),    //  0xD4
-            opCode(mnemonic: "DB ED,D5", instructionEnd: 1, countDataBytes: 0),    //  0xD5
-            opCode(mnemonic: "DB ED,D6", instructionEnd: 1, countDataBytes: 0),    //  0xD6
-            opCode(mnemonic: "DB ED,D7", instructionEnd: 1, countDataBytes: 0),    //  0xD7
-            opCode(mnemonic: "DB ED,D8", instructionEnd: 1, countDataBytes: 0),    //  0xD8
-            opCode(mnemonic: "DB ED,D9", instructionEnd: 1, countDataBytes: 0),    //  0xD9
-            opCode(mnemonic: "DB ED,DA", instructionEnd: 1, countDataBytes: 0),    //  0xDA
-            opCode(mnemonic: "DB ED,DB", instructionEnd: 1, countDataBytes: 0),    //  0xDB
-            opCode(mnemonic: "DB ED,DC", instructionEnd: 1, countDataBytes: 0),    //  0xDC
-            opCode(mnemonic: "DB ED,DD", instructionEnd: 1, countDataBytes: 0),    //  0xDD
-            opCode(mnemonic: "DB ED,DE", instructionEnd: 1, countDataBytes: 0),    //  0xDE
-            opCode(mnemonic: "DB ED,DF", instructionEnd: 1, countDataBytes: 0),    //  0xDF
-            opCode(mnemonic: "DB ED,E0", instructionEnd: 1, countDataBytes: 0),    //  0xE0
-            opCode(mnemonic: "DB ED,E1", instructionEnd: 1, countDataBytes: 0),    //  0xE1
-            opCode(mnemonic: "DB ED,E2", instructionEnd: 1, countDataBytes: 0),    //  0xE2
-            opCode(mnemonic: "DB ED,E3", instructionEnd: 1, countDataBytes: 0),    //  0xE3
-            opCode(mnemonic: "DB ED,E4", instructionEnd: 1, countDataBytes: 0),    //  0xE4
-            opCode(mnemonic: "DB ED,E5", instructionEnd: 1, countDataBytes: 0),    //  0xE5
-            opCode(mnemonic: "DB ED,E6", instructionEnd: 1, countDataBytes: 0),    //  0xE6
-            opCode(mnemonic: "DB ED,E7", instructionEnd: 1, countDataBytes: 0),    //  0xE7
-            opCode(mnemonic: "DB ED,E8", instructionEnd: 1, countDataBytes: 0),    //  0xE8
-            opCode(mnemonic: "DB ED,E9", instructionEnd: 1, countDataBytes: 0),    //  0xE9
-            opCode(mnemonic: "DB ED,EA", instructionEnd: 1, countDataBytes: 0),    //  0xEA
-            opCode(mnemonic: "DB ED,EB", instructionEnd: 1, countDataBytes: 0),    //  0xEB
-            opCode(mnemonic: "DB ED,EC", instructionEnd: 1, countDataBytes: 0),    //  0xEC
-            opCode(mnemonic: "DB ED,ED", instructionEnd: 1, countDataBytes: 0),    //  0xED
-            opCode(mnemonic: "DB ED,EE", instructionEnd: 1, countDataBytes: 0),    //  0xEE
-            opCode(mnemonic: "DB ED,EF", instructionEnd: 1, countDataBytes: 0),    //  0xEF
-            opCode(mnemonic: "DB ED,F0", instructionEnd: 1, countDataBytes: 0),    //  0xF0
-            opCode(mnemonic: "DB ED,F1", instructionEnd: 1, countDataBytes: 0),    //  0xF1
-            opCode(mnemonic: "DB ED,F2", instructionEnd: 1, countDataBytes: 0),    //  0xF2
-            opCode(mnemonic: "DB ED,F3", instructionEnd: 1, countDataBytes: 0),    //  0xF3
-            opCode(mnemonic: "DB ED,F4", instructionEnd: 1, countDataBytes: 0),    //  0xF4
-            opCode(mnemonic: "DB ED,F5", instructionEnd: 1, countDataBytes: 0),    //  0xF5
-            opCode(mnemonic: "DB ED,F6", instructionEnd: 1, countDataBytes: 0),    //  0xF6
-            opCode(mnemonic: "DB ED,F7", instructionEnd: 1, countDataBytes: 0),    //  0xF7
-            opCode(mnemonic: "DB ED,F8", instructionEnd: 1, countDataBytes: 0),    //  0xF8
-            opCode(mnemonic: "DB ED,F9", instructionEnd: 1, countDataBytes: 0),    //  0xF9
-            opCode(mnemonic: "DB ED,FA", instructionEnd: 1, countDataBytes: 0),    //  0xFA
-            opCode(mnemonic: "DB ED,FB", instructionEnd: 1, countDataBytes: 0),    //  0xFB
-            opCode(mnemonic: "DB ED,FC", instructionEnd: 1, countDataBytes: 0),    //  0xFC
-            opCode(mnemonic: "DB ED,FD", instructionEnd: 1, countDataBytes: 0),    //  0xFD
-            opCode(mnemonic: "DB ED,FE", instructionEnd: 1, countDataBytes: 0),    //  0xFE
-            opCode(mnemonic: "DB ED,FF", instructionEnd: 1, countDataBytes: 0)     //  0xFF
+            opCode(mnemonic: "DB ED,00", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x00
+            opCode(mnemonic: "DB ED,01", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x01
+            opCode(mnemonic: "DB ED,02", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x02
+            opCode(mnemonic: "DB ED,03", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x03
+            opCode(mnemonic: "DB ED,04", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x04
+            opCode(mnemonic: "DB ED,05", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x05
+            opCode(mnemonic: "DB ED,06", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x06
+            opCode(mnemonic: "DB ED,07", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x07
+            opCode(mnemonic: "DB ED,08", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x08
+            opCode(mnemonic: "DB ED,09", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x09
+            opCode(mnemonic: "DB ED,0A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0A
+            opCode(mnemonic: "DB ED,0B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0B
+            opCode(mnemonic: "DB ED,0C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0C
+            opCode(mnemonic: "DB ED,0D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0D
+            opCode(mnemonic: "DB ED,0E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0E
+            opCode(mnemonic: "DB ED,0F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0F
+            opCode(mnemonic: "DB ED,10", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x10
+            opCode(mnemonic: "DB ED,11", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x11
+            opCode(mnemonic: "DB ED,12", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x12
+            opCode(mnemonic: "DB ED,13", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x13
+            opCode(mnemonic: "DB ED,14", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x14
+            opCode(mnemonic: "DB ED,15", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x15
+            opCode(mnemonic: "DB ED,16", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x16
+            opCode(mnemonic: "DB ED,17", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x17
+            opCode(mnemonic: "DB ED,18", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x18
+            opCode(mnemonic: "DB ED,19", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x19
+            opCode(mnemonic: "DB ED,1A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1A
+            opCode(mnemonic: "DB ED,1B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1B
+            opCode(mnemonic: "DB ED,1C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1C
+            opCode(mnemonic: "DB ED,1D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1D
+            opCode(mnemonic: "DB ED,1E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1E
+            opCode(mnemonic: "DB ED,1F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1F
+            opCode(mnemonic: "DB ED,20", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x20
+            opCode(mnemonic: "DB ED,21", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x21
+            opCode(mnemonic: "DB ED,22", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x22
+            opCode(mnemonic: "DB ED,23", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x23
+            opCode(mnemonic: "DB ED,24", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x24
+            opCode(mnemonic: "DB ED,25", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x25
+            opCode(mnemonic: "DB ED,26", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x26
+            opCode(mnemonic: "DB ED,27", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x27
+            opCode(mnemonic: "DB ED,28", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x28
+            opCode(mnemonic: "DB ED,29", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x29
+            opCode(mnemonic: "DB ED,2A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2A
+            opCode(mnemonic: "DB ED,2B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2B
+            opCode(mnemonic: "DB ED,2C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2C
+            opCode(mnemonic: "DB ED,2D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2D
+            opCode(mnemonic: "DB ED,2E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2E
+            opCode(mnemonic: "DB ED,2F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2F
+            opCode(mnemonic: "DB ED,30", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x30
+            opCode(mnemonic: "DB ED,31", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x31
+            opCode(mnemonic: "DB ED,32", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x32
+            opCode(mnemonic: "DB ED,33", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x33
+            opCode(mnemonic: "DB ED,34", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x34
+            opCode(mnemonic: "DB ED,35", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x35
+            opCode(mnemonic: "DB ED,36", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x36
+            opCode(mnemonic: "DB ED,37", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x37
+            opCode(mnemonic: "DB ED,38", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x38
+            opCode(mnemonic: "DB ED,39", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x39
+            opCode(mnemonic: "DB ED,3A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3A
+            opCode(mnemonic: "DB ED,3B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3B
+            opCode(mnemonic: "DB ED,3C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3C
+            opCode(mnemonic: "DB ED,3D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3D
+            opCode(mnemonic: "DB ED,3E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3E
+            opCode(mnemonic: "DB ED,3F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3F
+            opCode(mnemonic: "IN B,(C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x40
+            opCode(mnemonic: "OUT (C),B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x41
+            opCode(mnemonic: "SBC HL,BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x42
+            opCode(mnemonic: "LD ($nn),BC", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x43
+            opCode(mnemonic: "NEG", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x44
+            opCode(mnemonic: "RETN", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x45
+            opCode(mnemonic: "IM 0", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x46
+            opCode(mnemonic: "LD I,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x47
+            opCode(mnemonic: "IN C,(C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x48
+            opCode(mnemonic: "OUT (C),C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x49
+            opCode(mnemonic: "ADC HL,BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4A
+            opCode(mnemonic: "LD BC,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),     //  0x4B
+            opCode(mnemonic: "DB ED,4C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4C
+            opCode(mnemonic: "RETI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4D
+            opCode(mnemonic: "DB ED,4E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4E
+            opCode(mnemonic: "LD R,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4F
+            opCode(mnemonic: "IN D,(C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x50
+            opCode(mnemonic: "OUT (C),D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x51
+            opCode(mnemonic: "SBC HL,DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x52
+            opCode(mnemonic: "LD ($nn),DE", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x53
+            opCode(mnemonic: "DB ED,54", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x54
+            opCode(mnemonic: "DB ED,55", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x55
+            opCode(mnemonic: "IM 1", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x56
+            opCode(mnemonic: "LD A,I", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x57
+            opCode(mnemonic: "IN E,(C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x58
+            opCode(mnemonic: "OUT (C),E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x59
+            opCode(mnemonic: "ADC HL,DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5A
+            opCode(mnemonic: "LD DE,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x5B
+            opCode(mnemonic: "DB ED,5C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5C
+            opCode(mnemonic: "DB ED,5D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5D
+            opCode(mnemonic: "IM 2", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5E
+            opCode(mnemonic: "LD A,R", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5F
+            opCode(mnemonic: "IN H,(C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x60
+            opCode(mnemonic: "OUT (C),H", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x61
+            opCode(mnemonic: "SBC HL,HL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x62
+            opCode(mnemonic: "LD ($nn),HL", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x63
+            opCode(mnemonic: "DB ED,64", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x64
+            opCode(mnemonic: "DB ED,65", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x65
+            opCode(mnemonic: "DB ED,66", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x66
+            opCode(mnemonic: "RRD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x67
+            opCode(mnemonic: "IN L,(C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x68
+            opCode(mnemonic: "OUT (C),L", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x69
+            opCode(mnemonic: "ADC HL,HL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6A
+            opCode(mnemonic: "LD HL,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),     //  0x6B
+            opCode(mnemonic: "DB ED,6C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6C
+            opCode(mnemonic: "DB ED,6D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6D
+            opCode(mnemonic: "DB ED,6E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6E
+            opCode(mnemonic: "RLD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6F
+            opCode(mnemonic: "IN (C)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x70
+            opCode(mnemonic: "OUT (C),0", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x71
+            opCode(mnemonic: "SBC HL,SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x72
+            opCode(mnemonic: "LD ($nn),SP", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x73
+            opCode(mnemonic: "DB ED,74", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x74
+            opCode(mnemonic: "DB ED,75", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x75
+            opCode(mnemonic: "DB ED,76", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x76
+            opCode(mnemonic: "DB ED,77", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x77
+            opCode(mnemonic: "IN A,(C)", instructionLength: 2, dataStart: 1, dataEnd: 0),    //  0x78
+            opCode(mnemonic: "OUT (C),A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x79
+            opCode(mnemonic: "ADC HL,SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7A
+            opCode(mnemonic: "LD SP,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x7B
+            opCode(mnemonic: "DB ED,7C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7C
+            opCode(mnemonic: "DB ED,7D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7D
+            opCode(mnemonic: "DB ED,7E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7E
+            opCode(mnemonic: "DB ED,7F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7F
+            opCode(mnemonic: "DB ED,80", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x80
+            opCode(mnemonic: "DB ED,81", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x81
+            opCode(mnemonic: "DB ED,82", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x82
+            opCode(mnemonic: "DB ED,83", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x83
+            opCode(mnemonic: "DB ED,84", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x84
+            opCode(mnemonic: "DB ED,85", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x85
+            opCode(mnemonic: "DB ED,86", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x86
+            opCode(mnemonic: "DB ED,87", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x87
+            opCode(mnemonic: "DB ED,88", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x88
+            opCode(mnemonic: "DB ED,89", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x89
+            opCode(mnemonic: "DB ED,8A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8A
+            opCode(mnemonic: "DB ED,8B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8B
+            opCode(mnemonic: "DB ED,8C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8C
+            opCode(mnemonic: "DB ED,8D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8D
+            opCode(mnemonic: "DB ED,8E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8E
+            opCode(mnemonic: "DB ED,8F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8F
+            opCode(mnemonic: "DB ED,90", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x90
+            opCode(mnemonic: "DB ED,91", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x91
+            opCode(mnemonic: "DB ED,92", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x92
+            opCode(mnemonic: "DB ED,93", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x93
+            opCode(mnemonic: "DB ED,94", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x94
+            opCode(mnemonic: "DB ED,95", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x95
+            opCode(mnemonic: "DB ED,96", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x96
+            opCode(mnemonic: "DB ED,97", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x97
+            opCode(mnemonic: "DB ED,98", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x98
+            opCode(mnemonic: "DB ED,99", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x99
+            opCode(mnemonic: "DB ED,9A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9A
+            opCode(mnemonic: "DB ED,9B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9B
+            opCode(mnemonic: "DB ED,9C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9C
+            opCode(mnemonic: "DB ED,9D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9D
+            opCode(mnemonic: "DB ED,9E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9E
+            opCode(mnemonic: "DB ED,9F", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9F
+            opCode(mnemonic: "LDI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA0
+            opCode(mnemonic: "CPI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA1
+            opCode(mnemonic: "INI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA2
+            opCode(mnemonic: "OUTI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA3
+            opCode(mnemonic: "DB ED,A4", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA4
+            opCode(mnemonic: "DB ED,A5", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA5
+            opCode(mnemonic: "DB ED,A6", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA6
+            opCode(mnemonic: "DB ED,A7", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA7
+            opCode(mnemonic: "LDD", instructionLength: 2, dataStart: 0, dataEnd: 0),         //  0xA8
+            opCode(mnemonic: "CPD", instructionLength: 2, dataStart: 0, dataEnd: 0),         //  0xA9
+            opCode(mnemonic: "IND", instructionLength: 2, dataStart: 0, dataEnd: 0),         //  0xAA
+            opCode(mnemonic: "OUTD", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xAB
+            opCode(mnemonic: "DB ED,AC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAC
+            opCode(mnemonic: "DB ED,AD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAD
+            opCode(mnemonic: "DB ED,AE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAE
+            opCode(mnemonic: "DB ED,AF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAF
+            opCode(mnemonic: "LDIR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xB0
+            opCode(mnemonic: "CPIR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xB1
+            opCode(mnemonic: "INIR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xB2
+            opCode(mnemonic: "OTIR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xB3
+            opCode(mnemonic: "DB ED,B4", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB4
+            opCode(mnemonic: "DB ED,B5", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB5
+            opCode(mnemonic: "DB ED,B6", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB6
+            opCode(mnemonic: "DB ED,B7", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB7
+            opCode(mnemonic: "LDDR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xB8
+            opCode(mnemonic: "CPDR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xB9
+            opCode(mnemonic: "INDR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xBA
+            opCode(mnemonic: "OTDR", instructionLength: 2, dataStart: 0, dataEnd: 0),        //  0xBB
+            opCode(mnemonic: "DB ED,BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBC
+            opCode(mnemonic: "DB ED,BD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBD
+            opCode(mnemonic: "DB ED,BE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBE
+            opCode(mnemonic: "DB ED,BF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBF
+            opCode(mnemonic: "DB ED,C0", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC0
+            opCode(mnemonic: "DB ED,C1", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC1
+            opCode(mnemonic: "DB ED,C2", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC2
+            opCode(mnemonic: "DB ED,C3", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC3
+            opCode(mnemonic: "DB ED,C4", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC4
+            opCode(mnemonic: "DB ED,C5", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC5
+            opCode(mnemonic: "DB ED,C6", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC6
+            opCode(mnemonic: "DB ED,C7", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC7
+            opCode(mnemonic: "DB ED,C8", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC8
+            opCode(mnemonic: "DB ED,C9", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC9
+            opCode(mnemonic: "DB ED,CA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCA
+            opCode(mnemonic: "DB ED,CB", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCB
+            opCode(mnemonic: "DB ED,CC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCC
+            opCode(mnemonic: "DB ED,CD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCD
+            opCode(mnemonic: "DB ED,CE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCE
+            opCode(mnemonic: "DB ED,CF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCF
+            opCode(mnemonic: "DB ED,D0", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD0
+            opCode(mnemonic: "DB ED,D1", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD1
+            opCode(mnemonic: "DB ED,D2", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD2
+            opCode(mnemonic: "DB ED,D3", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD3
+            opCode(mnemonic: "DB ED,D4", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD4
+            opCode(mnemonic: "DB ED,D5", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD5
+            opCode(mnemonic: "DB ED,D6", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD6
+            opCode(mnemonic: "DB ED,D7", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD7
+            opCode(mnemonic: "DB ED,D8", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD8
+            opCode(mnemonic: "DB ED,D9", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD9
+            opCode(mnemonic: "DB ED,DA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDA
+            opCode(mnemonic: "DB ED,DB", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDB
+            opCode(mnemonic: "DB ED,DC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDC
+            opCode(mnemonic: "DB ED,DD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDD
+            opCode(mnemonic: "DB ED,DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDE
+            opCode(mnemonic: "DB ED,DF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDF
+            opCode(mnemonic: "DB ED,E0", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE0
+            opCode(mnemonic: "DB ED,E1", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE1
+            opCode(mnemonic: "DB ED,E2", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE2
+            opCode(mnemonic: "DB ED,E3", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE3
+            opCode(mnemonic: "DB ED,E4", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE4
+            opCode(mnemonic: "DB ED,E5", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE5
+            opCode(mnemonic: "DB ED,E6", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE6
+            opCode(mnemonic: "DB ED,E7", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE7
+            opCode(mnemonic: "DB ED,E8", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE8
+            opCode(mnemonic: "DB ED,E9", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE9
+            opCode(mnemonic: "DB ED,EA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEA
+            opCode(mnemonic: "DB ED,EB", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEB
+            opCode(mnemonic: "DB ED,EC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEC
+            opCode(mnemonic: "DB ED,ED", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xED
+            opCode(mnemonic: "DB ED,EE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEE
+            opCode(mnemonic: "DB ED,EF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEF
+            opCode(mnemonic: "DB ED,F0", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF0
+            opCode(mnemonic: "DB ED,F1", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF1
+            opCode(mnemonic: "DB ED,F2", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF2
+            opCode(mnemonic: "DB ED,F3", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF3
+            opCode(mnemonic: "DB ED,F4", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF4
+            opCode(mnemonic: "DB ED,F5", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF5
+            opCode(mnemonic: "DB ED,F6", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF6
+            opCode(mnemonic: "DB ED,F7", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF7
+            opCode(mnemonic: "DB ED,F8", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF8
+            opCode(mnemonic: "DB ED,F9", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF9
+            opCode(mnemonic: "DB ED,FA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFA
+            opCode(mnemonic: "DB ED,FB", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFB
+            opCode(mnemonic: "DB ED,FC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFC
+            opCode(mnemonic: "DB ED,FD", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFD
+            opCode(mnemonic: "DB ED,FE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFE
+            opCode(mnemonic: "DB ED,FF", instructionLength: 2, dataStart: 0, dataEnd: 0)     //  0xFF
         ]
         
         let FDPrefixOpcode: [opCode] =
         [
-            opCode(mnemonic: "NOP", instructionEnd: 1, countDataBytes: 0),    //  0x00
-            opCode(mnemonic: "LD BC,$nn", instructionEnd: 1, countDataBytes: 2),   //  0x01
-            opCode(mnemonic: "LD (BC),A", instructionEnd: 1, countDataBytes: 0),    //  0x02
-            opCode(mnemonic: "INC BC", instructionEnd: 1, countDataBytes: 0),    //  0x03
-            opCode(mnemonic: "INC B", instructionEnd: 1, countDataBytes: 0),    //  0x04
-            opCode(mnemonic: "DEC B", instructionEnd: 1, countDataBytes: 0),    //  0x05
-            opCode(mnemonic: "LD B,$n", instructionEnd: 1, countDataBytes: 1),   //  0x06
-            opCode(mnemonic: "RLCA", instructionEnd: 1, countDataBytes: 0),    //  0x07
-            opCode(mnemonic: "EX AF,AF'", instructionEnd: 1, countDataBytes: 0),    //  0x08
-            opCode(mnemonic: "ADD IY,BC", instructionEnd: 1, countDataBytes: 0),    //  0x09
-            opCode(mnemonic: "LD A,(BC)", instructionEnd: 1, countDataBytes: 0),    //  0x0A
-            opCode(mnemonic: "DEC BC", instructionEnd: 1, countDataBytes: 0),    //  0x0B
-            opCode(mnemonic: "INC C", instructionEnd: 1, countDataBytes: 0),    //  0x0C
-            opCode(mnemonic: "DEC C", instructionEnd: 1, countDataBytes: 0),    //  0x0D
-            opCode(mnemonic: "LD C,$n", instructionEnd: 1, countDataBytes: 1),    //  0x0E
-            opCode(mnemonic: "RRCA", instructionEnd: 1, countDataBytes: 0),    //  0x0F
-            opCode(mnemonic: "DJNZ $d", instructionEnd: 1, countDataBytes: 1),   //  0x10
-            opCode(mnemonic: "LD DE,$nn", instructionEnd: 1, countDataBytes: 2),    //  0x11
-            opCode(mnemonic: "LD (DE),A", instructionEnd: 1, countDataBytes: 0),    //  0x12
-            opCode(mnemonic: "INC DE", instructionEnd: 1, countDataBytes: 0),    //  0x13
-            opCode(mnemonic: "INC D", instructionEnd: 1, countDataBytes: 0),    //  0x14
-            opCode(mnemonic: "DEC D", instructionEnd: 1, countDataBytes: 0),    //  0x15
-            opCode(mnemonic: "LD D,$n", instructionEnd: 1, countDataBytes: 1),    //  0x16
-            opCode(mnemonic: "RLA", instructionEnd: 1, countDataBytes: 0),    //  0x17
-            opCode(mnemonic: "JR $d", instructionEnd: 1, countDataBytes: 1),   //  0x18
-            opCode(mnemonic: "ADD IY,DE", instructionEnd: 1, countDataBytes: 0),    //  0x19
-            opCode(mnemonic: "LD A,(DE)", instructionEnd: 1, countDataBytes: 0),    //  0x1A
-            opCode(mnemonic: "DEC DE", instructionEnd: 1, countDataBytes: 0),    //  0x1B
-            opCode(mnemonic: "INC E", instructionEnd: 1, countDataBytes: 0),    //  0x1C
-            opCode(mnemonic: "DEC E", instructionEnd: 1, countDataBytes: 0),    //  0x1D
-            opCode(mnemonic: "LD E,$n", instructionEnd: 1, countDataBytes: 1),   //  0x1E
-            opCode(mnemonic: "RRA", instructionEnd: 1, countDataBytes: 0),    //  0x1F
-            opCode(mnemonic: "JR NZ,$d", instructionEnd: 1, countDataBytes: 1),    //  0x20
-            opCode(mnemonic: "LD IY,$nn", instructionEnd: 1, countDataBytes: 2),    //  0x21
-            opCode(mnemonic: "LD ($nn),IY", instructionEnd: 1, countDataBytes: 2),   //  0x22
-            opCode(mnemonic: "INC IY", instructionEnd: 1, countDataBytes: 0),    //  0x23
-            opCode(mnemonic: "INC IYH", instructionEnd: 1, countDataBytes: 0),    //  0x24
-            opCode(mnemonic: "DEC IYH", instructionEnd: 1, countDataBytes: 0),    //  0x25
-            opCode(mnemonic: "LD IYH,$n", instructionEnd: 1, countDataBytes: 1),   //  0x26
-            opCode(mnemonic: "DAA", instructionEnd: 1, countDataBytes: 0),    //  0x27
-            opCode(mnemonic: "JR Z,$d", instructionEnd: 1, countDataBytes: 1),   //  0x28
-            opCode(mnemonic: "ADD IY,IY", instructionEnd: 1, countDataBytes: 0),    //  0x29
-            opCode(mnemonic: "LD IY,($nn)", instructionEnd: 1, countDataBytes: 2),   //  0x2A
-            opCode(mnemonic: "DEC IY", instructionEnd: 1, countDataBytes: 0),    //  0x2B
-            opCode(mnemonic: "INC IYL", instructionEnd: 1, countDataBytes: 0),    //  0x2C
-            opCode(mnemonic: "DEC IYL", instructionEnd: 1, countDataBytes: 0),    //  0x2D
-            opCode(mnemonic: "LD IYL,$n", instructionEnd: 1, countDataBytes: 1), //  0x2E
-            opCode(mnemonic: "CPL", instructionEnd: 1, countDataBytes: 0),    //  0x2F
-            opCode(mnemonic: "JR NC,$d", instructionEnd: 1, countDataBytes: 1),   //  0x30
-            opCode(mnemonic: "LD SP,$nn", instructionEnd: 1, countDataBytes: 2),   //  0x31
-            opCode(mnemonic: "LD ($nn),A", instructionEnd: 1, countDataBytes: 2),   //  0x32
-            opCode(mnemonic: "INC SP", instructionEnd: 1, countDataBytes: 0),    //  0x33
-            opCode(mnemonic: "INC (IY+$d)", instructionEnd: 1, countDataBytes: 1),  //  0x34
-            opCode(mnemonic: "DEC (IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x35
-            opCode(mnemonic: "LD (IY+$d),$n", instructionEnd: 1, countDataBytes: 2),    //  0x36
-            opCode(mnemonic: "SCF", instructionEnd: 1, countDataBytes: 0),    //  0x37
-            opCode(mnemonic: "JR C,$d", instructionEnd: 1, countDataBytes: 1),   //  0x38
-            opCode(mnemonic: "ADD IY,SP", instructionEnd: 1, countDataBytes: 0),    //  0x39
-            opCode(mnemonic: "LD A,($nn)", instructionEnd: 1, countDataBytes: 2),   //  0x3A
-            opCode(mnemonic: "DEC SP", instructionEnd: 1, countDataBytes: 0),    //  0x3B
-            opCode(mnemonic: "INC A", instructionEnd: 1, countDataBytes: 0),    //  0x3C
-            opCode(mnemonic: "DEC A", instructionEnd: 1, countDataBytes: 0),    //  0x3D
-            opCode(mnemonic: "LD A,$n", instructionEnd: 1, countDataBytes: 1),  //  0x3E
-            opCode(mnemonic: "CCF", instructionEnd: 1, countDataBytes: 0),    //  0x3F
-            opCode(mnemonic: "LD B,B", instructionEnd: 1, countDataBytes: 0),    //  0x40
-            opCode(mnemonic: "LD B,C", instructionEnd: 1, countDataBytes: 0),    //  0x41
-            opCode(mnemonic: "LD B,D", instructionEnd: 1, countDataBytes: 0),    //  0x42
-            opCode(mnemonic: "LD B,E", instructionEnd: 1, countDataBytes: 0),    //  0x43
-            opCode(mnemonic: "LD B,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x44
-            opCode(mnemonic: "LD B,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x45
-            opCode(mnemonic: "LD B,(IY+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x46
-            opCode(mnemonic: "LD B,A", instructionEnd: 1, countDataBytes: 0),    //  0x47
-            opCode(mnemonic: "LD C,B", instructionEnd: 1, countDataBytes: 0),    //  0x48
-            opCode(mnemonic: "LD C,C", instructionEnd: 1, countDataBytes: 0),    //  0x49
-            opCode(mnemonic: "LD C,D", instructionEnd: 1, countDataBytes: 0),    //  0x4A
-            opCode(mnemonic: "LD C,E", instructionEnd: 1, countDataBytes: 0),    //  0x4B
-            opCode(mnemonic: "LD C,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x4C
-            opCode(mnemonic: "LD C,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x4D
-            opCode(mnemonic: "LD C,(IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x4E
-            opCode(mnemonic: "LD C,A", instructionEnd: 1, countDataBytes: 0),    //  0x4F
-            opCode(mnemonic: "LD D,B", instructionEnd: 1, countDataBytes: 0),    //  0x50
-            opCode(mnemonic: "LD D,C", instructionEnd: 1, countDataBytes: 0),    //  0x51
-            opCode(mnemonic: "LD D,D", instructionEnd: 1, countDataBytes: 0),    //  0x52
-            opCode(mnemonic: "LD D,E", instructionEnd: 1, countDataBytes: 0),    //  0x53
-            opCode(mnemonic: "LD D,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x54
-            opCode(mnemonic: "LD D,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x55
-            opCode(mnemonic: "LD D,(IY+$d)", instructionEnd: 1, countDataBytes: 1),  //  0x56
-            opCode(mnemonic: "LD D,A", instructionEnd: 1, countDataBytes: 0),    //  0x57
-            opCode(mnemonic: "LD E,B", instructionEnd: 1, countDataBytes: 0),    //  0x58
-            opCode(mnemonic: "LD E,C", instructionEnd: 1, countDataBytes: 0),    //  0x59
-            opCode(mnemonic: "LD E,D", instructionEnd: 1, countDataBytes: 0),    //  0x5A
-            opCode(mnemonic: "LD E,E", instructionEnd: 1, countDataBytes: 0),    //  0x5B
-            opCode(mnemonic: "LD E,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x5C
-            opCode(mnemonic: "LD E,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x5D
-            opCode(mnemonic: "LD E,(IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x5E
-            opCode(mnemonic: "LD E,A", instructionEnd: 1, countDataBytes: 0),    //  0x5F
-            opCode(mnemonic: "LD IYH,B", instructionEnd: 1, countDataBytes: 0),    //  0x60
-            opCode(mnemonic: "LD IYH,C", instructionEnd: 1, countDataBytes: 0),    //  0x61
-            opCode(mnemonic: "LD IYH,D", instructionEnd: 1, countDataBytes: 0),    //  0x62
-            opCode(mnemonic: "LD IYH,E", instructionEnd: 1, countDataBytes: 0),    //  0x63
-            opCode(mnemonic: "LD IYH,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x64
-            opCode(mnemonic: "LD IYH,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x65
-            opCode(mnemonic: "LD H,(IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x66
-            opCode(mnemonic: "LD IYH,A", instructionEnd: 1, countDataBytes: 0),    //  0x67
-            opCode(mnemonic: "LD IYL,B", instructionEnd: 1, countDataBytes: 0),    //  0x68
-            opCode(mnemonic: "LD IYL,C", instructionEnd: 1, countDataBytes: 0),    //  0x69
-            opCode(mnemonic: "LD IYL,D", instructionEnd: 1, countDataBytes: 0),    //  0x6A
-            opCode(mnemonic: "LD IYL,E", instructionEnd: 1, countDataBytes: 0),    //  0x6B
-            opCode(mnemonic: "LD IYL,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x6C
-            opCode(mnemonic: "LD IYL,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x6D
-            opCode(mnemonic: "LD L,(IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x6E
-            opCode(mnemonic: "LD IYL,A", instructionEnd: 1, countDataBytes: 0),    //  0x6F
-            opCode(mnemonic: "LD (IY+$d),B", instructionEnd: 1, countDataBytes: 1),    //  0x70
-            opCode(mnemonic: "LD (IY+$d),C", instructionEnd: 1, countDataBytes: 1),    //  0x71
-            opCode(mnemonic: "LD (IY+$d),D", instructionEnd: 1, countDataBytes: 1),    //  0x72
-            opCode(mnemonic: "LD (IY+$d),E", instructionEnd: 1, countDataBytes: 1),    //  0x73
-            opCode(mnemonic: "LD (IY+$d),H", instructionEnd: 1, countDataBytes: 1),    //  0x74
-            opCode(mnemonic: "LD (IY+$d),L", instructionEnd: 1, countDataBytes: 1),    //  0x75
-            opCode(mnemonic: "HALT", instructionEnd: 1, countDataBytes: 0),    //  0x76
-            opCode(mnemonic: "LD (IY+$d),A", instructionEnd: 1, countDataBytes: 1),    //  0x77
-            opCode(mnemonic: "LD A,B", instructionEnd: 1, countDataBytes: 0),    //  0x78
-            opCode(mnemonic: "LD A,C", instructionEnd: 1, countDataBytes: 0),    //  0x79
-            opCode(mnemonic: "LD A,D", instructionEnd: 1, countDataBytes: 0),    //  0x7A
-            opCode(mnemonic: "LD A,E", instructionEnd: 1, countDataBytes: 0),    //  0x7B
-            opCode(mnemonic: "LD A,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x7C
-            opCode(mnemonic: "LD A,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x7D
-            opCode(mnemonic: "LD A,(IY+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x7E
-            opCode(mnemonic: "LD A,A", instructionEnd: 1, countDataBytes: 0),    //  0x7F
-            opCode(mnemonic: "ADD A,B", instructionEnd: 1, countDataBytes: 0),    //  0x80
-            opCode(mnemonic: "ADD A,C", instructionEnd: 1, countDataBytes: 0),    //  0x81
-            opCode(mnemonic: "ADD A,D", instructionEnd: 1, countDataBytes: 0),    //  0x82
-            opCode(mnemonic: "ADD A,E", instructionEnd: 1, countDataBytes: 0),    //  0x83
-            opCode(mnemonic: "ADD A,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x84
-            opCode(mnemonic: "ADD A,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x85
-            opCode(mnemonic: "ADD A,(IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x86
-            opCode(mnemonic: "ADD A,A", instructionEnd: 1, countDataBytes: 0),    //  0x87
-            opCode(mnemonic: "ADC A,B", instructionEnd: 1, countDataBytes: 0),    //  0x88
-            opCode(mnemonic: "ADC A,C", instructionEnd: 1, countDataBytes: 0),    //  0x89
-            opCode(mnemonic: "ADC A,D", instructionEnd: 1, countDataBytes: 0),    //  0x8A
-            opCode(mnemonic: "ADC A,E", instructionEnd: 1, countDataBytes: 0),    //  0x8B
-            opCode(mnemonic: "ADC A,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x8C
-            opCode(mnemonic: "ADC A,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x8D
-            opCode(mnemonic: "ADC A,(IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0x8E
-            opCode(mnemonic: "ADC A,A", instructionEnd: 1, countDataBytes: 0),    //  0x8F
-            opCode(mnemonic: "SUB B", instructionEnd: 1, countDataBytes: 0),    //  0x90
-            opCode(mnemonic: "SUB C", instructionEnd: 1, countDataBytes: 0),    //  0x91
-            opCode(mnemonic: "SUB D", instructionEnd: 1, countDataBytes: 0),    //  0x92
-            opCode(mnemonic: "SUB E", instructionEnd: 1, countDataBytes: 0),    //  0x93
-            opCode(mnemonic: "SUB IYH", instructionEnd: 1, countDataBytes: 0),    //  0x94
-            opCode(mnemonic: "SUB IYL", instructionEnd: 1, countDataBytes: 0),    //  0x95
-            opCode(mnemonic: "SUB (IY+$d)", instructionEnd: 1, countDataBytes: 1),  //  0x96
-            opCode(mnemonic: "SUB A", instructionEnd: 1, countDataBytes: 0),    //  0x97
-            opCode(mnemonic: "SBC A,B", instructionEnd: 1, countDataBytes: 0),    //  0x98
-            opCode(mnemonic: "SBC A,C", instructionEnd: 1, countDataBytes: 0),    //  0x99
-            opCode(mnemonic: "SBC A,D", instructionEnd: 1, countDataBytes: 0),    //  0x9A
-            opCode(mnemonic: "SBC A,E", instructionEnd: 1, countDataBytes: 0),    //  0x9B
-            opCode(mnemonic: "SBC A,IYH", instructionEnd: 1, countDataBytes: 0),    //  0x9C
-            opCode(mnemonic: "SBC A,IYL", instructionEnd: 1, countDataBytes: 0),    //  0x9D
-            opCode(mnemonic: "SBC A,(IY+$d)", instructionEnd: 1, countDataBytes: 1),    //  0x9E
-            opCode(mnemonic: "SBC A,A", instructionEnd: 1, countDataBytes: 0),    //  0x9F
-            opCode(mnemonic: "AND B", instructionEnd: 1, countDataBytes: 0),    //  0xA0
-            opCode(mnemonic: "AND C", instructionEnd: 1, countDataBytes: 0),    //  0xA1
-            opCode(mnemonic: "AND D", instructionEnd: 1, countDataBytes: 0),    //  0xA2
-            opCode(mnemonic: "AND E", instructionEnd: 1, countDataBytes: 0),    //  0xA3
-            opCode(mnemonic: "AND IYH", instructionEnd: 1, countDataBytes: 0),    //  0xA4
-            opCode(mnemonic: "AND IYL", instructionEnd: 1, countDataBytes: 0),    //  0xA5
-            opCode(mnemonic: "AND (IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0xA6
-            opCode(mnemonic: "AND A", instructionEnd: 1, countDataBytes: 0),    //  0xA7
-            opCode(mnemonic: "XOR B", instructionEnd: 1, countDataBytes: 0),    //  0xA8
-            opCode(mnemonic: "XOR C", instructionEnd: 1, countDataBytes: 0),    //  0xA9
-            opCode(mnemonic: "XOR D", instructionEnd: 1, countDataBytes: 0),    //  0xAA
-            opCode(mnemonic: "XOR E", instructionEnd: 1, countDataBytes: 0),    //  0xAB
-            opCode(mnemonic: "XOR IYH", instructionEnd: 1, countDataBytes: 0),    //  0xAC
-            opCode(mnemonic: "XOR IYL", instructionEnd: 1, countDataBytes: 0),    //  0xAD
-            opCode(mnemonic: "XOR (IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0xAE
-            opCode(mnemonic: "XOR A", instructionEnd: 1, countDataBytes: 0),    //  0xAF
-            opCode(mnemonic: "OR B", instructionEnd: 1, countDataBytes: 0),    //  0xB0
-            opCode(mnemonic: "OR C", instructionEnd: 1, countDataBytes: 0),    //  0xB1
-            opCode(mnemonic: "OR D", instructionEnd: 1, countDataBytes: 0),    //  0xB2
-            opCode(mnemonic: "OR E", instructionEnd: 1, countDataBytes: 0),    //  0xB3
-            opCode(mnemonic: "OR IYH", instructionEnd: 1, countDataBytes: 0),    //  0xB4
-            opCode(mnemonic: "OR IYL", instructionEnd: 1, countDataBytes: 0),    //  0xB5
-            opCode(mnemonic: "OR (IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0xB6
-            opCode(mnemonic: "OR A", instructionEnd: 1, countDataBytes: 0),    //  0xB7
-            opCode(mnemonic: "CP B", instructionEnd: 1, countDataBytes: 0),    //  0xB8
-            opCode(mnemonic: "CP C", instructionEnd: 1, countDataBytes: 0),    //  0xB9
-            opCode(mnemonic: "CP D", instructionEnd: 1, countDataBytes: 0),    //  0xBA
-            opCode(mnemonic: "CP E", instructionEnd: 1, countDataBytes: 0),    //  0xBB
-            opCode(mnemonic: "CP IYH", instructionEnd: 1, countDataBytes: 0),    //  0xBC
-            opCode(mnemonic: "CP IYL", instructionEnd: 1, countDataBytes: 0),    //  0xBD
-            opCode(mnemonic: "CP (IY+$d)", instructionEnd: 1, countDataBytes: 1),   //  0xBE
-            opCode(mnemonic: "CP A", instructionEnd: 1, countDataBytes: 0),    //  0xBF
-            opCode(mnemonic: "RET NZ", instructionEnd: 1, countDataBytes: 0),    //  0xC0
-            opCode(mnemonic: "POP BC", instructionEnd: 1, countDataBytes: 0),    //  0xC1
-            opCode(mnemonic: "JP NZ,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xC2
-            opCode(mnemonic: "JP $nn", instructionEnd: 1, countDataBytes: 2),   //  0xC3
-            opCode(mnemonic: "CALL NZ,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xC4
-            opCode(mnemonic: "PUSH BC", instructionEnd: 1, countDataBytes: 0),    //  0xC5
-            opCode(mnemonic: "ADD A,$n", instructionEnd: 1, countDataBytes: 1),    //  0xC6
-            opCode(mnemonic: "RST 0x00", instructionEnd: 1, countDataBytes: 0),    //  0xC7
-            opCode(mnemonic: "RET Z", instructionEnd: 1, countDataBytes: 0),    //  0xC8
-            opCode(mnemonic: "RET", instructionEnd: 1, countDataBytes: 0),    //  0xC9
-            opCode(mnemonic: "JP Z,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xCA
-            opCode(mnemonic: "CB prefixes", instructionEnd: 0, countDataBytes: 0),    //  0xCB
-            opCode(mnemonic: "CALL Z,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xCC
-            opCode(mnemonic: "CALL $nn", instructionEnd: 1, countDataBytes: 2),   //  0xCD
-            opCode(mnemonic: "ADC A,$n", instructionEnd: 0, countDataBytes: 1),    //  0xCE
-            opCode(mnemonic: "RST 0x08", instructionEnd: 1, countDataBytes: 0),    //  0xCF
-            opCode(mnemonic: "RET NC", instructionEnd: 1, countDataBytes: 0),    //  0xD0
-            opCode(mnemonic: "POP DE", instructionEnd: 1, countDataBytes: 0),    //  0xD1
-            opCode(mnemonic: "JP NC,$nn", instructionEnd: 1, countDataBytes: 2),    //  0xD2
-            opCode(mnemonic: "OUT ($n),A", instructionEnd: 1, countDataBytes: 1),    //  0xD3
-            opCode(mnemonic: "CALL NC,$nn", instructionEnd: 1, countDataBytes: 2),    //  0xD4
-            opCode(mnemonic: "PUSH DE", instructionEnd: 1, countDataBytes: 0),    //  0xD5
-            opCode(mnemonic: "SUB $n", instructionEnd: 1, countDataBytes: 1),  //  0xD6
-            opCode(mnemonic: "RST 0x10", instructionEnd: 1, countDataBytes: 0),    //  0xD7
-            opCode(mnemonic: "RET C", instructionEnd: 1, countDataBytes: 0),    //  0xD8
-            opCode(mnemonic: "EXX", instructionEnd: 1, countDataBytes: 0),    //  0xD9
-            opCode(mnemonic: "JP C,$nn", instructionEnd: 1, countDataBytes: 2),  //  0xDA
-            opCode(mnemonic: "IN A,($n)", instructionEnd: 1, countDataBytes: 1),   //  0xDB
-            opCode(mnemonic: "CALL C,$nn", instructionEnd: 2, countDataBytes: 3),   //  0xDC
-            opCode(mnemonic: "??????", instructionEnd: 0, countDataBytes: 0),    //  0xDD
-            opCode(mnemonic: "SBC A,$n", instructionEnd: 1, countDataBytes: 1),   //  0xDE
-            opCode(mnemonic: "RST 0x18", instructionEnd: 1, countDataBytes: 0),    //  0xDF
-            opCode(mnemonic: "RET PO", instructionEnd: 1, countDataBytes: 0),    //  0xE0
-            opCode(mnemonic: "POP IY", instructionEnd: 1, countDataBytes: 0),    //  0xE1
-            opCode(mnemonic: "JP PO,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xE2
-            opCode(mnemonic: "EX (SP),IY", instructionEnd: 1, countDataBytes: 0),    //  0xE3
-            opCode(mnemonic: "CALL PO,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xE4
-            opCode(mnemonic: "PUSH IY", instructionEnd: 1, countDataBytes: 0),    //  0xE5
-            opCode(mnemonic: "AND $n", instructionEnd: 1, countDataBytes: 1),   //  0xE6
-            opCode(mnemonic: "RST 0x20", instructionEnd: 1, countDataBytes: 0),    //  0xE7
-            opCode(mnemonic: "RET PE", instructionEnd: 1, countDataBytes: 0),    //  0xE8
-            opCode(mnemonic: "JP (IY)", instructionEnd: 1, countDataBytes: 0),    //  0xE9
-            opCode(mnemonic: "JP PE,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xEA
-            opCode(mnemonic: "EX DE,HL", instructionEnd: 1, countDataBytes: 0),    //  0xEB
-            opCode(mnemonic: "CALL PE,$nn", instructionEnd: 1, countDataBytes: 2), //  0xEC
-            opCode(mnemonic: "ED prefixes", instructionEnd: 0, countDataBytes: 0),    //  0xED
-            opCode(mnemonic: "XOR $n", instructionEnd: 1, countDataBytes: 1),   //  0xEE
-            opCode(mnemonic: "RST 0x28", instructionEnd: 1, countDataBytes: 0),    //  0xEF
-            opCode(mnemonic: "RET P", instructionEnd: 1, countDataBytes: 0),    //  0xF0
-            opCode(mnemonic: "POP AF", instructionEnd: 1, countDataBytes: 0),    //  0xF1
-            opCode(mnemonic: "JP P,$nn", instructionEnd: 1, countDataBytes: 2),    //  0xF2
-            opCode(mnemonic: "DI", instructionEnd: 1, countDataBytes: 0),    //  0xF3
-            opCode(mnemonic: "CALL P,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xF4
-            opCode(mnemonic: "PUSH AF", instructionEnd: 1, countDataBytes: 0),    //  0xF5
-            opCode(mnemonic: "OR $n", instructionEnd: 1, countDataBytes: 1),   //  0xF6
-            opCode(mnemonic: "RST 0x30", instructionEnd: 1, countDataBytes: 0),    //  0xF7
-            opCode(mnemonic: "RET M", instructionEnd: 1, countDataBytes: 0),    //  0xF8
-            opCode(mnemonic: "LD SP,IY", instructionEnd: 1, countDataBytes: 0),    //  0xF9
-            opCode(mnemonic: "JP M,$nn", instructionEnd: 1, countDataBytes: 2),   //  0xFA
-            opCode(mnemonic: "EI", instructionEnd: 1, countDataBytes: 0),    //  0xFB
-            opCode(mnemonic: "CALL M,$nn", instructionEnd: 1, countDataBytes: 2),    //  0xFC
-            opCode(mnemonic: "???????", instructionEnd: 0, countDataBytes: 0),    //  0xFD
-            opCode(mnemonic: "CP $n", instructionEnd: 1, countDataBytes: 1),    //  0xFE
-            opCode(mnemonic: "RST 0x38", instructionEnd: 1, countDataBytes: 0)    //  0xFF
+            opCode(mnemonic: "NOP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x00
+            opCode(mnemonic: "LD BC,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x01
+            opCode(mnemonic: "LD (BC),A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x02
+            opCode(mnemonic: "INC BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x03
+            opCode(mnemonic: "INC B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x04
+            opCode(mnemonic: "DEC B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x05
+            opCode(mnemonic: "LD B,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x06
+            opCode(mnemonic: "RLCA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x07
+            opCode(mnemonic: "EX AF,AF'", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x08
+            opCode(mnemonic: "ADD IY,BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x09
+            opCode(mnemonic: "LD A,(BC)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0A
+            opCode(mnemonic: "DEC BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0B
+            opCode(mnemonic: "INC C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0C
+            opCode(mnemonic: "DEC C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0D
+            opCode(mnemonic: "LD C,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x0E
+            opCode(mnemonic: "RRCA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x0F
+            opCode(mnemonic: "DJNZ $d", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x10
+            opCode(mnemonic: "LD DE,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x11
+            opCode(mnemonic: "LD (DE),A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x12
+            opCode(mnemonic: "INC DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x13
+            opCode(mnemonic: "INC D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x14
+            opCode(mnemonic: "DEC D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x15
+            opCode(mnemonic: "LD D,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x16
+            opCode(mnemonic: "RLA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x17
+            opCode(mnemonic: "JR $d", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x18
+            opCode(mnemonic: "ADD IY,DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x19
+            opCode(mnemonic: "LD A,(DE)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1A
+            opCode(mnemonic: "DEC DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1B
+            opCode(mnemonic: "INC E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1C
+            opCode(mnemonic: "DEC E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1D
+            opCode(mnemonic: "LD E,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x1E
+            opCode(mnemonic: "RRA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x1F
+            opCode(mnemonic: "JR NZ,$d", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x20
+            opCode(mnemonic: "LD IY,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x21
+            opCode(mnemonic: "LD ($nn),IY", instructionLength: 2, dataStart: 1, dataEnd: 2),   //  0x22
+            opCode(mnemonic: "INC IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x23
+            opCode(mnemonic: "INC IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x24
+            opCode(mnemonic: "DEC IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x25
+            opCode(mnemonic: "LD IYH,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x26
+            opCode(mnemonic: "DAA", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x27
+            opCode(mnemonic: "JR Z,$d", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x28
+            opCode(mnemonic: "ADD IY,IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x29
+            opCode(mnemonic: "LD IY,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0x2A
+            opCode(mnemonic: "DEC IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2B
+            opCode(mnemonic: "INC IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2C
+            opCode(mnemonic: "DEC IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2D
+            opCode(mnemonic: "LD IYL,$n", instructionLength: 3, dataStart: 2, dataEnd: 2), //  0x2E
+            opCode(mnemonic: "CPL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x2F
+            opCode(mnemonic: "JR NC,$d", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x30
+            opCode(mnemonic: "LD SP,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0x31
+            opCode(mnemonic: "LD ($nn),A", instructionLength: 2, dataStart: 1, dataEnd: 2),   //  0x32
+            opCode(mnemonic: "INC SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x33
+            opCode(mnemonic: "INC (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x34
+            opCode(mnemonic: "DEC (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x35
+            opCode(mnemonic: "LD (IY+$d),$n", instructionLength: 4, dataStart: 2, dataEnd: 3),    //  0x36
+            opCode(mnemonic: "SCF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x37
+            opCode(mnemonic: "JR C,$d", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x38
+            opCode(mnemonic: "ADD IY,SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x39
+            opCode(mnemonic: "LD A,($nn)", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0x3A
+            opCode(mnemonic: "DEC SP", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3B
+            opCode(mnemonic: "INC A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3C
+            opCode(mnemonic: "DEC A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3D
+            opCode(mnemonic: "LD A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2), //  0x3E
+            opCode(mnemonic: "CCF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x3F
+            opCode(mnemonic: "LD B,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x40
+            opCode(mnemonic: "LD B,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x41
+            opCode(mnemonic: "LD B,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x42
+            opCode(mnemonic: "LD B,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x43
+            opCode(mnemonic: "LD B,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x44
+            opCode(mnemonic: "LD B,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x45
+            opCode(mnemonic: "LD B,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x46
+            opCode(mnemonic: "LD B,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x47
+            opCode(mnemonic: "LD C,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x48
+            opCode(mnemonic: "LD C,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x49
+            opCode(mnemonic: "LD C,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4A
+            opCode(mnemonic: "LD C,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4B
+            opCode(mnemonic: "LD C,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4C
+            opCode(mnemonic: "LD C,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4D
+            opCode(mnemonic: "LD C,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x4E
+            opCode(mnemonic: "LD C,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x4F
+            opCode(mnemonic: "LD D,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x50
+            opCode(mnemonic: "LD D,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x51
+            opCode(mnemonic: "LD D,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x52
+            opCode(mnemonic: "LD D,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x53
+            opCode(mnemonic: "LD D,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x54
+            opCode(mnemonic: "LD D,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x55
+            opCode(mnemonic: "LD D,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2), //  0x56
+            opCode(mnemonic: "LD D,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x57
+            opCode(mnemonic: "LD E,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x58
+            opCode(mnemonic: "LD E,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x59
+            opCode(mnemonic: "LD E,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5A
+            opCode(mnemonic: "LD E,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5B
+            opCode(mnemonic: "LD E,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5C
+            opCode(mnemonic: "LD E,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5D
+            opCode(mnemonic: "LD E,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x5E
+            opCode(mnemonic: "LD E,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x5F
+            opCode(mnemonic: "LD IYH,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x60
+            opCode(mnemonic: "LD IYH,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x61
+            opCode(mnemonic: "LD IYH,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x62
+            opCode(mnemonic: "LD IYH,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x63
+            opCode(mnemonic: "LD IYH,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x64
+            opCode(mnemonic: "LD IYH,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x65
+            opCode(mnemonic: "LD H,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x66
+            opCode(mnemonic: "LD IYH,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x67
+            opCode(mnemonic: "LD IYL,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x68
+            opCode(mnemonic: "LD IYL,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x69
+            opCode(mnemonic: "LD IYL,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6A
+            opCode(mnemonic: "LD IYL,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6B
+            opCode(mnemonic: "LD IYL,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6C
+            opCode(mnemonic: "LD IYL,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6D
+            opCode(mnemonic: "LD L,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x6E
+            opCode(mnemonic: "LD IYL,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x6F
+            opCode(mnemonic: "LD (IY+$d),B", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x70
+            opCode(mnemonic: "LD (IY+$d),C", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x71
+            opCode(mnemonic: "LD (IY+$d),D", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x72
+            opCode(mnemonic: "LD (IY+$d),E", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x73
+            opCode(mnemonic: "LD (IY+$d),H", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x74
+            opCode(mnemonic: "LD (IY+$d),L", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x75
+            opCode(mnemonic: "HALT", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x76
+            opCode(mnemonic: "LD (IY+$d),A", instructionLength: 2, dataStart: 1, dataEnd: 1),    //  0x77
+            opCode(mnemonic: "LD A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x78
+            opCode(mnemonic: "LD A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x79
+            opCode(mnemonic: "LD A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7A
+            opCode(mnemonic: "LD A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7B
+            opCode(mnemonic: "LD A,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7C
+            opCode(mnemonic: "LD A,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7D
+            opCode(mnemonic: "LD A,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),    //  0x7E
+            opCode(mnemonic: "LD A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x7F
+            opCode(mnemonic: "ADD A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x80
+            opCode(mnemonic: "ADD A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x81
+            opCode(mnemonic: "ADD A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x82
+            opCode(mnemonic: "ADD A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x83
+            opCode(mnemonic: "ADD A,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x84
+            opCode(mnemonic: "ADD A,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x85
+            opCode(mnemonic: "ADD A,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x86
+            opCode(mnemonic: "ADD A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x87
+            opCode(mnemonic: "ADC A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x88
+            opCode(mnemonic: "ADC A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x89
+            opCode(mnemonic: "ADC A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8A
+            opCode(mnemonic: "ADC A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8B
+            opCode(mnemonic: "ADC A,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8C
+            opCode(mnemonic: "ADC A,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8D
+            opCode(mnemonic: "ADC A,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x8E
+            opCode(mnemonic: "ADC A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x8F
+            opCode(mnemonic: "SUB B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x90
+            opCode(mnemonic: "SUB C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x91
+            opCode(mnemonic: "SUB D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x92
+            opCode(mnemonic: "SUB E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x93
+            opCode(mnemonic: "SUB IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x94
+            opCode(mnemonic: "SUB IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x95
+            opCode(mnemonic: "SUB (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0x96
+            opCode(mnemonic: "SUB A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x97
+            opCode(mnemonic: "SBC A,B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x98
+            opCode(mnemonic: "SBC A,C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x99
+            opCode(mnemonic: "SBC A,D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9A
+            opCode(mnemonic: "SBC A,E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9B
+            opCode(mnemonic: "SBC A,IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9C
+            opCode(mnemonic: "SBC A,IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9D
+            opCode(mnemonic: "SBC A,(IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0x9E
+            opCode(mnemonic: "SBC A,A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0x9F
+            opCode(mnemonic: "AND B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA0
+            opCode(mnemonic: "AND C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA1
+            opCode(mnemonic: "AND D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA2
+            opCode(mnemonic: "AND E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA3
+            opCode(mnemonic: "AND IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA4
+            opCode(mnemonic: "AND IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA5
+            opCode(mnemonic: "AND (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xA6
+            opCode(mnemonic: "AND A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA7
+            opCode(mnemonic: "XOR B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA8
+            opCode(mnemonic: "XOR C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xA9
+            opCode(mnemonic: "XOR D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAA
+            opCode(mnemonic: "XOR E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAB
+            opCode(mnemonic: "XOR IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAC
+            opCode(mnemonic: "XOR IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAD
+            opCode(mnemonic: "XOR (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xAE
+            opCode(mnemonic: "XOR A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xAF
+            opCode(mnemonic: "OR B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB0
+            opCode(mnemonic: "OR C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB1
+            opCode(mnemonic: "OR D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB2
+            opCode(mnemonic: "OR E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB3
+            opCode(mnemonic: "OR IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB4
+            opCode(mnemonic: "OR IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB5
+            opCode(mnemonic: "OR (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xB6
+            opCode(mnemonic: "OR A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB7
+            opCode(mnemonic: "CP B", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB8
+            opCode(mnemonic: "CP C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xB9
+            opCode(mnemonic: "CP D", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBA
+            opCode(mnemonic: "CP E", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBB
+            opCode(mnemonic: "CP IYH", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBC
+            opCode(mnemonic: "CP IYL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBD
+            opCode(mnemonic: "CP (IY+$d)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xBE
+            opCode(mnemonic: "CP A", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xBF
+            opCode(mnemonic: "RET NZ", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC0
+            opCode(mnemonic: "POP BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC1
+            opCode(mnemonic: "JP NZ,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xC2
+            opCode(mnemonic: "JP $nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xC3
+            opCode(mnemonic: "CALL NZ,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xC4
+            opCode(mnemonic: "PUSH BC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC5
+            opCode(mnemonic: "ADD A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xC6
+            opCode(mnemonic: "RST 0x00", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC7
+            opCode(mnemonic: "RET Z", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC8
+            opCode(mnemonic: "RET", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xC9
+            opCode(mnemonic: "JP Z,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xCA
+            opCode(mnemonic: "CB prefixes", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCB
+            opCode(mnemonic: "CALL Z,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xCC
+            opCode(mnemonic: "CALL $nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0xCD
+            opCode(mnemonic: "ADC A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xCE
+            opCode(mnemonic: "RST 0x08", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xCF
+            opCode(mnemonic: "RET NC", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD0
+            opCode(mnemonic: "POP DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD1
+            opCode(mnemonic: "JP NC,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xD2
+            opCode(mnemonic: "OUT ($n),A", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xD3
+            opCode(mnemonic: "CALL NC,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xD4
+            opCode(mnemonic: "PUSH DE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD5
+            opCode(mnemonic: "SUB $n", instructionLength: 2, dataStart: 1, dataEnd: 1),  //  0xD6
+            opCode(mnemonic: "RST 0x10", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD7
+            opCode(mnemonic: "RET C", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD8
+            opCode(mnemonic: "EXX", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xD9
+            opCode(mnemonic: "JP C,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0xDA
+            opCode(mnemonic: "IN A,($n)", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xDB
+            opCode(mnemonic: "CALL C,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xDC
+            opCode(mnemonic: "??????", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDD
+            opCode(mnemonic: "SBC A,$n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xDE
+            opCode(mnemonic: "RST 0x18", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xDF
+            opCode(mnemonic: "RET PO", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE0
+            opCode(mnemonic: "POP IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE1
+            opCode(mnemonic: "JP PO,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0xE2
+            opCode(mnemonic: "EX (SP),IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE3
+            opCode(mnemonic: "CALL PO,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xE4
+            opCode(mnemonic: "PUSH IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE5
+            opCode(mnemonic: "AND $n", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xE6
+            opCode(mnemonic: "RST 0x20", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE7
+            opCode(mnemonic: "RET PE", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE8
+            opCode(mnemonic: "JP (IY)", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xE9
+            opCode(mnemonic: "JP PE,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xEA
+            opCode(mnemonic: "EX DE,HL", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEB
+            opCode(mnemonic: "CALL PE,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3), //  0xEC
+            opCode(mnemonic: "ED prefixes", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xED
+            opCode(mnemonic: "XOR $n", instructionLength: 3, dataStart: 2, dataEnd: 2),  //  0xEE
+            opCode(mnemonic: "RST 0x28", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xEF
+            opCode(mnemonic: "RET P", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF0
+            opCode(mnemonic: "POP AF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF1
+            opCode(mnemonic: "JP P,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xF2
+            opCode(mnemonic: "DI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF3
+            opCode(mnemonic: "CALL P,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0xF4
+            opCode(mnemonic: "PUSH AF", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF5
+            opCode(mnemonic: "OR $n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xF6
+            opCode(mnemonic: "RST 0x30", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF7
+            opCode(mnemonic: "RET M", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF8
+            opCode(mnemonic: "LD SP,IY", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xF9
+            opCode(mnemonic: "JP M,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),  //  0xFA
+            opCode(mnemonic: "EI", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFB
+            opCode(mnemonic: "CALL M,$nn", instructionLength: 4, dataStart: 2, dataEnd: 3),   //  0xFC
+            opCode(mnemonic: "???????", instructionLength: 2, dataStart: 0, dataEnd: 0),    //  0xFD
+            opCode(mnemonic: "CP $n", instructionLength: 3, dataStart: 2, dataEnd: 2),   //  0xFE
+            opCode(mnemonic: "RST 0x38", instructionLength: 2, dataStart: 1, dataEnd: 0)    //  0xFF
         ]
         
         let DDCBPrefixOpcode: [opCode] =
         [
-            opCode(mnemonic: "RLC (IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x00
-            opCode(mnemonic: "RLC (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x01
-            opCode(mnemonic: "RLC (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x02
-            opCode(mnemonic: "RLC (IX+$d),E", instructionEnd: 3, countDataBytes: 1),   //  0x03
-            opCode(mnemonic: "RLC (IX+$d),H", instructionEnd: 3, countDataBytes: 1),   //  0x04
-            opCode(mnemonic: "RLC (IX+$d),L", instructionEnd: 3, countDataBytes: 1),   //  0x05
-            opCode(mnemonic: "RLC (IX+$d)", instructionEnd: 3, countDataBytes: 1),     //  0x06
-            opCode(mnemonic: "RLC (IX+$d),A", instructionEnd: 3, countDataBytes: 1),   //  0x07
-            opCode(mnemonic: "RRC (IX+$d),B", instructionEnd: 3, countDataBytes: 1),   //  0x08
-            opCode(mnemonic: "RRC (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x09
-            opCode(mnemonic: "RRC (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x0A
-            opCode(mnemonic: "RRC (IX+$d),E", instructionEnd: 3, countDataBytes: 1),   //  0x0B
-            opCode(mnemonic: "RRC (IX+$d),H", instructionEnd: 3, countDataBytes: 1),   //  0x0C
-            opCode(mnemonic: "RRC (IX+$d),L", instructionEnd: 3, countDataBytes: 1),   //  0x0D
-            opCode(mnemonic: "RRC (IX+$d)", instructionEnd: 3, countDataBytes: 1),  //  0x0E
-            opCode(mnemonic: "RRC (IX+$d),A", instructionEnd: 3, countDataBytes: 1),   //  0x0F
-            opCode(mnemonic: "RL (IX+$d),B", instructionEnd: 3, countDataBytes: 1),  //  0x10
-            opCode(mnemonic: "RL (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x11
-            opCode(mnemonic: "RL (IX+$d),D", instructionEnd: 3, countDataBytes: 1),   //  0x12
-            opCode(mnemonic: "RL (IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x13
-            opCode(mnemonic: "RL (IX+$d),H", instructionEnd: 3, countDataBytes: 1),   //  0x14
-            opCode(mnemonic: "RL (IX+$d),L", instructionEnd: 3, countDataBytes: 1),   //  0x15
-            opCode(mnemonic: "RL (IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x16
-            opCode(mnemonic: "RL (IX+$d),A", instructionEnd: 3, countDataBytes: 1),   //  0x17
-            opCode(mnemonic: "RR (IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x18
-            opCode(mnemonic: "RR (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x19
-            opCode(mnemonic: "RR (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x1A
-            opCode(mnemonic: "RR (IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x1B
-            opCode(mnemonic: "RR (IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x1C
-            opCode(mnemonic: "RR (IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x1D
-            opCode(mnemonic: "RR (IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x1E
-            opCode(mnemonic: "RR (IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x1F
-            opCode(mnemonic: "SLA (IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x20
-            opCode(mnemonic: "SLA (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x21
-            opCode(mnemonic: "SLA (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x22
-            opCode(mnemonic: "SLA (IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x23
-            opCode(mnemonic: "SLA (IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x24
-            opCode(mnemonic: "SLA (IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x25
-            opCode(mnemonic: "SLA (IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x26
-            opCode(mnemonic: "SLA (IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x27
-            opCode(mnemonic: "SRA (IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x28
-            opCode(mnemonic: "SRA (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x29
-            opCode(mnemonic: "SRA (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x2A
-            opCode(mnemonic: "SRA (IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x2B
-            opCode(mnemonic: "SRA (IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x2C
-            opCode(mnemonic: "SRA (IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x2D
-            opCode(mnemonic: "SRA (IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x2E
-            opCode(mnemonic: "SRA (IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x2F
-            opCode(mnemonic: "SLL (IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x30
-            opCode(mnemonic: "SLL (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x31
-            opCode(mnemonic: "SLL (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x32
-            opCode(mnemonic: "SLL (IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x33
-            opCode(mnemonic: "SLL (IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x34
-            opCode(mnemonic: "SLL (IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x35
-            opCode(mnemonic: "SLL (IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x36
-            opCode(mnemonic: "SLL (IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x37
-            opCode(mnemonic: "SRL (IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x38
-            opCode(mnemonic: "SRL (IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x39
-            opCode(mnemonic: "SRL (IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x3A
-            opCode(mnemonic: "SRL (IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x3B
-            opCode(mnemonic: "SRL (IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x3C
-            opCode(mnemonic: "SRL (IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x3D
-            opCode(mnemonic: "SRL (IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x3E
-            opCode(mnemonic: "SRL (IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x3F
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x40
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x41
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x42
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x43
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x44
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x45
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x46
-            opCode(mnemonic: "BIT 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x47
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x48
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x49
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4A
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4B
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4C
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4D
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4E
-            opCode(mnemonic: "BIT 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4F
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x50
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x51
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x52
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x53
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x54
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x55
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x56
-            opCode(mnemonic: "BIT 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x57
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x58
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x59
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5A
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5B
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5C
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5D
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5E
-            opCode(mnemonic: "BIT 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5F
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x60
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x61
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x62
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x63
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x64
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x65
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x66
-            opCode(mnemonic: "BIT 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x67
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x68
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x69
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6A
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6B
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6C
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6D
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6E
-            opCode(mnemonic: "BIT 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6F
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x70
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x71
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x72
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x73
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x74
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x75
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x76
-            opCode(mnemonic: "BIT 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x77
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x78
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x79
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7A
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7B
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7C
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7D
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7E
-            opCode(mnemonic: "BIT 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7F
-            opCode(mnemonic: "RES 0,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x80
-            opCode(mnemonic: "RES 0,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x81
-            opCode(mnemonic: "RES 0,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x82
-            opCode(mnemonic: "RES 0,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x83
-            opCode(mnemonic: "RES 0,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x84
-            opCode(mnemonic: "RES 0,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x85
-            opCode(mnemonic: "RES 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x86
-            opCode(mnemonic: "RES 0,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x87
-            opCode(mnemonic: "RES 1,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x88
-            opCode(mnemonic: "RES 1,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x89
-            opCode(mnemonic: "RES 1,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x8A
-            opCode(mnemonic: "RES 1,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x8B
-            opCode(mnemonic: "RES 1,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x8C
-            opCode(mnemonic: "RES 1,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x8D
-            opCode(mnemonic: "RES 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x8E
-            opCode(mnemonic: "RES 1,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x8F
-            opCode(mnemonic: "RES 2,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x90
-            opCode(mnemonic: "RES 2,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x91
-            opCode(mnemonic: "RES 2,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x92
-            opCode(mnemonic: "RES 2,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x93
-            opCode(mnemonic: "RES 2,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x94
-            opCode(mnemonic: "RES 2,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x95
-            opCode(mnemonic: "RES 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x96
-            opCode(mnemonic: "RES 2,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x97
-            opCode(mnemonic: "RES 3,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x98
-            opCode(mnemonic: "RES 3,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x99
-            opCode(mnemonic: "RES 3,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x9A
-            opCode(mnemonic: "RES 3,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x9B
-            opCode(mnemonic: "RES 3,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x9C
-            opCode(mnemonic: "RES 3,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x9D
-            opCode(mnemonic: "RES 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x9E
-            opCode(mnemonic: "RES 3,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x9F
-            opCode(mnemonic: "RES 4,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xA0
-            opCode(mnemonic: "RES 4,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xA1
-            opCode(mnemonic: "RES 4,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xA2
-            opCode(mnemonic: "RES 4,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xA3
-            opCode(mnemonic: "RES 4,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xA4
-            opCode(mnemonic: "RES 4,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xA5
-            opCode(mnemonic: "RES 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xA6
-            opCode(mnemonic: "RES 4,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xA7
-            opCode(mnemonic: "RES 5,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xA8
-            opCode(mnemonic: "RES 5,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xA9
-            opCode(mnemonic: "RES 5,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xAA
-            opCode(mnemonic: "RES 5,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xAB
-            opCode(mnemonic: "RES 5,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xAC
-            opCode(mnemonic: "RES 5,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xAD
-            opCode(mnemonic: "RES 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xAE
-            opCode(mnemonic: "RES 5,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xAF
-            opCode(mnemonic: "RES 6,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xB0
-            opCode(mnemonic: "RES 6,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xB1
-            opCode(mnemonic: "RES 6,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xB2
-            opCode(mnemonic: "RES 6,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xB3
-            opCode(mnemonic: "RES 6,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xB4
-            opCode(mnemonic: "RES 6,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xB5
-            opCode(mnemonic: "RES 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xB6
-            opCode(mnemonic: "RES 6,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xB7
-            opCode(mnemonic: "RES 7,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xB8
-            opCode(mnemonic: "RES 7,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xB9
-            opCode(mnemonic: "RES 7,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xBA
-            opCode(mnemonic: "RES 7,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xBB
-            opCode(mnemonic: "RES 7,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xBC
-            opCode(mnemonic: "RES 7,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xBD
-            opCode(mnemonic: "RES 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xBE
-            opCode(mnemonic: "RES 7,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xBF
-            opCode(mnemonic: "SET 0,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xC0
-            opCode(mnemonic: "SET 0,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xC1
-            opCode(mnemonic: "SET 0,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xC2
-            opCode(mnemonic: "SET 0,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xC3
-            opCode(mnemonic: "SET 0,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xC4
-            opCode(mnemonic: "SET 0,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xC5
-            opCode(mnemonic: "SET 0,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xC6
-            opCode(mnemonic: "SET 0,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xC7
-            opCode(mnemonic: "SET 1,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xC8
-            opCode(mnemonic: "SET 1,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xC9
-            opCode(mnemonic: "SET 1,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xCA
-            opCode(mnemonic: "SET 1,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xCB
-            opCode(mnemonic: "SET 1,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xCC
-            opCode(mnemonic: "SET 1,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xCD
-            opCode(mnemonic: "SET 1,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xCE
-            opCode(mnemonic: "SET 1,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xCF
-            opCode(mnemonic: "SET 2,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xD0
-            opCode(mnemonic: "SET 2,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xD1
-            opCode(mnemonic: "SET 2,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xD2
-            opCode(mnemonic: "SET 2,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xD3
-            opCode(mnemonic: "SET 2,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xD4
-            opCode(mnemonic: "SET 2,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xD5
-            opCode(mnemonic: "SET 2,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xD6
-            opCode(mnemonic: "SET 2,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xD7
-            opCode(mnemonic: "SET 3,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xD8
-            opCode(mnemonic: "SET 3,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xD9
-            opCode(mnemonic: "SET 3,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xDA
-            opCode(mnemonic: "SET 3,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xDB
-            opCode(mnemonic: "SET 3,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xDC
-            opCode(mnemonic: "SET 3,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xDD
-            opCode(mnemonic: "SET 3,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xDE
-            opCode(mnemonic: "SET 3,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xDF
-            opCode(mnemonic: "SET 4,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xE0
-            opCode(mnemonic: "SET 4,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xE1
-            opCode(mnemonic: "SET 4,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xE2
-            opCode(mnemonic: "SET 4,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xE3
-            opCode(mnemonic: "SET 4,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xE4
-            opCode(mnemonic: "SET 4,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xE5
-            opCode(mnemonic: "SET 4,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xE6
-            opCode(mnemonic: "SET 4,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xE7
-            opCode(mnemonic: "SET 5,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xE8
-            opCode(mnemonic: "SET 5,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xE9
-            opCode(mnemonic: "SET 5,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xEA
-            opCode(mnemonic: "SET 5,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xEB
-            opCode(mnemonic: "SET 5,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xEC
-            opCode(mnemonic: "SET 5,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xED
-            opCode(mnemonic: "SET 5,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xEE
-            opCode(mnemonic: "SET 5,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xEF
-            opCode(mnemonic: "SET 6,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xF0
-            opCode(mnemonic: "SET 6,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xF1
-            opCode(mnemonic: "SET 6,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xF2
-            opCode(mnemonic: "SET 6,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xF3
-            opCode(mnemonic: "SET 6,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xF4
-            opCode(mnemonic: "SET 6,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xF5
-            opCode(mnemonic: "SET 6,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xF6
-            opCode(mnemonic: "SET 6,(IX+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xF7
-            opCode(mnemonic: "SET 7,(IX+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xF8
-            opCode(mnemonic: "SET 7,(IX+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xF9
-            opCode(mnemonic: "SET 7,(IX+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xFA
-            opCode(mnemonic: "SET 7,(IX+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xFB
-            opCode(mnemonic: "SET 7,(IX+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xFC
-            opCode(mnemonic: "SET 7,(IX+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xFD
-            opCode(mnemonic: "SET 7,(IX+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xFE
-            opCode(mnemonic: "SET 7,(IX+$d),A", instructionEnd: 3, countDataBytes: 1)    //  0xFF
+            opCode(mnemonic: "RLC (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x00
+            opCode(mnemonic: "RLC (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x01
+            opCode(mnemonic: "RLC (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x02
+            opCode(mnemonic: "RLC (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x03
+            opCode(mnemonic: "RLC (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x04
+            opCode(mnemonic: "RLC (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x05
+            opCode(mnemonic: "RLC (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),     //  0x06
+            opCode(mnemonic: "RLC (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x07
+            opCode(mnemonic: "RRC (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x08
+            opCode(mnemonic: "RRC (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x09
+            opCode(mnemonic: "RRC (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0A
+            opCode(mnemonic: "RRC (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x0B
+            opCode(mnemonic: "RRC (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x0C
+            opCode(mnemonic: "RRC (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x0D
+            opCode(mnemonic: "RRC (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),  //  0x0E
+            opCode(mnemonic: "RRC (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x0F
+            opCode(mnemonic: "RL (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),  //  0x10
+            opCode(mnemonic: "RL (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x11
+            opCode(mnemonic: "RL (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x12
+            opCode(mnemonic: "RL (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x13
+            opCode(mnemonic: "RL (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x14
+            opCode(mnemonic: "RL (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x15
+            opCode(mnemonic: "RL (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x16
+            opCode(mnemonic: "RL (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),   //  0x17
+            opCode(mnemonic: "RR (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x18
+            opCode(mnemonic: "RR (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x19
+            opCode(mnemonic: "RR (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1A
+            opCode(mnemonic: "RR (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1B
+            opCode(mnemonic: "RR (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1C
+            opCode(mnemonic: "RR (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1D
+            opCode(mnemonic: "RR (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1E
+            opCode(mnemonic: "RR (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1F
+            opCode(mnemonic: "SLA (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x20
+            opCode(mnemonic: "SLA (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x21
+            opCode(mnemonic: "SLA (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x22
+            opCode(mnemonic: "SLA (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x23
+            opCode(mnemonic: "SLA (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x24
+            opCode(mnemonic: "SLA (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x25
+            opCode(mnemonic: "SLA (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x26
+            opCode(mnemonic: "SLA (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x27
+            opCode(mnemonic: "SRA (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x28
+            opCode(mnemonic: "SRA (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x29
+            opCode(mnemonic: "SRA (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2A
+            opCode(mnemonic: "SRA (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2B
+            opCode(mnemonic: "SRA (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2C
+            opCode(mnemonic: "SRA (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2D
+            opCode(mnemonic: "SRA (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2E
+            opCode(mnemonic: "SRA (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2F
+            opCode(mnemonic: "SLL (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x30
+            opCode(mnemonic: "SLL (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x31
+            opCode(mnemonic: "SLL (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x32
+            opCode(mnemonic: "SLL (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x33
+            opCode(mnemonic: "SLL (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x34
+            opCode(mnemonic: "SLL (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x35
+            opCode(mnemonic: "SLL (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x36
+            opCode(mnemonic: "SLL (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x37
+            opCode(mnemonic: "SRL (IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x38
+            opCode(mnemonic: "SRL (IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x39
+            opCode(mnemonic: "SRL (IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3A
+            opCode(mnemonic: "SRL (IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3B
+            opCode(mnemonic: "SRL (IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3C
+            opCode(mnemonic: "SRL (IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3D
+            opCode(mnemonic: "SRL (IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3E
+            opCode(mnemonic: "SRL (IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3F
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x40
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x41
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x42
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x43
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x44
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x45
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x46
+            opCode(mnemonic: "BIT 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x47
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x48
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x49
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4A
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4B
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4C
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4D
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4E
+            opCode(mnemonic: "BIT 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4F
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x50
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x51
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x52
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x53
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x54
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x55
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x56
+            opCode(mnemonic: "BIT 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x57
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x58
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x59
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5A
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5B
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5C
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5D
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5E
+            opCode(mnemonic: "BIT 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5F
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x60
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x61
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x62
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x63
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x64
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x65
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x66
+            opCode(mnemonic: "BIT 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x67
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x68
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x69
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6A
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6B
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6C
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6D
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6E
+            opCode(mnemonic: "BIT 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6F
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x70
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x71
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x72
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x73
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x74
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x75
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x76
+            opCode(mnemonic: "BIT 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x77
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x78
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x79
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7A
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7B
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7C
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7D
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7E
+            opCode(mnemonic: "BIT 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7F
+            opCode(mnemonic: "RES 0,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x80
+            opCode(mnemonic: "RES 0,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x81
+            opCode(mnemonic: "RES 0,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x82
+            opCode(mnemonic: "RES 0,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x83
+            opCode(mnemonic: "RES 0,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x84
+            opCode(mnemonic: "RES 0,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x85
+            opCode(mnemonic: "RES 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x86
+            opCode(mnemonic: "RES 0,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x87
+            opCode(mnemonic: "RES 1,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x88
+            opCode(mnemonic: "RES 1,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x89
+            opCode(mnemonic: "RES 1,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8A
+            opCode(mnemonic: "RES 1,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8B
+            opCode(mnemonic: "RES 1,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8C
+            opCode(mnemonic: "RES 1,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8D
+            opCode(mnemonic: "RES 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8E
+            opCode(mnemonic: "RES 1,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8F
+            opCode(mnemonic: "RES 2,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x90
+            opCode(mnemonic: "RES 2,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x91
+            opCode(mnemonic: "RES 2,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x92
+            opCode(mnemonic: "RES 2,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x93
+            opCode(mnemonic: "RES 2,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x94
+            opCode(mnemonic: "RES 2,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x95
+            opCode(mnemonic: "RES 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x96
+            opCode(mnemonic: "RES 2,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x97
+            opCode(mnemonic: "RES 3,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x98
+            opCode(mnemonic: "RES 3,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x99
+            opCode(mnemonic: "RES 3,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9A
+            opCode(mnemonic: "RES 3,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9B
+            opCode(mnemonic: "RES 3,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9C
+            opCode(mnemonic: "RES 3,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9D
+            opCode(mnemonic: "RES 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9E
+            opCode(mnemonic: "RES 3,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9F
+            opCode(mnemonic: "RES 4,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA0
+            opCode(mnemonic: "RES 4,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA1
+            opCode(mnemonic: "RES 4,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA2
+            opCode(mnemonic: "RES 4,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA3
+            opCode(mnemonic: "RES 4,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA4
+            opCode(mnemonic: "RES 4,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA5
+            opCode(mnemonic: "RES 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA6
+            opCode(mnemonic: "RES 4,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA7
+            opCode(mnemonic: "RES 5,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA8
+            opCode(mnemonic: "RES 5,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA9
+            opCode(mnemonic: "RES 5,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAA
+            opCode(mnemonic: "RES 5,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAB
+            opCode(mnemonic: "RES 5,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAC
+            opCode(mnemonic: "RES 5,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAD
+            opCode(mnemonic: "RES 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAE
+            opCode(mnemonic: "RES 5,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAF
+            opCode(mnemonic: "RES 6,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB0
+            opCode(mnemonic: "RES 6,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB1
+            opCode(mnemonic: "RES 6,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB2
+            opCode(mnemonic: "RES 6,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB3
+            opCode(mnemonic: "RES 6,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB4
+            opCode(mnemonic: "RES 6,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB5
+            opCode(mnemonic: "RES 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB6
+            opCode(mnemonic: "RES 6,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB7
+            opCode(mnemonic: "RES 7,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB8
+            opCode(mnemonic: "RES 7,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB9
+            opCode(mnemonic: "RES 7,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBA
+            opCode(mnemonic: "RES 7,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBB
+            opCode(mnemonic: "RES 7,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBC
+            opCode(mnemonic: "RES 7,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBD
+            opCode(mnemonic: "RES 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBE
+            opCode(mnemonic: "RES 7,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBF
+            opCode(mnemonic: "SET 0,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC0
+            opCode(mnemonic: "SET 0,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC1
+            opCode(mnemonic: "SET 0,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC2
+            opCode(mnemonic: "SET 0,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC3
+            opCode(mnemonic: "SET 0,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC4
+            opCode(mnemonic: "SET 0,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC5
+            opCode(mnemonic: "SET 0,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC6
+            opCode(mnemonic: "SET 0,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC7
+            opCode(mnemonic: "SET 1,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC8
+            opCode(mnemonic: "SET 1,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC9
+            opCode(mnemonic: "SET 1,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCA
+            opCode(mnemonic: "SET 1,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCB
+            opCode(mnemonic: "SET 1,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCC
+            opCode(mnemonic: "SET 1,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCD
+            opCode(mnemonic: "SET 1,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCE
+            opCode(mnemonic: "SET 1,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCF
+            opCode(mnemonic: "SET 2,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD0
+            opCode(mnemonic: "SET 2,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD1
+            opCode(mnemonic: "SET 2,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD2
+            opCode(mnemonic: "SET 2,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD3
+            opCode(mnemonic: "SET 2,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD4
+            opCode(mnemonic: "SET 2,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD5
+            opCode(mnemonic: "SET 2,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD6
+            opCode(mnemonic: "SET 2,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD7
+            opCode(mnemonic: "SET 3,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD8
+            opCode(mnemonic: "SET 3,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD9
+            opCode(mnemonic: "SET 3,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDA
+            opCode(mnemonic: "SET 3,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDB
+            opCode(mnemonic: "SET 3,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDC
+            opCode(mnemonic: "SET 3,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDD
+            opCode(mnemonic: "SET 3,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDE
+            opCode(mnemonic: "SET 3,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDF
+            opCode(mnemonic: "SET 4,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE0
+            opCode(mnemonic: "SET 4,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE1
+            opCode(mnemonic: "SET 4,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE2
+            opCode(mnemonic: "SET 4,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE3
+            opCode(mnemonic: "SET 4,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE4
+            opCode(mnemonic: "SET 4,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE5
+            opCode(mnemonic: "SET 4,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE6
+            opCode(mnemonic: "SET 4,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE7
+            opCode(mnemonic: "SET 5,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE8
+            opCode(mnemonic: "SET 5,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE9
+            opCode(mnemonic: "SET 5,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEA
+            opCode(mnemonic: "SET 5,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEB
+            opCode(mnemonic: "SET 5,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEC
+            opCode(mnemonic: "SET 5,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xED
+            opCode(mnemonic: "SET 5,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEE
+            opCode(mnemonic: "SET 5,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEF
+            opCode(mnemonic: "SET 6,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF0
+            opCode(mnemonic: "SET 6,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF1
+            opCode(mnemonic: "SET 6,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF2
+            opCode(mnemonic: "SET 6,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF3
+            opCode(mnemonic: "SET 6,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF4
+            opCode(mnemonic: "SET 6,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF5
+            opCode(mnemonic: "SET 6,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF6
+            opCode(mnemonic: "SET 6,(IX+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF7
+            opCode(mnemonic: "SET 7,(IX+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF8
+            opCode(mnemonic: "SET 7,(IX+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF9
+            opCode(mnemonic: "SET 7,(IX+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFA
+            opCode(mnemonic: "SET 7,(IX+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFB
+            opCode(mnemonic: "SET 7,(IX+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFC
+            opCode(mnemonic: "SET 7,(IX+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFD
+            opCode(mnemonic: "SET 7,(IX+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFE
+            opCode(mnemonic: "SET 7,(IX+$d),A", instructionLength: 1, dataStart: 3, dataEnd: 1)    //  0xFF
         ]
         
         let FDCBPrefixOpcode: [opCode] =
         [
-            opCode(mnemonic: "RLC (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x01
-            opCode(mnemonic: "RLC (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x02
-            opCode(mnemonic: "RLC (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x03
-            opCode(mnemonic: "RLC (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x04
-            opCode(mnemonic: "RLC (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x05
-            opCode(mnemonic: "RLC (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x06
-            opCode(mnemonic: "RLC (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x07
-            opCode(mnemonic: "RRC (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x08
-            opCode(mnemonic: "RRC (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x09
-            opCode(mnemonic: "RRC (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x0A
-            opCode(mnemonic: "RRC (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x0B
-            opCode(mnemonic: "RRC (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x0C
-            opCode(mnemonic: "RRC (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x0D
-            opCode(mnemonic: "RRC (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x0E
-            opCode(mnemonic: "RRC (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x0F
-            opCode(mnemonic: "RL (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x10
-            opCode(mnemonic: "RL (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x11
-            opCode(mnemonic: "RL (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x12
-            opCode(mnemonic: "RL (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x13
-            opCode(mnemonic: "RL (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x14
-            opCode(mnemonic: "RL (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x15
-            opCode(mnemonic: "RL (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x16
-            opCode(mnemonic: "RL (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x17
-            opCode(mnemonic: "RR (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x18
-            opCode(mnemonic: "RR (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x19
-            opCode(mnemonic: "RR (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x1A
-            opCode(mnemonic: "RR (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x1B
-            opCode(mnemonic: "RR (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x1C
-            opCode(mnemonic: "RR (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x1D
-            opCode(mnemonic: "RR (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x1E
-            opCode(mnemonic: "RR (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x1F
-            opCode(mnemonic: "SLA (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x20
-            opCode(mnemonic: "SLA (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x21
-            opCode(mnemonic: "SLA (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x22
-            opCode(mnemonic: "SLA (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x23
-            opCode(mnemonic: "SLA (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x24
-            opCode(mnemonic: "SLA (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x25
-            opCode(mnemonic: "SLA (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x26
-            opCode(mnemonic: "SLA (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x27
-            opCode(mnemonic: "SRA (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x28
-            opCode(mnemonic: "SRA (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x29
-            opCode(mnemonic: "SRA (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x2A
-            opCode(mnemonic: "SRA (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x2B
-            opCode(mnemonic: "SRA (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x2C
-            opCode(mnemonic: "SRA (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x2D
-            opCode(mnemonic: "SRA (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x2E
-            opCode(mnemonic: "SRA (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x2F
-            opCode(mnemonic: "SLL (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x30
-            opCode(mnemonic: "SLL (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x31
-            opCode(mnemonic: "SLL (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x32
-            opCode(mnemonic: "SLL (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x33
-            opCode(mnemonic: "SLL (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x34
-            opCode(mnemonic: "SLL (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x35
-            opCode(mnemonic: "SLL (IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x36
-            opCode(mnemonic: "SLL (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x37
-            opCode(mnemonic: "SRL (IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x38
-            opCode(mnemonic: "SRL (IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x39
-            opCode(mnemonic: "SRL (IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x3A
-            opCode(mnemonic: "SRL (IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x3B
-            opCode(mnemonic: "SRL (IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x3C
-            opCode(mnemonic: "SRL (IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x3D
-            opCode(mnemonic: "SRL (IY+$d)", instructionEnd: 3, countDataBytes: 1),      //  0x3E
-            opCode(mnemonic: "SRL (IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x3F
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x40
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x41
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x42
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x43
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x44
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x45
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x46
-            opCode(mnemonic: "BIT 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x47
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x48
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x49
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4A
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4B
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4C
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4D
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4E
-            opCode(mnemonic: "BIT 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x4F
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x50
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x51
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x52
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x53
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x54
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x55
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x56
-            opCode(mnemonic: "BIT 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x57
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x58
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x59
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5A
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5B
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5C
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5D
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5E
-            opCode(mnemonic: "BIT 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x5F
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x60
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x61
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x62
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x63
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x64
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x65
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x66
-            opCode(mnemonic: "BIT 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x67
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x68
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x69
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6A
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6B
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6C
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6D
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6E
-            opCode(mnemonic: "BIT 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x6F
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x70
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x71
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x72
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x73
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x74
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x75
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x76
-            opCode(mnemonic: "BIT 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x77
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x78
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x79
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7A
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7B
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7C
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7D
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7E
-            opCode(mnemonic: "BIT 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x7F
-            opCode(mnemonic: "RES 0,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x80
-            opCode(mnemonic: "RES 0,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x81
-            opCode(mnemonic: "RES 0,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x82
-            opCode(mnemonic: "RES 0,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x83
-            opCode(mnemonic: "RES 0,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x84
-            opCode(mnemonic: "RES 0,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x85
-            opCode(mnemonic: "RES 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x86
-            opCode(mnemonic: "RES 0,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x87
-            opCode(mnemonic: "RES 1,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x88
-            opCode(mnemonic: "RES 1,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x89
-            opCode(mnemonic: "RES 1,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x8A
-            opCode(mnemonic: "RES 1,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x8B
-            opCode(mnemonic: "RES 1,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x8C
-            opCode(mnemonic: "RES 1,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x8D
-            opCode(mnemonic: "RES 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x8E
-            opCode(mnemonic: "RES 1,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x8F
-            opCode(mnemonic: "RES 2,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x90
-            opCode(mnemonic: "RES 2,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x91
-            opCode(mnemonic: "RES 2,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x92
-            opCode(mnemonic: "RES 2,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x93
-            opCode(mnemonic: "RES 2,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x94
-            opCode(mnemonic: "RES 2,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x95
-            opCode(mnemonic: "RES 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x96
-            opCode(mnemonic: "RES 2,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x97
-            opCode(mnemonic: "RES 3,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0x98
-            opCode(mnemonic: "RES 3,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0x99
-            opCode(mnemonic: "RES 3,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0x9A
-            opCode(mnemonic: "RES 3,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0x9B
-            opCode(mnemonic: "RES 3,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0x9C
-            opCode(mnemonic: "RES 3,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0x9D
-            opCode(mnemonic: "RES 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0x9E
-            opCode(mnemonic: "RES 3,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0x9F
-            opCode(mnemonic: "RES 4,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xA0
-            opCode(mnemonic: "RES 4,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xA1
-            opCode(mnemonic: "RES 4,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xA2
-            opCode(mnemonic: "RES 4,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xA3
-            opCode(mnemonic: "RES 4,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xA4
-            opCode(mnemonic: "RES 4,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xA5
-            opCode(mnemonic: "RES 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xA6
-            opCode(mnemonic: "RES 4,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xA7
-            opCode(mnemonic: "RES 5,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xA8
-            opCode(mnemonic: "RES 5,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xA9
-            opCode(mnemonic: "RES 5,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xAA
-            opCode(mnemonic: "RES 5,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xAB
-            opCode(mnemonic: "RES 5,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xAC
-            opCode(mnemonic: "RES 5,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xAD
-            opCode(mnemonic: "RES 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xAE
-            opCode(mnemonic: "RES 5,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xAF
-            opCode(mnemonic: "RES 6,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xB0
-            opCode(mnemonic: "RES 6,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xB1
-            opCode(mnemonic: "RES 6,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xB2
-            opCode(mnemonic: "RES 6,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xB3
-            opCode(mnemonic: "RES 6,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xB4
-            opCode(mnemonic: "RES 6,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xB5
-            opCode(mnemonic: "RES 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xB6
-            opCode(mnemonic: "RES 6,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xB7
-            opCode(mnemonic: "RES 7,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xB8
-            opCode(mnemonic: "RES 7,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xB9
-            opCode(mnemonic: "RES 7,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xBA
-            opCode(mnemonic: "RES 7,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xBB
-            opCode(mnemonic: "RES 7,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xBC
-            opCode(mnemonic: "RES 7,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xBD
-            opCode(mnemonic: "RES 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xBE
-            opCode(mnemonic: "RES 7,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xBF
-            opCode(mnemonic: "SET 0,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xC0
-            opCode(mnemonic: "SET 0,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xC1
-            opCode(mnemonic: "SET 0,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xC2
-            opCode(mnemonic: "SET 0,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xC3
-            opCode(mnemonic: "SET 0,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xC4
-            opCode(mnemonic: "SET 0,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xC5
-            opCode(mnemonic: "SET 0,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xC6
-            opCode(mnemonic: "SET 0,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xC7
-            opCode(mnemonic: "SET 1,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xC8
-            opCode(mnemonic: "SET 1,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xC9
-            opCode(mnemonic: "SET 1,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xCA
-            opCode(mnemonic: "SET 1,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xCB
-            opCode(mnemonic: "SET 1,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xCC
-            opCode(mnemonic: "SET 1,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xCD
-            opCode(mnemonic: "SET 1,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xCE
-            opCode(mnemonic: "SET 1,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xCF
-            opCode(mnemonic: "SET 2,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xD0
-            opCode(mnemonic: "SET 2,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xD1
-            opCode(mnemonic: "SET 2,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xD2
-            opCode(mnemonic: "SET 2,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xD3
-            opCode(mnemonic: "SET 2,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xD4
-            opCode(mnemonic: "SET 2,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xD5
-            opCode(mnemonic: "SET 2,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xD6
-            opCode(mnemonic: "SET 2,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xD7
-            opCode(mnemonic: "SET 3,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xD8
-            opCode(mnemonic: "SET 3,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xD9
-            opCode(mnemonic: "SET 3,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xDA
-            opCode(mnemonic: "SET 3,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xDB
-            opCode(mnemonic: "SET 3,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xDC
-            opCode(mnemonic: "SET 3,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xDD
-            opCode(mnemonic: "SET 3,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xDE
-            opCode(mnemonic: "SET 3,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xDF
-            opCode(mnemonic: "SET 4,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xE0
-            opCode(mnemonic: "SET 4,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xE1
-            opCode(mnemonic: "SET 4,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xE2
-            opCode(mnemonic: "SET 4,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xE3
-            opCode(mnemonic: "SET 4,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xE4
-            opCode(mnemonic: "SET 4,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xE5
-            opCode(mnemonic: "SET 4,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xE6
-            opCode(mnemonic: "SET 4,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xE7
-            opCode(mnemonic: "SET 5,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xE8
-            opCode(mnemonic: "SET 5,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xE9
-            opCode(mnemonic: "SET 5,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xEA
-            opCode(mnemonic: "SET 5,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xEB
-            opCode(mnemonic: "SET 5,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xEC
-            opCode(mnemonic: "SET 5,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xED
-            opCode(mnemonic: "SET 5,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xEE
-            opCode(mnemonic: "SET 5,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xEF
-            opCode(mnemonic: "SET 6,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xF0
-            opCode(mnemonic: "SET 6,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xF1
-            opCode(mnemonic: "SET 6,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xF2
-            opCode(mnemonic: "SET 6,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xF3
-            opCode(mnemonic: "SET 6,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xF4
-            opCode(mnemonic: "SET 6,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xF5
-            opCode(mnemonic: "SET 6,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xF6
-            opCode(mnemonic: "SET 6,(IY+$d),A", instructionEnd: 3, countDataBytes: 1),    //  0xF7
-            opCode(mnemonic: "SET 7,(IY+$d),B", instructionEnd: 3, countDataBytes: 1),    //  0xF8
-            opCode(mnemonic: "SET 7,(IY+$d),C", instructionEnd: 3, countDataBytes: 1),    //  0xF9
-            opCode(mnemonic: "SET 7,(IY+$d),D", instructionEnd: 3, countDataBytes: 1),    //  0xFA
-            opCode(mnemonic: "SET 7,(IY+$d),E", instructionEnd: 3, countDataBytes: 1),    //  0xFB
-            opCode(mnemonic: "SET 7,(IY+$d),H", instructionEnd: 3, countDataBytes: 1),    //  0xFC
-            opCode(mnemonic: "SET 7,(IY+$d),L", instructionEnd: 3, countDataBytes: 1),    //  0xFD
-            opCode(mnemonic: "SET 7,(IY+$d)", instructionEnd: 3, countDataBytes: 1),    //  0xFE
-            opCode(mnemonic: "SET 7,(IY+$d),A", instructionEnd: 3, countDataBytes: 1)    //  0xFF
+            opCode(mnemonic: "RLC (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x01
+            opCode(mnemonic: "RLC (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x02
+            opCode(mnemonic: "RLC (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x03
+            opCode(mnemonic: "RLC (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x04
+            opCode(mnemonic: "RLC (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x05
+            opCode(mnemonic: "RLC (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x06
+            opCode(mnemonic: "RLC (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x07
+            opCode(mnemonic: "RRC (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x08
+            opCode(mnemonic: "RRC (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x09
+            opCode(mnemonic: "RRC (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0A
+            opCode(mnemonic: "RRC (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0B
+            opCode(mnemonic: "RRC (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0C
+            opCode(mnemonic: "RRC (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0D
+            opCode(mnemonic: "RRC (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0E
+            opCode(mnemonic: "RRC (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x0F
+            opCode(mnemonic: "RL (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x10
+            opCode(mnemonic: "RL (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x11
+            opCode(mnemonic: "RL (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x12
+            opCode(mnemonic: "RL (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x13
+            opCode(mnemonic: "RL (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x14
+            opCode(mnemonic: "RL (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x15
+            opCode(mnemonic: "RL (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x16
+            opCode(mnemonic: "RL (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x17
+            opCode(mnemonic: "RR (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x18
+            opCode(mnemonic: "RR (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x19
+            opCode(mnemonic: "RR (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1A
+            opCode(mnemonic: "RR (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1B
+            opCode(mnemonic: "RR (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1C
+            opCode(mnemonic: "RR (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1D
+            opCode(mnemonic: "RR (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1E
+            opCode(mnemonic: "RR (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x1F
+            opCode(mnemonic: "SLA (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x20
+            opCode(mnemonic: "SLA (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x21
+            opCode(mnemonic: "SLA (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x22
+            opCode(mnemonic: "SLA (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x23
+            opCode(mnemonic: "SLA (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x24
+            opCode(mnemonic: "SLA (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x25
+            opCode(mnemonic: "SLA (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x26
+            opCode(mnemonic: "SLA (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x27
+            opCode(mnemonic: "SRA (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x28
+            opCode(mnemonic: "SRA (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x29
+            opCode(mnemonic: "SRA (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2A
+            opCode(mnemonic: "SRA (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2B
+            opCode(mnemonic: "SRA (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2C
+            opCode(mnemonic: "SRA (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2D
+            opCode(mnemonic: "SRA (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2E
+            opCode(mnemonic: "SRA (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x2F
+            opCode(mnemonic: "SLL (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x30
+            opCode(mnemonic: "SLL (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x31
+            opCode(mnemonic: "SLL (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x32
+            opCode(mnemonic: "SLL (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x33
+            opCode(mnemonic: "SLL (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x34
+            opCode(mnemonic: "SLL (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x35
+            opCode(mnemonic: "SLL (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x36
+            opCode(mnemonic: "SLL (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x37
+            opCode(mnemonic: "SRL (IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x38
+            opCode(mnemonic: "SRL (IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x39
+            opCode(mnemonic: "SRL (IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3A
+            opCode(mnemonic: "SRL (IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3B
+            opCode(mnemonic: "SRL (IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3C
+            opCode(mnemonic: "SRL (IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3D
+            opCode(mnemonic: "SRL (IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),      //  0x3E
+            opCode(mnemonic: "SRL (IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x3F
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x40
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x41
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x42
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x43
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x44
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x45
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x46
+            opCode(mnemonic: "BIT 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x47
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x48
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x49
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4A
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4B
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4C
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4D
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4E
+            opCode(mnemonic: "BIT 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x4F
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x50
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x51
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x52
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x53
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x54
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x55
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x56
+            opCode(mnemonic: "BIT 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x57
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x58
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x59
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5A
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5B
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5C
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5D
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5E
+            opCode(mnemonic: "BIT 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x5F
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x60
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x61
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x62
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x63
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x64
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x65
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x66
+            opCode(mnemonic: "BIT 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x67
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x68
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x69
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6A
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6B
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6C
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6D
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6E
+            opCode(mnemonic: "BIT 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x6F
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x70
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x71
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x72
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x73
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x74
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x75
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x76
+            opCode(mnemonic: "BIT 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x77
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x78
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x79
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7A
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7B
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7C
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7D
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7E
+            opCode(mnemonic: "BIT 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x7F
+            opCode(mnemonic: "RES 0,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x80
+            opCode(mnemonic: "RES 0,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x81
+            opCode(mnemonic: "RES 0,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x82
+            opCode(mnemonic: "RES 0,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x83
+            opCode(mnemonic: "RES 0,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x84
+            opCode(mnemonic: "RES 0,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x85
+            opCode(mnemonic: "RES 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x86
+            opCode(mnemonic: "RES 0,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x87
+            opCode(mnemonic: "RES 1,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x88
+            opCode(mnemonic: "RES 1,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x89
+            opCode(mnemonic: "RES 1,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8A
+            opCode(mnemonic: "RES 1,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8B
+            opCode(mnemonic: "RES 1,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8C
+            opCode(mnemonic: "RES 1,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8D
+            opCode(mnemonic: "RES 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8E
+            opCode(mnemonic: "RES 1,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x8F
+            opCode(mnemonic: "RES 2,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x90
+            opCode(mnemonic: "RES 2,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x91
+            opCode(mnemonic: "RES 2,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x92
+            opCode(mnemonic: "RES 2,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x93
+            opCode(mnemonic: "RES 2,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x94
+            opCode(mnemonic: "RES 2,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x95
+            opCode(mnemonic: "RES 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x96
+            opCode(mnemonic: "RES 2,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x97
+            opCode(mnemonic: "RES 3,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x98
+            opCode(mnemonic: "RES 3,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x99
+            opCode(mnemonic: "RES 3,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9A
+            opCode(mnemonic: "RES 3,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9B
+            opCode(mnemonic: "RES 3,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9C
+            opCode(mnemonic: "RES 3,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9D
+            opCode(mnemonic: "RES 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9E
+            opCode(mnemonic: "RES 3,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0x9F
+            opCode(mnemonic: "RES 4,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA0
+            opCode(mnemonic: "RES 4,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA1
+            opCode(mnemonic: "RES 4,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA2
+            opCode(mnemonic: "RES 4,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA3
+            opCode(mnemonic: "RES 4,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA4
+            opCode(mnemonic: "RES 4,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA5
+            opCode(mnemonic: "RES 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA6
+            opCode(mnemonic: "RES 4,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA7
+            opCode(mnemonic: "RES 5,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA8
+            opCode(mnemonic: "RES 5,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xA9
+            opCode(mnemonic: "RES 5,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAA
+            opCode(mnemonic: "RES 5,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAB
+            opCode(mnemonic: "RES 5,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAC
+            opCode(mnemonic: "RES 5,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAD
+            opCode(mnemonic: "RES 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAE
+            opCode(mnemonic: "RES 5,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xAF
+            opCode(mnemonic: "RES 6,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB0
+            opCode(mnemonic: "RES 6,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB1
+            opCode(mnemonic: "RES 6,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB2
+            opCode(mnemonic: "RES 6,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB3
+            opCode(mnemonic: "RES 6,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB4
+            opCode(mnemonic: "RES 6,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB5
+            opCode(mnemonic: "RES 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB6
+            opCode(mnemonic: "RES 6,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB7
+            opCode(mnemonic: "RES 7,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB8
+            opCode(mnemonic: "RES 7,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xB9
+            opCode(mnemonic: "RES 7,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBA
+            opCode(mnemonic: "RES 7,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBB
+            opCode(mnemonic: "RES 7,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBC
+            opCode(mnemonic: "RES 7,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBD
+            opCode(mnemonic: "RES 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBE
+            opCode(mnemonic: "RES 7,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xBF
+            opCode(mnemonic: "SET 0,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC0
+            opCode(mnemonic: "SET 0,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC1
+            opCode(mnemonic: "SET 0,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC2
+            opCode(mnemonic: "SET 0,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC3
+            opCode(mnemonic: "SET 0,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC4
+            opCode(mnemonic: "SET 0,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC5
+            opCode(mnemonic: "SET 0,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC6
+            opCode(mnemonic: "SET 0,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC7
+            opCode(mnemonic: "SET 1,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC8
+            opCode(mnemonic: "SET 1,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xC9
+            opCode(mnemonic: "SET 1,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCA
+            opCode(mnemonic: "SET 1,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCB
+            opCode(mnemonic: "SET 1,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCC
+            opCode(mnemonic: "SET 1,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCD
+            opCode(mnemonic: "SET 1,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCE
+            opCode(mnemonic: "SET 1,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xCF
+            opCode(mnemonic: "SET 2,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD0
+            opCode(mnemonic: "SET 2,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD1
+            opCode(mnemonic: "SET 2,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD2
+            opCode(mnemonic: "SET 2,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD3
+            opCode(mnemonic: "SET 2,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD4
+            opCode(mnemonic: "SET 2,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD5
+            opCode(mnemonic: "SET 2,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD6
+            opCode(mnemonic: "SET 2,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD7
+            opCode(mnemonic: "SET 3,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD8
+            opCode(mnemonic: "SET 3,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xD9
+            opCode(mnemonic: "SET 3,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDA
+            opCode(mnemonic: "SET 3,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDB
+            opCode(mnemonic: "SET 3,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDC
+            opCode(mnemonic: "SET 3,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDD
+            opCode(mnemonic: "SET 3,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDE
+            opCode(mnemonic: "SET 3,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xDF
+            opCode(mnemonic: "SET 4,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE0
+            opCode(mnemonic: "SET 4,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE1
+            opCode(mnemonic: "SET 4,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE2
+            opCode(mnemonic: "SET 4,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE3
+            opCode(mnemonic: "SET 4,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE4
+            opCode(mnemonic: "SET 4,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE5
+            opCode(mnemonic: "SET 4,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE6
+            opCode(mnemonic: "SET 4,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE7
+            opCode(mnemonic: "SET 5,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE8
+            opCode(mnemonic: "SET 5,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xE9
+            opCode(mnemonic: "SET 5,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEA
+            opCode(mnemonic: "SET 5,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEB
+            opCode(mnemonic: "SET 5,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEC
+            opCode(mnemonic: "SET 5,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xED
+            opCode(mnemonic: "SET 5,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEE
+            opCode(mnemonic: "SET 5,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xEF
+            opCode(mnemonic: "SET 6,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF0
+            opCode(mnemonic: "SET 6,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF1
+            opCode(mnemonic: "SET 6,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF2
+            opCode(mnemonic: "SET 6,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF3
+            opCode(mnemonic: "SET 6,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF4
+            opCode(mnemonic: "SET 6,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF5
+            opCode(mnemonic: "SET 6,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF6
+            opCode(mnemonic: "SET 6,(IY+$d),A", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF7
+            opCode(mnemonic: "SET 7,(IY+$d),B", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF8
+            opCode(mnemonic: "SET 7,(IY+$d),C", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xF9
+            opCode(mnemonic: "SET 7,(IY+$d),D", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFA
+            opCode(mnemonic: "SET 7,(IY+$d),E", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFB
+            opCode(mnemonic: "SET 7,(IY+$d),H", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFC
+            opCode(mnemonic: "SET 7,(IY+$d),L", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFD
+            opCode(mnemonic: "SET 7,(IY+$d)", instructionLength: 4, dataStart: 2, dataEnd: 2),    //  0xFE
+            opCode(mnemonic: "SET 7,(IY+$d),A", instructionLength: 1, dataStart: 3, dataEnd: 1)    //  0xFF
         ]
     
-    func decodeMnemonic(mnemonic: String, bytes: [UInt8], instructionEnd: Int, countDataBytes: Int) -> String
+    func decodeMnemonic(mnemonic: String, bytes: [UInt8], instructionLength: Int, dataStart: Int, dataEnd: Int) -> String
     {
         var tempString : String
         
-        let dataBytes = Array(bytes[instructionEnd+1...instructionEnd+1+countDataBytes])
-        let instructionBytes = Array(bytes[0...instructionEnd+countDataBytes])
-        switch countDataBytes
+        let dataBytes = Array(bytes[dataStart...dataEnd])
+        let instructionBytes = Array(bytes[0...instructionLength-1])
+        switch dataEnd
         {
             case 1 :
                 tempString = mnemonic.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",dataBytes[0]))
@@ -1856,32 +1857,32 @@ struct Z80Disassembler
             {
                 case 0x00...0xCA,0xCD...0xDC,0xDE...0xEC,0xEE...0xFC,0xFE...0xFF :
                     let tempOpcode = singleOpcode[Int(bytes[0])]
-                    tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                    tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                 case 0xCB :
                     let tempOpcode = CBPrefixOpcode[Int(bytes[1])]
-                    tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                    tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                 case 0xDD :
                 switch bytes[1]
                 {
                     case 0xCB :
                         let tempOpcode = DDCBPrefixOpcode[Int(bytes[3])]
-                        tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                        tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                     default :
                         let tempOpcode = DDPrefixOpcode[Int(bytes[1])]
-                        tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                        tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                 }
                 case 0xED :
                     let tempOpcode = EDPrefixOpcode[Int(bytes[1])]
-                    tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                    tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                 case 0xFD :
                     switch bytes[1]
                     {
                         case 0xCB :
                             let tempOpcode = FDCBPrefixOpcode[Int(bytes[3])]
-                            tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                            tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                         default :
                             let tempOpcode = FDPrefixOpcode[Int(bytes[1])]
-                            tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionEnd: tempOpcode.instructionEnd, countDataBytes: tempOpcode.countDataBytes)
+                            tempString = tempString + decodeMnemonic(mnemonic: tempOpcode.mnemonic, bytes: bytes, instructionLength: tempOpcode.instructionLength, dataStart: tempOpcode.dataStart, dataEnd: tempOpcode.dataEnd)
                     }
                 default: break
             }
