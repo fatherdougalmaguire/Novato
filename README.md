@@ -27,10 +27,13 @@ This emulator is still in what could charitably called *alpha* status.
 * You can start and stop the emulator via button control.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
+* There is a splash screen displaying the application logo as PCG characters
+* You can choose to start the emulator automatically or go to the splash screen first
+* A rudimentary scanline shader has been added (rudimentary as in not very good.  This needs to be worked on)
 * A small number of Z80 instructions are decoded.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
-* ~The last 16 instructions are decoded and displayed~ Disassembly is currently broken.
+* The last 16 instructions are decoded and displayed
 * The screen buffer is output to the display using a metal shader.
 * Shader will automatically scale the output resolution to the same display size.
 * Colour support has been added ( green mono, amber mono, blue mono, white mono and colour )
@@ -45,13 +48,13 @@ This emulator is still in what could charitably called *alpha* status.
   - Each memory device can be tagged as read-only or read/write
   - Devices can be switched into and out of memory ranges in RAM
   - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
-* Splash screen displaying the application logo as PCG characters
 * Settings module to set
   - Start-up mode ( automatic or splash screen )
   - Select boot code (  Basic demo, CP/M demo, Viatel demo, Microworld Basic 5.22e )
   - Colour mode
   - Aspect ratio
   - Screen scaling
+  - Interlace mode
 
 ## On the to-do list
 
