@@ -44,6 +44,7 @@ struct emulatorView: View
     @AppStorage("colorSelection") private var colourSelection = "Colour"
     @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
+    //@AppStorage("interlaceEnabled") private var interlaceEnabled: Bool = false
     
     @State private var isRunning = false
     
@@ -61,6 +62,8 @@ struct emulatorView: View
         let colourOptions: [String: Int]
         let charScale: CGFloat
         let charAspect: CGFloat
+        
+        @AppStorage("interlaceEnabled") private var interlaceEnabled: Bool = false
         
         var body: some View
         {
@@ -136,6 +139,7 @@ struct emulatorView: View
                         .floatArray(pcgRamArray),
                         .floatArray(colourRamArray)
                     ))
+                    .colorEffect(ShaderLibrary.interlace(.float(0.5), .float(3.14159), .float(interlaceEnabled ? 1.0 : 0.0)))  // Scanline depth and density
                     .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
                     .frame(width: scaledWidth, height: scaledHeight)
             }

@@ -64,9 +64,9 @@ struct SettingsView: View
     {
         TabView
         {
-//            modelSettingsView()
-//                .tabItem { Label("Pick your model", systemImage: "gear") }
-//                .tag("model")
+            //            modelSettingsView()
+            //                .tabItem { Label("Pick your model", systemImage: "gear") }
+            //                .tag("model")
             bootSettingsView()
                 .tabItem { Label("Boot Settings", systemImage: "gear") }
                 .tag("general")
@@ -75,7 +75,7 @@ struct SettingsView: View
                 .tag("general")
             
         }
-        .frame(width: 450, height: 250) // Standard starting size
+        .frame(width: 450, height: 250)
     }
 }
 
@@ -92,7 +92,7 @@ struct modelSettingsView: View
             {
                 ForEach(themes, id: \.self) { theme in Text(theme) }
             }
-            .pickerStyle(.menu) // Standard macOS pop-up button
+            .pickerStyle(.menu)
             
             Divider()
             
@@ -109,7 +109,7 @@ struct bootSettingsView: View
 {
     @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
-
+    
     var body: some View
     {
         let themes = ["Demo #1 - Basic","Demo #2 - CP/M","Demo #3 - Viatel","MicroWorld Basic 5.22e"]
@@ -119,18 +119,16 @@ struct bootSettingsView: View
             {
                 ForEach(themes, id: \.self) { theme in Text(theme) }
             }
-            .pickerStyle(.menu) // Standard macOS pop-up button
+            .pickerStyle(.menu)
             
-            Divider()
-                        
             Picker("Operation Mode", selection: $autoStartSelection) {
-                            Text("Splash Screen").tag(false)
-                            Text("Auto-Start").tag(true)
-                        }
-                        .pickerStyle(.menu) // Works great on macOS and iOS
+                Text("Splash Screen").tag(false)
+                Text("Auto-Start").tag(true)
+            }
+            .pickerStyle(.menu)
         }
-        .padding(30)
-        .frame(width: 400, height: 150)
+        .formStyle(.grouped)
+
     }
 }
 
@@ -138,6 +136,7 @@ struct screenSettingsView: View
 {
     @AppStorage("scalingSelection") private var scalingSelection: Double = 2.0
     @AppStorage("aspectSelection") private var aspectSelection: Double = 4/3
+    @AppStorage("interlaceEnabled") private var interlaceEnabled: Bool = false
     @AppStorage("colorSelection") private var colourSelection = "Colour"
     
     var body: some View
@@ -150,23 +149,20 @@ struct screenSettingsView: View
             { Text("Screen Scaling") }
             minimumValueLabel: { Text("1") }
             maximumValueLabel: { Text("4") }
-            
-            Divider()
-            
+   
             Slider(value: $aspectSelection, in: 0...2, step: 0.1)
             { Text("Aspect Ratio") }
             minimumValueLabel: { Text("0") }
             maximumValueLabel: { Text("2") }
             
-            Divider()
-            
             Picker("Colour Mode:", selection: $colourSelection)
             {
                 ForEach(themes, id: \.self) { theme in Text(theme) }
             }
-            .pickerStyle(.menu) // Standard macOS pop-up button
+            .pickerStyle(.menu)
+            
+            Toggle("Interlace Mode:", isOn: $interlaceEnabled)
         }
-        .padding(30)
-        .frame(width: 400, height: 150)
+        .formStyle(.grouped)
     }
 }

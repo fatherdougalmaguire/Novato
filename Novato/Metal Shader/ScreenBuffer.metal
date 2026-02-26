@@ -169,15 +169,14 @@ using namespace metal;
     }
 }
 
-[[ stitchable ]] half4 interlace ( float2 position, half4 color, float interlaceon )
+[[ stitchable ]] half4 interlace(float2 position, half4 color, float strength, float frequency, float interlaceEnabled)
 {
-    half4 InterlaceColor = half4(0.0, 0.0, 0.0, 1.0);
-
-    // 2 pixels wide, change for more/less
-    // or change fragCoord.y to fragCoord.x for vertical lines
-    if ((int(position.y) % 2 == 0) && (interlaceon == 1))
+    if (interlaceEnabled > 0.5)
     {
-        return InterlaceColor;
+        float wave = cos(position.y * frequency);
+        float mask = mix(1.0, (wave + 1.0) * 0.5, strength);
+        half3 brightened = color.rgb * 1.5;
+        return half4(brightened * mask, color.a);
     }
     else
     {
