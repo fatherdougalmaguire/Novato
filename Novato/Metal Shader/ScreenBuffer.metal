@@ -169,14 +169,27 @@ using namespace metal;
     }
 }
 
-[[ stitchable ]] half4 interlace(float2 position, half4 color, float strength, float frequency, float interlaceEnabled)
+[[ stitchable ]]
+half4 interlace(float2 position, half4 color, float spacing, float intensity, float brightnessBoost, float interlaceEnabled)
 {
     if (interlaceEnabled > 0.5)
     {
-        float wave = cos(position.y * frequency);
-        float mask = mix(1.0, (wave + 1.0) * 0.5, strength);
-        half3 brightened = color.rgb * 1.5;
-        return half4(brightened * mask, color.a);
+        float yValue = fmod(position.y, spacing);
+        
+        if (yValue < (spacing * 0.5))
+        {
+            // This is the DARK gap
+            return color * half4(intensity, intensity, intensity, 1.0);
+        }
+        else
+        {
+            // This is the BRIGHT pixel.
+            // We multiply the color by brightnessBoost (e.g., 1.5 for 150% brightness)
+            half4 boosted = color * brightnessBoost;
+            // Ensure we don't 'clip' the alpha channel
+            boosted.a = color.a;
+            return boosted;
+        }
     }
     else
     {

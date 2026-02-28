@@ -44,7 +44,6 @@ struct emulatorView: View
     @AppStorage("colorSelection") private var colourSelection = "Colour"
     @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
-    //@AppStorage("interlaceEnabled") private var interlaceEnabled: Bool = false
     
     @State private var isRunning = false
     
@@ -65,83 +64,143 @@ struct emulatorView: View
         
         @AppStorage("interlaceEnabled") private var interlaceEnabled: Bool = false
         
+        struct ScreenPipelineView: View {
+            let baseWidth: CGFloat
+            let baseHeight: CGFloat
+            let scaledWidth: CGFloat
+            let scaledHeight: CGFloat
+            let charScale: CGFloat
+            let charAspect: CGFloat
+            let frameXScale: Double
+            let frameYScale: Double
+            let interlaceEnabled: Bool
+
+            // Shader inputs
+            let scanLineHeight: Float
+            let displayColumns: Float
+            let fontLocationOffset: Float
+            let cursorPosition: Float
+            let cursorStartScanLine: Float
+            let cursorEndScanLine: Float
+            let cursorBlinkType: Float
+            let colourMode: Float
+            let backGroundIntensity: Float
+            let elapsedTime: Float
+            let vduArray: [Float]
+            let charRomArray: [Float]
+            let pcgRamArray: [Float]
+            let colourRamArray: [Float]
+
+            var body: some View {
+                Rectangle()
+                    .frame(width: baseWidth, height: baseHeight)
+                    .colorEffect(
+                        ShaderLibrary.ScreenBuffer(
+                            .float(scanLineHeight),
+                            .float(displayColumns),
+                            .float(fontLocationOffset),
+                            .float(cursorPosition),
+                            .float(cursorStartScanLine),
+                            .float(cursorEndScanLine),
+                            .float(cursorBlinkType),
+                            .float(colourMode),
+                            .float(backGroundIntensity),
+                            .float(elapsedTime),
+                            .floatArray(vduArray),
+                            .floatArray(charRomArray),
+                            .floatArray(pcgRamArray),
+                            .floatArray(colourRamArray)
+                        )
+                    )
+                    .colorEffect(
+                        ShaderLibrary.interlace(.float(1.0), .float(0.2), .float(1.8), .float(interlaceEnabled ? 1.0 : 0.0)))
+                        .brightness(0.1)
+                        .saturation(1.5)
+                    .scaleEffect(
+                        x: charScale * CGFloat(frameXScale),
+                        y: charScale * charAspect * CGFloat(frameYScale)
+                    )
+                    .frame(width: scaledWidth, height: scaledHeight)
+            }
+        }
+        
         var body: some View
         {
-            let rawHorizDisplayed = Int(snapshot.crtcSnapshot.R1)
-            let horizDisplayed = max(rawHorizDisplayed, 1)
-            let rawScanLines = Int(snapshot.crtcSnapshot.R9 + 1)
-            let scanLines = max(rawScanLines, 1)
-            let vertDisplayed = max(Int(snapshot.crtcSnapshot.R6), 1)
-            
-            let frameWidth = 8 * horizDisplayed
-            let frameHeight = scanLines * vertDisplayed
-            
-            let baseXScale = 512.0 / Double(max(frameWidth, 1))
-            let frameXScale = baseXScale.isFinite ? baseXScale : 1.0
-            let baseYScale = 256.0 / Double(max(frameHeight, 1))
-            let frameYScale = baseYScale.isFinite ? baseYScale : 1.0
-            
-            let scanLineHeight = Float(scanLines)
-            let displayColumns = Float(horizDisplayed)
-            let cursorStartScanLine = Float(Int(snapshot.crtcSnapshot.R10) & 0b00011111)
-            let cursorEndScanLine = Float(snapshot.crtcSnapshot.R11)
-            let cursorBlinkType = Float(Int(snapshot.crtcSnapshot.R10 >> 5))
-            let fontLocationOffset = Float(Int(snapshot.crtcSnapshot.R12) << 8 | Int(snapshot.crtcSnapshot.R13))
-            let cursorPosition = Float(Int(snapshot.crtcSnapshot.R14) << 8 | Int(snapshot.crtcSnapshot.R15))
-            
-            let colourMode = Float(colourOptions[colourSelection] ?? 0)
-            
-            let baseWidth = max(CGFloat(frameWidth), 1)
-            let baseHeight = max(CGFloat(frameHeight), 1)
-            let scaledWidth = baseWidth * charScale * CGFloat(frameXScale)
-            let scaledHeight = baseHeight * charScale * charAspect * CGFloat(frameYScale)
-            
-            let backGroundIntensity = Float(
+            // Extract and clamp CRTC values with explicit typing to help the type checker
+            let rawHorizDisplayed: Int = Int(snapshot.crtcSnapshot.R1)
+            let horizDisplayed: Int = max(rawHorizDisplayed, 1)
+            let rawScanLines: Int = Int(snapshot.crtcSnapshot.R9 + 1)
+            let scanLines: Int = max(rawScanLines, 1)
+            let vertDisplayed: Int = max(Int(snapshot.crtcSnapshot.R6), 1)
+
+            // Compute frame dimensions
+            let frameWidth: Int = 8 * horizDisplayed
+            let frameHeight: Int = scanLines * vertDisplayed
+
+            // Compute scale factors with explicit defaults
+            let baseXScaleValue = 512.0 / Double(max(frameWidth, 1))
+            let frameXScale: Double = baseXScaleValue.isFinite ? baseXScaleValue : 1.0
+            let baseYScaleValue = 256.0 / Double(max(frameHeight, 1))
+            let frameYScale: Double = baseYScaleValue.isFinite ? baseYScaleValue : 1.0
+
+            // Cursor and display parameters
+            let scanLineHeight: Float = Float(scanLines)
+            let displayColumns: Float = Float(horizDisplayed)
+            let cursorStartScanLine: Float = Float(Int(snapshot.crtcSnapshot.R10) & 0b00011111)
+            let cursorEndScanLine: Float = Float(snapshot.crtcSnapshot.R11)
+            let cursorBlinkType: Float = Float(Int(snapshot.crtcSnapshot.R10 >> 5))
+            let fontLocationOffset: Float = Float(Int(snapshot.crtcSnapshot.R12) << 8 | Int(snapshot.crtcSnapshot.R13))
+            let cursorPosition: Float = Float(Int(snapshot.crtcSnapshot.R14) << 8 | Int(snapshot.crtcSnapshot.R15))
+
+            let colourMode: Float = Float(colourOptions[colourSelection] ?? 0)
+
+            // Base and scaled sizes
+            let baseWidth: CGFloat = max(CGFloat(frameWidth), 1)
+            let baseHeight: CGFloat = max(CGFloat(frameHeight), 1)
+            let scaledWidth: CGFloat = baseWidth * charScale * CGFloat(frameXScale)
+            let scaledHeight: CGFloat = baseHeight * charScale * charAspect * CGFloat(frameYScale)
+
+            // Background intensity
+            let backGroundIntensity: Float = Float(
                 (Int(snapshot.crtcSnapshot.redBackgroundIntensity) << 2) +
                 (Int(snapshot.crtcSnapshot.greenBackgroundIntensity) << 1) +
                 Int(snapshot.crtcSnapshot.blueBackgroundIntensity)
             )
-            
-            TimelineView(.periodic(from: startDate, by: 0.02))
-            { context in
-                let elapsedTime = Float(context.date.timeIntervalSince(startDate))
-                
-                let shaderScanLineHeight = Float(scanLineHeight)
-                let shaderDisplayColumns = Float(displayColumns)
-                let shaderFontLocationOffset = Float(fontLocationOffset)
-                let shaderCursorPosition = Float(cursorPosition)
-                let shaderCursorStartScanLine = Float(cursorStartScanLine)
-                let shaderCursorEndScanLine = Float(cursorEndScanLine)
-                let shaderCursorBlinkType = Float(cursorBlinkType)
-                let shaderColourMode = Float(colourMode)
-                let shaderBackGroundIntensity = Float(backGroundIntensity)
-                let shaderElapsedTime = Float(elapsedTime)
-                let vduArray = snapshot.memorySnapshot.VDU
-                let charRomArray = snapshot.memorySnapshot.CharRom
-                let pcgRamArray = snapshot.memorySnapshot.PcgRam
-                let colourRamArray = snapshot.memorySnapshot.ColourRam
-                
-                Rectangle()
-                    .frame(width: baseWidth, height: baseHeight)
-                    .colorEffect(ShaderLibrary.ScreenBuffer(
-                        .float(shaderScanLineHeight),
-                        .float(shaderDisplayColumns),
-                        .float(shaderFontLocationOffset),
-                        .float(shaderCursorPosition),
-                        .float(shaderCursorStartScanLine),
-                        .float(shaderCursorEndScanLine),
-                        .float(shaderCursorBlinkType),
-                        .float(shaderColourMode),
-                        .float(shaderBackGroundIntensity),
-                        .float(shaderElapsedTime),
-                        .floatArray(vduArray),
-                        .floatArray(charRomArray),
-                        .floatArray(pcgRamArray),
-                        .floatArray(colourRamArray)
-                    ))
-                    .colorEffect(ShaderLibrary.interlace(.float(0.5), .float(3.14159), .float(interlaceEnabled ? 1.0 : 0.0)))  // Scanline depth and density
-                    .scaleEffect(x: charScale * CGFloat(frameXScale), y: charScale * charAspect * CGFloat(frameYScale))
-                    .frame(width: scaledWidth, height: scaledHeight)
+
+            // Pre-extract large arrays to avoid recomputation and inference across modifier chains
+            let vduArray: [Float] = snapshot.memorySnapshot.VDU
+            let charRomArray: [Float] = snapshot.memorySnapshot.CharRom
+            let pcgRamArray: [Float] = snapshot.memorySnapshot.PcgRam
+            let colourRamArray: [Float] = snapshot.memorySnapshot.ColourRam
+
+            TimelineView(.periodic(from: startDate, by: 0.02)) { context in
+                let elapsedTime: Float = Float(context.date.timeIntervalSince(startDate))
+
+                ScreenPipelineView(
+                    baseWidth: baseWidth,
+                    baseHeight: baseHeight,
+                    scaledWidth: scaledWidth,
+                    scaledHeight: scaledHeight,
+                    charScale: charScale,
+                    charAspect: charAspect,
+                    frameXScale: frameXScale,
+                    frameYScale: frameYScale,
+                    interlaceEnabled: interlaceEnabled,
+                    scanLineHeight: scanLineHeight,
+                    displayColumns: displayColumns,
+                    fontLocationOffset: fontLocationOffset,
+                    cursorPosition: cursorPosition,
+                    cursorStartScanLine: cursorStartScanLine,
+                    cursorEndScanLine: cursorEndScanLine,
+                    cursorBlinkType: cursorBlinkType,
+                    colourMode: colourMode,
+                    backGroundIntensity: backGroundIntensity,
+                    elapsedTime: elapsedTime,
+                    vduArray: vduArray,
+                    charRomArray: charRomArray,
+                    pcgRamArray: pcgRamArray,
+                    colourRamArray: colourRamArray
+                )
             }
         }
     }
@@ -267,4 +326,5 @@ struct emulatorView: View
         }
     } //body
 } // emulatorView
+
 
