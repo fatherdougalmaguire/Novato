@@ -107,12 +107,12 @@ struct modelSettingsView: View
 
 struct bootSettingsView: View
 {
-    @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
+    @AppStorage("bootModeSelection") private var bootModeSelection = "MicroWorld Basic 5.22e"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
     
     var body: some View
     {
-        let themes = ["Demo #1 - Basic","Demo #2 - CP/M","Demo #3 - Viatel","MicroWorld Basic 5.22e"]
+        let themes = ["Demo #1 - CP/M","Demo #2 - Viatel","MicroWorld Basic 5.22e"]
         Form
         {
             Picker("Demo Screen:", selection: $bootModeSelection)
@@ -161,7 +161,7 @@ struct screenSettingsView: View
             }
             .pickerStyle(.menu)
             
-            Toggle("Interlace Mode:", isOn: $interlaceEnabled)
+           // Toggle("Interlace Mode:", isOn: $interlaceEnabled)
         }
         .formStyle(.grouped)
     }

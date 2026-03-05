@@ -42,7 +42,7 @@ struct emulatorView: View
     @AppStorage("scalingSelection") private var charScale: Double = 2.0 // Scale for visibility on 27" screen ( 2560 x 1440 )
     @AppStorage("aspectSelection") private var charAspect: Double = 4/3  // Correction for CRT aspect ratio
     @AppStorage("colorSelection") private var colourSelection = "Colour"
-    @AppStorage("bootModeSelection") private var bootModeSelection = "Demo #1 - Basic"
+    @AppStorage("bootModeSelection") private var bootModeSelection = "MicroWorld Basic 5.22e"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
     
     @State private var isRunning = false
@@ -112,10 +112,10 @@ struct emulatorView: View
                             .floatArray(colourRamArray)
                         )
                     )
-                    .colorEffect(
-                        ShaderLibrary.interlace(.float(1.0), .float(0.2), .float(1.8), .float(interlaceEnabled ? 1.0 : 0.0)))
-                    .brightness(Double(interlaceEnabled ? 0.1 : 0.0))
-                    .saturation(Double(interlaceEnabled ? 1.5 : 1.0))
+                   // .colorEffect(
+                  //      ShaderLibrary.interlace(.float(3.0), .float(0.15), .float(1.8), .float(interlaceEnabled ? 1.0 : 0.0)))
+                  //  .brightness(Double(interlaceEnabled ? 0.1 : 0.0))
+                  //  .saturation(Double(interlaceEnabled ? 1.5 : 1.0))
                     .scaleEffect(
                         x: charScale * CGFloat(frameXScale),
                         y: charScale * charAspect * CGFloat(frameYScale)
@@ -264,9 +264,9 @@ struct emulatorView: View
                                         
                                         switch bootModeSelection
                                         {
-                                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
-                                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
-                                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
+                                            //case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
+                                            case "Demo #1 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
+                                            case "Demo #2 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
                                             case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
                                             default: break
                                         }
@@ -302,9 +302,9 @@ struct emulatorView: View
                     {
                         switch bootModeSelection
                         {
-                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
-                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
-                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
+                            //case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
+                            case "Demo #1 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
+                            case "Demo #2 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
                             case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
                             default: break
                         }
