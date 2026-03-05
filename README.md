@@ -2,19 +2,31 @@
 Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee) family of home computers.
 
 © Tony Sanchez 2025-2026 All Rights Reserved
-
+<div>
+  <br>
+</div>
 <div align=left>
   <img width="300" alt="image" src="https://github.com/user-attachments/assets/9c6fc378-3184-44ff-a0e7-11361103483c"/>
 </div>
+<div>
+  <br>
+</div>
 
+> For those that are curious, novato is a Spanish word denoting novice, beginner or rookie.
+>
+> It also means **newbie**.  
+> So I had great trouble resisting the obvious dad joke.
+<div>
+  <br>
+</div>
 It runs on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe.
 
 Universal binaries can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
 
-At some point,  I may build iOS and iPadOS versions off the same codebase.
-( And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly. )
+At some point,  I may build iOS and iPadOS versions off the same codebase.  
+And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 
-## Ackowledgements
+## Acknowledgements
 
 The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
 
@@ -24,50 +36,60 @@ Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.
 
 This emulator is still in what could charitably called *alpha* status.
 
+### UI controls
 * You can start and stop the emulator via button control.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
 * There is a splash screen displaying the application logo as PCG characters
 * You can choose to start the emulator automatically or go to the splash screen first
-* A rudimentary scanline shader has been added (rudimentary as in not very good.  This needs to be worked on)
-* A small number of Z80 instructions are decoded.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
-* The screen buffer is output to the display using a metal shader.
-* Shader will automatically scale the output resolution to the same display size.
-* Colour support has been added ( green mono, amber mono, blue mono, white mono and colour )
-* Rudimentary 6545 functionality is emulated:
-  - Supports definition of the nummber of display rows and columns.
-  - Supports definition of cursor position.
-  - Supports selection of Character ROM address.
-  - Supports selection of cursor start and end scanline.
-  - Supports cursor flash mode ( On/Off/slow flash/fast flash ).
-* Working MMU has been implemented
-  - An arbitrary number of memory devices can be defined
-  - Each memory device can be tagged as read-only or read/write
-  - Devices can be switched into and out of memory ranges in RAM
-  - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
-* Settings module to set
+* There is now a **Settings** module so you can dynamically set:
+  
   - Start-up mode ( automatic or splash screen )
   - Select boot code (  Basic demo, CP/M demo, Viatel demo, Microworld Basic 5.22e )
   - Colour mode
   - Aspect ratio
   - Screen scaling
   - Interlace mode
+  
+### Instruction decoding
+* All non-flag affecting instructions are decoded
+* A small number of flag affecting instructions are decoded
+* t-states are captured
 
+### Display output
+* The screen buffer is output to the display using a metal shader.
+* A rudimentary scanline shader overlay has been added ( it looks quite nice but I don't think it's historically accurate )
+* Shader will automatically scale the output resolution to the same display size.
+* Colour support has been added ( green mono, amber mono, blue mono, white mono and non-premium colour )
+* Rudimentary 6545 functionality is emulated:
+  - Supports definition of the nummber of display rows and columns.
+  - Supports definition of cursor position.
+  - Supports selection of Character ROM address.
+  - Supports selection of cursor start and end scanline.
+  - Supports cursor flash mode ( On/Off/slow flash/fast flash ).
+
+### Memory
+* Working MMU has been implemented
+  - An arbitrary number of memory devices can be defined
+  - Each memory device can be tagged as read-only or read/write
+  - Devices can be switched into and out of memory ranges in RAM
+  - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
+    
 ## On the to-do list
 
-* ROM selecton and load
+* Test harness for JSON test files ( most likely the [JSMoo single step tests](https://github.com/SingleStepTests/z80) )
+* ROM selection and load
 * Machine state saving
 * Full emulation of Z80 including undocumented instructions
 * Interrupt processing
 * Sound output
 * Capture keyboard input
 * Proper emulator state machine
-  - rejig the basic state machine to allow start/pause, step, stop and stopping the emulator actor burning cycles when paused 
+  - rejig the basic state machine to stop the emulator actor burning cycles when paused 
 * Frame based emulation
-  - The emulator now captures t-states
   - rewrite the emulator loop to run 50hz worth of cycles before emitting CPU state to view model
   - rewrite the emulator loop to process interrupts
   - rewrite the emulator loop to fill sound buffer
@@ -96,7 +118,8 @@ This emulator is still in what could charitably called *alpha* status.
 
 Below are demo screens for the three video modes ( 64x16, 80x24, 40x24 ).  
 These screens are drawn using internally loaded Z80 assembler.
-The emulator is **NOT** currently booting BASIC, CP/M or Viatel ( as you can tell when you try the MicroWorld Basic 5.22e option )
+
+Whilst the emulator boots to the BASIC splash screen ( via the MicroWorld Basic 5.22e load option ), BASIC itself is not functional.
 
 ### 64 columns x 16 rows 
 
