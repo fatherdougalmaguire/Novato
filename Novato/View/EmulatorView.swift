@@ -114,8 +114,8 @@ struct emulatorView: View
                     )
                     .colorEffect(
                         ShaderLibrary.interlace(.float(1.0), .float(0.2), .float(1.8), .float(interlaceEnabled ? 1.0 : 0.0)))
-                        .brightness(0.1)
-                        .saturation(1.5)
+                    .brightness(Double(interlaceEnabled ? 0.1 : 0.0))
+                    .saturation(Double(interlaceEnabled ? 1.5 : 1.0))
                     .scaleEffect(
                         x: charScale * CGFloat(frameXScale),
                         y: charScale * charAspect * CGFloat(frameYScale)
