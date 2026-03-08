@@ -52,10 +52,12 @@ This emulator is still in what could charitably called *alpha* status.
   - Colour mode
   - Aspect ratio
   - Screen scaling
-  - Interlace mode
+  - Visible scanline mode
   
 ### Instruction decoding
 * All non-flag affecting instructions are decoded
+* Flags are now precomputed for S,P and Z general instructions
+* Flags are now precomputed for 8 bit increment and decrement instructions
 * A small number of flag affecting instructions are decoded
 * t-states are captured
 
