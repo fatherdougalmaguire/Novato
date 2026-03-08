@@ -15,7 +15,7 @@ Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.mi
 > For those that are curious, novato is a Spanish word denoting novice, beginner or rookie.
 >
 > It also means **newbie**.  
-> So I had great trouble resisting the obvious dad joke.
+> So I couldn't resist the obvious dad joke.
 <div>
   <br>
 </div>
@@ -45,10 +45,10 @@ This emulator is still in what could charitably called *alpha* status.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
-* There is now a **Settings** module so you can dynamically set:
+* There is now a **Settings** module so you can dynamically set ( and retain ):
   
   - Start-up mode ( automatic or splash screen )
-  - Select boot code (  Basic demo, CP/M demo, Viatel demo, Microworld Basic 5.22e )
+  - Select boot code ( CP/M demo, Viatel demo, Microworld Basic 5.22e )
   - Colour mode
   - Aspect ratio
   - Screen scaling
@@ -60,19 +60,21 @@ This emulator is still in what could charitably called *alpha* status.
 * t-states are captured
 
 ### Display output
-* The screen buffer is output to the display using a metal shader.
-* A rudimentary scanline shader overlay has been added ( it looks quite nice but I don't think it's historically accurate )
-* Shader will automatically scale the output resolution to the same display size.
-* Colour support has been added ( green mono, amber mono, blue mono, white mono and non-premium colour )
+* The screen buffer is output to the display using a SwiftUI Shader library .ColorEffect shader
 * Rudimentary 6545 functionality is emulated:
+  
   - Supports definition of the nummber of display rows and columns.
   - Supports definition of cursor position.
   - Supports selection of Character ROM address.
   - Supports selection of cursor start and end scanline.
   - Supports cursor flash mode ( On/Off/slow flash/fast flash ).
 
+* Shader will automatically scale the output resolution to the same display size.
+* Colour support has been added ( green mono, amber mono, blue mono, white mono and non-premium colour )
+
 ### Memory
 * Working MMU has been implemented
+  
   - An arbitrary number of memory devices can be defined
   - Each memory device can be tagged as read-only or read/write
   - Devices can be switched into and out of memory ranges in RAM
@@ -81,6 +83,7 @@ This emulator is still in what could charitably called *alpha* status.
 ## On the to-do list
 
 * Test harness for JSON test files ( most likely the [JSMoo single step tests](https://github.com/SingleStepTests/z80) )
+* Display PCG characters in the memory dump window
 * ROM selection and load
 * Machine state saving
 * Full emulation of Z80 including undocumented instructions
@@ -88,19 +91,29 @@ This emulator is still in what could charitably called *alpha* status.
 * Sound output
 * Capture keyboard input
 * Proper emulator state machine
-  - rejig the basic state machine to stop the emulator actor burning cycles when paused 
+  
+  - rejig the basic state machine to stop the emulator actor burning cycles when paused
+    
 * Frame based emulation
+  
   - rewrite the emulator loop to run 50hz worth of cycles before emitting CPU state to view model
   - rewrite the emulator loop to process interrupts
   - rewrite the emulator loop to fill sound buffer
   - rewrite the emulator loop to trigger vblank update of 6545 for video and keypressed
+    
 * Cassette load/save functionality
 
 ## Emulator screenshots
 
-### Emulator Window
+### Splash Screen
 
 <img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/b1a3c31c-8eac-42bb-b47f-28bfd4c665a4" />
+
+### BASIC
+
+Whilst the emulator boots to the BASIC splash screen ( via the MicroWorld Basic 5.22e load option ), BASIC itself is not functional.
+
+<img width="1136" height="830" alt="image" src="https://github.com/user-attachments/assets/34999e8d-b5df-44d4-98cf-b7f04fa15478" />
 
 ### Port View
 
@@ -116,14 +129,8 @@ This emulator is still in what could charitably called *alpha* status.
 
 ## Demo Screens
 
-Below are demo screens for the three video modes ( 64x16, 80x24, 40x24 ).  
+Below are demo screens for the two additional video modes ( 80x24 and 40x25 ).  
 These screens are drawn using internally loaded Z80 assembler.
-
-Whilst the emulator boots to the BASIC splash screen ( via the MicroWorld Basic 5.22e load option ), BASIC itself is not functional.
-
-### 64 columns x 16 rows 
-
-<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/bd0b2fe5-2e51-49bf-b18c-0474af1833bd" />
 
 ### 80 columns x 24 rows 
 
