@@ -178,15 +178,11 @@ half4 interlace(float2 position, half4 color, float spacing, float intensity, fl
         
         if (yValue < (spacing * 0.5))
         {
-            // This is the DARK gap
             return color * half4(intensity, intensity, intensity, 1.0);
         }
         else
         {
-            // This is the BRIGHT pixel.
-            // We multiply the color by brightnessBoost (e.g., 1.5 for 150% brightness)
             half4 boosted = color * brightnessBoost;
-            // Ensure we don't 'clip' the alpha channel
             boosted.a = color.a;
             return boosted;
         }

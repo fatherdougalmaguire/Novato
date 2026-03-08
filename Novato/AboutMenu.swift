@@ -161,7 +161,7 @@ struct screenSettingsView: View
             }
             .pickerStyle(.menu)
             
-           // Toggle("Interlace Mode:", isOn: $interlaceEnabled)
+            Toggle("Ahistorical Scanline Mode:", isOn: $interlaceEnabled)
         }
         .formStyle(.grouped)
     }

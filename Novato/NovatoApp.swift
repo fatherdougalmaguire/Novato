@@ -96,8 +96,6 @@ struct NovatoApp: App
                 Divider()
                 Link("Microbee Software Preservation Project Forum", destination: URL(string: "https://microbee-mspp.org/forum")!)
                 Link("Microbee Technology Forum", destination: URL(string: "https://microbeetechnology.com.au/forum")!)
-                Divider()
-                Link("Hello to Jason Isaacs", destination: URL(string: "https://www.kermodeandmayo.com")!)
             }
         }
     }

@@ -16,90 +16,135 @@ actor microbee
     
     struct z80FastFlags
     {
-        static let lookupSZP: [UInt8] =
+        // Precomputed Sign, Parity and Zero flags lookup array
+        // Carry, Half-Carry and Negative are reset (0)
+        
+        static let szp: [UInt8] =
         {
             (0...255).map
             { counter in
-                var tempF: UInt8 = 0
+                var tempFlags: UInt8 = 0
                 if (counter & 0x80) != 0
                 {
-                    tempF |= 0x80  // Set sign flag is bit 7 is set
+                    tempFlags =  tempFlags | 0x80  // Set Sign
                 }
                 if counter == 0
                 {
-                    tempF |= 0x40 // set zero flag is result is 0
+                    tempFlags =  tempFlags | 0x40 // Set Zero
                 }
-                let bitsSet = counter.nonzeroBitCount
-                if bitsSet % 2 == 0
+                if counter.nonzeroBitCount % 2 == 0
                 {
-                    tempF |= 0x04 // set parity flag if even number of bits set
+                    tempFlags =  tempFlags | 0x04 // Set Parity
                 }
-                
-                return tempF
+                return tempFlags
             }
         }()
+            
+        // Precomputed Sign, Parity, Zero and Half-Carry flags lookup array for 8 bit increment
+        // Carry and Negative are reset (0)
+        
+        static let inc: [UInt8] =
+        {
+            (0...255).map
+            { counter in
+                let previousValue = UInt8(counter)
+                let currentValue = previousValue &+ 1
+                var tempFlags = szp[Int(currentValue)]
+                if (previousValue & 0x0F) == 0x0F
+                {
+                    tempFlags =  tempFlags | 0x10  // Set Half-Carry
+                }
+                if previousValue == 0x7F
+                {
+                    tempFlags =  tempFlags | 0x04 // Set Parity/Overflow
+                }
+                else
+                {
+                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
+                } // Overflow
+                return tempFlags
+            }
+        }()
+            
+        // Precomputed Sign, Parity, Zero and Half-Carry flags lookup array for 8 bit decrement
+        // Carry is reset (0)
+        // Negative is set (1)
+        
+        static let dec: [UInt8] =
+        {
+            (0...255).map
+            { counter in
+                let previousValue = UInt8(counter)
+                let currentValue = previousValue &- 1
+                var tempFlags = szp[Int(currentValue)] | 0x02 // Set Negative
+                if (previousValue & 0x0F) == 0x00
+                {
+                    tempFlags =  tempFlags | 0x10   // Set Half-Carry
+                }
+                if previousValue == 0x80
+                {
+                    tempFlags =  tempFlags | 0x04  // Set Parity/Overflow
+                }
+                else
+                {
+                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
+                }
+                return tempFlags
+            }
+        }()
+
+            // For ADD and ADC
         
             @inline(__always)
-            static func addFlags(operand1: UInt8, operand2: UInt8, tempResult: Int) -> UInt8
+            static func getAddFlags(operand1: UInt8, operand2: UInt8, tempResult: Int) -> UInt8
             {
-                // for ADD/ADC
-                let byteTempResult = UInt8(tempResult & 0xFF)
-                var tempF = lookupSZP[Int(byteTempResult)] // Get S, Z, V (as Parity)
-                
-                let overflow = ((operand1 ^ byteTempResult) & (operand2 ^ byteTempResult) & 0x80) != 0
-                if overflow
+                let tempResultByte = UInt8(tempResult & 0xFF)
+                var tempFlags = szp[Int(tempResultByte)]
+                if ((operand1 ^ tempResultByte) & (operand2 ^ tempResultByte) & 0x80) != 0
                 {
-                    tempF |= 0x04  // Set V if
+                    tempFlags =  tempFlags | 0x04 // Set Parity/Overflow
                 }
                 else
                 {
-                    tempF &= ~0x04 // Reset V if
+                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
                 }
-                
-                // 2. Half-Carry (H): Carry from bit 3 to 4
-                if ((operand1 ^ operand2 ^ byteTempResult) & 0x10) != 0
+                if ((operand1 ^ operand2 ^ tempResultByte) & 0x10) != 0
                 {
-                    tempF |= 0x10
+                    tempFlags =  tempFlags | 0x10   // Set Half-Carry
                 }
-                
                 if tempResult > 255
                 {
-                    tempF |= 0x01 // set C if original addition > 255
+                    tempFlags =  tempFlags | 0x01 // Set Carry
                 }
-                
-                return tempF // No need to set N as it always 0 in addition
+                return tempFlags
             }
-
+            
+            // For SUB, SBC and CP
+        
             @inline(__always)
-            static func subFlags(operand1: UInt8, operand2: UInt8, tempResult: Int) -> UInt8
+            static func getSubFlags(operand1: UInt8, operand2: UInt8, tempResult: Int) -> UInt8
             {
-                // for SUB/SBC/CP
-                let byteTempResult = UInt8(tempResult & 0xFF)
-                var tempF = lookupSZP[Int(byteTempResult)]
-                
-                let overflow = ((operand1 ^ operand2) & (operand1 ^ byteTempResult) & 0x80) != 0
-                if overflow
+                let tempResultByte = UInt8(tempResult & 0xFF)
+                var tempFlags = szp[Int(tempResultByte)] | 0x02 // Set Negative
+                if ((operand1 ^ operand2) & (operand1 ^ tempResultByte) & 0x80) != 0
                 {
-                    tempF |= 0x04 // Set V if
+                    tempFlags =  tempFlags | 0x04 // Set Parity/Overflow
                 }
                 else
                 {
-                    tempF &= ~0x04 // Reset V if
+                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
                 }
-                
-                if ((operand1 ^ operand2 ^ byteTempResult) & 0x10) != 0
+                if ((operand1 ^ operand2 ^ tempResultByte) & 0x10) != 0
                 {
-                    tempF |= 0x10  // Set H if original result borrowed from bit 4
+                    tempFlags =  tempFlags | 0x10 // Set Half-Carry
                 }
-                
                 if tempResult < 0
                 {
-                    tempF |= 0x01 // Set C if original result < 0
+                    tempFlags =  tempFlags | 0x01  // Set Carry
                 }
-                
-                return tempF | 0x02 // set N as it always 1 in subtraction
+                return tempFlags
             }
-    }
+        }
     
     struct Registers
     {
@@ -668,14 +713,14 @@ actor microbee
         registers.PC = address
     }
     
-    func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
-    {
-        return ( opcode1 : mmu.readByte(address: ProgramCounter),
-                 opcode2 : mmu.readByte(address: ProgramCounter &+ 1),
-                 opcode3 : mmu.readByte(address: ProgramCounter &+ 2),
-                 opcode4 : mmu.readByte(address: ProgramCounter &+ 3)
-        )
-    }
+//    func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
+//    {
+//        return ( opcode1 : mmu.readByte(address: ProgramCounter),
+//                 opcode2 : mmu.readByte(address: ProgramCounter &+ 1),
+//                 opcode3 : mmu.readByte(address: ProgramCounter &+ 2),
+//                 opcode4 : mmu.readByte(address: ProgramCounter &+ 3)
+//        )
+//    }
     
     func TestFlags ( FlagRegister : UInt8, Flag : Z80Flags ) -> Bool
     
@@ -787,31 +832,19 @@ actor microbee
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
             incrementR(opcodeCount:1)
-        case 0x04: // INC B
-            registers.B = registers.B &+ 1
-            //            H    Half-Carry    Set if there was a carry from bit 3 to bit 4 (useful for BCD math).
-            //            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.B & 0x80) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.B == 0)
-            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcode2 & 0x0F)))
-            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+        case 0x04: // INC B - 04 - Adds one to B
             logInstructionDetails(instructionDetails: "INC B", opcode: [0x04], programCounter: registers.PC)
-            // myz80Queue.addToQueue(address: registers.PC, opCodes: [0x04])
+            let previousB = registers.B
+            registers.B = registers.B &+ 1
+            registers.F = z80FastFlags.inc[Int(previousB)] | (registers.F & 0x01)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
-        case 0x05: // DEC B
-            registers.B = registers.B &- 1
-            //            H    Half-Carry    Set if there was a borrow from bit 4 to bit 3.
-            //            P/V    Overflow    Set if B was 127 (7F) and became -128 (80) indicating a signed overflow.
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.B & 0x80) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.B == 0)
-            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcode2 & 0x0F)))
-            //registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
+        case 0x05: // DEC B - 05 - Subtracts one from B
             logInstructionDetails(instructionDetails: "DEC B", opcode: [0x05], programCounter: registers.PC)
-            // myz80Queue.addToQueue(address: registers.PC, opCodes: [0x05])
+            let previousB = registers.B
+            registers.B = registers.B &- 1
+            registers.F = z80FastFlags.dec[Int(previousB)] | (registers.F & 0x01)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -840,6 +873,22 @@ actor microbee
             registers.BC = registers.BC &- 1
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
+            incrementR(opcodeCount:1)
+        case 0x0C: // INC C - 0C - Adds one to C
+            logInstructionDetails(instructionDetails: "INC C", opcode: [0x0C], programCounter: registers.PC)
+            let previousC = registers.C
+            registers.C = registers.C &+ 1
+            registers.F = z80FastFlags.inc[Int(previousC)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x0D: // DEC C - 0D - Subtracts one from C
+            logInstructionDetails(instructionDetails: "DEC C", opcode: [0x0D], programCounter: registers.PC)
+            let previousC = registers.C
+            registers.C = registers.C &- 1
+            registers.F = z80FastFlags.dec[Int(previousC)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x0E: // LD C,$n - 0E n - Loads n into C
             logInstructionDetails(instructionDetails: "LD C,$n", opcode: [0x0E], values: [opcode2], programCounter: registers.PC)
@@ -880,6 +929,22 @@ actor microbee
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
             incrementR(opcodeCount:1)
+        case 0x14: // INC D - 14 - Adds one to D
+            logInstructionDetails(instructionDetails: "INC D", opcode: [0x14], programCounter: registers.PC)
+            let previousD = registers.D
+            registers.D = registers.D &+ 1
+            registers.F = z80FastFlags.inc[Int(previousD)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x15: // DEC D - 15 - Subtracts one from D
+            logInstructionDetails(instructionDetails: "DEC D", opcode: [0x15], programCounter: registers.PC)
+            let previousD = registers.D
+            registers.D = registers.D &- 1
+            registers.F = z80FastFlags.dec[Int(previousD)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0x16: // LD D,$n - 16 n - Loads $n into D
             logInstructionDetails(instructionDetails: "LD D,$n", opcode: [0x16], values: [opcode2], programCounter: registers.PC)
             registers.D = opcode2
@@ -903,6 +968,22 @@ actor microbee
             registers.DE = registers.DE &- 1
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
+            incrementR(opcodeCount:1)
+        case 0x1C: // INC E - 14 - Adds one to E
+            logInstructionDetails(instructionDetails: "INC E", opcode: [0x1C], programCounter: registers.PC)
+            let previousE = registers.E
+            registers.E = registers.E &+ 1
+            registers.F = z80FastFlags.inc[Int(previousE)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x1D: // DEC E - 1D - Subtracts one from E
+            logInstructionDetails(instructionDetails: "DEC E", opcode: [0x1D], programCounter: registers.PC)
+            let previousE = registers.E
+            registers.E = registers.E &- 1
+            registers.F = z80FastFlags.dec[Int(previousE)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x1E: // LD E,$n - 1E n - Loads $n into E
             logInstructionDetails(instructionDetails: "LD E,$n", opcode: [0x1E], values: [opcode2], programCounter: registers.PC)
@@ -944,6 +1025,22 @@ actor microbee
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
             incrementR(opcodeCount:1)
+        case 0x24: // INC H - 24 - Adds one to H
+            logInstructionDetails(instructionDetails: "INC H", opcode: [0x24], programCounter: registers.PC)
+            let previousH = registers.H
+            registers.H = registers.H &+ 1
+            registers.F = z80FastFlags.inc[Int(previousH)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x25: // DEC H - 25 - Subtracts one from H
+            logInstructionDetails(instructionDetails: "DEC H", opcode: [0x25], programCounter: registers.PC)
+            let previousH = registers.H
+            registers.H = registers.H &- 1
+            registers.F = z80FastFlags.dec[Int(previousH)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0x26: // LD H,$n - 26 n - Loads $n into H
             logInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x26], values: [opcode2], programCounter: registers.PC)
             registers.H = opcode2
@@ -976,6 +1073,22 @@ actor microbee
             registers.HL = registers.HL &- 1
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
+            incrementR(opcodeCount:1)
+        case 0x2C: // INC L - 2C - Adds one to L
+            logInstructionDetails(instructionDetails: "INC L", opcode: [0x2C], programCounter: registers.PC)
+            let previousL = registers.L
+            registers.L = registers.L &+ 1
+            registers.F = z80FastFlags.inc[Int(previousL)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x2D: // DEC L - 2D - Subtracts one from L
+            logInstructionDetails(instructionDetails: "DEC L", opcode: [0x2D], programCounter: registers.PC)
+            let previousL = registers.L
+            registers.L = registers.L &- 1
+            registers.F = z80FastFlags.dec[Int(previousL)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x2E: // LD L,$n - 2E n - Loads n into L
             logInstructionDetails(instructionDetails: "LD H,$n", opcode: [0x2E], values: [opcode2], programCounter: registers.PC)
@@ -1025,6 +1138,23 @@ actor microbee
             registers.PC = registers.PC &+ 3
             tStates = tStates + 6
             incrementR(opcodeCount:1)
+        case 0x34: // INC (HL) - 34 - Adds one to (HL)
+            logInstructionDetails(instructionDetails: "INC (HL)", opcode: [0x34], programCounter: registers.PC)
+            let previous = mmu.readByte(address: registers.HL)
+            mmu.writeByte(address: registers.HL,value: previous &+ 1)
+            registers.F = z80FastFlags.inc[Int(previous)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 11
+            incrementR(opcodeCount:1)
+            incrementR(opcodeCount:1)
+        case 0x35: // DEC (HL) - 35 - Subtracts one from (HL)
+            logInstructionDetails(instructionDetails: "DEC (HL)", opcode: [0x35], programCounter: registers.PC)
+            let previous = mmu.readByte(address: registers.HL)
+            mmu.writeByte(address: registers.HL,value: previous &- 1)
+            registers.F = z80FastFlags.dec[Int(previous)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 11
+            incrementR(opcodeCount:1)
         case 0x36: // LD (HL),$n - 36 n - Loads $n into address at HL
             logInstructionDetails(instructionDetails: "LD (HL),$n", opcode: [0x36], values: [opcode2], programCounter: registers.PC)
             mmu.writeByte(address: registers.HL, value: opcode2)
@@ -1058,11 +1188,19 @@ actor microbee
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
             incrementR(opcodeCount:1)
-        case 0x3C: // INC A
-            // flags
-            registers.A = registers.A &+ 1
+        case 0x3C: // INC A - 3C - Adds one to A
             logInstructionDetails(instructionDetails: "INC A", opcode: [0x3C], programCounter: registers.PC)
-            // myz80Queue.addToQueue(address: registers.PC, opCodes: [0x3C])
+            let previousA = registers.A
+            registers.A = registers.A &+ 1
+            registers.F = z80FastFlags.inc[Int(previousA)] | (registers.F & 0x01)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x3D: // DEC A - 3D - Subtracts one from A
+            logInstructionDetails(instructionDetails: "DEC A", opcode: [0x3D], programCounter: registers.PC)
+            let previousA = registers.A
+            registers.A = registers.A &- 1
+            registers.F = z80FastFlags.dec[Int(previousA)] | (registers.F & 0x01)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -2571,6 +2709,24 @@ actor microbee
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 10
                     incrementR(opcodeCount:2)
+                case 0x34: // INC (IX+$d) - DD 34 d - Adds one to the memory location pointed to by IX plus $d
+                    logInstructionDetails(instructionDetails: "INC (IX+$d)", opcode: [0xDD,0x34], values: [opcode3], programCounter: registers.PC)
+                    let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    let previous = mmu.readByte(address: tempResult)
+                    mmu.writeByte(address: tempResult,value: previous &+ 1)
+                    registers.F = z80FastFlags.inc[Int(previous)] | (registers.F & 0x01)
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 23
+                    incrementR(opcodeCount:2)
+                case 0x35: // DEC (IX+$d) - DD 35 d - Subtracts one from the memory location pointed to by IX plus $d.
+                    logInstructionDetails(instructionDetails: "DEC (IX+$d)", opcode: [0xDD,0x35], values: [opcode3], programCounter: registers.PC)
+                    let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    let previous = mmu.readByte(address: tempResult)
+                    mmu.writeByte(address: tempResult,value: previous &- 1)
+                    registers.F = z80FastFlags.dec[Int(previous)] | (registers.F & 0x01)
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 23
+                    incrementR(opcodeCount:2)
                 case 0x36: // LD (IX+$d),$n - DD 36 d n - Stores $n to the memory location pointed to by IX plus $d
                     logInstructionDetails(instructionDetails: "LD (IX+$d),$n", opcode: [0xDD,0x36], values: [opcode3,opcode4], programCounter: registers.PC)
                     let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3687,6 +3843,24 @@ actor microbee
                     registers.IY = registers.IY &- 1
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 10
+                    incrementR(opcodeCount:2)
+                case 0x34: // INC (IY+$d) - FD 34 d - Adds one to the memory location pointed to by IY plus $d
+                    logInstructionDetails(instructionDetails: "INC (IY+$d)", opcode: [0xFD,0x34], values: [opcode3], programCounter: registers.PC)
+                    let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    let previous = mmu.readByte(address: tempResult)
+                    mmu.writeByte(address: tempResult,value: previous &+ 1)
+                    registers.F = z80FastFlags.inc[Int(previous)] | (registers.F & 0x01)
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 23
+                    incrementR(opcodeCount:2)
+                case 0x35: // DEC (IY+$d) - FD 35 d - Subtracts one from the memory location pointed to by IY plus $d
+                    logInstructionDetails(instructionDetails: "DEC (IY+$d)", opcode: [0xFD,0x35], values: [opcode3], programCounter: registers.PC)
+                    let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    let previous = mmu.readByte(address: tempResult)
+                    mmu.writeByte(address: tempResult,value: previous &- 1)
+                    registers.F = z80FastFlags.dec[Int(previous)] | (registers.F & 0x01)
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 23
                     incrementR(opcodeCount:2)
                 case 0x36: // LD (IY+$d),$n - FD 36 n n - Stores $n to the memory location pointed to by IY plus $d
                     logInstructionDetails(instructionDetails: "LD (IY+$d),$n", opcode: [0xFD,0x36], values: [opcode3,opcode4], programCounter: registers.PC)

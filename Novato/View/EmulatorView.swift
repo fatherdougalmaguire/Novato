@@ -112,10 +112,10 @@ struct emulatorView: View
                             .floatArray(colourRamArray)
                         )
                     )
-                   // .colorEffect(
-                  //      ShaderLibrary.interlace(.float(3.0), .float(0.15), .float(1.8), .float(interlaceEnabled ? 1.0 : 0.0)))
-                  //  .brightness(Double(interlaceEnabled ? 0.1 : 0.0))
-                  //  .saturation(Double(interlaceEnabled ? 1.5 : 1.0))
+                    .colorEffect(
+                        ShaderLibrary.interlace(.float(1.0), .float(0.2), .float(1.8), .float(interlaceEnabled ? 1.0 : 0.0)))
+                                .brightness(Double(interlaceEnabled ? 0.1 : 0.0))
+                                .saturation(Double(interlaceEnabled ? 1.8 : 1.0))
                     .scaleEffect(
                         x: charScale * CGFloat(frameXScale),
                         y: charScale * charAspect * CGFloat(frameYScale)
@@ -160,7 +160,6 @@ struct emulatorView: View
             let scaledWidth: CGFloat = baseWidth * charScale * CGFloat(frameXScale)
             let scaledHeight: CGFloat = baseHeight * charScale * charAspect * CGFloat(frameYScale)
 
-            // Background intensity
             let backGroundIntensity: Float = Float(
                 (Int(snapshot.crtcSnapshot.redBackgroundIntensity) << 2) +
                 (Int(snapshot.crtcSnapshot.greenBackgroundIntensity) << 1) +
