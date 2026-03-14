@@ -2,149 +2,146 @@ import Foundation
 
 actor microbee
 {
-    enum Z80Flags : UInt8
+    enum z80Flags : UInt8
     {
         case Carry = 0x01               // 00000001
         case Negative = 0x02            // 00000010
-        case Parity_Overflow = 0x04     // 00000100
+        case ParityOverflow = 0x04      // 00000100
         case Y = 0x08                   // 00001000
-        case Half_Carry = 0x10          // 00010000
+        case HalfCarry = 0x10           // 00010000
         case X = 0x20                   // 00100000
         case Zero = 0x40                // 01000000
         case Sign = 0x80                // 10000000
     }
-    
+
     struct z80FastFlags
     {
-        // Precomputed Sign, Parity and Zero flags lookup array
-        // Carry, Half-Carry and Negative are reset (0)
-        
-        static let szp: [UInt8] =
+        static let lookupSZP: [UInt8] =
         {
             (0...255).map
             { counter in
-                var tempFlags: UInt8 = 0
-                if (counter & 0x80) != 0
+                var tempF: UInt8 = 0
+                if (counter & Int(z80Flags.Sign.rawValue)) != 0
                 {
-                    tempFlags =  tempFlags | 0x80  // Set Sign
+                    tempF |= z80Flags.Sign.rawValue             // Set sign flag is bit 7 is set
                 }
                 if counter == 0
                 {
-                    tempFlags =  tempFlags | 0x40 // Set Zero
+                    tempF |= z80Flags.Zero.rawValue             // set zero flag is result is 0
                 }
-                if counter.nonzeroBitCount % 2 == 0
+                let bitsSet = counter.nonzeroBitCount
+                if bitsSet % 2 == 0
                 {
-                    tempFlags =  tempFlags | 0x04 // Set Parity
+                    tempF |= z80Flags.ParityOverflow.rawValue   // set parity flag if even number of bits set
                 }
-                return tempFlags
+                
+                return tempF
             }
         }()
-            
-        // Precomputed Sign, Parity, Zero and Half-Carry flags lookup array for 8 bit increment
-        // Carry and Negative are reset (0)
         
-        static let inc: [UInt8] =
+        static func incHelper(operand: UInt8, currentFlags: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
         {
-            (0...255).map
-            { counter in
-                let previousValue = UInt8(counter)
-                let currentValue = previousValue &+ 1
-                var tempFlags = szp[Int(currentValue)]
-                if (previousValue & 0x0F) == 0x0F
-                {
-                    tempFlags =  tempFlags | 0x10  // Set Half-Carry
-                }
-                if previousValue == 0x7F
-                {
-                    tempFlags =  tempFlags | 0x04 // Set Parity/Overflow
-                }
-                else
-                {
-                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
-                } // Overflow
-                return tempFlags
-            }
-        }()
+            let tempResult = operand &+ 1 // Wrapping addition
             
-        // Precomputed Sign, Parity, Zero and Half-Carry flags lookup array for 8 bit decrement
-        // Carry is reset (0)
-        // Negative is set (1)
-        
-        static let dec: [UInt8] =
-        {
-            (0...255).map
-            { counter in
-                let previousValue = UInt8(counter)
-                let currentValue = previousValue &- 1
-                var tempFlags = szp[Int(currentValue)] | 0x02 // Set Negative
-                if (previousValue & 0x0F) == 0x00
-                {
-                    tempFlags =  tempFlags | 0x10   // Set Half-Carry
-                }
-                if previousValue == 0x80
-                {
-                    tempFlags =  tempFlags | 0x04  // Set Parity/Overflow
-                }
-                else
-                {
-                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
-                }
-                return tempFlags
+            var tempFlags = lookupSZP[Int(tempResult)] & ~0x04                                              // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
+            
+            tempFlags |= (currentFlags & z80Flags.Carry.rawValue)                                          // Preserve Carry
+            
+            tempFlags &= ~z80Flags.Negative.rawValue                                                       // Reset Negative for subtraction
+            
+            if operand == 0x7F
+            {
+                tempFlags |= z80Flags.ParityOverflow.rawValue                                              // set Overflow if operand is 127
             }
-        }()
+            
+            if (operand & 0x0F) == 0x0F
+            {
+                tempFlags |= z80Flags.HalfCarry.rawValue                                                    // set Half Carry if carry from bit 3 to bit 4
+            }
 
-            // For ADD and ADC
+            return (tempResult, tempFlags)
+        }
         
-            @inline(__always)
-            static func getAddFlags(operand1: UInt8, operand2: UInt8, tempResult: Int) -> UInt8
+        @inline(__always)
+        static func decHelper(operand: UInt8, currentFlags: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
+        {
+            let tempResult = operand &- 1
+            
+            var tempFlags = lookupSZP[Int(tempResult)] & ~z80Flags.ParityOverflow.rawValue          // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
+            
+            tempFlags |= (currentFlags & z80Flags.Carry.rawValue)                                    // Preserve Carry
+            
+            tempFlags |= z80Flags.Negative.rawValue                                                 // Set Negative for subtraction
+            
+            if operand == z80Flags.Sign.rawValue
             {
-                let tempResultByte = UInt8(tempResult & 0xFF)
-                var tempFlags = szp[Int(tempResultByte)]
-                if ((operand1 ^ tempResultByte) & (operand2 ^ tempResultByte) & 0x80) != 0
-                {
-                    tempFlags =  tempFlags | 0x04 // Set Parity/Overflow
-                }
-                else
-                {
-                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
-                }
-                if ((operand1 ^ operand2 ^ tempResultByte) & 0x10) != 0
-                {
-                    tempFlags =  tempFlags | 0x10   // Set Half-Carry
-                }
-                if tempResult > 255
-                {
-                    tempFlags =  tempFlags | 0x01 // Set Carry
-                }
-                return tempFlags
+                tempFlags |= z80Flags.ParityOverflow.rawValue                                       // set Overflow if operand is -128
             }
             
-            // For SUB, SBC and CP
-        
-            @inline(__always)
-            static func getSubFlags(operand1: UInt8, operand2: UInt8, tempResult: Int) -> UInt8
+            if (operand & 0x0F) == 0x00
             {
-                let tempResultByte = UInt8(tempResult & 0xFF)
-                var tempFlags = szp[Int(tempResultByte)] | 0x02 // Set Negative
-                if ((operand1 ^ operand2) & (operand1 ^ tempResultByte) & 0x80) != 0
-                {
-                    tempFlags =  tempFlags | 0x04 // Set Parity/Overflow
-                }
-                else
-                {
-                    tempFlags =  tempFlags & ~0x04 // Reset Parity/Overflow
-                }
-                if ((operand1 ^ operand2 ^ tempResultByte) & 0x10) != 0
-                {
-                    tempFlags =  tempFlags | 0x10 // Set Half-Carry
-                }
-                if tempResult < 0
-                {
-                    tempFlags =  tempFlags | 0x01  // Set Carry
-                }
-                return tempFlags
+                tempFlags |= z80Flags.HalfCarry.rawValue                                           // set Half Carry if borrow from bit 4 to bit 3
             }
+            
+            return (tempResult, tempFlags)
         }
+        
+        @inline(__always)
+        static func addHelper(operand1: UInt8, operand2: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
+        {
+            let (tempResult, carry) = operand1.addingReportingOverflow(operand2)
+            
+            var tempFlags = lookupSZP[Int(tempResult)] & ~z80Flags.ParityOverflow.rawValue  // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
+            
+            print(tempFlags)
+            
+            if carry
+            {
+                tempFlags |= z80Flags.Carry.rawValue                                        // Set Carry
+            }
+
+            tempFlags &= ~z80Flags.Negative.rawValue                                        // Reset Negative for addition
+            
+            if ((operand1 ^ tempResult) & (operand2 ^ tempResult) & z80Flags.Sign.rawValue) != 0
+            {
+                tempFlags |= z80Flags.ParityOverflow.rawValue                              // set Overflow if operand1 and operand2 have same sign but tempresult has a different sign
+            }
+            
+            if (operand1 & 0x0F) + (operand2 & 0x0F) > 0x0F                                // set Half Carry if carry from bit 3 to bit 4
+            {
+                tempFlags |= z80Flags.HalfCarry.rawValue
+            }
+            
+            return (tempResult, tempFlags)
+        }
+        
+        @inline(__always)
+        static func subHelper(operand1: UInt8, operand2: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
+        {
+            let (tempResult, carry) = operand1.subtractingReportingOverflow(operand2)
+            
+            var tempFlags = lookupSZP[Int(tempResult)] & ~z80Flags.ParityOverflow.rawValue              // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
+
+            if carry
+            {
+                tempFlags |= z80Flags.Carry.rawValue                                                   // Set Carry
+            }
+
+            tempFlags |= z80Flags.Negative.rawValue                                                    // Set Negative for subtraction
+            
+            if ((operand1 ^ operand2) & z80Flags.Sign.rawValue != 0) && ((operand1 ^ tempResult) & z80Flags.Sign.rawValue != 0)     // set Overflow if operand1 and operand2 have different signs
+            {
+                tempFlags |= z80Flags.ParityOverflow.rawValue
+            }
+            
+            if (operand1 & 0x0F) < (operand2 & 0x0F)
+            {
+                tempFlags |= z80Flags.HalfCarry.rawValue                                               // set Half Carry if borrow from bit 4 to bit 3
+            }
+            
+            return (tempResult, tempFlags)
+        }
+    }
     
     struct Registers
     {
@@ -713,22 +710,13 @@ actor microbee
         registers.PC = address
     }
     
-//    func fetch( ProgramCounter : UInt16) -> (UInt8,UInt8,UInt8,UInt8)
-//    {
-//        return ( opcode1 : mmu.readByte(address: ProgramCounter),
-//                 opcode2 : mmu.readByte(address: ProgramCounter &+ 1),
-//                 opcode3 : mmu.readByte(address: ProgramCounter &+ 2),
-//                 opcode4 : mmu.readByte(address: ProgramCounter &+ 3)
-//        )
-//    }
-    
-    func TestFlags ( FlagRegister : UInt8, Flag : Z80Flags ) -> Bool
+    func TestFlags ( FlagRegister : UInt8, Flag : z80Flags ) -> Bool
     
     {
         return FlagRegister & Flag.rawValue != 0
     }
     
-    func UpdateFlags ( FlagRegister : UInt8, Flag : Z80Flags, SetFlag : Bool ) -> UInt8
+    func UpdateFlags ( FlagRegister : UInt8, Flag : z80Flags, SetFlag : Bool ) -> UInt8
     {
         if (SetFlag)
         {
@@ -834,17 +822,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x04: // INC B - 04 - Adds one to B
             logInstructionDetails(instructionDetails: "INC B", opcode: [0x04], programCounter: registers.PC)
-            let previousB = registers.B
-            registers.B = registers.B &+ 1
-            registers.F = z80FastFlags.inc[Int(previousB)] | (registers.F & 0x01)
+            (registers.B,registers.F) = z80FastFlags.incHelper(operand: registers.B, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x05: // DEC B - 05 - Subtracts one from B
             logInstructionDetails(instructionDetails: "DEC B", opcode: [0x05], programCounter: registers.PC)
-            let previousB = registers.B
-            registers.B = registers.B &- 1
-            registers.F = z80FastFlags.dec[Int(previousB)] | (registers.F & 0x01)
+            (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -854,13 +838,35 @@ actor microbee
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
             incrementR(opcodeCount:1)
+        case 0x07: // RLCA - 07 - The contents of A are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
+            logInstructionDetails(instructionDetails: "RLCA", opcode: [0x07], programCounter: registers.PC)
+            let previousA = registers.A
+            registers.A = (previousA << 1) | (previousA >> 7)
+            let carry = registers.A & 0x01
+            registers.F = (registers.F & 0xEC) | carry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0x08: // EX AF,AF' - 08 - Adds one to Exchanges the 16-bit contents of AF and AF'
             logInstructionDetails(instructionDetails: "EX AF,AF'", opcode: [0x08], programCounter: registers.PC)
             let tempResult = registers.AF
             registers.AF = registers.altAF
             registers.altAF = tempResult
-            registers.PC = registers.PC &+ 1
+            registers.PC = registers.PC &+ 1	
             tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x09: // ADD HL,BC - 09 - The value of BC is added to HL
+            logInstructionDetails(instructionDetails: "ADD HL,BC", opcode: [0x09], programCounter: registers.PC)
+            let tempResult = registers.HL &+ registers.BC
+            let halfCarry = UInt8((registers.HL ^ registers.BC ^ tempResult) & 0x1000)
+            let carrytempResult = UInt32(registers.HL) + UInt32(registers.BC)
+            let carry = UInt8((carrytempResult & 0x10000) >> 16)
+            registers.HL = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+            registers.F = registers.F | halfCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0x0A: // LD A,(BC) - 0A - Loads the value pointed to by BC into A
             logInstructionDetails(instructionDetails: "LD A,(BC)", opcode: [0x0A], programCounter: registers.PC)
@@ -876,17 +882,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x0C: // INC C - 0C - Adds one to C
             logInstructionDetails(instructionDetails: "INC C", opcode: [0x0C], programCounter: registers.PC)
-            let previousC = registers.C
-            registers.C = registers.C &+ 1
-            registers.F = z80FastFlags.inc[Int(previousC)] | (registers.F & 0x01)
+            (registers.C,registers.F) = z80FastFlags.incHelper(operand: registers.C, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x0D: // DEC C - 0D - Subtracts one from C
             logInstructionDetails(instructionDetails: "DEC C", opcode: [0x0D], programCounter: registers.PC)
-            let previousC = registers.C
-            registers.C = registers.C &- 1
-            registers.F = z80FastFlags.dec[Int(previousC)] | (registers.F & 0x01)
+            (registers.C,registers.F) = z80FastFlags.decHelper(operand: registers.C, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -895,6 +897,15 @@ actor microbee
             registers.C = opcode2
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0x0F: // RRCA - 0F - The contents of A are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
+            logInstructionDetails(instructionDetails: "RRCA", opcode: [0x0F], programCounter: registers.PC)
+            let previousA = registers.A
+            registers.A = (previousA >> 1) | (previousA << 7)
+            let carry = registers.A >> 7
+            registers.F = (registers.F & 0xEC) | carry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x10: // DJNZ $d - 10 d - The B register is decremented, and if not zero, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode.
             logInstructionDetails(instructionDetails: "DJNZ $d", opcode: [0x10], values: [opcode2], programCounter: registers.PC)
@@ -931,17 +942,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x14: // INC D - 14 - Adds one to D
             logInstructionDetails(instructionDetails: "INC D", opcode: [0x14], programCounter: registers.PC)
-            let previousD = registers.D
-            registers.D = registers.D &+ 1
-            registers.F = z80FastFlags.inc[Int(previousD)] | (registers.F & 0x01)
+            (registers.D,registers.F) = z80FastFlags.incHelper(operand: registers.D, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x15: // DEC D - 15 - Subtracts one from D
             logInstructionDetails(instructionDetails: "DEC D", opcode: [0x15], programCounter: registers.PC)
-            let previousD = registers.D
-            registers.D = registers.D &- 1
-            registers.F = z80FastFlags.dec[Int(previousD)] | (registers.F & 0x01)
+            (registers.D,registers.F) = z80FastFlags.decHelper(operand: registers.D, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -951,12 +958,35 @@ actor microbee
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
             incrementR(opcodeCount:1)
+        case 0x17: // RLA - 17 - The contents of A are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0
+            logInstructionDetails(instructionDetails: "RLA", opcode: [0x17], programCounter: registers.PC)
+            let previousA = registers.A
+            let oldCarry = registers.F & 0x01
+            registers.A = (previousA << 1) | oldCarry
+            let newCarry = (previousA >> 7) & 0x01
+            registers.F = (registers.F & 0xEC) | newCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0x18: // JR d - 18 d - The signed value $d is added to PC. The jump is measured from the start of the instruction opcode
             logInstructionDetails(instructionDetails: "JR $d", opcode: [0x18], values: [opcode2], programCounter: registers.PC)
             let signedOffset = Int8(bitPattern: opcode2)
             let displacement = Int16(signedOffset)
             registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
             tStates = tStates + 12
+        case 0x19: // ADD HL,DE - 19 - The value of DE is added to HL
+            logInstructionDetails(instructionDetails: "ADD HL,DE", opcode: [0x19], programCounter: registers.PC)
+            let tempResult = registers.HL &+ registers.DE
+            let halfCarry = UInt8((registers.HL ^ registers.DE ^ tempResult) & 0x1000)
+            let carrytempResult = UInt32(registers.HL) + UInt32(registers.DE)
+            let carry = UInt8((carrytempResult & 0x10000) >> 16)
+            registers.HL = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+            registers.F = registers.F | halfCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 11
+            incrementR(opcodeCount:1)
         case 0x1A: // LD A,(DE) - 1A - Loads the value pointed to by DE into A
             logInstructionDetails(instructionDetails: "LD A,(DE)", opcode: [0x1A], programCounter: registers.PC)
             registers.A = mmu.readByte(address: registers.DE)
@@ -971,17 +1001,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x1C: // INC E - 14 - Adds one to E
             logInstructionDetails(instructionDetails: "INC E", opcode: [0x1C], programCounter: registers.PC)
-            let previousE = registers.E
-            registers.E = registers.E &+ 1
-            registers.F = z80FastFlags.inc[Int(previousE)] | (registers.F & 0x01)
+            (registers.E,registers.F) = z80FastFlags.incHelper(operand: registers.E, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x1D: // DEC E - 1D - Subtracts one from E
             logInstructionDetails(instructionDetails: "DEC E", opcode: [0x1D], programCounter: registers.PC)
-            let previousE = registers.E
-            registers.E = registers.E &- 1
-            registers.F = z80FastFlags.dec[Int(previousE)] | (registers.F & 0x01)
+            (registers.E,registers.F) = z80FastFlags.decHelper(operand: registers.E, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -991,9 +1017,19 @@ actor microbee
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
             incrementR(opcodeCount:1)
+        case 0x1F: // RRA - 1F - The contents of A are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
+            logInstructionDetails(instructionDetails: "RRA", opcode: [0x1F], programCounter: registers.PC)
+            let previousA = registers.A
+            let oldCarry = registers.F & 0x01
+            registers.A = (previousA >> 1) | (oldCarry << 7)
+            let newCarry = previousA  & 0x01
+            registers.F = (registers.F & 0xEC) | newCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0x20: // JR NZ,$d - 20 d - If the zero flag is unset, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
             logInstructionDetails(instructionDetails: "JR NZ,$d", opcode: [0x20], values: [opcode2], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = registers.PC &+ 2
             }
@@ -1027,17 +1063,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x24: // INC H - 24 - Adds one to H
             logInstructionDetails(instructionDetails: "INC H", opcode: [0x24], programCounter: registers.PC)
-            let previousH = registers.H
-            registers.H = registers.H &+ 1
-            registers.F = z80FastFlags.inc[Int(previousH)] | (registers.F & 0x01)
+            (registers.H,registers.F) = z80FastFlags.incHelper(operand: registers.H, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x25: // DEC H - 25 - Subtracts one from H
             logInstructionDetails(instructionDetails: "DEC H", opcode: [0x25], programCounter: registers.PC)
-            let previousH = registers.H
-            registers.H = registers.H &- 1
-            registers.F = z80FastFlags.dec[Int(previousH)] | (registers.F & 0x01)
+            (registers.H,registers.F) = z80FastFlags.decHelper(operand: registers.H, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -1049,7 +1081,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x28: // JR Z,$d - 28 d - If the zero flag is set, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
             logInstructionDetails(instructionDetails: "JR Z,$d", opcode: [0x28], values: [opcode2], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
@@ -1060,6 +1092,19 @@ actor microbee
                 registers.PC = registers.PC &+ 2
             }
             tStates = tStates + 12
+            incrementR(opcodeCount:1)
+        case 0x29: // ADD HL,HL - 29 - The value of HL is added to HL
+            logInstructionDetails(instructionDetails: "ADD HL,HL", opcode: [0x29], programCounter: registers.PC)
+            let tempResult = registers.HL &+ registers.HL
+            let halfCarry = UInt8((registers.HL ^ registers.HL ^ tempResult) & 0x1000)
+            let carrytempResult = UInt32(registers.HL) + UInt32(registers.HL)
+            let carry = UInt8((carrytempResult & 0x10000) >> 16)
+            registers.HL = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+            registers.F = registers.F | halfCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0x2A: // LD HL,($nn) - 2A n n - Loads the value pointed to by $nn into HL
             logInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0x2A], values: [opcode2,opcode3], programCounter: registers.PC)
@@ -1076,17 +1121,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x2C: // INC L - 2C - Adds one to L
             logInstructionDetails(instructionDetails: "INC L", opcode: [0x2C], programCounter: registers.PC)
-            let previousL = registers.L
-            registers.L = registers.L &+ 1
-            registers.F = z80FastFlags.inc[Int(previousL)] | (registers.F & 0x01)
+            (registers.L,registers.F) = z80FastFlags.incHelper(operand: registers.L, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x2D: // DEC L - 2D - Subtracts one from L
             logInstructionDetails(instructionDetails: "DEC L", opcode: [0x2D], programCounter: registers.PC)
-            let previousL = registers.L
-            registers.L = registers.L &- 1
-            registers.F = z80FastFlags.dec[Int(previousL)] | (registers.F & 0x01)
+            (registers.L,registers.F) = z80FastFlags.decHelper(operand: registers.L, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -1096,18 +1137,17 @@ actor microbee
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
             incrementR(opcodeCount:1)
-        case 0x2F: // CPL
-            registers.A = ~registers.A
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
+        case 0x2F: // CPL - 2F - The contents of A are inverted (one's complement)
             logInstructionDetails(instructionDetails: "CPL", opcode: [0x2F], programCounter: registers.PC)
-            // myz80Queue.addToQueue(address: registers.PC, opCodes: [0x2F])
+            registers.A = ~registers.A
+            registers.F = registers.F | z80Flags.Negative.rawValue
+            registers.F = registers.F | z80Flags.HalfCarry.rawValue
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x30: // JR NC,d - 30 $d - If the carry flag is unset, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
             logInstructionDetails(instructionDetails: "JR NC,$d", opcode: [0x30], values: [opcode2], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 registers.PC = registers.PC &+ 2
             }
@@ -1140,18 +1180,18 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x34: // INC (HL) - 34 - Adds one to (HL)
             logInstructionDetails(instructionDetails: "INC (HL)", opcode: [0x34], programCounter: registers.PC)
-            let previous = mmu.readByte(address: registers.HL)
-            mmu.writeByte(address: registers.HL,value: previous &+ 1)
-            registers.F = z80FastFlags.inc[Int(previous)] | (registers.F & 0x01)
+            var previous = mmu.readByte(address: registers.HL)
+            (previous,registers.F) = z80FastFlags.incHelper(operand: previous, currentFlags: registers.F)
+            mmu.writeByte(address: registers.HL,value: previous)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 11
             incrementR(opcodeCount:1)
             incrementR(opcodeCount:1)
         case 0x35: // DEC (HL) - 35 - Subtracts one from (HL)
             logInstructionDetails(instructionDetails: "DEC (HL)", opcode: [0x35], programCounter: registers.PC)
-            let previous = mmu.readByte(address: registers.HL)
-            mmu.writeByte(address: registers.HL,value: previous &- 1)
-            registers.F = z80FastFlags.dec[Int(previous)] | (registers.F & 0x01)
+            var previous = mmu.readByte(address: registers.HL)
+            (previous,registers.F) = z80FastFlags.decHelper(operand: previous, currentFlags: registers.F)
+            mmu.writeByte(address: registers.HL,value: previous)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 11
             incrementR(opcodeCount:1)
@@ -1161,9 +1201,17 @@ actor microbee
             registers.PC = registers.PC &+ 2
             tStates = tStates + 10
             incrementR(opcodeCount:1)
+        case 0x37: // SCF - 37 - Sets the carry flag
+            logInstructionDetails(instructionDetails: "SCF", opcode: [0x37], programCounter: registers.PC)
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = registers.F | z80Flags.Carry.rawValue
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0x38: // JR C,d - 38 $d - If the carry flag is set, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
             logInstructionDetails(instructionDetails: "JR C,$d", opcode: [0x38], values: [opcode2], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
@@ -1174,6 +1222,19 @@ actor microbee
                 registers.PC = registers.PC &+ 2
             }
             tStates = tStates + 12
+            incrementR(opcodeCount:1)
+        case 0x39: // ADD HL,SP - 39 - The value of SP is added to HL
+            logInstructionDetails(instructionDetails: "ADD HL,SP", opcode: [0x39], programCounter: registers.PC)
+            let tempResult = registers.HL &+ registers.SP
+            let halfCarry = UInt8((registers.HL ^ registers.SP ^ tempResult) & 0x1000)
+            let carrytempResult = UInt32(registers.HL) + UInt32(registers.SP)
+            let carry = UInt8((carrytempResult & 0x10000) >> 16)
+            registers.HL = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+            registers.F = registers.F | halfCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0x3A: // LD A,($nn) - 3A n n - Loads the value pointed to by $nn into A
             logInstructionDetails(instructionDetails: "LD A,($nn)", opcode: [0x3A], values: [opcode2,opcode3], programCounter: registers.PC)
@@ -1190,17 +1251,13 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x3C: // INC A - 3C - Adds one to A
             logInstructionDetails(instructionDetails: "INC A", opcode: [0x3C], programCounter: registers.PC)
-            let previousA = registers.A
-            registers.A = registers.A &+ 1
-            registers.F = z80FastFlags.inc[Int(previousA)] | (registers.F & 0x01)
+            (registers.A,registers.F) = z80FastFlags.incHelper(operand: registers.A, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x3D: // DEC A - 3D - Subtracts one from A
             logInstructionDetails(instructionDetails: "DEC A", opcode: [0x3D], programCounter: registers.PC)
-            let previousA = registers.A
-            registers.A = registers.A &- 1
-            registers.F = z80FastFlags.dec[Int(previousA)] | (registers.F & 0x01)
+            (registers.A,registers.F) = z80FastFlags.decHelper(operand: registers.A, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -1209,6 +1266,16 @@ actor microbee
             registers.A = opcode2
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0x3F: // CCF - 3F - Inverts the carry flag
+            logInstructionDetails(instructionDetails: "CCF", opcode: [0x3F], programCounter: registers.PC)
+            let previousCarry = registers.F & z80Flags.Carry.rawValue
+            let newHalfCarry = previousCarry << 4
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F | newHalfCarry
+            registers.F = registers.F ^ previousCarry
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x40: // LD B,B - 40 - The contents of B are loaded into B
             logInstructionDetails(instructionDetails: "LD B,B", opcode: [0x40], programCounter: registers.PC)
@@ -1589,20 +1656,77 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xB1: // OR C
             registers.A = registers.C | registers.A
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0x80) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:registers.A == 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:returnParity(value: registers.A))
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry,SetFlag:false)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Sign,SetFlag:(registers.A & 0x80) != 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:registers.A == 0)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:false)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:returnParity(value: registers.A))
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Carry,SetFlag:false)
             logInstructionDetails(instructionDetails: "OR C", opcode: [0xB1], programCounter: registers.PC)
             // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xB1])
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
+        case 0xB8: // CP B - B8 - Subtracts B from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP B", opcode: [0xB8], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.B)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB9: // CP C - B9 - Subtracts C from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP C", opcode: [0xB9], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.C)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xBA: // CP D - BA - Subtracts D from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP D", opcode: [0xBA], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.D)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xBB: // CP E - BB - Subtracts E from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP E", opcode: [0xBB], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.E)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xBC: // CP H - BC - Subtracts H from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP H", opcode: [0xBC], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.H)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xBD: // CP L - BD - Subtracts L from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP L", opcode: [0xBD], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.L)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xBE: // CP (HL) - BE - Subtracts (HL) from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP (HL)", opcode: [0xBE], programCounter: registers.PC)
+            let previous = mmu.readByte(address: registers.HL)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: previous)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0xBF: // CP A - BF - Subtracts A from A and affects flags according to the result. A is not modified
+            logInstructionDetails(instructionDetails: "CP A", opcode: [0xBF], programCounter: registers.PC)
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.A)
+            registers.F = tempFlags
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
         case 0xC0: // RET NZ - C0 - If the zero flag is unset, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET NZ", opcode: [0xC0], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = registers.PC &+ 1
                 tStates = tStates + 5
@@ -1624,7 +1748,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xC2: // JP NZ,$nn - C2 n n - If the zero flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [0xC2], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = registers.PC &+ 3
             }
@@ -1642,7 +1766,7 @@ actor microbee
         case 0xC4: // CALL NZ,$nn - C4 n n - JIf the zero flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL NZ,$nn",opcode: [0xC4], values:[opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 tStates = tStates + 10
             }
@@ -1677,7 +1801,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xC8: // RETZ - C8 - If the zero flag is set, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET", opcode: [0xC8], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
                 registers.SP = registers.SP &+ 2
@@ -1697,7 +1821,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xCA: // JP Z,nn - CA n n - If the zero flag is set, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [0xCA], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
             }
@@ -1711,74 +1835,74 @@ actor microbee
             switch opcode2
             {
             case 0x47: // BIT 0, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000001) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00000001) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 logInstructionDetails(instructionDetails: "BIT 0, A", opcode: [0xCB,0x47], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x47])
                 tStates = tStates + 8
                 incrementR(opcodeCount:2)
             case 0x4F: // BIT 1, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000010) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00000010) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 1, A", opcode: [0xCB,0x4F], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x4F])
                 incrementR(opcodeCount:2)
             case 0x57: // BIT 2, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00000100) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00000100) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 2, A", opcode: [0xCB,0x57], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x57])
                 incrementR(opcodeCount:2)
             case 0x5F: // BIT 3, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00001000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00001000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 3, A", opcode: [0xCB,0x5F], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x5F])
                 incrementR(opcodeCount:2)
             case 0x67: // BIT 4, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b00010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 4, A", opcode: [0xCB,0x67], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x67])
                 incrementR(opcodeCount:2)
             case 0x6F: // BIT 5, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b0010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b0010000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 5, A", opcode: [0xCB,0x6F], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x6F])
                 incrementR(opcodeCount:2)
             case 0x77: // BIT 6, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b01000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b01000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 6, A", opcode: [0xCB,0x77], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x77])
                 incrementR(opcodeCount:2)
             case 0x7F: // BIT 7, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:!((registers.A & 0b10000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b10000000) == 1))
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
                 tStates = tStates + 8
                 logInstructionDetails(instructionDetails: "BIT 7, A", opcode: [0xCB,0x7F], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x7F])
@@ -2449,7 +2573,7 @@ actor microbee
         case 0xCC: // CALL Z,$nn - CC n n - If the zero flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL Z,$nn",opcode: [0xCC], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
@@ -2484,7 +2608,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xD0: // RET NC - D0 - If the carry flag is unset, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET NC", opcode: [0xD0], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 registers.PC = registers.PC &+ 1
                 tStates = tStates + 5
@@ -2506,7 +2630,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xD2: // JP NC,$nn - D2 n n - If the carry flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [0xD2], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 registers.PC = registers.PC &+ 3
             }
@@ -2575,7 +2699,7 @@ actor microbee
         case 0xD4: // CALL NC,$nn - D4 n n - If the carry flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL NC,$nn",opcode: [0xD4], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 tStates = tStates + 10
             }
@@ -2609,7 +2733,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xD8: // RET C - D8 - If the carry flag is set, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET NC", opcode: [0xD0], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
                 registers.SP = registers.SP &+ 2
@@ -2629,7 +2753,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xDA: // JP C,$nn - DA n n - If the carry flag is set, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP C,$nn", opcode: [0xDA], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
             }
@@ -2657,7 +2781,7 @@ actor microbee
         case 0xDC: // CALL C,$nn - DC n n - If the carry flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
             logInstructionDetails(instructionDetails: "CALL C,$nn",opcode: [0xDC], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
@@ -2674,6 +2798,32 @@ actor microbee
         case 0xDD: // DD instructions
             switch opcode2
             {
+                case 0x09: // ADD IX,BC - DD 09 - The value of BC is added to IX
+                    logInstructionDetails(instructionDetails: "ADD IX,BC", opcode: [0xDD,0x09], programCounter: registers.PC)
+                    let tempResult = registers.IX &+ registers.BC
+                    let halfCarry = UInt8((registers.IX ^ registers.BC ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IX) + UInt32(registers.BC)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IX = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
+                    incrementR(opcodeCount:2)
+                case 0x19: // ADD IX,DE - DD 19 - The value of DE is added to IX
+                    logInstructionDetails(instructionDetails: "ADD IX,DE", opcode: [0xDD,0x19], programCounter: registers.PC)
+                    let tempResult = registers.IX &+ registers.DE
+                    let halfCarry = UInt8((registers.IX ^ registers.DE ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IX) + UInt32(registers.DE)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IX = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
+                    incrementR(opcodeCount:2)
                 case 0x21: // LD IX,$nn - DD 21 n n - Loads $nn into register IX
                     logInstructionDetails(instructionDetails: "LD IX,$nn", opcode: [0xDD,0x21], values: [opcode3,opcode4], programCounter: registers.PC)
                     registers.IX = UInt16(opcode4) << 8 | UInt16(opcode3)
@@ -2709,21 +2859,34 @@ actor microbee
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 10
                     incrementR(opcodeCount:2)
+                case 0x29: // ADD IX,IX - DD 29 - The value of IX is added to IX
+                    logInstructionDetails(instructionDetails: "ADD IX,IX", opcode: [0xDD,0x29], programCounter: registers.PC)
+                    let tempResult = registers.IX &+ registers.IX
+                    let halfCarry = UInt8((registers.IX ^ registers.IX ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IX) + UInt32(registers.IX)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IX = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
+                    incrementR(opcodeCount:2)
                 case 0x34: // INC (IX+$d) - DD 34 d - Adds one to the memory location pointed to by IX plus $d
                     logInstructionDetails(instructionDetails: "INC (IX+$d)", opcode: [0xDD,0x34], values: [opcode3], programCounter: registers.PC)
                     let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-                    let previous = mmu.readByte(address: tempResult)
-                    mmu.writeByte(address: tempResult,value: previous &+ 1)
-                    registers.F = z80FastFlags.inc[Int(previous)] | (registers.F & 0x01)
+                    var previous = mmu.readByte(address: tempResult)
+                    (previous,registers.F) = z80FastFlags.incHelper(operand: previous, currentFlags: registers.F)
+                    mmu.writeByte(address: tempResult,value: previous)
                     registers.PC = registers.PC &+ 3
                     tStates = tStates + 23
                     incrementR(opcodeCount:2)
                 case 0x35: // DEC (IX+$d) - DD 35 d - Subtracts one from the memory location pointed to by IX plus $d.
                     logInstructionDetails(instructionDetails: "DEC (IX+$d)", opcode: [0xDD,0x35], values: [opcode3], programCounter: registers.PC)
                     let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-                    let previous = mmu.readByte(address: tempResult)
-                    mmu.writeByte(address: tempResult,value: previous &- 1)
-                    registers.F = z80FastFlags.dec[Int(previous)] | (registers.F & 0x01)
+                    var previous = mmu.readByte(address: tempResult)
+                    (previous,registers.F) = z80FastFlags.decHelper(operand: previous, currentFlags: registers.F)
+                    mmu.writeByte(address: tempResult,value: previous)
                     registers.PC = registers.PC &+ 3
                     tStates = tStates + 23
                     incrementR(opcodeCount:2)
@@ -2733,6 +2896,19 @@ actor microbee
                     mmu.writeByte(address: tempResult, value: opcode4)
                     registers.PC = registers.PC &+ 4
                     tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0x39: // ADD IX,SP - DD 39 - The value of SP is added to IX
+                    logInstructionDetails(instructionDetails: "ADD IX,SP", opcode: [0xDD,0x39], programCounter: registers.PC)
+                    let tempResult = registers.IX &+ registers.SP
+                    let halfCarry = UInt8((registers.IX ^ registers.SP ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IX) + UInt32(registers.SP)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IX = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
                     incrementR(opcodeCount:2)
                 case 0x46: // LD B,(IX+$d) - DD 46 d - Loads the value pointed to by IX plus $d into B
                     logInstructionDetails(instructionDetails: "LD B,(IX+$d)", opcode: [0xDD,0x46], values: [opcode3], programCounter: registers.PC)
@@ -2829,6 +3005,15 @@ actor microbee
                     logInstructionDetails(instructionDetails: "LD A,(IX+$d)", opcode: [0xDD,0x7E], values: [opcode3], programCounter: registers.PC)
                     let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
                     registers.A = mmu.readByte(address: tempResult)
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0xBE: // CP (IX+$d) - DD BE d - Subtracts the value pointed to by IX plus $d from A and affects flags according to the result. A is not modified
+                    logInstructionDetails(instructionDetails: "CP (IX+$d)", opcode: [0xDD,0xBE], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    let tempResult = mmu.readByte(address: tempResultAddress)
+                    let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempResult)
+                    registers.F = tempFlags
                     registers.PC = registers.PC &+ 3
                     tStates = tStates + 19
                     incrementR(opcodeCount:2)
@@ -3020,7 +3205,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xE0: // RET PO - E0 - If the parity/overflow flag is unset, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET PO", opcode: [0xE0], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.PC = registers.PC &+ 1
                 tStates = tStates + 5
@@ -3042,7 +3227,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xE2: // JP PO,nn - E1 n n - If the parity/overflow flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP PO,$nn", opcode: [0xE2], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.PC = registers.PC &+ 3
             }
@@ -3066,7 +3251,7 @@ actor microbee
         case 0xE4: // CALL PO,$nn - D4 n n - If the parity/overflow flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL PO,$nn",opcode: [0xE4], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 tStates = tStates + 10
             }
@@ -3101,7 +3286,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xE8: // RET PO - E8 - If the parity/overflow flag is unset, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET PE", opcode: [0xE8], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
                 registers.SP = registers.SP &+ 2
@@ -3120,7 +3305,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xEA: // JP PE,nn - EA n n - If the parity/overflow flag is set, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP PE,$nn", opcode: [0xEA], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
             }
@@ -3139,7 +3324,7 @@ actor microbee
         case 0xEC: // CALL PE,$nn - EC n n - If the parity/overflow flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL PE,$nn",opcode: [0xEC], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
@@ -3649,9 +3834,9 @@ actor microbee
                     registers.BC = registers.BC &- 1
                 }
                 while registers.BC != 0
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:false)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:false)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:registers.BC == 0)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:registers.BC == 0)
                 logInstructionDetails(instructionDetails: "LDIR", opcode: [0xED,0xB0], programCounter: registers.PC)
                 // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xED,0xB0])
                 registers.PC = registers.PC &+ 2
@@ -3675,7 +3860,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xF0: // RET P - F0 - If the sign flag is unset, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET P", opcode: [0xF0], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.PC = registers.PC &+ 1
                 tStates = tStates + 5
@@ -3697,7 +3882,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xF2: // JP P,nn - F2 n n - If the sign flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP P,$nn", opcode: [0xF2], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.PC = registers.PC &+ 3
             }
@@ -3717,7 +3902,7 @@ actor microbee
         case 0xF4: // CALL P,$nn - F4 n n - If the sign flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
             logInstructionDetails(instructionDetails: "CALL P,$nn",opcode: [0xF4], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 tStates = tStates + 10
             }
@@ -3752,7 +3937,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xF8: // RET M - F0 - If the sign flag is set, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET M", opcode: [0xF8], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
                 registers.SP = registers.SP &+ 2
@@ -3772,7 +3957,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xFA: // JP M,nn
             logInstructionDetails(instructionDetails: "JP M,$nn", opcode: [0xFA], values: [opcode2,opcode3], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
             }
@@ -3792,7 +3977,7 @@ actor microbee
         case 0xFC: // CALL M,$nn - FC n n - If the sign flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL M,$nn",opcode: [0xFC], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
-            if (TestFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign))
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
@@ -3809,6 +3994,32 @@ actor microbee
         case 0xFD: // FD and FDCB opcodes
             switch opcode2
             {
+                case 0x09: // ADD IY,BC - FD 09 - The value of BC is added to IY
+                    logInstructionDetails(instructionDetails: "ADD IY,BC", opcode: [0xDD,0x09], programCounter: registers.PC)
+                    let tempResult = registers.IY &+ registers.BC
+                    let halfCarry = UInt8((registers.IY ^ registers.BC ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IY) + UInt32(registers.BC)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IY = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
+                    incrementR(opcodeCount:2)
+                case 0x19: // ADD IY,DE - FD 19 - The value of DE is added to IY
+                    logInstructionDetails(instructionDetails: "ADD IY,DE", opcode: [0xDD,0x19], programCounter: registers.PC)
+                    let tempResult = registers.IY &+ registers.DE
+                    let halfCarry = UInt8((registers.IY ^ registers.DE ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IY) + UInt32(registers.DE)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IY = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
+                    incrementR(opcodeCount:2)
                 case 0x21: // LD IY,$nn - FD 21 n n - Loads $nn into register IY
                     logInstructionDetails(instructionDetails: "LD IY,$nn", opcode: [0xFD,0x21], values: [opcode3,opcode4], programCounter: registers.PC)
                     registers.IY = UInt16(opcode4) << 8 | UInt16(opcode3)
@@ -3829,6 +4040,19 @@ actor microbee
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 10
                     incrementR(opcodeCount:2)
+                case 0x29: // ADD IY,IY - FD 29 - The value of IY is added to IY
+                    logInstructionDetails(instructionDetails: "ADD IY,IY", opcode: [0xDD,0x29], programCounter: registers.PC)
+                    let tempResult = registers.IY &+ registers.IY
+                    let halfCarry = UInt8((registers.IY ^ registers.IY ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IY) + UInt32(registers.IY)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IY = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
+                    incrementR(opcodeCount:2)
                 case 0x2A: // LD IY,($nn) - FD 2A n n - Loads the value pointed to by $nn into IY
                     logInstructionDetails(instructionDetails: "LD IY,($nn)", opcode: [0xFD,0x2A], values: [opcode3,opcode4], programCounter: registers.PC)
                     let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
@@ -3847,18 +4071,18 @@ actor microbee
                 case 0x34: // INC (IY+$d) - FD 34 d - Adds one to the memory location pointed to by IY plus $d
                     logInstructionDetails(instructionDetails: "INC (IY+$d)", opcode: [0xFD,0x34], values: [opcode3], programCounter: registers.PC)
                     let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-                    let previous = mmu.readByte(address: tempResult)
-                    mmu.writeByte(address: tempResult,value: previous &+ 1)
-                    registers.F = z80FastFlags.inc[Int(previous)] | (registers.F & 0x01)
+                    var previous = mmu.readByte(address: tempResult)
+                    (previous,registers.F) = z80FastFlags.incHelper(operand: previous, currentFlags: registers.F)
+                    mmu.writeByte(address: tempResult,value: previous)
                     registers.PC = registers.PC &+ 3
                     tStates = tStates + 23
                     incrementR(opcodeCount:2)
                 case 0x35: // DEC (IY+$d) - FD 35 d - Subtracts one from the memory location pointed to by IY plus $d
                     logInstructionDetails(instructionDetails: "DEC (IY+$d)", opcode: [0xFD,0x35], values: [opcode3], programCounter: registers.PC)
                     let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-                    let previous = mmu.readByte(address: tempResult)
-                    mmu.writeByte(address: tempResult,value: previous &- 1)
-                    registers.F = z80FastFlags.dec[Int(previous)] | (registers.F & 0x01)
+                    var previous = mmu.readByte(address: tempResult)
+                    (previous,registers.F) = z80FastFlags.decHelper(operand: previous, currentFlags: registers.F)
+                    mmu.writeByte(address: tempResult,value: previous)
                     registers.PC = registers.PC &+ 3
                     tStates = tStates + 23
                     incrementR(opcodeCount:2)
@@ -3868,6 +4092,19 @@ actor microbee
                     mmu.writeByte(address: tempResult, value: opcode4)
                     registers.PC = registers.PC &+ 4
                     tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0x39: // ADD IY,SP - FD 39 - The value of SP is added to IY
+                    logInstructionDetails(instructionDetails: "ADD IY,SP", opcode: [0xDD,0x39], programCounter: registers.PC)
+                    let tempResult = registers.IY &+ registers.SP
+                    let halfCarry = UInt8((registers.IY ^ registers.SP ^ tempResult) & 0x1000)
+                    let carrytempResult = UInt32(registers.IY) + UInt32(registers.SP)
+                    let carry = UInt8((carrytempResult & 0x10000) >> 16)
+                    registers.IY = tempResult
+                    registers.F = registers.F & ~z80Flags.Negative.rawValue
+                    registers.F = (registers.F & ~z80Flags.Carry.rawValue) | carry
+                    registers.F = registers.F | halfCarry
+                    registers.PC = registers.PC &+ 2
+                    tStates = tStates + 15
                     incrementR(opcodeCount:2)
                 case 0x46: // LD B,(IY+$d) - FD 46 n n - Loads the value pointed to by IY plus $d into B
                     logInstructionDetails(instructionDetails: "LD B,(IY+$d)", opcode: [0xFD,0x46], values: [opcode3], programCounter: registers.PC)
@@ -4099,6 +4336,15 @@ actor microbee
                         incrementR(opcodeCount:3)
                     default: break
                 } // FC CB opcodes
+                case 0xBE: // CP (IY+$d) - FD BE d - Subtracts the value pointed to by IY plus $d from A and affects flags according to the result. A is not modified
+                    logInstructionDetails(instructionDetails: "CP (IY+$d)", opcode: [0xFD,0xBE], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    let tempResult = mmu.readByte(address: tempResultAddress)
+                    let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempResult)
+                    registers.F = tempFlags
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
                 case 0xE1: // POP IY - FD E1 - The memory location pointed to by SP is stored into IYL and SP is incremented. The memory location pointed to by SP is stored into IYH and SP is incremented again
                     logInstructionDetails(instructionDetails: "POP IY", opcode: [0xFD,0xE1], programCounter: registers.PC)
                     let tempIYL = mmu.readByte(address: registers.SP)
@@ -4142,16 +4388,10 @@ actor microbee
                     incrementR(opcodeCount:2)
                 default: break
             } // FD and FC CB opcodes
-        case 0xFE: // CP n
-            let temporaryResult = registers.A &- opcode2
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Sign,SetFlag:(temporaryResult & 0x80) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Zero,SetFlag:temporaryResult == 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Half_Carry,SetFlag:((registers.A & 0x0F) < (opcode2 & 0x0F)))
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Parity_Overflow,SetFlag:((registers.A ^ opcode2) & (registers.A ^ temporaryResult) & 0x80 ) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Negative,SetFlag:true)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:Z80Flags.Carry,SetFlag:registers.A < opcode2)
+        case 0xFE: // CP n - FE n - Subtracts $n from A and affects flags according to the result. A is not modified
             logInstructionDetails(instructionDetails: "CP $n", opcode: [0xFE], values: [opcode2], programCounter: registers.PC)
-            // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xFE], dataBytes: [opcode2])
+            let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: opcode2)
+            registers.F = tempFlags
             registers.PC = registers.PC &+ 2
             tStates = tStates + 7
             incrementR(opcodeCount:1)
