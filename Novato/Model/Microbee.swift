@@ -39,15 +39,28 @@ actor microbee
             }
         }()
         
+        @inline(__always)
+        static func logicHelper(tempResult: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
+        {
+            var tempFlags = lookupSZP[Int(tempResult)]                                                     // Lookup Sign,Zero,Parity/Overflow
+            
+            tempFlags = tempFlags & ~z80Flags.Negative.rawValue                                            // Reset Negative for AND
+            tempFlags = tempFlags & ~z80Flags.Carry.rawValue                                               // Reset Carry for AND
+            tempFlags = tempFlags | z80Flags.HalfCarry.rawValue                                            // Set Negative for AND
+            
+            return (tempResult, tempFlags)
+        }
+        
+        @inline(__always)
         static func incHelper(operand: UInt8, currentFlags: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
         {
-            let tempResult = operand &+ 1 // Wrapping addition
+            let tempResult = operand &+ 1                                                                   // Wrapping addition
             
             var tempFlags = lookupSZP[Int(tempResult)] & ~0x04                                              // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
             
-            tempFlags |= (currentFlags & z80Flags.Carry.rawValue)                                          // Preserve Carry
+            tempFlags = tempFlags | (currentFlags & z80Flags.Carry.rawValue)                               // Preserve Carry
             
-            tempFlags &= ~z80Flags.Negative.rawValue                                                       // Reset Negative for subtraction
+            tempFlags = tempFlags & ~z80Flags.Negative.rawValue                                            // Reset Negative for subtraction
             
             if operand == 0x7F
             {
@@ -69,18 +82,18 @@ actor microbee
             
             var tempFlags = lookupSZP[Int(tempResult)] & ~z80Flags.ParityOverflow.rawValue          // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
             
-            tempFlags |= (currentFlags & z80Flags.Carry.rawValue)                                    // Preserve Carry
+            tempFlags = tempFlags | (currentFlags & z80Flags.Carry.rawValue)                                    // Preserve Carry
             
-            tempFlags |= z80Flags.Negative.rawValue                                                 // Set Negative for subtraction
+            tempFlags = tempFlags | z80Flags.Negative.rawValue                                                 // Set Negative for subtraction
             
             if operand == z80Flags.Sign.rawValue
             {
-                tempFlags |= z80Flags.ParityOverflow.rawValue                                       // set Overflow if operand is -128
+                tempFlags = tempFlags | z80Flags.ParityOverflow.rawValue                                       // set Overflow if operand is -128
             }
             
             if (operand & 0x0F) == 0x00
             {
-                tempFlags |= z80Flags.HalfCarry.rawValue                                           // set Half Carry if borrow from bit 4 to bit 3
+                tempFlags = tempFlags | z80Flags.HalfCarry.rawValue                                           // set Half Carry if borrow from bit 4 to bit 3
             }
             
             return (tempResult, tempFlags)
@@ -97,19 +110,19 @@ actor microbee
             
             if carry
             {
-                tempFlags |= z80Flags.Carry.rawValue                                        // Set Carry
+                tempFlags = tempFlags | z80Flags.Carry.rawValue                                        // Set Carry
             }
 
-            tempFlags &= ~z80Flags.Negative.rawValue                                        // Reset Negative for addition
+            tempFlags = tempFlags | ~z80Flags.Negative.rawValue                                        // Reset Negative for addition
             
             if ((operand1 ^ tempResult) & (operand2 ^ tempResult) & z80Flags.Sign.rawValue) != 0
             {
-                tempFlags |= z80Flags.ParityOverflow.rawValue                              // set Overflow if operand1 and operand2 have same sign but tempresult has a different sign
+                tempFlags = tempFlags | z80Flags.ParityOverflow.rawValue                              // set Overflow if operand1 and operand2 have same sign but tempresult has a different sign
             }
             
             if (operand1 & 0x0F) + (operand2 & 0x0F) > 0x0F                                // set Half Carry if carry from bit 3 to bit 4
             {
-                tempFlags |= z80Flags.HalfCarry.rawValue
+                tempFlags = tempFlags | z80Flags.HalfCarry.rawValue
             }
             
             return (tempResult, tempFlags)
@@ -124,19 +137,19 @@ actor microbee
 
             if carry
             {
-                tempFlags |= z80Flags.Carry.rawValue                                                   // Set Carry
+                tempFlags = tempFlags | z80Flags.Carry.rawValue                                                   // Set Carry
             }
 
-            tempFlags |= z80Flags.Negative.rawValue                                                    // Set Negative for subtraction
+            tempFlags = tempFlags | z80Flags.Negative.rawValue                                                    // Set Negative for subtraction
             
             if ((operand1 ^ operand2) & z80Flags.Sign.rawValue != 0) && ((operand1 ^ tempResult) & z80Flags.Sign.rawValue != 0)     // set Overflow if operand1 and operand2 have different signs
             {
-                tempFlags |= z80Flags.ParityOverflow.rawValue
+                tempFlags = tempFlags | z80Flags.ParityOverflow.rawValue
             }
             
             if (operand1 & 0x0F) < (operand2 & 0x0F)
             {
-                tempFlags |= z80Flags.HalfCarry.rawValue                                               // set Half Carry if borrow from bit 4 to bit 3
+                tempFlags = tempFlags | z80Flags.HalfCarry.rawValue                                               // set Half Carry if borrow from bit 4 to bit 3
             }
             
             return (tempResult, tempFlags)
@@ -163,6 +176,68 @@ actor microbee
         var altH : UInt8 = 0        // Alternate General Purpose Register H - 8 bit
         var altL : UInt8 = 0        // Alternate General Purpose Register L - 8 bit
         
+        var IXH : UInt8 = 0         // Index Register IX - high byte - 8 bit
+        var IXL : UInt8 = 0         // Index Register IX - low byte - 8 bit
+        var IYH : UInt8 = 0         // Index Register IY - high byte - 8 bit
+        var IYL : UInt8 = 0         // Index Register IY - low byte - 8 bit
+        
+        var SPH : UInt8 = 0x7F         // Index Register SP - high byte - 8 bit
+        var SPL : UInt8 = 0x00      // Index Register SP - low byte - 8 bit
+        var PCH : UInt8 = 0x80         // Index Register PC - high byte - 8 bit
+        var PCL : UInt8 = 0x00         // Index Register PC - low byte - 8 bit
+        
+        var IX : UInt16             // Index Register IX - 16 bit
+        {
+            get
+            {
+                return UInt16(IXH) << 8 | UInt16(IXL)
+            }
+            set
+            {
+                IXH = UInt8(newValue >> 8)
+                IXL = UInt8(newValue & 0xFF)
+            }
+        }
+        
+        var IY : UInt16             // Index Register IY - 16 bit
+        {
+            get
+            {
+                return UInt16(IYH) << 8 | UInt16(IYL)
+            }
+            set
+            {
+                IYH = UInt8(newValue >> 8)
+                IYL = UInt8(newValue & 0xFF)
+            }
+        }
+        
+        var SP : UInt16           // Stack Pointer - 16 bit
+        {
+            get
+            {
+                return UInt16(SPH) << 8 | UInt16(SPL)
+            }
+            set
+            {
+                SPH = UInt8(newValue >> 8)
+                SPL = UInt8(newValue & 0xFF)
+            }
+        }
+        
+        var PC : UInt16             // Program Counter - 16 bit
+        {
+            get
+            {
+                return UInt16(PCH) << 8 | UInt16(PCL)
+            }
+            set
+            {
+                PCH = UInt8(newValue >> 8)
+                PCL = UInt8(newValue & 0xFF)
+            }
+        }
+        
         var AF : UInt16             // General Purpose Register Pair AF - 16 bit
         {
             get
@@ -175,6 +250,7 @@ actor microbee
                 F = UInt8(newValue & 0xFF)
             }
         }
+        
         var BC : UInt16             // General Purpose Register Pair BC - 16 bit
         {
             get
@@ -187,6 +263,7 @@ actor microbee
                 C = UInt8(newValue & 0xFF)
             }
         }
+        
         var DE : UInt16         // General Purpose Register Pair DE - 16 bit
         {
             get
@@ -199,6 +276,7 @@ actor microbee
                 E = UInt8(newValue & 0xFF)
             }
         }
+        
         var HL : UInt16         // General Purpose Register Pair HL - 16 bit
         {
             get
@@ -224,6 +302,7 @@ actor microbee
                 altF = UInt8(newValue & 0xFF)
             }
         }
+        
         var altBC : UInt16      // Alternate General Purpose Register Pair BC - 16 bit
         {
             get
@@ -236,6 +315,7 @@ actor microbee
                 altC = UInt8(newValue & 0xFF)
             }
         }
+        
         var altDE : UInt16       // Alternate General Purpose Register Pair DE - 16 bit
         {
             get
@@ -248,6 +328,7 @@ actor microbee
                 altC = UInt8(newValue & 0xFF)
             }
         }
+        
         var altHL : UInt16      // Alternate General Purpose Register Pair HL - 16 bit
         {
             get
@@ -265,21 +346,18 @@ actor microbee
         var R : UInt8 = 0           // Memory Refresh Register - 8 bit
         
         var IM : UInt8 = 0          // Interrupt Mode
-        var IFF1 : Bool = false        // Interrupt Flip-flop 1
-        var IFF2 : Bool = false       // Interrupt Flip-flop 2
-        
-        var IX : UInt16 = 0         // Index Register IX - 16 bit
-        var IY : UInt16 = 0         // Index Register IY - 16 bit
-        
-        var SP : UInt16 = 0x7F00    // Stack Pointer - 16 bit
-        var PC : UInt16 = 0x0000  // Program Counter - 16 bit
+        var IFF1 : Bool = false     // Interrupt Flip-flop 1
+        var IFF2 : Bool = false     // Interrupt Flip-flop 2
     }
-        
+    
     private let z80Disassembler = Z80Disassembler()
     
     private var z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
     private var z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
     private var z80QueueHead = 0
+    
+    private var breakpoints = SIMD16<UInt16>(repeating: 0x0000)
+    private var breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
     
     var registers = Registers()
     
@@ -364,6 +442,12 @@ actor microbee
         mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
     }
     private var runTask: Task<Void, Never>?
+    
+    func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
+    {
+        breakpoints[index] = value
+        breakpointMask[index] = (mask ? 1 : 0)
+    }
     
     func ClearVideoMemory()
     {
@@ -555,7 +639,6 @@ actor microbee
         }
         executionMode = .singleStep
         nextInstruction()
-        appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
     }
     
     func reset()
@@ -599,8 +682,8 @@ actor microbee
         registers.IX =  0
         registers.IY =  0
         
-        registers.PC =  0
-        registers.SP =  0x7F00
+        registers.PC =  0x8000
+        registers.SP =  0x7FFF
         
         tStates = 0
         
@@ -614,7 +697,10 @@ actor microbee
         z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
         z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
         z80QueueHead = 0
-  
+        
+        breakpoints = SIMD16<UInt16>(repeating: 0x0000)
+        breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
+        
         crtc.registers.R0 = 0x00
         crtc.registers.R1 = 0x40
         crtc.registers.R2 = 0x00
@@ -642,7 +728,18 @@ actor microbee
         crtc.registers.greenBackgroundIntensity = 0x00
         crtc.registers.blueBackgroundIntensity = 0x00
         
-        mainRAM.fillMemory(memValue: 0)
+        mmu.map(readDevice: mainRAM, writeDevice: mainRAM, memoryLocation: 0x0000)       // 32K System RAM
+        mmu.map(readDevice: basicROM, writeDevice: basicROM, memoryLocation: 0x8000)     // 16K BASIC ROM
+        mmu.map(readDevice: pakROM, writeDevice: pakROM , memoryLocation: 0xC000)        // 8K Optional ROM
+        mmu.map(readDevice: netROM, writeDevice: netROM, memoryLocation: 0xE000)         // 4K Net ROM
+        mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)     // 2K Video RAM
+        mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)         // 2K PCG RAM
+        
+        basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
+        pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
+        netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        
         mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
     }
     
@@ -687,17 +784,16 @@ actor microbee
         guard registers.IFF1 else { return }
         
         interruptPending = false
-        emulatorState = .running   // ← EXIT HALT
+        emulatorState = .running
         
-        // Z80 interrupt entry
         registers.IFF1 = false
         registers.IFF2 = false
         
         // check this
         registers.SP &-= 2
-        mmu.writeByte(address: registers.SP, value: UInt8((registers.PC >> 8) & 0xFF))
-        mmu.writeByte(address: registers.SP + 1, value: UInt8(registers.PC & 0xFF))
-        registers.PC = 0x0038 // IM 1 vector
+        mmu.writeByte(address: registers.SP, value: registers.PCH)
+        mmu.writeByte(address: registers.SP + 1, value: registers.PCL)
+        registers.PC = 0x0038
     }
     
     func writeToMemory(address: UInt16, value: UInt8)
@@ -708,6 +804,11 @@ actor microbee
     func updatePC(address: UInt16)
     {
         registers.PC = address
+
+        z80Queue[z80QueueHead] = registers.PC
+        z80QueueFilled[z80QueueHead] = true
+        z80QueueHead = (z80QueueHead + 1) % 16
+    
     }
     
     func TestFlags ( FlagRegister : UInt8, Flag : z80Flags ) -> Bool
@@ -774,11 +875,22 @@ actor microbee
             pollInterrupt()
             return
         }
+        
+        let currentPCVector = SIMD16<UInt16>(repeating: UInt16(registers.PC))
+        let addressMatch = (currentPCVector .== breakpoints)
+        
+        if any(addressMatch .& (breakpointMask .!= 0))
+        {
+        pause()
+            // wrong state
+            // wrong PC
+        }
         executeInstruction()
         appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
         pollInterrupt()
     }
-    
+
+    @inline(__always)
     func incrementR(opcodeCount: UInt8)
     {
         let msb = registers.R & 0x80
@@ -792,9 +904,6 @@ actor microbee
         let opcode2 = mmu.readByte(address: registers.PC &+ 1)
         let opcode3 = mmu.readByte(address: registers.PC &+ 2)
         let opcode4 = mmu.readByte(address: registers.PC &+ 3)
-        z80Queue[z80QueueHead] = registers.PC
-        z80QueueFilled[z80QueueHead] = true
-        z80QueueHead = (z80QueueHead + 1) % 16
         switch opcode1
         {
         case 0x00: // NOP - 00 - No operation is performed
@@ -852,7 +961,7 @@ actor microbee
             let tempResult = registers.AF
             registers.AF = registers.altAF
             registers.altAF = tempResult
-            registers.PC = registers.PC &+ 1	
+            registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
         case 0x09: // ADD HL,BC - 09 - The value of BC is added to HL
@@ -1654,16 +1763,196 @@ actor microbee
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
-        case 0xB1: // OR C
-            registers.A = registers.C | registers.A
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Sign,SetFlag:(registers.A & 0x80) != 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:registers.A == 0)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:false)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:returnParity(value: registers.A))
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
-            registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Carry,SetFlag:false)
+        case 0x90: // SUB B - 90 - Subtracts B from A
+            logInstructionDetails(instructionDetails: "SUB B", opcode: [0x90], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.B)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x91: // SUB C - 91 - Subtracts C from A
+            logInstructionDetails(instructionDetails: "SUB C", opcode: [0x91], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.C)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x92: // SUB D - 92 - Subtracts D from A
+            logInstructionDetails(instructionDetails: "SUB D", opcode: [0x92], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.D)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x93: // SUB E - 93 - Subtracts E from A
+            logInstructionDetails(instructionDetails: "SUB E", opcode: [0x93], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.E)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x94: // SUB H - 94 - Subtracts H from A
+            logInstructionDetails(instructionDetails: "SUB H", opcode: [0x94], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.H)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x95: // SUB L - 95 - Subtracts L from A
+            logInstructionDetails(instructionDetails: "SUB L", opcode: [0x95], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.L)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x96: // SUB (HL) - 96 - Subtracts (HL) from A
+            logInstructionDetails(instructionDetails: "SUB (HL)", opcode: [0x96], programCounter: registers.PC)
+            let tempResult = mmu.readByte(address: registers.HL)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempResult)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0x97: // SUB A - 97 - Subtracts A from A
+            logInstructionDetails(instructionDetails: "SUB A", opcode: [0x97], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: registers.A)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA0: // AND B - A0 - Bitwise AND on A with B
+            logInstructionDetails(instructionDetails: "AND B", opcode: [0xA0], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.B)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA1: // AND C - A1 - Bitwise AND on A with C
+            logInstructionDetails(instructionDetails: "AND C", opcode: [0xA1], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.C)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA2: // AND D - A2 - Bitwise AND on A with D
+            logInstructionDetails(instructionDetails: "AND D", opcode: [0xA2], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.D)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA3: // AND E - A3 - Bitwise AND on A with E
+            logInstructionDetails(instructionDetails: "AND E", opcode: [0xA3], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.E)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA4: // AND H - A4 - Bitwise AND on A with H
+            logInstructionDetails(instructionDetails: "AND H", opcode: [0xA4], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.H)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA5: // AND L - A5 - Bitwise AND on A with L
+            logInstructionDetails(instructionDetails: "AND L", opcode: [0xA5], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.L)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA6: // AND (HL) - A6 - Bitwise AND on A with (HL)
+            logInstructionDetails(instructionDetails: "AND (HL)", opcode: [0xA6], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & mmu.readByte(address: registers.HL))
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0xA7: // AND A - A7 - Bitwise AND on A with A
+            logInstructionDetails(instructionDetails: "AND A", opcode: [0xA7], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & registers.A)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA8: // XOR B - A8 - Bitwise XOR on A with B
+            logInstructionDetails(instructionDetails: "XOR B", opcode: [0xA8], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.B)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xA9: // XOR C - A9 - Bitwise XOR on A with C
+            logInstructionDetails(instructionDetails: "XOR C", opcode: [0xA9], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.C)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xAA: // XOR D - AA - Bitwise XOR on A with D
+            logInstructionDetails(instructionDetails: "XOR D", opcode: [0xAA], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.D)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xAB: // XOR E - AB - Bitwise XOR on A with E
+            logInstructionDetails(instructionDetails: "XOR E", opcode: [0xAB], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.E)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xAC: // XOR H - AC - Bitwise XOR on A with H
+            logInstructionDetails(instructionDetails: "XOR H", opcode: [0xAC], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.H)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xAD: // XOR L - AD - Bitwise XOR on A with L
+            logInstructionDetails(instructionDetails: "XOR L", opcode: [0xAD], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.L)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xAE: // XOR (HL) - AE - Bitwise XOR on A with (HL)
+            logInstructionDetails(instructionDetails: "XOR (HL)", opcode: [0xAE], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ mmu.readByte(address: registers.HL))
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0xAF: // XOR A - AF - Bitwise XOR on A with A
+            logInstructionDetails(instructionDetails: "XOR A", opcode: [0xAF], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ registers.A)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB0: // OR B - B0 - Bitwise OR on A with B
+            logInstructionDetails(instructionDetails: "OR B", opcode: [0xB0], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.B)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB1: // OR C - B1 - Bitwise OR on A with C
             logInstructionDetails(instructionDetails: "OR C", opcode: [0xB1], programCounter: registers.PC)
-            // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xB1])
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.C)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB2: // OR D - B2 - Bitwise OR on A with D
+            logInstructionDetails(instructionDetails: "OR D", opcode: [0xB2], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.D)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB3: // OR E - B3 - Bitwise OR on A with E
+            logInstructionDetails(instructionDetails: "OR E", opcode: [0xB3], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.E)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB4: // OR H - B4 - Bitwise OR on A with H
+            logInstructionDetails(instructionDetails: "OR H", opcode: [0xB4], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.H)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB5: // OR L - B5 - Bitwise OR on A with L
+            logInstructionDetails(instructionDetails: "OR L", opcode: [0xB5], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.L)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0xB6: // OR (HL) - B6 - Bitwise OR on A with (HL)
+            logInstructionDetails(instructionDetails: "OR (HL)", opcode: [0xB6], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | mmu.readByte(address: registers.HL))
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
+            incrementR(opcodeCount:1)
+        case 0xB7: // OR A - B7 - Bitwise OR on A with A
+            logInstructionDetails(instructionDetails: "OR A", opcode: [0xB7], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | registers.A)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
             incrementR(opcodeCount:1)
@@ -1733,8 +2022,10 @@ actor microbee
             }
             else
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             incrementR(opcodeCount:1)
@@ -1772,10 +2063,11 @@ actor microbee
             }
             else
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -1803,8 +2095,10 @@ actor microbee
             logInstructionDetails(instructionDetails: "RET", opcode: [0xC8], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             else
@@ -1815,8 +2109,10 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xC9: // RET - C9 - The top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RET", opcode: [0xC9], programCounter: registers.PC)
-            registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-            registers.SP = registers.SP &+ 2
+            registers.PCL = mmu.readByte(address: registers.SP)
+            registers.SP = registers.SP &+ 1
+            registers.PCH = mmu.readByte(address: registers.SP)
+            registers.SP = registers.SP &+ 1
             tStates = tStates + 10
             incrementR(opcodeCount:1)
         case 0xCA: // JP Z,nn - CA n n - If the zero flag is set, $nn is copied to PC
@@ -2575,10 +2871,11 @@ actor microbee
             registers.PC = registers.PC &+ 3
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -2591,9 +2888,9 @@ actor microbee
             logInstructionDetails(instructionDetails: "CALL $nn",opcode: [0xCD], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
             registers.SP = registers.SP &- 1
-            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+            mmu.writeByte(address: registers.SP, value: registers.PCH)
             registers.SP = registers.SP &- 1
-            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+            mmu.writeByte(address: registers.SP, value: registers.PCL)
             registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
             tStates = tStates + 17
             incrementR(opcodeCount:1)
@@ -2615,8 +2912,10 @@ actor microbee
             }
             else
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             incrementR(opcodeCount:1)
@@ -2705,10 +3004,11 @@ actor microbee
             }
             else
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -2721,6 +3021,12 @@ actor microbee
             mmu.writeByte(address: registers.SP, value: registers.E)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 11
+            incrementR(opcodeCount:1)
+        case 0xD6: // SUB $n - D6 n - Subtracts $n from A
+            logInstructionDetails(instructionDetails: "SUB $n", opcode: [0xD6], values: [opcode2], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: opcode2)
+            registers.PC = registers.PC &+ 2
+            tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0xD7: // RST 0x10 - The current PC value plus one is pushed onto the stack, then is loaded with 0x10
             logInstructionDetails(instructionDetails: "RST 0x10", opcode: [0xD7], programCounter: registers.PC)
@@ -2735,8 +3041,10 @@ actor microbee
             logInstructionDetails(instructionDetails: "RET NC", opcode: [0xD0], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             else
@@ -2783,10 +3091,11 @@ actor microbee
             registers.PC = registers.PC &+ 3
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -3008,6 +3317,34 @@ actor microbee
                     registers.PC = registers.PC &+ 3
                     tStates = tStates + 19
                     incrementR(opcodeCount:2)
+                case 0x96: // SUB (IX+$d) - DD 96 d - Subtracts the value pointed to by IX plus $d from A
+                    logInstructionDetails(instructionDetails: "SUB (IX+$d)", opcode: [0xDD,0x96], values: [opcode2], programCounter: registers.PC)
+                    let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0xA6: // AND (IX+$d) - DD A6 d - Bitwise AND on A with the value pointed to by IX plus $d
+                    logInstructionDetails(instructionDetails: "AND (IX+$d)", opcode: [0xDD,0xA6], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0xAE: // XOR (IX+$d) - DD AE d - Bitwise XOR on A with the value pointed to by IX plus $d
+                    logInstructionDetails(instructionDetails: "XOR (IX+$d)", opcode: [0xDD,0xAE], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0xB6: // OR (IX+$d) - DD B6 d - Bitwise OR on A with the value pointed to by IX plus $d
+                    logInstructionDetails(instructionDetails: "OR (IX+$d)", opcode: [0xDD,0xB6], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
                 case 0xBE: // CP (IX+$d) - DD BE d - Subtracts the value pointed to by IX plus $d from A and affects flags according to the result. A is not modified
                     logInstructionDetails(instructionDetails: "CP (IX+$d)", opcode: [0xDD,0xBE], values: [opcode3], programCounter: registers.PC)
                     let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3152,9 +3489,8 @@ actor microbee
                     } // DB CB opcodes
                 case 0xE1: // POP IX - DD E1 - The memory location pointed to by SP is stored into IXL and SP is incremented. The memory location pointed to by SP is stored into IXH and SP is incremented again
                     logInstructionDetails(instructionDetails: "POP IX", opcode: [0xDD,0xE1], programCounter: registers.PC)
-                    let tempIXL = mmu.readByte(address: registers.SP)
-                    let tempIXH = mmu.readByte(address: registers.SP &+ 1)
-                    registers.IX = UInt16(tempIXH) << 8 | UInt16(tempIXL)
+                    registers.IXL = mmu.readByte(address: registers.SP)
+                    registers.IXH = mmu.readByte(address: registers.SP &+ 1)
                     registers.SP = registers.SP &+ 2
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 14
@@ -3171,12 +3507,10 @@ actor microbee
                     incrementR(opcodeCount:2)
                 case 0xE5: // PUSH IX - DD E5 - SP is decremented and IXH is stored into the memory location pointed to by SP. SP is decremented again and IXL is stored into the memory location pointed to by SP
                     logInstructionDetails(instructionDetails: "PUSH IX", opcode: [0xDD,0xE5], programCounter: registers.PC)
-                    let tempIXH = UInt8(registers.IX >> 8)
-                    let tempIXL = UInt8(registers.IX & 0xFF)
                     registers.SP = registers.SP &- 1
-                    mmu.writeByte(address: registers.SP, value: tempIXL)
+                    mmu.writeByte(address: registers.SP, value: registers.IXH)
                     registers.SP = registers.SP &- 1
-                    mmu.writeByte(address: registers.SP, value: tempIXH)
+                    mmu.writeByte(address: registers.SP, value: registers.IXL)
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 15
                     incrementR(opcodeCount:2)
@@ -3212,8 +3546,10 @@ actor microbee
             }
             else
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             incrementR(opcodeCount:1)
@@ -3257,10 +3593,11 @@ actor microbee
             }
             else
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -3273,6 +3610,12 @@ actor microbee
             mmu.writeByte(address: registers.SP, value: registers.L)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 11
+            incrementR(opcodeCount:1)
+        case 0xE6: // AND n - E6 n - Bitwise AND on A with $n
+            logInstructionDetails(instructionDetails: "AND $n", opcode: [0xE6], values: [opcode2], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & opcode2)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0xE7: // RST 0x20 - E7 - The current PC value plus one is pushed onto the stack, then is loaded with 0x20
             logInstructionDetails(instructionDetails: "RST 0x20", opcode: [0xE7], programCounter: registers.PC)
@@ -3288,8 +3631,10 @@ actor microbee
             logInstructionDetails(instructionDetails: "RET PE", opcode: [0xE8], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             else
@@ -3326,10 +3671,11 @@ actor microbee
             registers.PC = registers.PC &+ 3
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 1
             }
@@ -3408,8 +3754,10 @@ actor microbee
             case 0x45: // RETN - ED 45 - Used at the end of a non-maskable interrupt service routine (located at 0066h) to pop the top stack entry into PC. The value of IFF2 is copied to IFF1 so that maskable interrupts are allowed to continue as before. NMIs are not enabled on the TI
                 logInstructionDetails(instructionDetails: "RETN", opcode: [0xED,0x45], programCounter: registers.PC)
                 registers.IFF1 = registers.IFF2
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &- 1) << 8) | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 14
                 incrementR(opcodeCount:2)
             case 0x46: // IM 0 - ED 46 - Sets interrupt mode 0
@@ -3490,8 +3838,10 @@ actor microbee
                 incrementR(opcodeCount:2)
             case 0x4D: // RETI - ED 4D - Used at the end of a maskable interrupt service routine. The top stack entry is popped into PC, and signals an I/O device that the interrupt has finished, allowing nested interrupts (not a consideration on the TI)
                 logInstructionDetails(instructionDetails: "RETI", opcode: [0xED,0x4D], programCounter: registers.PC)
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &- 1) << 8) | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 14
                 incrementR(opcodeCount:2)
             case 0x4F: // LD R,A - ED 4F - Stores the value of A into register R
@@ -3755,10 +4105,8 @@ actor microbee
             case 0x73: // LD ($nn),SP - ED 73 n n - Stores SP into the memory location pointed to by $nn
                 logInstructionDetails(instructionDetails: "LD ($nn),SP", opcode: [0xED,0x73], values: [opcode3,opcode4], programCounter: registers.PC)
                 let tempResultAddress = UInt16(opcode4) << 8 | UInt16(opcode3)
-                let tempResultSPH = UInt8(registers.SP >> 8)
-                let tempResultSPL = UInt8(registers.SP & 0xFF)
-                mmu.writeByte(address: tempResultAddress, value: tempResultSPL)
-                mmu.writeByte(address: tempResultAddress &+ 1, value: tempResultSPH)
+                mmu.writeByte(address: tempResultAddress, value: registers.SPL)
+                mmu.writeByte(address: tempResultAddress &+ 1, value: registers.SPH)
                 registers.PC = registers.PC &+ 4
                 tStates = tStates + 20
                 incrementR(opcodeCount:2)
@@ -3842,12 +4190,40 @@ actor microbee
                 registers.PC = registers.PC &+ 2
                 tStates = tStates + 21
                 incrementR(opcodeCount:2)
+            case 0xB3: // OTIR - ED B3 - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
+                logInstructionDetails(instructionDetails: "OTIR", opcode: [0xED,0xB3], programCounter: registers.PC)
+                let preserveB = registers.B
+                repeat
+                {
+                    ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+                    registers.HL = registers.HL &+ 1
+                    registers.B = registers.B &- 1
+                }
+                while registers.B != 0
+                registers.F = registers.F | z80Flags.Zero.rawValue
+                registers.F = registers.F | z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                if preserveB == 0
+                {
+                    tStates = tStates + 16
+                }
+                else
+                {
+                    tStates = tStates + 21
+                }
+                incrementR(opcodeCount:2)
             default:
                 logInstructionDetails(opcode: [0xED,opcode2], programCounter: registers.PC)
                 registers.PC = registers.PC &+ 2
                 tStates = tStates + 21  // confirm this behaviour
                 incrementR(opcodeCount:2) // confirm this behaviour for ED codes
-            }
+            } // ED
+        case 0xEE: // XOR n - EE n - Bitwise XOR on A with $n
+            logInstructionDetails(instructionDetails: "XOR $n", opcode: [0xEE], values: [opcode2], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ opcode2)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
+            incrementR(opcodeCount:1)
         case 0xEF: // RST 0x28 - EF - The current PC value plus one is pushed onto the stack, then is loaded with 0x28
             logInstructionDetails(instructionDetails: "RST 0x28", opcode: [0xEF], programCounter: registers.PC)
             registers.PC = registers.PC &+ 1
@@ -3867,8 +4243,10 @@ actor microbee
             }
             else
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             incrementR(opcodeCount:1)
@@ -3908,10 +4286,11 @@ actor microbee
             }
             else
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -3924,6 +4303,12 @@ actor microbee
             mmu.writeByte(address: registers.SP, value: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 11
+            incrementR(opcodeCount:1)
+        case 0xF6: // OR n - F6 n - Bitwise OR on A with $n
+            logInstructionDetails(instructionDetails: "OR $n", opcode: [0xF6], values: [opcode2], programCounter: registers.PC)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | opcode2)
+            registers.PC = registers.PC &+ 1
+            tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0xF7: // RST 0x30 - F7 - The current PC value plus one is pushed onto the stack, then is loaded with 0x30
             logInstructionDetails(instructionDetails: "RST 0x30", opcode: [0xF7], programCounter: registers.PC)
@@ -3939,8 +4324,10 @@ actor microbee
             logInstructionDetails(instructionDetails: "RET M", opcode: [0xF8], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
-                registers.PC = UInt16(mmu.readByte(address: registers.SP &+ 1)) << 8 | UInt16(mmu.readByte(address: registers.SP))
-                registers.SP = registers.SP &+ 2
+                registers.PCL = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
+                registers.PCH = mmu.readByte(address: registers.SP)
+                registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
             else
@@ -3979,10 +4366,11 @@ actor microbee
             registers.PC = registers.PC &+ 3
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
+                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
+                mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
-                mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
+                mmu.writeByte(address: registers.SP, value: registers.PCL)
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
                 tStates = tStates + 17
             }
@@ -4204,6 +4592,20 @@ actor microbee
                     registers.PC = registers.PC &+ 4
                     tStates = tStates + 19
                     incrementR(opcodeCount:2)
+                case 0x96: // SUB (IY+$d) - FD 96 d - Subtracts the value pointed to by IY plus $d from A
+                    logInstructionDetails(instructionDetails: "SUB (IY+$d)", opcode: [0xFD,0x96], values: [opcode2], programCounter: registers.PC)
+                    let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0xA6: // AND (IY+$d) - FD A6 d - Bitwise AND on A with the value pointed to by IY plus $d
+                    logInstructionDetails(instructionDetails: "AND (IY+$d)", opcode: [0xFD,0xA6], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A & mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
                 switch opcode4 // FD CB opcodes
                 {
                     case 0x86: // RES 0,(IY+$d) - FD CB d 86 - Resets bit 0 of the memory location pointed to by IY plus $d
@@ -4335,7 +4737,21 @@ actor microbee
                         tStates = tStates + 23
                         incrementR(opcodeCount:3)
                     default: break
-                } // FC CB opcodes
+                } // FD CB opcodes
+                case 0xAE: // XOR (IY+$d) - FD AE d - Bitwise XOR on A with the value pointed to by IX plus $d
+                    logInstructionDetails(instructionDetails: "XOR (IY+$d)", opcode: [0xFD,0xAE], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A ^ mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
+                case 0xB6: // OR (IY+$d) - FD B6 d - Bitwise OR on A with the value pointed to by IX plus $d
+                    logInstructionDetails(instructionDetails: "OR (IY+$d)", opcode: [0xDD,0xB6], values: [opcode3], programCounter: registers.PC)
+                    let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                    (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: registers.A | mmu.readByte(address: tempResultAddress))
+                    registers.PC = registers.PC &+ 3
+                    tStates = tStates + 19
+                    incrementR(opcodeCount:2)
                 case 0xBE: // CP (IY+$d) - FD BE d - Subtracts the value pointed to by IY plus $d from A and affects flags according to the result. A is not modified
                     logInstructionDetails(instructionDetails: "CP (IY+$d)", opcode: [0xFD,0xBE], values: [opcode3], programCounter: registers.PC)
                     let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4347,9 +4763,8 @@ actor microbee
                     incrementR(opcodeCount:2)
                 case 0xE1: // POP IY - FD E1 - The memory location pointed to by SP is stored into IYL and SP is incremented. The memory location pointed to by SP is stored into IYH and SP is incremented again
                     logInstructionDetails(instructionDetails: "POP IY", opcode: [0xFD,0xE1], programCounter: registers.PC)
-                    let tempIYL = mmu.readByte(address: registers.SP)
-                    let tempIYH = mmu.readByte(address: registers.SP &+ 1)
-                    registers.IX = UInt16(tempIYH) << 8 | UInt16(tempIYL)
+                    registers.IYL = mmu.readByte(address: registers.SP)
+                    registers.IYH = mmu.readByte(address: registers.SP &+ 1)
                     registers.SP = registers.SP &+ 2
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 14
@@ -4366,12 +4781,10 @@ actor microbee
                     incrementR(opcodeCount:2)
                 case 0xE5: // PUSH IY - FD E5 - SP is decremented and IYH is stored into the memory location pointed to by SP. SP is decremented again and IYL is stored into the memory location pointed to by SP
                     logInstructionDetails(instructionDetails: "PUSH IY", opcode: [0xFD,0xE5], programCounter: registers.PC)
-                    let tempIYH = UInt8(registers.IY >> 8)
-                    let tempIYL = UInt8(registers.IY & 0xFF)
                     registers.SP = registers.SP &- 1
-                    mmu.writeByte(address: registers.SP, value: tempIYL)
+                    mmu.writeByte(address: registers.SP, value: registers.IYH)
                     registers.SP = registers.SP &- 1
-                    mmu.writeByte(address: registers.SP, value: tempIYH)
+                    mmu.writeByte(address: registers.SP, value: registers.IYL)
                     registers.PC = registers.PC &+ 2
                     tStates = tStates + 15
                     incrementR(opcodeCount:2)
@@ -4412,11 +4825,15 @@ actor microbee
             tStates = tStates + 0 // check this behaviour
             incrementR(opcodeCount:1)
         } // end single opcodes
+        z80Queue[z80QueueHead] = registers.PC
+        z80QueueFilled[z80QueueHead] = true
+        z80QueueHead = (z80QueueHead + 1) % 16
     }
     
     func sortZ80Queue() -> [String]
     {
         var tempZ80Queue: [String] = []
+        
         for counter in 0..<16
         {
             let z80QueuePosition = (z80QueueHead + counter) % 16
@@ -4429,6 +4846,42 @@ actor microbee
             }
         }
         return tempZ80Queue
+    }
+    
+    func sortBreakpointQueue() -> [String]
+    {
+        var tempBreakpointQueue: [String] = []
+        for counter in 0...15
+        {
+            if breakpointMask[counter] == 0
+            {
+                tempBreakpointQueue.append("")
+            }
+            else
+            {
+                tempBreakpointQueue.append(String(breakpoints[counter]))
+            }
+        }
+
+        return tempBreakpointQueue
+    }
+    
+    func sortBreakpointQueueMask() -> [Bool]
+    {
+        var tempBreakpointQueueMask: [Bool] = []
+        for counter in 0...15
+        {
+            if breakpointMask[counter] == 0
+            {
+                tempBreakpointQueueMask.append(false)
+            }
+            else
+            {
+                tempBreakpointQueueMask.append(true)
+            }
+        }
+
+        return tempBreakpointQueueMask
     }
     
     func returnSnapshot() async -> microbeeSnapshot
@@ -4503,7 +4956,9 @@ actor microbee
                 emulatorState: emulatorState,
                 executionMode: executionMode,
                 ports: ports,
-                orderedZ80Queue: sortZ80Queue()
+                orderedZ80Queue: sortZ80Queue(),
+                breakpointQueue: sortBreakpointQueue(),
+                breakpointQueueMask : sortBreakpointQueueMask()
             ),
             memorySnapshot: memorySnapshot(
                 VDU: videoRAM.bufferTransform(),

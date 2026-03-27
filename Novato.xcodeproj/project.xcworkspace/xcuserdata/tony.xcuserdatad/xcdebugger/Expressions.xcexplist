@@ -61,6 +61,26 @@
       </ContextState>
       <ContextState
          contextName = "microbee.executeInstruction():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.HL">
+            </PersistentString>
+            <PersistentString
+               value = "registers.DE">
+            </PersistentString>
+            <PersistentString
+               value = "mmu.readByte(address: registers.HL)">
+            </PersistentString>
+            <PersistentString
+               value = "mmu.readByte(address: registers.DE)">
+            </PersistentString>
+            <PersistentString
+               value = "registers.PC">
+            </PersistentString>
+            <PersistentString
+               value = "registers.SP">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "EmulatorView.VDURam(_:_:):EmulatorView.swift">

@@ -58,6 +58,7 @@ public extension Bundle {
         infoDictionary?["CFBundleDisplayName"] as? String ?? "-"
     }
 }
+
 struct SettingsView: View
 {
     var body: some View
@@ -73,7 +74,9 @@ struct SettingsView: View
             screenSettingsView()
                 .tabItem { Label("Screen Settings", systemImage: "gear") }
                 .tag("general")
-            
+            windowsView()
+                .tabItem { Label("Windows Settings", systemImage: "gear") }
+                .tag("general")
         }
         .frame(width: 450, height: 250)
     }
@@ -112,7 +115,7 @@ struct bootSettingsView: View
     
     var body: some View
     {
-        let themes = ["Demo #1 - CP/M","Demo #2 - Viatel","MicroWorld Basic 5.22e"]
+        let themes = ["Demo #1 - Basic","Demo #2 - CP/M","Demo #3 - Viatel","MicroWorld Basic 5.22e"]
         Form
         {
             Picker("Demo Screen:", selection: $bootModeSelection)
@@ -164,5 +167,26 @@ struct screenSettingsView: View
             Toggle("Ahistorical Scanline Mode:", isOn: $interlaceEnabled)
         }
         .formStyle(.grouped)
+    }
+}
+
+struct windowsView: View
+{
+    @AppStorage("registerWindowVisible") private var registerWindowVisible: Bool = true
+    @AppStorage("portWindowVisible") private var portWindowVisible: Bool = true
+    @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
+    @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
+    
+    var body: some View
+    {
+        Form
+        {
+            Toggle("Show register window", isOn: $registerWindowVisible)
+            Toggle("Show port window", isOn: $portWindowVisible)
+            Toggle("Show memory window", isOn: $memoryWindowVisible)
+            Toggle("Show breakpoint window", isOn: $breakpointWindowVisible)
+        }
+        .formStyle(.grouped)
+
     }
 }

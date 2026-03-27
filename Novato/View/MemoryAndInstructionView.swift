@@ -15,7 +15,7 @@ struct memoryAndInstructionView: View
         {
             switch ascii
             {
-            case 32...127:
+            case 32...126:
                 return String(UnicodeScalar(Int(ascii))!)
             default:
                 return "."

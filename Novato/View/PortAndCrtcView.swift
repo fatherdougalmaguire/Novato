@@ -34,11 +34,11 @@ struct portAndCrtcView: View
                 
                 Spacer()
                 
-//                let port00Hex: String = String(format: "0x%02X", snapshot.executionSnapshot.ports[0])
-//                let port00Bin: String = padBinary(value: snapshot.executionSnapshot.ports[0])
-//                Text("0x00   \(port00Hex) \(port00Bin) PIO port A data port")
-//                    .foregroundColor(Color.orange)
-//                    .font(.system(.body, design: .monospaced))
+                let port00Hex: String = String(format: "0x%02X", snapshot.executionSnapshot.ports[0])
+                let port00Bin: String = padBinary(value: snapshot.executionSnapshot.ports[0])
+                Text("0x00   \(port00Hex) \(port00Bin) PIO port A data port")
+                    .foregroundColor(Color.orange)
+                    .font(.system(.body, design: .monospaced))
                 
                 displayPort(portLabel: "0x00",portDescription: "PIO port A data port",portValue: snapshot.executionSnapshot.ports[0], alternateRow: false)
                 displayPort(portLabel: "0x01",portDescription: "PIO port A control port       ",portValue: snapshot.executionSnapshot.ports[1], alternateRow: true)

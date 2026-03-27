@@ -26,6 +26,11 @@ final class emulatorViewModel
         Task { await takeSnapshot() }
     }
 
+    func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
+    {
+        await cpu.updateBreakpoints(index: index, value: value, mask: mask)
+    }
+    
     func ClearEmulationScreen() async
     {
         await cpu.ClearVideoMemory()
@@ -36,7 +41,7 @@ final class emulatorViewModel
         await cpu.splashScreen()
     }
     
-    func writeToMemory( address : UInt16, value : UInt8) async
+    func writeToMemory(address : UInt16, value : UInt8) async
     {
         await cpu.writeToMemory(address : address, value : value)
     }

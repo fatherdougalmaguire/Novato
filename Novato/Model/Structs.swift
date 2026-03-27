@@ -98,8 +98,11 @@ struct executionSnapshot: Sendable, Equatable
     let executionMode: executionMode
     
     let ports: [UInt8]
-
+    
     let orderedZ80Queue: [String]
+    
+    let breakpointQueue: [String]
+    let breakpointQueueMask: [Bool]
 }
 
 struct microbeeSnapshot: Sendable, Equatable, Identifiable

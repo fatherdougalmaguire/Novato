@@ -44,6 +44,10 @@ struct emulatorView: View
     @AppStorage("colorSelection") private var colourSelection = "Colour"
     @AppStorage("bootModeSelection") private var bootModeSelection = "MicroWorld Basic 5.22e"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
+    @AppStorage("registerWindowVisible") private var registerWindowVisible: Bool = true
+    @AppStorage("portWindowVisible") private var portWindowVisible: Bool = true
+    @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
+    @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
     
     @State private var isRunning = false
     
@@ -263,9 +267,9 @@ struct emulatorView: View
                                         
                                         switch bootModeSelection
                                         {
-                                            //case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
-                                            case "Demo #1 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
-                                            case "Demo #2 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
+                                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
+                                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
+                                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
                                             case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
                                             default: break
                                         }
@@ -293,17 +297,18 @@ struct emulatorView: View
                 }
                 .onAppear
                 {
-                    openWindow(id: "registerWindow")
-                    openWindow(id: "portAndCrtcWindow")
-                    openWindow(id: "memoryAndInstructionWindow")
+                    if registerWindowVisible { openWindow(id: "registerWindow") }
+                    if portWindowVisible { openWindow(id: "portAndCrtcWindow") }
+                    if memoryWindowVisible { openWindow(id: "memoryAndInstructionWindow") }
+                    if breakpointWindowVisible { openWindow(id: "breakpointsWindow") }
                     focusWindow(withId: "emulatorWindow")
                     Task
                     {
                         switch bootModeSelection
                         {
-                            //case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
-                            case "Demo #1 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
-                            case "Demo #2 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
+                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
+                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
+                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
                             case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
                             default: break
                         }

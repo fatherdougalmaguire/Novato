@@ -24,6 +24,10 @@ struct NovatoApp: App
         {
             memoryAndInstructionView().environment(vm)
         }
+        Window("Breakpoints", id: "breakpointsWindow")
+        {
+            breakpointsView().environment(vm)
+        }
         Settings { SettingsView() }
         .commands
         {
@@ -100,3 +104,4 @@ struct NovatoApp: App
         }
     }
 }
+
