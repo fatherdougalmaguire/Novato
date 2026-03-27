@@ -45,14 +45,16 @@ This emulator is still in what could charitably called *alpha* status.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
+* You can define up to 16 breakpoints
 * There is now a **Settings** module so you can dynamically set ( and retain ):
   
   - Start-up mode ( automatic or splash screen )
-  - Select boot code ( CP/M demo, Viatel demo, Microworld Basic 5.22e )
+  - Select boot code ( Basic demo, CP/M demo, Viatel demo, Microworld Basic 5.22e )
   - Colour mode
   - Aspect ratio
   - Screen scaling
   - Visible scanline mode
+  - Apperance of debug windows
   
 ### Instruction decoding
 * All non-flag affecting instructions are decoded
@@ -85,6 +87,7 @@ This emulator is still in what could charitably called *alpha* status.
 ## On the to-do list
 
 * Test harness for JSON test files ( most likely the [JSMoo single step tests](https://github.com/SingleStepTests/z80) )
+* Watch breakpoints for registers and memory locations
 * Display PCG characters in the memory dump window
 * ROM selection and load
 * Machine state saving
@@ -111,11 +114,9 @@ This emulator is still in what could charitably called *alpha* status.
 
 <img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/b1a3c31c-8eac-42bb-b47f-28bfd4c665a4" />
 
-### BASIC
+### Breakpoints
 
-Whilst the emulator boots to the BASIC splash screen ( via the MicroWorld Basic 5.22e load option ), BASIC itself is not functional.
-
-<img width="1136" height="830" alt="image" src="https://github.com/user-attachments/assets/34999e8d-b5df-44d4-98cf-b7f04fa15478" />
+<img width="536" height="1232" alt="image" src="https://github.com/user-attachments/assets/df78c080-2505-41b4-b982-9ca47428137f" />
 
 ### Port View
 
@@ -131,8 +132,12 @@ Whilst the emulator boots to the BASIC splash screen ( via the MicroWorld Basic 
 
 ## Demo Screens
 
-Below are demo screens for the two additional video modes ( 80x24 and 40x25 ).  
+Below are demo screens for all three video modes ( 64x16, 80x24 and 40x25 ).  
 These screens are drawn using internally loaded Z80 assembler.
+
+### 64 columns x 16 rows 
+
+<img width="2272" height="1660" alt="image" src="https://github.com/user-attachments/assets/9a00e753-b8c9-498a-a738-21a67b8665bb" />
 
 ### 80 columns x 24 rows 
 
