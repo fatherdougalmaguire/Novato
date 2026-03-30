@@ -2130,78 +2130,525 @@ actor microbee
         case 0xCB: //start CB opcodes
             switch opcode2
             {
-            case 0x47: // BIT 0, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00000001) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00000001) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
-                logInstructionDetails(instructionDetails: "BIT 0, A", opcode: [0xCB,0x47], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x47])
+            case 0x40: // BIT 0,B - CB 40 - Tests bit 0 of B
+                logInstructionDetails(instructionDetails: "BIT 0,B", opcode: [0xCB,0x40], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
                 incrementR(opcodeCount:2)
-            case 0x4F: // BIT 1, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00000010) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00000010) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            case 0x41: // BIT 0,C - CB 41 - Tests bit 0 of C
+                logInstructionDetails(instructionDetails: "BIT 0,C", opcode: [0xCB,0x41], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 1, A", opcode: [0xCB,0x4F], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x4F])
                 incrementR(opcodeCount:2)
-            case 0x57: // BIT 2, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00000100) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00000100) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            case 0x42: // BIT 0,D - CB 42 - Tests bit 0 of D
+                logInstructionDetails(instructionDetails: "BIT 0,D", opcode: [0xCB,0x42], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 2, A", opcode: [0xCB,0x57], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x57])
                 incrementR(opcodeCount:2)
-            case 0x5F: // BIT 3, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00001000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00001000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            case 0x43: // BIT 0,E - CB 43 - Tests bit 0 of E
+                logInstructionDetails(instructionDetails: "BIT 0,E", opcode: [0xCB,0x43], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 3, A", opcode: [0xCB,0x5F], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x5F])
                 incrementR(opcodeCount:2)
-            case 0x67: // BIT 4, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b00010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b00010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            case 0x44: // BIT 0,H - CB 44 - Tests bit 0 of H
+                logInstructionDetails(instructionDetails: "BIT 0,H", opcode: [0xCB,0x44], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 4, A", opcode: [0xCB,0x67], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x67])
                 incrementR(opcodeCount:2)
-            case 0x6F: // BIT 5, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b0010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b0010000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            case 0x45: // BIT 0,L - CB 45 - Tests bit 0 of L
+                logInstructionDetails(instructionDetails: "BIT 0,L", opcode: [0xCB,0x45], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 5, A", opcode: [0xCB,0x6F], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x6F])
                 incrementR(opcodeCount:2)
-            case 0x77: // BIT 6, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b01000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b01000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
-                tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 6, A", opcode: [0xCB,0x77], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x77])
+            case 0x46: // BIT 0,(HL) - CB 46 - Tests bit 0 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 0,(HL)", opcode: [0xCB,0x46], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
                 incrementR(opcodeCount:2)
-            case 0x7F: // BIT 7, A
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Sign,SetFlag:(registers.A & 0b10000000) == 1)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Zero,SetFlag:!((registers.A & 0b10000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.HalfCarry,SetFlag:true)
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow,SetFlag:!((registers.A & 0b10000000) == 1))
-                registers.F = UpdateFlags(FlagRegister:registers.F,Flag:z80Flags.Negative,SetFlag:false)
+            case 0x47: // BIT 0,A - CB 47 - Tests bit 0 of A
+                logInstructionDetails(instructionDetails: "BIT 0,A", opcode: [0xCB,0x47], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 1) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
                 tStates = tStates + 8
-                logInstructionDetails(instructionDetails: "BIT 7, A", opcode: [0xCB,0x7F], programCounter: registers.PC)
-                // myz80Queue.addToQueue(address: registers.PC, opCodes: [0xCB,0x7F])
+                incrementR(opcodeCount:2)
+            case 0x48: // BIT 1,B - CB 48 - Tests bit 1 of B
+                logInstructionDetails(instructionDetails: "BIT 1,B", opcode: [0xCB,0x48], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x49: // BIT 1,C - CB 49 - Tests bit 1 of C
+                logInstructionDetails(instructionDetails: "BIT 1,C", opcode: [0xCB,0x49], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x4A: // BIT 1,D - CB 4A - Tests bit 1 of D
+                logInstructionDetails(instructionDetails: "BIT 1,D", opcode: [0xCB,0x4A], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x4B: // BIT 1,E - CB 4B - Tests bit 1 of E
+                logInstructionDetails(instructionDetails: "BIT 1,E", opcode: [0xCB,0x4B], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x4C: // BIT 1,H - CB 4C - Tests bit 1 of H
+                logInstructionDetails(instructionDetails: "BIT 1,H", opcode: [0xCB,0x4C], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x4D: // BIT 1,L - CB 4D - Tests bit 1 of L
+                logInstructionDetails(instructionDetails: "BIT 1,L", opcode: [0xCB,0x4D], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x4E: // BIT 1,(HL) - CB 4E - Tests bit 1 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 1,(HL)", opcode: [0xCB,0x4E], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x4F: // BIT 1,A - CB 4F - Tests bit 1 of A
+                logInstructionDetails(instructionDetails: "BIT 1,A", opcode: [0xCB,0x4F], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 2) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x50: // BIT 2,B - CB 50 - Tests bit 2 of B
+                logInstructionDetails(instructionDetails: "BIT 2,B", opcode: [0xCB,0x50], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x51: // BIT 2,C - CB 51 - Tests bit 2 of C
+                logInstructionDetails(instructionDetails: "BIT 2,C", opcode: [0xCB,0x51], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x52: // BIT 2,D - CB 52 - Tests bit 2 of D
+                logInstructionDetails(instructionDetails: "BIT 2,D", opcode: [0xCB,0x52], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x53: // BIT 2,E - CB 53 - Tests bit 2 of E
+                logInstructionDetails(instructionDetails: "BIT 2,E", opcode: [0xCB,0x53], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x54: // BIT 2,H - CB 54 - Tests bit 2 of H
+                logInstructionDetails(instructionDetails: "BIT 2,H", opcode: [0xCB,0x54], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x55: // BIT 2,L - CB 55 - Tests bit 2 of L
+                logInstructionDetails(instructionDetails: "BIT 2,L", opcode: [0xCB,0x55], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x56: // BIT 2,(HL) - CB 56 - Tests bit 2 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 2,(HL)", opcode: [0xCB,0x56], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 1) ^ 4) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x57: // BIT 2,A - CB 57 - Tests bit 2 of A
+                logInstructionDetails(instructionDetails: "BIT 2,A", opcode: [0xCB,0x57], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 4) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x58: // BIT 3,B - CB 58 - Tests bit 3 of B
+                logInstructionDetails(instructionDetails: "BIT 3,B", opcode: [0xCB,0x58], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x59: // BIT 3,C - CB 59 - Tests bit 3 of C
+                logInstructionDetails(instructionDetails: "BIT 3,C", opcode: [0xCB,0x59], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x5A: // BIT 3,D - CB 5A - Tests bit 3 of D
+                logInstructionDetails(instructionDetails: "BIT 3,D", opcode: [0xCB,0x5A], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x5B: // BIT 3,E - CB 5B - Tests bit 3 of E
+                logInstructionDetails(instructionDetails: "BIT 3,E", opcode: [0xCB,0x5B], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x5C: // BIT 3,H - CB 5C - Tests bit 3 of H
+                logInstructionDetails(instructionDetails: "BIT 3,H", opcode: [0xCB,0x5C], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x5D: // BIT 3,L - CB 5D - Tests bit 3 of L
+                logInstructionDetails(instructionDetails: "BIT 3,L", opcode: [0xCB,0x5D], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x5E: // BIT 3,(HL) - CB 5E - Tests bit 3 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 3,(HL)", opcode: [0xCB,0x5E], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x5F: // BIT 3,A - CB 5F - Tests bit 3 of A
+                logInstructionDetails(instructionDetails: "BIT 3,A", opcode: [0xCB,0x5F], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 8) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x60: // BIT 4,B - CB 60 - Tests bit 4 of B
+                logInstructionDetails(instructionDetails: "BIT 4,B", opcode: [0xCB,0x60], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x61: // BIT 4,C - CB 61 - Tests bit 4 of C
+                logInstructionDetails(instructionDetails: "BIT 4,C", opcode: [0xCB,0x61], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x62: // BIT 4,D - CB 62 - Tests bit 4 of D
+                logInstructionDetails(instructionDetails: "BIT 4,D", opcode: [0xCB,0x62], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x63: // BIT 4,E - CB 63 - Tests bit 4 of E
+                logInstructionDetails(instructionDetails: "BIT 4,E", opcode: [0xCB,0x63], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x64: // BIT 4,H - CB 64 - Tests bit 4 of H
+                logInstructionDetails(instructionDetails: "BIT 4,H", opcode: [0xCB,0x64], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x65: // BIT 4,L - CB 65 - Tests bit 4 of L
+                logInstructionDetails(instructionDetails: "BIT 4,L", opcode: [0xCB,0x65], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x66: // BIT 4,(HL) - CB 66 - Tests bit 4 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 4,(HL)", opcode: [0xCB,0x66], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x67: // BIT 4,A - CB 67 - Tests bit 4 of A
+                logInstructionDetails(instructionDetails: "BIT 4,A", opcode: [0xCB,0x67], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 16) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x68: // BIT 5,B - CB 68 - Tests bit 5 of B
+                logInstructionDetails(instructionDetails: "BIT 5,B", opcode: [0xCB,0x68], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x69: // BIT 5,C - CB 69 - Tests bit 5 of C
+                logInstructionDetails(instructionDetails: "BIT 5,C", opcode: [0xCB,0x69], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x6A: // BIT 5,D - CB 6A - Tests bit 5 of D
+                logInstructionDetails(instructionDetails: "BIT 5,D", opcode: [0xCB,0x6A], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x6B: // BIT 5,E - CB 6B - Tests bit 5 of E
+                logInstructionDetails(instructionDetails: "BIT 5,E", opcode: [0xCB,0x6B], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x6C: // BIT 5,H - CB 6C - Tests bit 5 of H
+                logInstructionDetails(instructionDetails: "BIT 5,H", opcode: [0xCB,0x6C], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x6D: // BIT 5,L - CB 6D - Tests bit 5 of L
+                logInstructionDetails(instructionDetails: "BIT 5,L", opcode: [0xCB,0x6D], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x6E: // BIT 5,(HL) - CB 6E - Tests bit 5 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 5,(HL)", opcode: [0xCB,0x6E], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x6F: // BIT 5,A - CB 6F - Tests bit 5 of A
+                logInstructionDetails(instructionDetails: "BIT 5,A", opcode: [0xCB,0x6F], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 32) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x70: // BIT 6,B - CB 70 - Tests bit 6 of B
+                logInstructionDetails(instructionDetails: "BIT 6,B", opcode: [0xCB,0x70], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x71: // BIT 6,C - CB 71 - Tests bit 6 of C
+                logInstructionDetails(instructionDetails: "BIT 6,C", opcode: [0xCB,0x71], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x72: // BIT 6,D - CB 72 - Tests bit 6 of D
+                logInstructionDetails(instructionDetails: "BIT 6,D", opcode: [0xCB,0x72], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x73: // BIT 6,E - CB 73 - Tests bit 6 of E
+                logInstructionDetails(instructionDetails: "BIT 6,E", opcode: [0xCB,0x73], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x74: // BIT 6,H - CB 74 - Tests bit 6 of H
+                logInstructionDetails(instructionDetails: "BIT 6,H", opcode: [0xCB,0x74], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x75: // BIT 6,L - CB 75 - Tests bit 6 of L
+                logInstructionDetails(instructionDetails: "BIT 6,L", opcode: [0xCB,0x75], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x76: // BIT 6,(HL) - CB 76 - Tests bit 6 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 6,(HL)", opcode: [0xCB,0x76], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x77: // BIT 6,A - CB 77 - Tests bit 6 of A
+                logInstructionDetails(instructionDetails: "BIT 6,A", opcode: [0xCB,0x77], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 64) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x78: // BIT 7,B - CB 78 - Tests bit 7 of B
+                logInstructionDetails(instructionDetails: "BIT 7,B", opcode: [0xCB,0x78], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x79: // BIT 7,C - CB 79 - Tests bit 7 of C
+                logInstructionDetails(instructionDetails: "BIT 7,C", opcode: [0xCB,0x79], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x7A: // BIT 7,D - CB 7A - Tests bit 7 of D
+                logInstructionDetails(instructionDetails: "BIT 7,D", opcode: [0xCB,0x7A], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x7B: // BIT 7,E - CB 7B - Tests bit 7 of E
+                logInstructionDetails(instructionDetails: "BIT 7,E", opcode: [0xCB,0x7B], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x7C: // BIT 7,H - CB 7C - Tests bit 7 of H
+                logInstructionDetails(instructionDetails: "BIT 7,H", opcode: [0xCB,0x7C], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x7D: // BIT 7,L - CB 7D - Tests bit 7 of L
+                logInstructionDetails(instructionDetails: "BIT 7,L", opcode: [0xCB,0x7D], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
+                incrementR(opcodeCount:2)
+            case 0x7E: // BIT 7,(HL) - CB 7E - Tests bit 7 of (HL)
+                logInstructionDetails(instructionDetails: "BIT 7,(HL)", opcode: [0xCB,0x7E], programCounter: registers.PC)
+                let tempResult = mmu.readByte(address: registers.HL)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 12
+                incrementR(opcodeCount:2)
+            case 0x7F: // BIT 7,A - CB 7F - Tests bit 7 of A
+                logInstructionDetails(instructionDetails: "BIT 7,A", opcode: [0xCB,0x7F], programCounter: registers.PC)
+                registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 128) ^ 1) << 6)
+                registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                registers.F = registers.F & ~z80Flags.Negative.rawValue
+                registers.PC = registers.PC &+ 2
+                tStates = tStates + 8
                 incrementR(opcodeCount:2)
             case 0x80: // RES 0,B - CB 80 - Resets bit 0 of B
                 logInstructionDetails(instructionDetails: "RES 0,B", opcode: [0xCB,0x80], programCounter: registers.PC)
@@ -3357,6 +3804,646 @@ actor microbee
                 case 0xCB: // DD CB opcodes
                     switch opcode4
                     {
+                        case 0x40: // BIT 0,(IX+$d) - DD CB $d 40 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x40], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x41: // BIT 0,(IX+$d) - DD CB $d 41 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x41], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x42: // BIT 0,(IX+$d) - DD CB $d 42 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x42], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x43: // BIT 0,(IX+$d) - DD CB $d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x43], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x44: // BIT 0,(IX+$d) - DD CB $d 44 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x44], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x45: // BIT 0,(IX+$d) - DD CB $d 45 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x45], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x46: // BIT 0,(IX+$d) - DD CB $d 46 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x46], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x47: // BIT 0,(IX+$d) - DD CB $d 47 - Tests bit 0 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x47], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x48: // BIT 1,(IX+$d) - DD CB $d 48 - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x48], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x49: // BIT 1,(IX+$d) - DD CB $d 49 - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x49], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x4A: // BIT 1,(IX+$d) - DD CB $d 4A - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4A], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x4B: // BIT 1,(IX+$d) - DD CB $d 4B - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4B], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x4C: // BIT 1,(IX+$d) - DD CB $d 4C - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4C], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x4D: // BIT 1,(IX+$d) - DD CB $d 4D - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4D], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x4E: // BIT 1,(IX+$d) - DD CB $d 4E - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4E], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x4F: // BIT 1,(IX+$d) - DD CB $d 4F - Tests bit 1 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4F], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x50: // BIT 2,(IX+$d) - DD CB $d 50 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x50], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x51: // BIT 2,(IX+$d) - DD CB $d 51 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x51], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x52: // BIT 2,(IX+$d) - DD CB $d 52 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x52], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x53: // BIT 2,(IX+$d) - DD CB $d 53 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x53], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x54: // BIT 2,(IX+$d) - DD CB $d 54 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x54], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x55: // BIT 2,(IX+$d) - DD CB $d 55 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x55], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x56: // BIT 2,(IX+$d) - DD CB $d 56 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x56], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x57: // BIT 2,(IX+$d) - DD CB $d 57 - Tests bit 2 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x57], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x58: // BIT 3,(IX+$d) - DD CB $d 58 - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x58], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x59: // BIT 3,(IX+$d) - DD CB $d 59 - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x59], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x5A: // BIT 3,(IX+$d) - DD CB $d 5A - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5A], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x5B: // BIT 3,(IX+$d) - DD CB $d 5B - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5B], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x5C: // BIT 3,(IX+$d) - DD CB $d 5C - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5C], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x5D: // BIT 3,(IX+$d) - DD CB $d 5D - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5D], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x5E: // BIT 3,(IX+$d) - DD CB $d 5E - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5E], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x5F: // BIT 3,(IX+$d) - DD CB $d 5F - Tests bit 3 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5F], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x60: // BIT 4,(IX+$d) - DD CB $d 60 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x60], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x61: // BIT 4,(IX+$d) - DD CB $d 61 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x61], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x62: // BIT 4,(IX+$d) - DD CB $d 62 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x62], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x63: // BIT 4,(IX+$d) - DD CB $d 63 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x63], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x64: // BIT 4,(IX+$d) - DD CB $d 64 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x64], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x65: // BIT 4,(IX+$d) - DD CB $d 65 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x65], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x66: // BIT 4,(IX+$d) - DD CB $d 66 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x66], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x67: // BIT 4,(IX+$d) - DD CB $d 67 - Tests bit 4 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x67], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x68: // BIT 5,(IX+$d) - DD CB $d 68 - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x68], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x69: // BIT 5,(IX+$d) - DD CB $d 69 - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x69], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x6A: // BIT 5,(IX+$d) - DD CB $d 6A - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6A], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x6B: // BIT 5,(IX+$d) - DD CB $d 6B - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6B], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x6C: // BIT 5,(IX+$d) - DD CB $d 6C - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6C], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x6D: // BIT 5,(IX+$d) - DD CB $d 6D - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6D], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x6E: // BIT 5,(IX+$d) - DD CB $d 6E - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6E], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x6F: // BIT 5,(IX+$d) - DD CB $d 6F - Tests bit 5 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6F], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x70: // BIT 6,(IX+$d) - DD CB $d 70 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x70], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x71: // BIT 6,(IX+$d) - DD CB $d 71 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x71], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x72: // BIT 6,(IX+$d) - DD CB $d 72 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x72], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x73: // BIT 6,(IX+$d) - DD CB $d 73 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x73], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x74: // BIT 6,(IX+$d) - DD CB $d 74 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x74], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x75: // BIT 6,(IX+$d) - DD CB $d 75 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x75], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x76: // BIT 6,(IX+$d) - DD CB $d 76 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x76], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x77: // BIT 6,(IX+$d) - DD CB $d 77 - Tests bit 6 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x77], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x78: // BIT 7,(IX+$d) - DD CB $d 78 - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x78], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x79: // BIT 7,(IX+$d) - DD CB $d 79 - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x79], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x7A: // BIT 7,(IX+$d) - DD CB $d 7A - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7A], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x7B: // BIT 7,(IX+$d) - DD CB $d 7B - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7B], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x7C: // BIT 7,(IX+$d) - DD CB $d 7C - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7C], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x7D: // BIT 7,(IX+$d) - DD CB $d 7D - Tests bit 7 of the memory location pointed to by IX plus $d L
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7D], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x7E: // BIT 7,(IX+$d) - DD CB $d 7E - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7E], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
+                        case 0x7F: // BIT 7,(IX+$d) - DD CB $d 7F - Tests bit 7 of the memory location pointed to by IX plus $d
+                            logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7F], values: [opcode3], programCounter: registers.PC)
+                            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                            let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                            registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                            registers.F = registers.F & ~z80Flags.Negative.rawValue
+                            registers.PC = registers.PC &+ 4
+                            tStates = tStates + 20
+                            incrementR(opcodeCount:3)
                         case 0x86: // RES 0,(IX+$d) - DD CB d 86 - Resets bit 0 of the memory location pointed to by IX plus $d
                             logInstructionDetails(instructionDetails: "RES 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x86], values: [opcode3], programCounter: registers.PC)
                             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4608,6 +5695,646 @@ actor microbee
                     incrementR(opcodeCount:2)
                 switch opcode4 // FD CB opcodes
                 {
+                    case 0x40: // BIT 0,(IY+$d) - FD CB $d 40 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x40], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x41: // BIT 0,(IY+$d) - FD CB $d 41 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x41], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x42: // BIT 0,(IY+$d) - FD CB $d 42 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x42], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x43: // BIT 0,(IY+$d) - FD CB $d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x43], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x44: // BIT 0,(IY+$d) - FD CB $d 44 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x44], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x45: // BIT 0,(IY+$d) - FD CB $d 45 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x45], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x46: // BIT 0,(IY+$d) - FD CB $d 46 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x46], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x47: // BIT 0,(IY+$d) - FD CB $d 47 - Tests bit 0 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x47], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 1
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x48: // BIT 1,(IY+$d) - FD CB $d 48 - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x48], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x49: // BIT 1,(IY+$d) - FD CB $d 49 - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x49], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x4A: // BIT 1,(IY+$d) - FD CB $d 4A - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4A], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x4B: // BIT 1,(IY+$d) - FD CB $d 4B - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4B], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x4C: // BIT 1,(IY+$d) - FD CB $d 4C - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4C], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x4D: // BIT 1,(IY+$d) - FD CB $d 4D - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4D], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x4E: // BIT 1,(IY+$d) - FD CB $d 4E - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4E], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x4F: // BIT 1,(IY+$d) - FD CB $d 4F - Tests bit 1 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4F], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 2
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x50: // BIT 2,(IY+$d) - FD CB $d 50 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x50], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x51: // BIT 2,(IY+$d) - FD CB $d 51 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x51], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x52: // BIT 2,(IY+$d) - FD CB $d 52 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x52], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x53: // BIT 2,(IY+$d) - FD CB $d 53 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x53], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x54: // BIT 2,(IY+$d) - FD CB $d 54 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x54], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x55: // BIT 2,(IY+$d) - FD CB $d 55 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x55], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x56: // BIT 2,(IY+$d) - FD CB $d 56 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x56], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x57: // BIT 2,(IY+$d) - FD CB $d 57 - Tests bit 2 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x57], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 4
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x58: // BIT 3,(IY+$d) - FD CB $d 58 - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x58], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x59: // BIT 3,(IY+$d) - FD CB $d 59 - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x59], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x5A: // BIT 3,(IY+$d) - FD CB $d 5A - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5A], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x5B: // BIT 3,(IY+$d) - FD CB $d 5B - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5B], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x5C: // BIT 3,(IY+$d) - FD CB $d 5C - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5C], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x5D: // BIT 3,(IY+$d) - FD CB $d 5D - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5D], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x5E: // BIT 3,(IY+$d) - FD CB $d 5E - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5E], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x5F: // BIT 3,(IY+$d) - FD CB $d 5F - Tests bit 3 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5F], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 8
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x60: // BIT 4,(IY+$d) - FD CB $d 60 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x60], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x61: // BIT 4,(IY+$d) - FD CB $d 61 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x61], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x62: // BIT 4,(IY+$d) - FD CB $d 62 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x62], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x63: // BIT 4,(IY+$d) - FD CB $d 63 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x63], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x64: // BIT 4,(IY+$d) - FD CB $d 64 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x64], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x65: // BIT 4,(IY+$d) - FD CB $d 65 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x65], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x66: // BIT 4,(IY+$d) - FD CB $d 66 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x66], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x67: // BIT 4,(IY+$d) - FD CB $d 67 - Tests bit 4 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x67], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 16
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x68: // BIT 5,(IY+$d) - FD CB $d 68 - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x68], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x69: // BIT 5,(IY+$d) - FD CB $d 69 - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x69], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x6A: // BIT 5,(IY+$d) - FD CB $d 6A - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6A], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x6B: // BIT 5,(IY+$d) - FD CB $d 6B - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6B], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x6C: // BIT 5,(IY+$d) - FD CB $d 6C - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6C], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x6D: // BIT 5,(IY+$d) - FD CB $d 6D - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6D], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x6E: // BIT 5,(IY+$d) - FD CB $d 6E - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6E], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x6F: // BIT 5,(IY+$d) - FD CB $d 6F - Tests bit 5 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6F], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 32
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x70: // BIT 6,(IY+$d) - FD CB $d 70 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x70], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x71: // BIT 6,(IY+$d) - FD CB $d 71 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x71], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x72: // BIT 6,(IY+$d) - FD CB $d 72 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x72], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x73: // BIT 6,(IY+$d) - FD CB $d 73 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x73], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x74: // BIT 6,(IY+$d) - FD CB $d 74 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x74], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x75: // BIT 6,(IY+$d) - FD CB $d 75 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x75], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x76: // BIT 6,(IY+$d) - FD CB $d 76 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x76], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x77: // BIT 6,(IY+$d) - FD CB $d 77 - Tests bit 6 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x77], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 64
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x78: // BIT 7,(IY+$d) - FD CB $d 78 - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x78], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x79: // BIT 7,(IY+$d) - FD CB $d 79 - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x79], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x7A: // BIT 7,(IY+$d) - FD CB $d 7A - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7A], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x7B: // BIT 7,(IY+$d) - FD CB $d 7B - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7B], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x7C: // BIT 7,(IY+$d) - FD CB $d 7C - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7C], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x7D: // BIT 7,(IY+$d) - FD CB $d 7D - Tests bit 7 of the memory location pointed to by IY plus $d L
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7D], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x7E: // BIT 7,(IY+$d) - FD CB $d 7E - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7E], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
+                    case 0x7F: // BIT 7,(IY+$d) - FD CB $d 7F - Tests bit 7 of the memory location pointed to by IY plus $d
+                        logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7F], values: [opcode3], programCounter: registers.PC)
+                        let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+                        let tempResult = mmu.readByte(address: tempResultAddress) & 128
+                        registers.F = (registers.F & ~z80Flags.Zero.rawValue) | ((tempResult ^ 1) << 6)
+                        registers.F = registers.F | z80Flags.HalfCarry.rawValue
+                        registers.F = registers.F & ~z80Flags.Negative.rawValue
+                        registers.PC = registers.PC &+ 4
+                        tStates = tStates + 20
+                        incrementR(opcodeCount:3)
                     case 0x86: // RES 0,(IY+$d) - FD CB d 86 - Resets bit 0 of the memory location pointed to by IY plus $d
                         logInstructionDetails(instructionDetails: "RES 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x86], values: [opcode3], programCounter: registers.PC)
                         let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
