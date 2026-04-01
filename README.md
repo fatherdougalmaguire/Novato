@@ -5,6 +5,7 @@
 ![Universal Binary](https://img.shields.io/badge/architecture-universal-007AFF?style=flat-square&logo=apple&logoColor=white)
 ![Signed](https://img.shields.io/badge/security-Signed%20%26%20Notarized-brightgreen?logo=apple&style=flat-square)
 ![Latest Version](https://img.shields.io/github/v/release/fatherdougalmaguire/novato?style=flat-square&color=blue)
+![Last Commit](https://img.shields.io/github/last-commit/fatherdougalmaguire/novato?style=flat-square&color=blue)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee) family of home computers.
