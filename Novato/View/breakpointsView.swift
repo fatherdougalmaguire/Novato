@@ -78,9 +78,6 @@ struct breakpointsView: View
         {
             let displayedBreakpoints: [String] = snapshot.executionSnapshot.breakpointQueue
             let displayedBreakpointMask : [Bool] = snapshot.executionSnapshot.breakpointQueueMask
-            let adjustedMask: [Bool] = zip(displayedBreakpoints, displayedBreakpointMask).map { (bp, mask) in
-                bp.isEmpty ? false : mask
-            }
             
             VStack(alignment: .leading)
             {

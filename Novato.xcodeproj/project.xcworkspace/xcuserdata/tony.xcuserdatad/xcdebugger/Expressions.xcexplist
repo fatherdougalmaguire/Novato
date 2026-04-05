@@ -23,6 +23,14 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "microbee.nextInstruction():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "CRTC.WriteRegister(RegNum:RegValue:):CRTC.swift">
       </ContextState>
       <ContextState
@@ -63,13 +71,13 @@
          contextName = "microbee.executeInstruction():Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.HL">
+               value = "mmu.readByte(address: registers.HL)">
             </PersistentString>
             <PersistentString
                value = "registers.DE">
             </PersistentString>
             <PersistentString
-               value = "mmu.readByte(address: registers.HL)">
+               value = "registers.SP">
             </PersistentString>
             <PersistentString
                value = "mmu.readByte(address: registers.DE)">
@@ -78,7 +86,7 @@
                value = "registers.PC">
             </PersistentString>
             <PersistentString
-               value = "registers.SP">
+               value = "registers.HL">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
