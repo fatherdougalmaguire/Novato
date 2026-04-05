@@ -1,99 +1,124 @@
 import SwiftUI
 
-struct breakpointsView: View
-{
+struct breakpointsView: View {
     @Environment(emulatorViewModel.self) private var vm
     
-    struct StatusLED: View
+    struct statusLED: View
     {
         let isOn: Bool
-        
-        private let ledOnColor = Color.green
-        private let ledOffColor = Color.red
-        
         var body: some View
         {
             Circle()
-                .fill(isOn ? ledOnColor : ledOffColor)
-                .frame(width: 15, height: 15)
-                .overlay(
-                    Circle()
-                        .fill(Color.white.opacity(isOn ? 0.4 : 0.4))
-                        .frame(width: 3, height: 3)
-                        .offset(x: -2, y: -2)
-                )
-                .shadow(color: isOn ? ledOnColor.opacity(0.8) : .clear, radius: 3)
-                .animation(.easeInOut(duration: 0.1), value: isOn)
+                .fill(isOn ? Color.green : Color.red)
+                .frame(width: 14, height: 14)
+                .overlay(Circle().fill(.white.opacity(0.4)).frame(width: 3, height: 3).offset(x: -2, y: -2))
+                .shadow(color: isOn ? .green.opacity(0.8) : .clear, radius: 3)
         }
     }
     
-    struct ValidateAddress: View
+    struct validateAddress: View
     {
-        @State private var localText: String
+        let text: String
+        let isActive: Bool
         let labelText: String
         let onCommit: (String) -> Void
+        let onToggle: (String) -> Void
         
-        init(text: String, labelText: String, onCommit: @escaping (String) -> Void) {
-            self._localText = State(initialValue: text)
-            self.labelText = labelText
-            self.onCommit = onCommit
-        }
-        
+        @State private var localText: String = ""
+
         var body: some View
         {
-            HStack
+            HStack(spacing: 12)
             {
-                StatusLED(isOn: !localText.isEmpty)
+                Button(action: { onToggle(localText) }) { statusLED(isOn: isActive) }
+                .buttonStyle(.plain)
+                
                 TextField(labelText, text: $localText)
-                    .textFieldStyle(SquareBorderTextFieldStyle())
+                    .textFieldStyle(.squareBorder)
                     .font(.system(.body, design: .monospaced))
                     .foregroundColor(.orange)
+                    .frame(minWidth: 180)
                     .autocorrectionDisabled()
-                    .onChange(of: localText) { _, newValue in
-                        let filtered = newValue.filter { $0.isHexDigit }
-                        if filtered.count > 4 {
-                            localText = String(filtered.prefix(4)).uppercased()
-                        } else {
-                            localText = filtered.uppercased()
-                        }
+                    .onSubmit
+                    {
                         onCommit(localText)
                     }
+                    .onChange(of: localText)
+                    { _, newValue in
+                        let filtered = newValue.filter { $0.isHexDigit }.uppercased()
+                        localText = String(filtered.prefix(4))
+                    }
+            }
+            .onAppear { localText = text }
+            .onChange(of: text)
+            { _, newValue in
+                if localText != newValue
+                {
+                    localText = newValue
+                }
             }
         }
     }
     
     private func updateActor(index: Int, hex: String, mask: Bool)
     {
-        if let value = UInt16(hex, radix: 16)
+        let scrubbed = hex.filter { $0.isHexDigit }
+        
+        if scrubbed.isEmpty
         {
-            Task {
-                await vm.updateBreakpoints(index: index, value: value, mask : mask)
-            }
+            Task { await vm.updateBreakpoints(index: index, value: 0, mask: false) }
+        }
+        else if let value = UInt16(scrubbed, radix: 16)
+        {
+            Task { await vm.updateBreakpoints(index: index, value: value, mask: mask) }
         }
     }
-    
+
     var body: some View
     {
         if let snapshot = vm.snapshot
         {
-            let displayedBreakpoints: [String] = snapshot.executionSnapshot.breakpointQueue
-            let displayedBreakpointMask : [Bool] = snapshot.executionSnapshot.breakpointQueueMask
+            let breakpoints = snapshot.executionSnapshot.breakpointQueue
+            let masks = snapshot.executionSnapshot.breakpointQueueMask
             
-            VStack(alignment: .leading)
+            VStack(alignment: .leading, spacing: 10)
             {
-                ForEach(displayedBreakpoints.indices, id: \.self) { index in
-                    ValidateAddress(
-                        text: displayedBreakpoints[index],
-                        labelText: "Breakpoint \(index+1)",
-                        onCommit: { newValue in
-                            updateActor(index: index, hex: newValue, mask: true)
+
+                ForEach(breakpoints.indices, id: \.self)
+                { index in
+                    let addrRaw = breakpoints[index]
+                    let isMasked = masks[index]
+                    
+                    let hexDisplay: String =
+                    {
+
+                        let val = UInt16(addrRaw, radix: 16) ?? UInt16(addrRaw) ?? 0
+
+                        if val == 0 && !isMasked
+                        {
+                            return ""
+                        }
+                    
+                        return String(format: "%04X", val)
+                    }()
+    
+
+                    validateAddress(
+                        text: hexDisplay,
+                        isActive: isMasked,
+                        labelText: "Breakpoint \(index + 1)",
+                        onCommit: { newValue in updateActor(index: index, hex: newValue, mask: isMasked) },
+                        onToggle:
+                        {
+                            currentText in
+                            let finalHex = currentText.isEmpty ? hexDisplay : currentText
+                            updateActor(index: index, hex: finalHex, mask: !isMasked)
                         }
                     )
                 }
             }
-            .fixedSize()
-            .padding(10)
-            .background(.white)
+            .padding(.horizontal, 25)
+            .padding(.vertical, 20)
         }
         else
         {
@@ -101,4 +126,3 @@ struct breakpointsView: View
         }
     }
 }
-

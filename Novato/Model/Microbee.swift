@@ -996,15 +996,16 @@ actor microbee
             return
         }
         
-//        let currentPCVector = SIMD16<UInt16>(repeating: UInt16(registers.PC))
-//        let addressMatch = (currentPCVector .== breakpoints)
-//        
-//        if any(addressMatch .& (breakpointMask .!= 0))
-//        {
-//            pause()
-//            // wrong state
-//            // wrong PC
-//        }
+        let currentPCVector = SIMD16<UInt16>(repeating: UInt16(registers.PC))
+        let addressMatch = (currentPCVector .== breakpoints)
+        
+        if any(addressMatch .& (breakpointMask .!= 0))
+        {
+            pause()
+            // wrong state
+            // wrong PC
+        }
+        
         executeInstructions()
         appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
         pollInterrupt()
@@ -8425,14 +8426,7 @@ actor microbee
         var tempBreakpointQueue: [String] = []
         for counter in 0...15
         {
-            if breakpointMask[counter] == 0
-            {
-                tempBreakpointQueue.append("")
-            }
-            else
-            {
-                tempBreakpointQueue.append(String(breakpoints[counter]))
-            }
+            tempBreakpointQueue.append(String(format: "%04X",breakpoints[counter]))
         }
 
         return tempBreakpointQueue

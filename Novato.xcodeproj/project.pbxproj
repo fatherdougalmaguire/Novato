@@ -6,8 +6,19 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		EA9E889C2F8214020032907B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA58B67C2E2F87680030E3C5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA58B6832E2F87680030E3C5;
+			remoteInfo = Novato;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		EA58B6842E2F87680030E3C5 /* Novato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Novato.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA9E88982F8214020032907B /* NovatoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NovatoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +27,22 @@
 			path = Novato;
 			sourceTree = "<group>";
 		};
+		EA9E88992F8214020032907B /* NovatoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = NovatoTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		EA58B6812E2F87680030E3C5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA9E88952F8214020032907B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +56,7 @@
 			isa = PBXGroup;
 			children = (
 				EA58B6862E2F87680030E3C5 /* Novato */,
+				EA9E88992F8214020032907B /* NovatoTests */,
 				EA58B6852E2F87680030E3C5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				EA58B6842E2F87680030E3C5 /* Novato.app */,
+				EA9E88982F8214020032907B /* NovatoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -70,6 +95,29 @@
 			productReference = EA58B6842E2F87680030E3C5 /* Novato.app */;
 			productType = "com.apple.product-type.application";
 		};
+		EA9E88972F8214020032907B /* NovatoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA9E889E2F8214020032907B /* Build configuration list for PBXNativeTarget "NovatoTests" */;
+			buildPhases = (
+				EA9E88942F8214020032907B /* Sources */,
+				EA9E88952F8214020032907B /* Frameworks */,
+				EA9E88962F8214020032907B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				EA9E889D2F8214020032907B /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				EA9E88992F8214020032907B /* NovatoTests */,
+			);
+			name = NovatoTests;
+			packageProductDependencies = (
+			);
+			productName = NovatoTests;
+			productReference = EA9E88982F8214020032907B /* NovatoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -77,11 +125,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					EA58B6832E2F87680030E3C5 = {
 						CreatedOnToolsVersion = 16.4;
+					};
+					EA9E88972F8214020032907B = {
+						CreatedOnToolsVersion = 26.4;
+						TestTargetID = EA58B6832E2F87680030E3C5;
 					};
 				};
 			};
@@ -100,12 +152,20 @@
 			projectRoot = "";
 			targets = (
 				EA58B6832E2F87680030E3C5 /* Novato */,
+				EA9E88972F8214020032907B /* NovatoTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		EA58B6822E2F87680030E3C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA9E88962F8214020032907B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +182,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA9E88942F8214020032907B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		EA9E889D2F8214020032907B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA58B6832E2F87680030E3C5 /* Novato */;
+			targetProxy = EA9E889C2F8214020032907B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		EA58B68E2E2F87690030E3C5 /* Debug */ = {
@@ -257,7 +332,7 @@
 				CODE_SIGN_ENTITLEMENTS = novato/novato.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 0;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5VUXP3WKH8;
 				ENABLE_APP_SANDBOX = YES;
@@ -273,7 +348,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 0.12;
+				MARKETING_VERSION = 0.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.emulator.novato;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -290,7 +365,7 @@
 				CODE_SIGN_ENTITLEMENTS = novato/novato.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 0;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5VUXP3WKH8;
 				ENABLE_APP_SANDBOX = YES;
@@ -306,12 +381,54 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.6;
-				MARKETING_VERSION = 0.12;
+				MARKETING_VERSION = 0.13;
 				PRODUCT_BUNDLE_IDENTIFIER = com.emulator.novato;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		EA9E889F2F8214020032907B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5VUXP3WKH8;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.emulator.NovatoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Novato.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Novato";
+			};
+			name = Debug;
+		};
+		EA9E88A02F8214020032907B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5VUXP3WKH8;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.emulator.NovatoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Novato.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Novato";
 			};
 			name = Release;
 		};
@@ -332,6 +449,15 @@
 			buildConfigurations = (
 				EA58B6912E2F87690030E3C5 /* Debug */,
 				EA58B6922E2F87690030E3C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA9E889E2F8214020032907B /* Build configuration list for PBXNativeTarget "NovatoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA9E889F2F8214020032907B /* Debug */,
+				EA9E88A02F8214020032907B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

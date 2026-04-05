@@ -494,8 +494,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8531"
-            endingLineNumber = "8531"
+            startingLineNumber = "8525"
+            endingLineNumber = "8525"
             landmarkName = "returnSnapshot()"
             landmarkType = "7">
          </BreakpointContent>
@@ -510,8 +510,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8411"
-            endingLineNumber = "8411"
+            startingLineNumber = "8412"
+            endingLineNumber = "8412"
             landmarkName = "sortZ80Queue()"
             landmarkType = "7">
          </BreakpointContent>
@@ -577,6 +577,22 @@
             startingLineNumber = "992"
             endingLineNumber = "992"
             landmarkName = "nextInstruction()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1D8D1034-DB26-46CD-BA32-DF8D9A2A3EDC"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Novato/ViewModel/EmulatorViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
+            landmarkName = "updateBreakpoints(index:value:mask:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
