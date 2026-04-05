@@ -71,7 +71,7 @@ This emulator is still in what could charitably called *alpha* status.
   - Apperance of debug windows
   
 ### Instruction decoding
-* All non-flag affecting instructions are decoded
+* All documented instructions are decoded
 * Flags are now precomputed for S,P and Z general instructions
 * Flags are now precomputed for 8 bit increment and decrement instructions
 * A small number of flag affecting instructions are decoded
