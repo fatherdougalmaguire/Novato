@@ -470,6 +470,8 @@ actor microbee
         var IFF2 : Bool = false     // Interrupt Flip-flop 2
     }
     
+    private var pausedBreakpoint : Bool = false
+    
     private let z80Disassembler = Z80Disassembler()
     
     private var z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
@@ -758,6 +760,7 @@ actor microbee
             emulatorState = .paused
         }
         executionMode = .singleStep
+        pausedBreakpoint = true
         nextInstruction()
     }
     
@@ -809,6 +812,8 @@ actor microbee
         
         emulatorState = .stopped
         executionMode = .continuous
+        
+        pausedBreakpoint = false
         
         interruptPending = false
         
@@ -923,12 +928,7 @@ actor microbee
     
     func updatePC(address: UInt16)
     {
-        registers.PC = address
-
-        z80Queue[z80QueueHead] = registers.PC
-        z80QueueFilled[z80QueueHead] = true
-        z80QueueHead = (z80QueueHead + 1) % 16
-    
+        registers.PC = address    
     }
     
     func TestFlags ( FlagRegister : UInt8, Flag : z80Flags ) -> Bool
@@ -936,19 +936,7 @@ actor microbee
     {
         return FlagRegister & Flag.rawValue != 0
     }
-    
-    func UpdateFlags ( FlagRegister : UInt8, Flag : z80Flags, SetFlag : Bool ) -> UInt8
-    {
-        if (SetFlag)
-        {
-            return FlagRegister | Flag.rawValue
-        }
-        else
-        {
-            return FlagRegister & ~Flag.rawValue
-        }
-    }
-    
+
     func testBit (value: UInt8, bitPosition : UInt8  ) -> Bool
     {
         return (value & (1 << bitPosition)) != 0
@@ -965,7 +953,7 @@ actor microbee
     
     func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
-#if DEBUG
+    #if DEBUG
         var instructionString : String = instructionDetails
         
         switch values.count
@@ -983,7 +971,7 @@ actor microbee
         let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: " ") + (noValues ? "" : " ") + values.map { String(format:"%02X",$0) }.joined(separator: " ")
         let logString = String(format:"0x%04X",registers.PC) + "   " + opcodeString + "    " + instructionString
         appLog.cpu.debug("\(logString)")
-#endif
+    #endif
     }
     
     func nextInstruction()
@@ -999,16 +987,20 @@ actor microbee
         let currentPCVector = SIMD16<UInt16>(repeating: UInt16(registers.PC))
         let addressMatch = (currentPCVector .== breakpoints)
         
-        if any(addressMatch .& (breakpointMask .!= 0))
+        if any(addressMatch .& (breakpointMask .!= 0)) && !pausedBreakpoint
         {
             pause()
-            // wrong state
-            // wrong PC
+            return
+            // need to allow a smoother continuation of execution
         }
+
+        pausedBreakpoint = false
+            executeInstructions()
+            appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
+            pollInterrupt()
+
+
         
-        executeInstructions()
-        appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
-        pollInterrupt()
     }
 
     @inline(__always)
@@ -6339,6 +6331,9 @@ actor microbee
         let opcode2 = mmu.readByte(address: registers.PC &+ 1)
         let opcode3 = mmu.readByte(address: registers.PC &+ 2)
         let opcode4 = mmu.readByte(address: registers.PC &+ 3)
+        z80Queue[z80QueueHead] = registers.PC
+        z80QueueFilled[z80QueueHead] = true
+        z80QueueHead = (z80QueueHead + 1) % 16
         switch opcode1
         {
         case 0x00: // NOP - 00 - No operation is performed
@@ -8396,11 +8391,7 @@ actor microbee
             tStates = tStates + 8
             incrementR(opcodeCount:1)
             // Assuming this is correct behaviour - confirm what decodes in missing ranges in real z80
-            
         }
-        z80Queue[z80QueueHead] = registers.PC
-        z80QueueFilled[z80QueueHead] = true
-        z80QueueHead = (z80QueueHead + 1) % 16
     }
     
     func sortZ80Queue() -> [String]
@@ -8524,7 +8515,8 @@ actor microbee
                 ports: ports,
                 orderedZ80Queue: sortZ80Queue(),
                 breakpointQueue: sortBreakpointQueue(),
-                breakpointQueueMask : sortBreakpointQueueMask()
+                breakpointQueueMask : sortBreakpointQueueMask(),
+                currentInstruction : z80Disassembler.decodeInstructions(address: registers.PC, bytes: [mmu.readByte(address: registers.PC),mmu.readByte(address: registers.PC &+ 1),mmu.readByte(address: registers.PC &+ 2),mmu.readByte(address: registers.PC &+ 3)])
             ),
             memorySnapshot: memorySnapshot(
                 VDU: videoRAM.bufferTransform(),

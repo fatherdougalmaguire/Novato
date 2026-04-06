@@ -94,10 +94,12 @@ struct memoryAndInstructionView: View
                     }
                     
                     Spacer()
+                    Spacer()
                     
                     Text("Instruction History")
                         .font(.headline)
                     
+                    Spacer()
                     Spacer()
                 
                     let queue = snapshot.executionSnapshot.orderedZ80Queue
@@ -105,33 +107,22 @@ struct memoryAndInstructionView: View
 
                     ForEach(indices, id: \.self)
                     { counter in
-                            let isLast = counter == queue.count - 1
                             let isAlternate = counter % 2 == 1
                             let alternateColor = Color(red: 0.95, green: 0.95, blue: 0.97)
                             
                             Text(queue[counter])
                                 .font(.system(.body, design: .monospaced))
-                                .foregroundColor(isLast ? .white : .orange)
-                                .background
-                        {
-                            if isLast
-                            {
-                                Color.orange
-                            }
-                            else if isAlternate
-                            {
-                                alternateColor
-                            }
-                            else
-                            {
-                                Color.white
-                            }
-                        }
+                                .foregroundColor(.orange)
+                                .background( isAlternate ? alternateColor : Color.white)
                     }
-
+                    Text(snapshot.executionSnapshot.currentInstruction)
+                        .font(.system(.body, design: .monospaced))
+                        .background(Color.orange)
+                        .foregroundColor(.white)
                     let instructionsToPad = 16-snapshot.executionSnapshot.orderedZ80Queue.count
                     ForEach(0...instructionsToPad, id: \.self)
                     { counter in Text(" ") }
+                    
                 }
             }
             .fixedSize()

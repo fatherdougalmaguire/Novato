@@ -103,6 +103,8 @@ struct executionSnapshot: Sendable, Equatable
     
     let breakpointQueue: [String]
     let breakpointQueueMask: [Bool]
+    
+    let currentInstruction : String
 }
 
 struct microbeeSnapshot: Sendable, Equatable, Identifiable
