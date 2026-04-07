@@ -1,14 +1,18 @@
 # Novato
+![Swift](https://img.shields.io/badge/Swift-D19D00?style=plastic&logo=swift&logoColor=white)
+![Static Badge](https://img.shields.io/badge/macOS-Sonoma-D19D00?style=plastic&logo=apple)
+![Static Badge](https://img.shields.io/badge/macOS-Sequioa-D19D00?style=plastic&logo=apple)
+![Static Badge](https://img.shields.io/badge/macOS-Tahoe-D19D00?style=plastic&logo=apple)
 
-![macOS](https://img.shields.io/badge/platform-macOS-000000?logo=apple&logoColor=white&style=flat-square)
-![Universal Binary](https://img.shields.io/badge/architecture-universal-007AFF?style=flat-square&logo=apple&logoColor=white)
-![Signed](https://img.shields.io/badge/security-Signed%20%26%20Notarized-brightgreen?logo=apple&style=flat-square)
+![Static Badge](https://img.shields.io/badge/Architecture-Apple_Silicon-D19D00?style=plastic&logo=apple)
+![Static Badge](https://img.shields.io/badge/Architecture-Intel-D19D00?style=plastic&logo=apple)
 
-![SwiftUI](https://img.shields.io/badge/SwiftUI-F05138?style=flat-square&logo=swift&logoColor=white) 
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Static Badge](https://img.shields.io/badge/Security-Signed_&_Notarised-D19D00?style=plastic&logo=apple)
 
-![Latest Version](https://img.shields.io/github/v/release/fatherdougalmaguire/novato?style=flat-square&color=blue)
-![Last Commit](https://img.shields.io/github/last-commit/fatherdougalmaguire/novato?style=flat-square&color=blue)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-D19D00.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+![Latest Version](https://img.shields.io/github/v/release/fatherdougalmaguire/novato?style=plastic&color=D19D00)
+![Last Commit](https://img.shields.io/github/last-commit/fatherdougalmaguire/novato?style=plastic&color=D19D00)
 
 
 Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee) family of home computers.
