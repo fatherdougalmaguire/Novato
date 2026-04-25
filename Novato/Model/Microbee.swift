@@ -174,34 +174,6 @@ actor microbee
             return (tempResult, tempFlags)
         }
         
-        
-//        @inline(__always)
-//        static func subHelper(operand1: UInt8, operand2: UInt8) -> (returnResult: UInt8, returnFlags: UInt8)
-//        {
-//            let (tempResult, carry) = operand1.subtractingReportingOverflow(operand2)
-//            
-//            var tempFlags = lookupSZP[Int(tempResult)] & ~z80Flags.ParityOverflow.rawValue              // Lookup Sign,Zero,Parity/Overflow and set Parity/Overflow to 0
-//
-//            if carry
-//            {
-//                tempFlags = tempFlags | z80Flags.Carry.rawValue                                                   // Set Carry
-//            }
-//
-//            tempFlags = tempFlags | z80Flags.Negative.rawValue                                                    // Set Negative for subtraction
-//            
-//            if ((operand1 ^ operand2) & z80Flags.Sign.rawValue != 0) && ((operand1 ^ tempResult) & z80Flags.Sign.rawValue != 0)     // set Overflow if operand1 and operand2 have different signs
-//            {
-//                tempFlags = tempFlags | z80Flags.ParityOverflow.rawValue
-//            }
-//            
-//            if (operand1 & 0x0F) < (operand2 & 0x0F)
-//            {
-//                tempFlags = tempFlags | z80Flags.HalfCarry.rawValue                                               // set Half Carry if borrow from bit 4 to bit 3
-//            }
-//            
-//            return (tempResult, tempFlags)
-//        }
-        
         @inline(__always)
         static func subHelper(operand1: UInt8, operand2: UInt8, addCarry: Bool = false) -> (returnResult: UInt8, returnFlags: UInt8)
         {
@@ -301,10 +273,10 @@ actor microbee
         var IYH : UInt8 = 0         // Index Register IY - high byte - 8 bit
         var IYL : UInt8 = 0         // Index Register IY - low byte - 8 bit
         
-        var SPH : UInt8 = 0x7F         // Index Register SP - high byte - 8 bit
+        var SPH : UInt8 = 0x7F      // Index Register SP - high byte - 8 bit
         var SPL : UInt8 = 0x00      // Index Register SP - low byte - 8 bit
-        var PCH : UInt8 = 0x80         // Index Register PC - high byte - 8 bit
-        var PCL : UInt8 = 0x00         // Index Register PC - low byte - 8 bit
+        var PCH : UInt8 = 0x80      // Index Register PC - high byte - 8 bit
+        var PCL : UInt8 = 0x00      // Index Register PC - low byte - 8 bit
         
         var IX : UInt16             // Index Register IX - 16 bit
         {
@@ -445,7 +417,7 @@ actor microbee
             set
             {
                 altD = UInt8(newValue >> 8)
-                altC = UInt8(newValue & 0xFF)
+                altE = UInt8(newValue & 0xFF)
             }
         }
         
@@ -468,6 +440,14 @@ actor microbee
         var IM : UInt8 = 0          // Interrupt Mode
         var IFF1 : Bool = false     // Interrupt Flip-flop 1
         var IFF2 : Bool = false     // Interrupt Flip-flop 2
+        
+        var WZ : UInt16 = 0         // the mysterious WZ register - 16 bit - not handled yet
+        
+        var Q : UInt8 = 0           // preservation of output of last flag modifying instruction -  8 bit - not handled yet - JSMOO
+        
+        //var P : Bool = false        // preservation of IFF2 - not handled yet - JSMOO
+        
+        var EI : UInt8 = 0          // track interrput enable - not handled yet - JSMOO
     }
     
     private var pausedBreakpoint : Bool = false
@@ -547,6 +527,8 @@ actor microbee
     let colourRAM = memoryBlock(size: 0x800)
     let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM)
     
+    let testRAM = memoryBlock(size:0x10000)
+    
     init()
     {
         mmu.map(readDevice: mainRAM, writeDevice: mainRAM, memoryLocation: 0x0000)       // 32K System RAM
@@ -564,6 +546,82 @@ actor microbee
         mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
     }
     private var runTask: Task<Void, Never>?
+    
+    func loadCPUState(cpuState: CPUState) async
+    {
+        registers.A = cpuState.A
+        registers.F = cpuState.F
+        registers.B = cpuState.B
+        registers.C = cpuState.C
+        registers.D = cpuState.D
+        registers.E = cpuState.E
+        registers.H = cpuState.H
+        registers.L = cpuState.L
+        
+        registers.altAF = cpuState.altAF
+        registers.altBC = cpuState.altBC
+        registers.altDE = cpuState.altDE
+        registers.altHL = cpuState.altHL
+        
+        registers.I = cpuState.I
+        registers.R = cpuState.R
+        
+        registers.IM = cpuState.IM
+        
+        registers.IFF1 = (cpuState.IFF1 != 0)
+        //registers.IFF2 = (cpuState.IFF2 != 0)
+        registers.IFF2 = (cpuState.P != 0)
+        
+        registers.IX = cpuState.IX
+        registers.IY = cpuState.IY
+        
+        registers.PC = cpuState.PC
+        registers.SP  = cpuState.SP
+        
+        registers.WZ = cpuState.WZ
+        
+        registers.Q  = cpuState.Q
+        
+        //registers.P = (cpuState.P != 0)
+        
+        registers.EI = cpuState.EI
+        
+        mmu.map(readDevice: testRAM, writeDevice: testRAM, memoryLocation: 0x0000)
+        
+        for location in cpuState.ram
+        {
+            let address = UInt16(location[0])
+            let value = UInt8(location[1])
+            mmu.writeByte(address: address, value: value)
+        }
+    }
+    
+    func returnCPUState(cpuState: CPUState) async -> CPUState
+    {
+        var tempRam : [[Int]] = []
+        for location in cpuState.ram
+        {
+            let address = UInt16(location[0])
+            let value = mmu.readByte(address: address)
+            tempRam.append([Int(address),Int(value)])
+        }
+        
+        let afterTest = CPUState(
+            A: registers.A, F: registers.F,B: registers.B,C: registers.C,D: registers.D,E: registers.E,H: registers.H,L: registers.L,
+            altAF: registers.altAF, altBC: registers.altBC, altDE: registers.altDE, altHL: registers.altHL,
+            I: registers.I, R: registers.R,
+            IM: registers.IM,
+            IFF1: registers.IFF1 ? 1:0 , IFF2: registers.IFF2 ? 1:0,
+            IX: registers.IX, IY: registers.IY,
+            PC: registers.PC, SP: registers.SP,
+            WZ: registers.WZ,
+            Q: registers.Q,
+            P: registers.IFF2 ? 1:0,
+            EI: registers.EI,
+            ram : tempRam
+            )
+        return afterTest
+    }
     
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
     {
@@ -808,6 +866,14 @@ actor microbee
         registers.PC =  0x8000
         registers.SP =  0x7FFF
         
+        registers.WZ = 0
+        
+        registers.Q = 0
+        
+        //registers.P = false
+        
+        registers.EI = 0
+        
         tStates = 0
         
         emulatorState = .stopped
@@ -995,12 +1061,9 @@ actor microbee
         }
 
         pausedBreakpoint = false
-            executeInstructions()
-            appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
-            pollInterrupt()
-
-
-        
+        executeInstructions()
+        appLog.cpu.debug("Cumulative T-states: \(String(self.tStates))")
+        pollInterrupt()
     }
 
     @inline(__always)
@@ -6350,12 +6413,13 @@ actor microbee
         case 0x02: // LD (BC),A - 02 - Stores A into the memory location pointed to by BC
             logInstructionDetails(instructionDetails: "LD (BC),A", opcode: [0x02], programCounter: registers.PC)
             mmu.writeByte(address: registers.BC, value: registers.A)
+            registers.WZ = (UInt16(registers.A) << 8) | (UInt16(registers.C &+ 1))
             registers.PC = registers.PC &+ 1
             tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0x03: // INC BC - 03 - Adds one to BC
             logInstructionDetails(instructionDetails: "INC BE", opcode: [0x03], programCounter: registers.PC)
-            registers.DE = registers.BC &+ 1
+            registers.BC = registers.BC &+ 1
             registers.PC = registers.PC &+ 1
             tStates = tStates + 6
             incrementR(opcodeCount:1)

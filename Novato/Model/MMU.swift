@@ -157,5 +157,15 @@ final class memoryMapper
         
         writePages[pageIndex].addressBlock[pageOffset] = value
     }
+    
+    func returnCurrentRAM() -> ContiguousArray<UInt8>
+    {
+        var tempRAM: ContiguousArray<UInt8> = []
+        for counter in 0..<readPages.count
+        {
+            tempRAM.append(contentsOf: readPages[counter].addressBlock)
+        }
+        return tempRAM
+    }
 }
 

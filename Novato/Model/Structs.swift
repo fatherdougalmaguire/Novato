@@ -117,3 +117,68 @@ struct microbeeSnapshot: Sendable, Equatable, Identifiable
     let executionSnapshot: executionSnapshot
     let memorySnapshot: memorySnapshot
 }
+
+struct CPUState: Decodable, Sendable, Equatable
+{
+    let A,F,B,C,D,E,H,L : UInt8
+    
+    let altAF,altBC,altDE,altHL : UInt16
+    
+    let I,R : UInt8
+    
+    let IM : UInt8
+    let IFF1,IFF2 : UInt8
+    
+    let IX,IY : UInt16
+    
+    let PC,SP : UInt16
+    
+    let WZ : UInt16
+    
+    let Q : UInt8
+    
+    let P : UInt8
+    
+    let EI : UInt8
+  
+    let ram: [[Int]]
+
+    enum CodingKeys: String, CodingKey
+    {
+        case PC = "pc"
+        case SP = "sp"
+        case A = "a"
+        case F = "f"
+        case B = "b"
+        case C = "c"
+        case D = "d"
+        case E = "e"
+        case H = "h"
+        case L = "l"
+
+        case altAF = "af_"
+        case altBC = "bc_"
+        case altDE = "de_"
+        case altHL = "hl_"
+        
+        case I = "i"
+        case R = "r"
+        
+        case IM = "im"
+        case IFF1 = "iff1"
+        case IFF2 = "iff2"
+        
+        case IX = "ix"
+        case IY = "iy"
+        
+        case WZ = "wz"
+        
+        case Q = "q"
+        
+        case P = "p"
+        
+        case EI = "ei"
+        
+        case ram = "ram"
+    }
+}

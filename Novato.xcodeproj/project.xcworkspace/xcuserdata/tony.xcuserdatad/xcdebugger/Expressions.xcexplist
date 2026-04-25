@@ -12,7 +12,23 @@
          contextName = "Z80Disasm.addToQueue(address:opCodes:):Z80Disasm.swift">
       </ContextState>
       <ContextState
-         contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
+         contextName = "microbee.loadCPUState(cpuState:):Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.altDE">
+            </PersistentString>
+            <PersistentString
+               value = "registers.altBC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.executeInstructions():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.altBC">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
@@ -23,10 +39,24 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "Z80CPU.fetch(pc:):Z80CPU.swift">
+      </ContextState>
+      <ContextState
          contextName = "microbee.nextInstruction():Microbee.swift">
          <PersistentStrings>
             <PersistentString
                value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.Registers.altDE.setter:Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "">
+            </PersistentString>
+            <PersistentString
+               value = "registers.altBC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -41,6 +71,14 @@
          <PersistentStrings>
             <PersistentString
                value = "originalString.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "static Z80InstructionTests.loadJsonTests(named:):NovatoTests.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "url">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
