@@ -102,7 +102,7 @@ This emulator is still in what could charitably called *alpha* status.
   - Devices can be switched into and out of memory ranges in RAM
   - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
 
-### Test Harnes
+### Test Harness
 
 * Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
   - Missing support for P,Q and EI pseudo-registers
