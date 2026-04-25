@@ -7,7 +7,7 @@ This project makes use of several high-quality external resources and datasets t
 These test files provide comprehensive coverage for both documented and undocumented Z80 opcodes, including initial/final register states, memory bus activity, and internal interrupt flip-flop states.
 
 Repository: [SingleStepTests](https://github.com/SingleStepTests/z80)
-Licence : [MIT License](LICENCE.md)
+Licence : [MIT License](https://github.com/fatherdougalmaguire/Novato/blob/main/NovatoTests/JSON%20tests/LICENCE.md)
 
 ## MicroWorld Basic 5.22e and Microbee Font ROM
 
