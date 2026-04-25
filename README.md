@@ -101,10 +101,15 @@ This emulator is still in what could charitably called *alpha* status.
   - Each memory device can be tagged as read-only or read/write
   - Devices can be switched into and out of memory ranges in RAM
   - Memory ranges can have different read and write devices.  This allows the capability to switch font rom and colour ram in and out of memory
+
+### Test Harnes
+
+* Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
+  - Missing support for P,Q and EI pseudo-registers
+  - Opcodes currently tested - 0x00 to 0x03
     
 ## On the to-do list
 
-* Test harness for JSON test files ( most likely the [JSMoo single step tests](https://github.com/SingleStepTests/z80) )
 * Watch breakpoints for registers and memory locations
 * Display PCG characters in the memory dump window
 * ROM selection and load
