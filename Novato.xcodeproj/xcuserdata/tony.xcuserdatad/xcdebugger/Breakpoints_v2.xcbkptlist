@@ -494,8 +494,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8580"
-            endingLineNumber = "8580"
+            startingLineNumber = "8583"
+            endingLineNumber = "8583"
             landmarkName = "returnSnapshot()"
             landmarkType = "7">
          </BreakpointContent>
@@ -510,8 +510,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8467"
-            endingLineNumber = "8467"
+            startingLineNumber = "8470"
+            endingLineNumber = "8470"
             landmarkName = "sortZ80Queue()"
             landmarkType = "7">
          </BreakpointContent>
@@ -672,7 +672,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "93"
             endingLineNumber = "93"
-            landmarkName = "testNOP(testCase:)"
+            landmarkName = "test_NOP(testCase:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -688,6 +688,22 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "6421"
             endingLineNumber = "6421"
+            landmarkName = "executeInstructions()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "01E85E3A-5CAD-418C-B5E9-A0C13A3AA9DD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Novato/Model/Microbee.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "6514"
+            endingLineNumber = "6514"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>

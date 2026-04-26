@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>top-level-items</key>
+	<array>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>53</string>
+					<key>EndingLineNumber</key>
+					<string>6513</string>
+					<key>StartingColumnNumber</key>
+					<string>45</string>
+					<key>StartingLineNumber</key>
+					<string>6513</string>
+					<key>Timestamp</key>
+					<string>798863714.764611</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>register</string>
+				<key>leading</key>
+				<string>            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x10: // DJNZ $d - 10 d - The B </string>
+				<key>trailing</key>
+				<string> is decremented, and if not zero, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode.
+            logInstructionDetails(instructionDetails: "DJNZ $d", opcode: [0x10], values: [opcode2], programCounter: registers.PC)
+            registers.B = registers.B &amp;- 1
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>17</string>
+					<key>EndingLineNumber</key>
+					<string>4</string>
+					<key>StartingColumnNumber</key>
+					<string>9</string>
+					<key>StartingLineNumber</key>
+					<string>4</string>
+					<key>Timestamp</key>
+					<string>798863722.831826</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>z80Flags</string>
+				<key>leading</key>
+				<string>actor microbee
+{
+    enum </string>
+				<key>trailing</key>
+				<string> : UInt8
+    {
+        case Carry = 0x01               // 00000001
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+	</array>
+</dict>
+</plist>

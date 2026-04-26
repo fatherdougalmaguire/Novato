@@ -6474,6 +6474,7 @@ actor microbee
         case 0x0A: // LD A,(BC) - 0A - Loads the value pointed to by BC into A
             logInstructionDetails(instructionDetails: "LD A,(BC)", opcode: [0x0A], programCounter: registers.PC)
             registers.A = mmu.readByte(address: registers.BC)
+            registers.WZ = registers.BC &+ 1
             registers.PC = registers.PC &+ 1
             tStates = tStates + 7
             incrementR(opcodeCount:1)
@@ -6518,6 +6519,7 @@ actor microbee
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+                registers.WZ = registers.PC
             }
             else
             {
@@ -6535,6 +6537,7 @@ actor microbee
             logInstructionDetails(instructionDetails: "LD (DE),A", opcode: [0x12], programCounter: registers.PC)
             mmu.writeByte(address: registers.DE, value: registers.A)
             registers.PC = registers.PC &+ 1
+            registers.WZ = (UInt16(registers.A) << 8) | (UInt16(registers.E) &+ 1)
             tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0x13: // INC DE - 13 - Adds one to DE
