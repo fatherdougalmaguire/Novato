@@ -10,50 +10,6 @@
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>53</string>
-					<key>EndingLineNumber</key>
-					<string>6513</string>
-					<key>StartingColumnNumber</key>
-					<string>45</string>
-					<key>StartingLineNumber</key>
-					<string>6513</string>
-					<key>Timestamp</key>
-					<string>798863714.764611</string>
-				</dict>
-				<key>rebasable-url</key>
-				<dict>
-					<key>base</key>
-					<string>workspace</string>
-					<key>payload</key>
-					<dict>
-						<key>relative-path</key>
-						<string>Novato/Model/Microbee.swift</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>text-context</key>
-			<dict>
-				<key>focused</key>
-				<string>register</string>
-				<key>leading</key>
-				<string>            tStates = tStates + 4
-            incrementR(opcodeCount:1)
-        case 0x10: // DJNZ $d - 10 d - The B </string>
-				<key>trailing</key>
-				<string> is decremented, and if not zero, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode.
-            logInstructionDetails(instructionDetails: "DJNZ $d", opcode: [0x10], values: [opcode2], programCounter: registers.PC)
-            registers.B = registers.B &amp;- 1
-</string>
-			</dict>
-			<key>type</key>
-			<string>bookmark</string>
-		</dict>
-		<dict>
-			<key>destination</key>
-			<dict>
-				<key>location-parameters</key>
-				<dict>
-					<key>EndingColumnNumber</key>
 					<string>17</string>
 					<key>EndingLineNumber</key>
 					<string>4</string>
@@ -87,6 +43,50 @@
 				<string> : UInt8
     {
         case Carry = 0x01               // 00000001
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>27</string>
+					<key>EndingLineNumber</key>
+					<string>6576</string>
+					<key>StartingColumnNumber</key>
+					<string>26</string>
+					<key>StartingLineNumber</key>
+					<string>6576</string>
+					<key>Timestamp</key>
+					<string>798880576.5932781</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string> </string>
+				<key>leading</key>
+				<string>            tStates = tStates + 4
+            incrementR(opcodeCount:1)
+        case 0x18: // JR d</string>
+				<key>trailing</key>
+				<string>- 18 d - The signed value $d is added to PC. The jump is measured from the start of the instruction opcode
+            logInstructionDetails(instructionDetails: "JR $d", opcode: [0x18], values: [opcode2], programCounter: registers.PC)
+            let signedOffset = Int8(bitPattern: opcode2)
 </string>
 			</dict>
 			<key>type</key>

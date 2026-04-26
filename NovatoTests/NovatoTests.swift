@@ -599,4 +599,244 @@ struct Z80InstructionTests
        // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
         #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
     }
+    
+    @Test("Validate LD D,$n (0x16)", arguments: loadJsonTests(named: "16").prefix(1000))
+    func test_LD_D_N(testCase: Z80Test) async throws
+    {
+        let cpu = microbee()
+        
+        // 1. Initial State
+        await cpu.loadCPUState(cpuState: testCase.initial)
+        
+        // 2. Execute
+        await cpu.nextInstruction()
+        
+        // 3. Compare Results
+        let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
+        
+        #expect(finalState.A == testCase.final.A,"register A fail: Initial \(testCase.initial.A), expected \(testCase.final.A), got \(finalState.A) in \(testCase.name)")
+        #expect(finalState.F == testCase.final.F,"register F fail: Initial \(testCase.initial.F), expected \(testCase.final.F), got \(finalState.F) in \(testCase.name)")
+        #expect(finalState.B == testCase.final.B,"register B fail: Initial \(testCase.initial.B), expected \(testCase.final.B), got \(finalState.B) in \(testCase.name)")
+        #expect(finalState.C == testCase.final.C,"register C fail: Initial \(testCase.initial.C), expected \(testCase.final.C), got \(finalState.C) in \(testCase.name)")
+        #expect(finalState.D == testCase.final.D,"register D fail: Initial \(testCase.initial.D), expected \(testCase.final.D), got \(finalState.D) in \(testCase.name)")
+        #expect(finalState.E == testCase.final.E,"register E fail: Initial \(testCase.initial.E), expected \(testCase.final.E), got \(finalState.E) in \(testCase.name)")
+        #expect(finalState.H == testCase.final.H,"register H fail: Initial \(testCase.initial.H), expected \(testCase.final.H), got \(finalState.H) in \(testCase.name)")
+        #expect(finalState.L == testCase.final.L,"register L fail: Initial \(testCase.initial.L), expected \(testCase.final.L), got \(finalState.L) in \(testCase.name)")
+        #expect(finalState.altAF == testCase.final.altAF,"register altAF fail: Initial \(testCase.initial.altAF), expected \(testCase.final.altAF), got \(finalState.altAF) in \(testCase.name)")
+        #expect(finalState.altBC == testCase.final.altBC,"register altBC fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altBC), got \(finalState.altBC) in \(testCase.name)")
+        #expect(finalState.altDE == testCase.final.altDE,"register altDE fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altDE), got \(finalState.altDE) in \(testCase.name)")
+        #expect(finalState.altHL == testCase.final.altHL,"register altHL fail: Initial \(testCase.initial.altBC) ,expected \(testCase.final.altHL), got \(finalState.altHL) in \(testCase.name)")
+        #expect(finalState.I == testCase.final.I,"register I fail: Initial \(testCase.initial.I), expected \(testCase.final.I), got \(finalState.I) in \(testCase.name)")
+        #expect(finalState.R == testCase.final.R,"register R fail: Initial \(testCase.initial.R) ,expected \(testCase.final.R), got \(finalState.R) in \(testCase.name)")
+        #expect(finalState.IM == testCase.final.IM,"register IM fail: Initial \(testCase.initial.IM), expected \(testCase.final.IM), got \(finalState.IM) in \(testCase.name)")
+        #expect(finalState.IX == testCase.final.IX,"register IX fail: Initial \(testCase.initial.IX), expected \(testCase.final.IX), got \(finalState.IX) in \(testCase.name)")
+        #expect(finalState.IY == testCase.final.IY,"register IY fail: Initial \(testCase.initial.IY), expected \(testCase.final.IY), got \(finalState.IY) in \(testCase.name)")
+        #expect(finalState.PC == testCase.final.PC,"register PC fail: Initial \(testCase.initial.PC), expected \(testCase.final.PC), got \(finalState.PC) in \(testCase.name)")
+        #expect(finalState.SP == testCase.final.SP,"register SP fail: Initial \(testCase.initial.SP), expected \(testCase.final.SP), got \(finalState.SP) in \(testCase.name)")
+        #expect(finalState.WZ == testCase.final.WZ,"register WZ fail: Initial \(testCase.initial.WZ), expected \(testCase.final.WZ), got \(finalState.WZ) in \(testCase.name)")
+       // #expect(finalState.Q == testCase.final.Q,"register Q fail: Initial \(testCase.initial.Q), expected \(testCase.final.Q), got \(finalState.Q) in \(testCase.name)")
+       // #expect(finalState.P == testCase.final.P,"register P fail: Initial \(testCase.initial.P) ,expected \(testCase.final.P), got \(finalState.P) in \(testCase.name)")
+       // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
+        #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
+    }
+    
+    @Test("Validate JR $d (0x18)", arguments: loadJsonTests(named: "18").prefix(1000))
+    func test_JR_D(testCase: Z80Test) async throws
+    {
+        let cpu = microbee()
+        
+        // 1. Initial State
+        await cpu.loadCPUState(cpuState: testCase.initial)
+        
+        // 2. Execute
+        await cpu.nextInstruction()
+        
+        // 3. Compare Results
+        let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
+        
+        #expect(finalState.A == testCase.final.A,"register A fail: Initial \(testCase.initial.A), expected \(testCase.final.A), got \(finalState.A) in \(testCase.name)")
+        #expect(finalState.F == testCase.final.F,"register F fail: Initial \(testCase.initial.F), expected \(testCase.final.F), got \(finalState.F) in \(testCase.name)")
+        #expect(finalState.B == testCase.final.B,"register B fail: Initial \(testCase.initial.B), expected \(testCase.final.B), got \(finalState.B) in \(testCase.name)")
+        #expect(finalState.C == testCase.final.C,"register C fail: Initial \(testCase.initial.C), expected \(testCase.final.C), got \(finalState.C) in \(testCase.name)")
+        #expect(finalState.D == testCase.final.D,"register D fail: Initial \(testCase.initial.D), expected \(testCase.final.D), got \(finalState.D) in \(testCase.name)")
+        #expect(finalState.E == testCase.final.E,"register E fail: Initial \(testCase.initial.E), expected \(testCase.final.E), got \(finalState.E) in \(testCase.name)")
+        #expect(finalState.H == testCase.final.H,"register H fail: Initial \(testCase.initial.H), expected \(testCase.final.H), got \(finalState.H) in \(testCase.name)")
+        #expect(finalState.L == testCase.final.L,"register L fail: Initial \(testCase.initial.L), expected \(testCase.final.L), got \(finalState.L) in \(testCase.name)")
+        #expect(finalState.altAF == testCase.final.altAF,"register altAF fail: Initial \(testCase.initial.altAF), expected \(testCase.final.altAF), got \(finalState.altAF) in \(testCase.name)")
+        #expect(finalState.altBC == testCase.final.altBC,"register altBC fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altBC), got \(finalState.altBC) in \(testCase.name)")
+        #expect(finalState.altDE == testCase.final.altDE,"register altDE fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altDE), got \(finalState.altDE) in \(testCase.name)")
+        #expect(finalState.altHL == testCase.final.altHL,"register altHL fail: Initial \(testCase.initial.altBC) ,expected \(testCase.final.altHL), got \(finalState.altHL) in \(testCase.name)")
+        #expect(finalState.I == testCase.final.I,"register I fail: Initial \(testCase.initial.I), expected \(testCase.final.I), got \(finalState.I) in \(testCase.name)")
+        #expect(finalState.R == testCase.final.R,"register R fail: Initial \(testCase.initial.R) ,expected \(testCase.final.R), got \(finalState.R) in \(testCase.name)")
+        #expect(finalState.IM == testCase.final.IM,"register IM fail: Initial \(testCase.initial.IM), expected \(testCase.final.IM), got \(finalState.IM) in \(testCase.name)")
+        #expect(finalState.IX == testCase.final.IX,"register IX fail: Initial \(testCase.initial.IX), expected \(testCase.final.IX), got \(finalState.IX) in \(testCase.name)")
+        #expect(finalState.IY == testCase.final.IY,"register IY fail: Initial \(testCase.initial.IY), expected \(testCase.final.IY), got \(finalState.IY) in \(testCase.name)")
+        #expect(finalState.PC == testCase.final.PC,"register PC fail: Initial \(testCase.initial.PC), expected \(testCase.final.PC), got \(finalState.PC) in \(testCase.name)")
+        #expect(finalState.SP == testCase.final.SP,"register SP fail: Initial \(testCase.initial.SP), expected \(testCase.final.SP), got \(finalState.SP) in \(testCase.name)")
+        #expect(finalState.WZ == testCase.final.WZ,"register WZ fail: Initial \(testCase.initial.WZ), expected \(testCase.final.WZ), got \(finalState.WZ) in \(testCase.name)")
+       // #expect(finalState.Q == testCase.final.Q,"register Q fail: Initial \(testCase.initial.Q), expected \(testCase.final.Q), got \(finalState.Q) in \(testCase.name)")
+       // #expect(finalState.P == testCase.final.P,"register P fail: Initial \(testCase.initial.P) ,expected \(testCase.final.P), got \(finalState.P) in \(testCase.name)")
+       // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
+        #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
+    }
+    
+    @Test("Validate LD A,(DE) (0x1A)", arguments: loadJsonTests(named: "1a").prefix(1000))
+    func test_LD_A_CON_DE(testCase: Z80Test) async throws
+    {
+        let cpu = microbee()
+        
+        // 1. Initial State
+        await cpu.loadCPUState(cpuState: testCase.initial)
+        
+        // 2. Execute
+        await cpu.nextInstruction()
+        
+        // 3. Compare Results
+        let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
+        
+        #expect(finalState.A == testCase.final.A,"register A fail: Initial \(testCase.initial.A), expected \(testCase.final.A), got \(finalState.A) in \(testCase.name)")
+        #expect(finalState.F == testCase.final.F,"register F fail: Initial \(testCase.initial.F), expected \(testCase.final.F), got \(finalState.F) in \(testCase.name)")
+        #expect(finalState.B == testCase.final.B,"register B fail: Initial \(testCase.initial.B), expected \(testCase.final.B), got \(finalState.B) in \(testCase.name)")
+        #expect(finalState.C == testCase.final.C,"register C fail: Initial \(testCase.initial.C), expected \(testCase.final.C), got \(finalState.C) in \(testCase.name)")
+        #expect(finalState.D == testCase.final.D,"register D fail: Initial \(testCase.initial.D), expected \(testCase.final.D), got \(finalState.D) in \(testCase.name)")
+        #expect(finalState.E == testCase.final.E,"register E fail: Initial \(testCase.initial.E), expected \(testCase.final.E), got \(finalState.E) in \(testCase.name)")
+        #expect(finalState.H == testCase.final.H,"register H fail: Initial \(testCase.initial.H), expected \(testCase.final.H), got \(finalState.H) in \(testCase.name)")
+        #expect(finalState.L == testCase.final.L,"register L fail: Initial \(testCase.initial.L), expected \(testCase.final.L), got \(finalState.L) in \(testCase.name)")
+        #expect(finalState.altAF == testCase.final.altAF,"register altAF fail: Initial \(testCase.initial.altAF), expected \(testCase.final.altAF), got \(finalState.altAF) in \(testCase.name)")
+        #expect(finalState.altBC == testCase.final.altBC,"register altBC fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altBC), got \(finalState.altBC) in \(testCase.name)")
+        #expect(finalState.altDE == testCase.final.altDE,"register altDE fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altDE), got \(finalState.altDE) in \(testCase.name)")
+        #expect(finalState.altHL == testCase.final.altHL,"register altHL fail: Initial \(testCase.initial.altBC) ,expected \(testCase.final.altHL), got \(finalState.altHL) in \(testCase.name)")
+        #expect(finalState.I == testCase.final.I,"register I fail: Initial \(testCase.initial.I), expected \(testCase.final.I), got \(finalState.I) in \(testCase.name)")
+        #expect(finalState.R == testCase.final.R,"register R fail: Initial \(testCase.initial.R) ,expected \(testCase.final.R), got \(finalState.R) in \(testCase.name)")
+        #expect(finalState.IM == testCase.final.IM,"register IM fail: Initial \(testCase.initial.IM), expected \(testCase.final.IM), got \(finalState.IM) in \(testCase.name)")
+        #expect(finalState.IX == testCase.final.IX,"register IX fail: Initial \(testCase.initial.IX), expected \(testCase.final.IX), got \(finalState.IX) in \(testCase.name)")
+        #expect(finalState.IY == testCase.final.IY,"register IY fail: Initial \(testCase.initial.IY), expected \(testCase.final.IY), got \(finalState.IY) in \(testCase.name)")
+        #expect(finalState.PC == testCase.final.PC,"register PC fail: Initial \(testCase.initial.PC), expected \(testCase.final.PC), got \(finalState.PC) in \(testCase.name)")
+        #expect(finalState.SP == testCase.final.SP,"register SP fail: Initial \(testCase.initial.SP), expected \(testCase.final.SP), got \(finalState.SP) in \(testCase.name)")
+        #expect(finalState.WZ == testCase.final.WZ,"register WZ fail: Initial \(testCase.initial.WZ), expected \(testCase.final.WZ), got \(finalState.WZ) in \(testCase.name)")
+       // #expect(finalState.Q == testCase.final.Q,"register Q fail: Initial \(testCase.initial.Q), expected \(testCase.final.Q), got \(finalState.Q) in \(testCase.name)")
+       // #expect(finalState.P == testCase.final.P,"register P fail: Initial \(testCase.initial.P) ,expected \(testCase.final.P), got \(finalState.P) in \(testCase.name)")
+       // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
+        #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
+    }
+    
+    @Test("Validate DEC DE (0x1B)", .serialized, arguments: loadJsonTests(named: "1b").prefix(1000))
+    func test_DEC_DE(testCase: Z80Test) async throws
+    {
+        let cpu = microbee()
+        
+        // 1. Initial State
+        await cpu.loadCPUState(cpuState: testCase.initial)
+        
+        // 2. Execute
+        await cpu.nextInstruction()
+        
+        // 3. Compare Results
+        let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
+        
+        #expect(finalState.A == testCase.final.A,"register A fail: Initial \(testCase.initial.A), expected \(testCase.final.A), got \(finalState.A) in \(testCase.name)")
+        #expect(finalState.F == testCase.final.F,"register F fail: Initial \(testCase.initial.F), expected \(testCase.final.F), got \(finalState.F) in \(testCase.name)")
+        #expect(finalState.B == testCase.final.B,"register B fail: Initial \(testCase.initial.B), expected \(testCase.final.B), got \(finalState.B) in \(testCase.name)")
+        #expect(finalState.C == testCase.final.C,"register C fail: Initial \(testCase.initial.C), expected \(testCase.final.C), got \(finalState.C) in \(testCase.name)")
+        #expect(finalState.D == testCase.final.D,"register D fail: Initial \(testCase.initial.D), expected \(testCase.final.D), got \(finalState.D) in \(testCase.name)")
+        #expect(finalState.E == testCase.final.E,"register E fail: Initial \(testCase.initial.E), expected \(testCase.final.E), got \(finalState.E) in \(testCase.name)")
+        #expect(finalState.H == testCase.final.H,"register H fail: Initial \(testCase.initial.H), expected \(testCase.final.H), got \(finalState.H) in \(testCase.name)")
+        #expect(finalState.L == testCase.final.L,"register L fail: Initial \(testCase.initial.L), expected \(testCase.final.L), got \(finalState.L) in \(testCase.name)")
+        #expect(finalState.altAF == testCase.final.altAF,"register altAF fail: Initial \(testCase.initial.altAF), expected \(testCase.final.altAF), got \(finalState.altAF) in \(testCase.name)")
+        #expect(finalState.altBC == testCase.final.altBC,"register altBC fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altBC), got \(finalState.altBC) in \(testCase.name)")
+        #expect(finalState.altDE == testCase.final.altDE,"register altDE fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altDE), got \(finalState.altDE) in \(testCase.name)")
+        #expect(finalState.altHL == testCase.final.altHL,"register altHL fail: Initial \(testCase.initial.altBC) ,expected \(testCase.final.altHL), got \(finalState.altHL) in \(testCase.name)")
+        #expect(finalState.I == testCase.final.I,"register I fail: Initial \(testCase.initial.I), expected \(testCase.final.I), got \(finalState.I) in \(testCase.name)")
+        #expect(finalState.R == testCase.final.R,"register R fail: Initial \(testCase.initial.R) ,expected \(testCase.final.R), got \(finalState.R) in \(testCase.name)")
+        #expect(finalState.IM == testCase.final.IM,"register IM fail: Initial \(testCase.initial.IM), expected \(testCase.final.IM), got \(finalState.IM) in \(testCase.name)")
+        #expect(finalState.IX == testCase.final.IX,"register IX fail: Initial \(testCase.initial.IX), expected \(testCase.final.IX), got \(finalState.IX) in \(testCase.name)")
+        #expect(finalState.IY == testCase.final.IY,"register IY fail: Initial \(testCase.initial.IY), expected \(testCase.final.IY), got \(finalState.IY) in \(testCase.name)")
+        #expect(finalState.PC == testCase.final.PC,"register PC fail: Initial \(testCase.initial.PC), expected \(testCase.final.PC), got \(finalState.PC) in \(testCase.name)")
+        #expect(finalState.SP == testCase.final.SP,"register SP fail: Initial \(testCase.initial.SP), expected \(testCase.final.SP), got \(finalState.SP) in \(testCase.name)")
+        #expect(finalState.WZ == testCase.final.WZ,"register WZ fail: Initial \(testCase.initial.WZ), expected \(testCase.final.WZ), got \(finalState.WZ) in \(testCase.name)")
+       // #expect(finalState.Q == testCase.final.Q,"register Q fail: Initial \(testCase.initial.Q), expected \(testCase.final.Q), got \(finalState.Q) in \(testCase.name)")
+       // #expect(finalState.P == testCase.final.P,"register P fail: Initial \(testCase.initial.P) ,expected \(testCase.final.P), got \(finalState.P) in \(testCase.name)")
+       // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
+        #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
+    }
+    
+    @Test("Validate LD E,$n (0x1E)", .serialized, arguments: loadJsonTests(named: "1e").prefix(1000))
+    func test_LD_E_N(testCase: Z80Test) async throws
+    {
+        let cpu = microbee()
+        
+        // 1. Initial State
+        await cpu.loadCPUState(cpuState: testCase.initial)
+        
+        // 2. Execute
+        await cpu.nextInstruction()
+        
+        // 3. Compare Results
+        let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
+        
+        #expect(finalState.A == testCase.final.A,"register A fail: Initial \(testCase.initial.A), expected \(testCase.final.A), got \(finalState.A) in \(testCase.name)")
+        #expect(finalState.F == testCase.final.F,"register F fail: Initial \(testCase.initial.F), expected \(testCase.final.F), got \(finalState.F) in \(testCase.name)")
+        #expect(finalState.B == testCase.final.B,"register B fail: Initial \(testCase.initial.B), expected \(testCase.final.B), got \(finalState.B) in \(testCase.name)")
+        #expect(finalState.C == testCase.final.C,"register C fail: Initial \(testCase.initial.C), expected \(testCase.final.C), got \(finalState.C) in \(testCase.name)")
+        #expect(finalState.D == testCase.final.D,"register D fail: Initial \(testCase.initial.D), expected \(testCase.final.D), got \(finalState.D) in \(testCase.name)")
+        #expect(finalState.E == testCase.final.E,"register E fail: Initial \(testCase.initial.E), expected \(testCase.final.E), got \(finalState.E) in \(testCase.name)")
+        #expect(finalState.H == testCase.final.H,"register H fail: Initial \(testCase.initial.H), expected \(testCase.final.H), got \(finalState.H) in \(testCase.name)")
+        #expect(finalState.L == testCase.final.L,"register L fail: Initial \(testCase.initial.L), expected \(testCase.final.L), got \(finalState.L) in \(testCase.name)")
+        #expect(finalState.altAF == testCase.final.altAF,"register altAF fail: Initial \(testCase.initial.altAF), expected \(testCase.final.altAF), got \(finalState.altAF) in \(testCase.name)")
+        #expect(finalState.altBC == testCase.final.altBC,"register altBC fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altBC), got \(finalState.altBC) in \(testCase.name)")
+        #expect(finalState.altDE == testCase.final.altDE,"register altDE fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altDE), got \(finalState.altDE) in \(testCase.name)")
+        #expect(finalState.altHL == testCase.final.altHL,"register altHL fail: Initial \(testCase.initial.altBC) ,expected \(testCase.final.altHL), got \(finalState.altHL) in \(testCase.name)")
+        #expect(finalState.I == testCase.final.I,"register I fail: Initial \(testCase.initial.I), expected \(testCase.final.I), got \(finalState.I) in \(testCase.name)")
+        #expect(finalState.R == testCase.final.R,"register R fail: Initial \(testCase.initial.R) ,expected \(testCase.final.R), got \(finalState.R) in \(testCase.name)")
+        #expect(finalState.IM == testCase.final.IM,"register IM fail: Initial \(testCase.initial.IM), expected \(testCase.final.IM), got \(finalState.IM) in \(testCase.name)")
+        #expect(finalState.IX == testCase.final.IX,"register IX fail: Initial \(testCase.initial.IX), expected \(testCase.final.IX), got \(finalState.IX) in \(testCase.name)")
+        #expect(finalState.IY == testCase.final.IY,"register IY fail: Initial \(testCase.initial.IY), expected \(testCase.final.IY), got \(finalState.IY) in \(testCase.name)")
+        #expect(finalState.PC == testCase.final.PC,"register PC fail: Initial \(testCase.initial.PC), expected \(testCase.final.PC), got \(finalState.PC) in \(testCase.name)")
+        #expect(finalState.SP == testCase.final.SP,"register SP fail: Initial \(testCase.initial.SP), expected \(testCase.final.SP), got \(finalState.SP) in \(testCase.name)")
+        #expect(finalState.WZ == testCase.final.WZ,"register WZ fail: Initial \(testCase.initial.WZ), expected \(testCase.final.WZ), got \(finalState.WZ) in \(testCase.name)")
+       // #expect(finalState.Q == testCase.final.Q,"register Q fail: Initial \(testCase.initial.Q), expected \(testCase.final.Q), got \(finalState.Q) in \(testCase.name)")
+       // #expect(finalState.P == testCase.final.P,"register P fail: Initial \(testCase.initial.P) ,expected \(testCase.final.P), got \(finalState.P) in \(testCase.name)")
+       // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
+        #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
+    }
+    
+    @Test("Validate JR NZ,$d (0x20)", arguments: loadJsonTests(named: "20").prefix(1000))
+    func test_JR_NZ_d(testCase: Z80Test) async throws
+    {
+        let cpu = microbee()
+        
+        // 1. Initial State
+        await cpu.loadCPUState(cpuState: testCase.initial)
+        
+        // 2. Execute
+        await cpu.nextInstruction()
+        
+        // 3. Compare Results
+        let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
+        
+        #expect(finalState.A == testCase.final.A,"register A fail: Initial \(testCase.initial.A), expected \(testCase.final.A), got \(finalState.A) in \(testCase.name)")
+        #expect(finalState.F == testCase.final.F,"register F fail: Initial \(testCase.initial.F), expected \(testCase.final.F), got \(finalState.F) in \(testCase.name)")
+        #expect(finalState.B == testCase.final.B,"register B fail: Initial \(testCase.initial.B), expected \(testCase.final.B), got \(finalState.B) in \(testCase.name)")
+        #expect(finalState.C == testCase.final.C,"register C fail: Initial \(testCase.initial.C), expected \(testCase.final.C), got \(finalState.C) in \(testCase.name)")
+        #expect(finalState.D == testCase.final.D,"register D fail: Initial \(testCase.initial.D), expected \(testCase.final.D), got \(finalState.D) in \(testCase.name)")
+        #expect(finalState.E == testCase.final.E,"register E fail: Initial \(testCase.initial.E), expected \(testCase.final.E), got \(finalState.E) in \(testCase.name)")
+        #expect(finalState.H == testCase.final.H,"register H fail: Initial \(testCase.initial.H), expected \(testCase.final.H), got \(finalState.H) in \(testCase.name)")
+        #expect(finalState.L == testCase.final.L,"register L fail: Initial \(testCase.initial.L), expected \(testCase.final.L), got \(finalState.L) in \(testCase.name)")
+        #expect(finalState.altAF == testCase.final.altAF,"register altAF fail: Initial \(testCase.initial.altAF), expected \(testCase.final.altAF), got \(finalState.altAF) in \(testCase.name)")
+        #expect(finalState.altBC == testCase.final.altBC,"register altBC fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altBC), got \(finalState.altBC) in \(testCase.name)")
+        #expect(finalState.altDE == testCase.final.altDE,"register altDE fail: Initial \(testCase.initial.altBC), expected \(testCase.final.altDE), got \(finalState.altDE) in \(testCase.name)")
+        #expect(finalState.altHL == testCase.final.altHL,"register altHL fail: Initial \(testCase.initial.altBC) ,expected \(testCase.final.altHL), got \(finalState.altHL) in \(testCase.name)")
+        #expect(finalState.I == testCase.final.I,"register I fail: Initial \(testCase.initial.I), expected \(testCase.final.I), got \(finalState.I) in \(testCase.name)")
+        #expect(finalState.R == testCase.final.R,"register R fail: Initial \(testCase.initial.R) ,expected \(testCase.final.R), got \(finalState.R) in \(testCase.name)")
+        #expect(finalState.IM == testCase.final.IM,"register IM fail: Initial \(testCase.initial.IM), expected \(testCase.final.IM), got \(finalState.IM) in \(testCase.name)")
+        #expect(finalState.IX == testCase.final.IX,"register IX fail: Initial \(testCase.initial.IX), expected \(testCase.final.IX), got \(finalState.IX) in \(testCase.name)")
+        #expect(finalState.IY == testCase.final.IY,"register IY fail: Initial \(testCase.initial.IY), expected \(testCase.final.IY), got \(finalState.IY) in \(testCase.name)")
+        #expect(finalState.PC == testCase.final.PC,"register PC fail: Initial \(testCase.initial.PC), expected \(testCase.final.PC), got \(finalState.PC) in \(testCase.name)")
+        #expect(finalState.SP == testCase.final.SP,"register SP fail: Initial \(testCase.initial.SP), expected \(testCase.final.SP), got \(finalState.SP) in \(testCase.name)")
+        #expect(finalState.WZ == testCase.final.WZ,"register WZ fail: Initial \(testCase.initial.WZ), expected \(testCase.final.WZ), got \(finalState.WZ) in \(testCase.name)")
+       // #expect(finalState.Q == testCase.final.Q,"register Q fail: Initial \(testCase.initial.Q), expected \(testCase.final.Q), got \(finalState.Q) in \(testCase.name)")
+       // #expect(finalState.P == testCase.final.P,"register P fail: Initial \(testCase.initial.P) ,expected \(testCase.final.P), got \(finalState.P) in \(testCase.name)")
+       // #expect(finalState.EI == testCase.final.EI,"register EI fail: Initial \(testCase.initial.EI), expected \(testCase.final.EI), got \(finalState.EI) in \(testCase.name)")
+        #expect(finalState.ram == testCase.final.ram,"Ram fail: Initial \(testCase.initial.ram), expected \(testCase.final.ram), got \(finalState.ram) in \(testCase.name)")
+    }
 }

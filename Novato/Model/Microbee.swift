@@ -6579,7 +6579,9 @@ actor microbee
             let signedOffset = Int8(bitPattern: opcode2)
             let displacement = Int16(signedOffset)
             registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+            registers.WZ = registers.PC
             tStates = tStates + 12
+            incrementR(opcodeCount:1)
         case 0x19: // ADD HL,DE - 19 - The value of DE is added to HL
             logInstructionDetails(instructionDetails: "ADD HL,DE", opcode: [0x19], programCounter: registers.PC)
             let tempResult = registers.HL &+ registers.DE
@@ -6597,6 +6599,7 @@ actor microbee
             logInstructionDetails(instructionDetails: "LD A,(DE)", opcode: [0x1A], programCounter: registers.PC)
             registers.A = mmu.readByte(address: registers.DE)
             registers.PC = registers.PC &+ 1
+            registers.WZ = registers.DE &+ 1
             tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0x1B: // DEC DE - 1B - Subtracts one from DE
@@ -6644,6 +6647,7 @@ actor microbee
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+                registers.WZ = registers.PC
             }
             tStates = tStates + 12
             incrementR(opcodeCount:1)
