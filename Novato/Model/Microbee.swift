@@ -6663,6 +6663,7 @@ actor microbee
             mmu.writeByte(address: tempResult, value: registers.L)
             mmu.writeByte(address: tempResult &+ 1, value: registers.H)
             registers.PC = registers.PC &+ 3
+            registers.WZ = tempResult + 1
             tStates = tStates + 16
             incrementR(opcodeCount:1)
         case 0x23: // INC HL - 23 - Adds one to HL
@@ -6766,6 +6767,7 @@ actor microbee
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+                registers.WZ = registers.PC
             }
             else
             {
@@ -6789,8 +6791,10 @@ actor microbee
         case 0x2A: // LD HL,($nn) - 2A n n - Loads the value pointed to by $nn into HL
             logInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0x2A], values: [opcode2,opcode3], programCounter: registers.PC)
             let tempResult = UInt16(opcode3) << 8 | UInt16(opcode2)
-            registers.HL = UInt16(mmu.readByte(address: tempResult))
+            registers.L = mmu.readByte(address: tempResult)
+            registers.H = mmu.readByte(address: tempResult &+ 1)
             registers.PC = registers.PC &+ 3
+            registers.WZ = tempResult+1
             tStates = tStates + 16
             incrementR(opcodeCount:1)
         case 0x2B: // DEC HL - 2B - Subtracts one from HL
