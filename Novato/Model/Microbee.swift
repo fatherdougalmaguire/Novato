@@ -6840,6 +6840,7 @@ actor microbee
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+                registers.WZ = registers.PC
             }
             tStates = tStates + 12
             incrementR(opcodeCount:1)
@@ -6854,12 +6855,13 @@ actor microbee
             let tempResult = UInt16(opcode3) << 8 | UInt16(opcode2)
             mmu.writeByte(address: tempResult, value: registers.A)
             registers.PC = registers.PC &+ 3
+            registers.WZ = (UInt16(registers.A) << 8) | (UInt16((tempResult + 1)) & 0xFF)
             tStates = tStates + 13
             incrementR(opcodeCount:1)
         case 0x33: // INC SP - 33 - Adds one to SP
             logInstructionDetails(instructionDetails: "INC SP", opcode: [0x33], programCounter: registers.PC)
-            registers.SP = registers.PC &+ 1
-            registers.PC = registers.PC &+ 3
+            registers.SP = registers.SP &+ 1
+            registers.PC = registers.PC &+ 1
             tStates = tStates + 6
             incrementR(opcodeCount:1)
         case 0x34: // INC (HL) - 34 - Adds one to (HL)
@@ -6900,6 +6902,7 @@ actor microbee
                 let signedOffset = Int8(bitPattern: opcode2)
                 let displacement = Int16(signedOffset)
                 registers.PC = registers.PC &+ UInt16(bitPattern: displacement) &+ 2
+                registers.WZ = registers.PC
             }
             else
             {
@@ -6925,6 +6928,7 @@ actor microbee
             let tempResult = UInt16(opcode3) << 8 | UInt16(opcode2)
             registers.A = mmu.readByte(address: tempResult)
             registers.PC = registers.PC &+ 3
+            registers.WZ = tempResult &+ 1
             tStates = tStates + 13
             incrementR(opcodeCount:1)
         case 0x3B: // DEC SP - 3B - Subtracts one from SP
