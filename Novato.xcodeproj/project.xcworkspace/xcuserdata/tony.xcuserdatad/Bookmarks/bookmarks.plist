@@ -84,7 +84,7 @@
 
 let </string>
 				<key>trailing</key>
-				<string> = 1000
+				<string> = 1
 
 private class sentinelClass {} // is required to find the json tests.  Feels like some kind of bullshit to me
 </string>
