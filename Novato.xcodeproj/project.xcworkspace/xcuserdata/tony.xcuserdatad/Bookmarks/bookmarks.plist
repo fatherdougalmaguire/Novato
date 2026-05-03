@@ -54,15 +54,59 @@
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>27</string>
+					<string>14</string>
 					<key>EndingLineNumber</key>
-					<string>6576</string>
+					<string>3</string>
 					<key>StartingColumnNumber</key>
-					<string>26</string>
+					<string>4</string>
 					<key>StartingLineNumber</key>
-					<string>6576</string>
+					<string>3</string>
 					<key>Timestamp</key>
-					<string>798880576.5932781</string>
+					<string>799395254.245733</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>NovatoTests/NovatoTests.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>testCycles</string>
+				<key>leading</key>
+				<string>import Testing
+
+let </string>
+				<key>trailing</key>
+				<string> = 1000
+
+private class sentinelClass {} // is required to find the json tests.  Feels like some kind of bullshit to me
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>25</string>
+					<key>EndingLineNumber</key>
+					<string>7155</string>
+					<key>StartingColumnNumber</key>
+					<string>24</string>
+					<key>StartingLineNumber</key>
+					<string>7155</string>
+					<key>Timestamp</key>
+					<string>799395277.434482</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -82,55 +126,11 @@
 				<key>leading</key>
 				<string>            tStates = tStates + 4
             incrementR(opcodeCount:1)
-        case 0x18: // JR d</string>
+        case 0x60: // LD</string>
 				<key>trailing</key>
-				<string>- 18 d - The signed value $d is added to PC. The jump is measured from the start of the instruction opcode
-            logInstructionDetails(instructionDetails: "JR $d", opcode: [0x18], values: [opcode2], programCounter: registers.PC)
-            let signedOffset = Int8(bitPattern: opcode2)
-</string>
-			</dict>
-			<key>type</key>
-			<string>bookmark</string>
-		</dict>
-		<dict>
-			<key>destination</key>
-			<dict>
-				<key>location-parameters</key>
-				<dict>
-					<key>EndingColumnNumber</key>
-					<string>27</string>
-					<key>EndingLineNumber</key>
-					<string>6831</string>
-					<key>StartingColumnNumber</key>
-					<string>25</string>
-					<key>StartingLineNumber</key>
-					<string>6831</string>
-					<key>Timestamp</key>
-					<string>799293416.083427</string>
-				</dict>
-				<key>rebasable-url</key>
-				<dict>
-					<key>base</key>
-					<string>workspace</string>
-					<key>payload</key>
-					<dict>
-						<key>relative-path</key>
-						<string>Novato/Model/Microbee.swift</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>text-context</key>
-			<dict>
-				<key>focused</key>
-				<string>NC</string>
-				<key>leading</key>
-				<string>            tStates = tStates + 4
-            incrementR(opcodeCount:1)
-        case 0x30: // JR </string>
-				<key>trailing</key>
-				<string>,d - 30 $d - If the carry flag is unset, the signed value $d is added to PC. The jump is measured from the start of the instruction opcode
-            logInstructionDetails(instructionDetails: "JR NC,$d", opcode: [0x30], values: [opcode2], programCounter: registers.PC)
-            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
+				<string>H,B - 40 - The contents of B are loaded into H
+            logInstructionDetails(instructionDetails: "LD H,B", opcode: [0x60], programCounter: registers.PC)
+            registers.H = registers.B
 </string>
 			</dict>
 			<key>type</key>
