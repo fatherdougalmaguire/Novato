@@ -7765,6 +7765,7 @@ actor microbee
                 registers.PCL = mmu.readByte(address: registers.SP)
                 registers.SP = registers.SP &+ 1
                 registers.PCH = mmu.readByte(address: registers.SP)
+                registers.WZ = registers.PC
                 registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
@@ -7779,6 +7780,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xC2: // JP NZ,$nn - C2 n n - If the zero flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [0xC2], programCounter: registers.PC)
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = registers.PC &+ 3
@@ -7792,18 +7794,19 @@ actor microbee
         case 0xC3: // JP $nn - C3 n n - $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP $nn", opcode: [0xC3], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
+            registers.WZ = registers.PC
             tStates = tStates + 10
             incrementR(opcodeCount:1)
         case 0xC4: // CALL NZ,$nn - C4 n n - JIf the zero flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL NZ,$nn",opcode: [0xC4], values:[opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 tStates = tStates + 10
             }
             else
             {
-                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
@@ -7835,15 +7838,17 @@ actor microbee
             registers.SP = registers.SP &- 1
             mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
             registers.PC = 0x0000
+            registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0xC8: // RETZ - C8 - If the zero flag is set, the top stack entry is popped into PC
-            logInstructionDetails(instructionDetails: "RET", opcode: [0xC8], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "RETZ", opcode: [0xC8], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PCL = mmu.readByte(address: registers.SP)
                 registers.SP = registers.SP &+ 1
                 registers.PCH = mmu.readByte(address: registers.SP)
+                registers.WZ = registers.PC
                 registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
@@ -7858,11 +7863,13 @@ actor microbee
             registers.PCL = mmu.readByte(address: registers.SP)
             registers.SP = registers.SP &+ 1
             registers.PCH = mmu.readByte(address: registers.SP)
+            registers.WZ = registers.PC
             registers.SP = registers.SP &+ 1
             tStates = tStates + 10
             incrementR(opcodeCount:1)
         case 0xCA: // JP Z,nn - CA n n - If the zero flag is set, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [0xCA], values: [opcode2,opcode3], programCounter: registers.PC)
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
@@ -7877,9 +7884,9 @@ actor microbee
         case 0xCC: // CALL Z,$nn - CC n n - If the zero flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn
            logInstructionDetails(instructionDetails: "CALL Z,$nn",opcode: [0xCC], values: [opcode2,opcode3], programCounter: registers.PC)
            registers.PC = registers.PC &+ 3
+           registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
            {
-               registers.PC = registers.PC &+ 3
                registers.SP = registers.SP &- 1
                mmu.writeByte(address: registers.SP, value: registers.PCH)
                registers.SP = registers.SP &- 1
@@ -7900,6 +7907,7 @@ actor microbee
            registers.SP = registers.SP &- 1
            mmu.writeByte(address: registers.SP, value: registers.PCL)
            registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
+           registers.WZ = registers.PC
            tStates = tStates + 17
            incrementR(opcodeCount:1)
         case 0xCE: // ADC A,$n - C3 n - Adds $n and the carry flag to A
@@ -7911,11 +7919,13 @@ actor microbee
            incrementR(opcodeCount:1)
         case 0xCF: // RST 0x08 - The current PC value plus one is pushed onto the stack, then is loaded with 0x08
            logInstructionDetails(instructionDetails: "RST 0x08", opcode: [0xCF], programCounter: registers.PC)
+           registers.PC = registers.PC &+ 1
            registers.SP = registers.SP &- 1
            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
            registers.SP = registers.SP &- 1
            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
            registers.PC = 0x0008
+           registers.WZ = registers.PC
            tStates = tStates + 11
            incrementR(opcodeCount:1)
         case 0xD0: // RET NC - D0 - If the carry flag is unset, the top stack entry is popped into PC
@@ -7931,6 +7941,7 @@ actor microbee
                registers.SP = registers.SP &+ 1
                registers.PCH = mmu.readByte(address: registers.SP)
                registers.SP = registers.SP &+ 1
+               registers.WZ = registers.PC
                tStates = tStates + 11
            }
            incrementR(opcodeCount:1)
@@ -7944,6 +7955,7 @@ actor microbee
            incrementR(opcodeCount:1)
        case 0xD2: // JP NC,$nn - D2 n n - If the carry flag is unset, $nn is copied to PC
            logInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [0xD2], values: [opcode2,opcode3], programCounter: registers.PC)
+           registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
            {
                registers.PC = registers.PC &+ 3
@@ -8013,13 +8025,13 @@ actor microbee
        case 0xD4: // CALL NC,$nn - D4 n n - If the carry flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
            logInstructionDetails(instructionDetails: "CALL NC,$nn",opcode: [0xD4], values: [opcode2,opcode3], programCounter: registers.PC)
            registers.PC = registers.PC &+ 3
+           registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
            {
                tStates = tStates + 10
            }
            else
            {
-               registers.PC = registers.PC &+ 3
                registers.SP = registers.SP &- 1
                mmu.writeByte(address: registers.SP, value: registers.PCH)
                registers.SP = registers.SP &- 1
@@ -8045,11 +8057,13 @@ actor microbee
            incrementR(opcodeCount:1)
        case 0xD7: // RST 0x10 - The current PC value plus one is pushed onto the stack, then is loaded with 0x10
            logInstructionDetails(instructionDetails: "RST 0x10", opcode: [0xD7], programCounter: registers.PC)
+           registers.PC = registers.PC &+ 1
            registers.SP = registers.SP &- 1
            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC >> 8))
            registers.SP = registers.SP &- 1
            mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
            registers.PC = 0x0010
+           registers.WZ = registers.PC
            tStates = tStates + 11
            incrementR(opcodeCount:1)
        case 0xD8: // RET C - D8 - If the carry flag is set, the top stack entry is popped into PC
@@ -8059,6 +8073,7 @@ actor microbee
                registers.PCL = mmu.readByte(address: registers.SP)
                registers.SP = registers.SP &+ 1
                registers.PCH = mmu.readByte(address: registers.SP)
+               registers.WZ = registers.PC
                registers.SP = registers.SP &+ 1
                tStates = tStates + 11
            }
@@ -8070,12 +8085,15 @@ actor microbee
            incrementR(opcodeCount:1)
        case 0xD9: // EXX - D9 - Exchanges the 16-bit contents of BC, DE, and HL with BC', DE', and HL'
            logInstructionDetails(instructionDetails: "EXX", opcode: [0xD9], programCounter: registers.PC)
-           (registers.BC,registers.DE,registers.HL) = (registers.altBC,registers.altDE,registers.altHL)
+           (registers.BC,registers.altBC) = (registers.altBC,registers.BC)
+           (registers.DE,registers.altDE) = (registers.altDE,registers.DE)
+           (registers.HL,registers.altHL) = (registers.altHL,registers.HL)
            registers.PC = registers.PC &+ 1
            tStates = tStates + 4
            incrementR(opcodeCount:1)
        case 0xDA: // JP C,$nn - DA n n - If the carry flag is set, $nn is copied to PC
            logInstructionDetails(instructionDetails: "JP C,$nn", opcode: [0xDA], values: [opcode2,opcode3], programCounter: registers.PC)
+           registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
            {
                registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
@@ -8104,9 +8122,9 @@ actor microbee
        case 0xDC: // CALL C,$nn - DC n n - If the carry flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
            logInstructionDetails(instructionDetails: "CALL C,$nn",opcode: [0xDC], values: [opcode2,opcode3], programCounter: registers.PC)
            registers.PC = registers.PC &+ 3
+           registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
            {
-               registers.PC = registers.PC &+ 3
                registers.SP = registers.SP &- 1
                mmu.writeByte(address: registers.SP, value: registers.PCH)
                registers.SP = registers.SP &- 1
@@ -8135,6 +8153,7 @@ actor microbee
             registers.SP = registers.SP &- 1
             mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
             registers.PC = 0x0018
+            registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0xE0: // RET PO - E0 - If the parity/overflow flag is unset, the top stack entry is popped into PC
@@ -8149,6 +8168,7 @@ actor microbee
                 registers.PCL = mmu.readByte(address: registers.SP)
                 registers.SP = registers.SP &+ 1
                 registers.PCH = mmu.readByte(address: registers.SP)
+                registers.WZ = registers.PC
                 registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
@@ -8163,6 +8183,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xE2: // JP PO,nn - E1 n n - If the parity/overflow flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP PO,$nn", opcode: [0xE2], values: [opcode2,opcode3], programCounter: registers.PC)
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.PC = registers.PC &+ 3
@@ -8179,6 +8200,7 @@ actor microbee
             let tempResultL = registers.L
             registers.L = mmu.readByte(address: registers.SP)
             registers.H = mmu.readByte(address: registers.SP &+ 1)
+            registers.WZ = UInt16(registers.H) << 8 | UInt16(registers.L)
             mmu.writeByte(address: registers.SP, value: tempResultL)
             mmu.writeByte(address: registers.SP &+ 1, value: tempResultH)
             registers.PC = registers.PC &+ 1
@@ -8187,13 +8209,13 @@ actor microbee
         case 0xE4: // CALL PO,$nn - D4 n n - If the parity/overflow flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL PO,$nn",opcode: [0xE4], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 tStates = tStates + 10
             }
             else
             {
-                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
@@ -8225,6 +8247,7 @@ actor microbee
             registers.SP = registers.SP &- 1
             mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
             registers.PC = 0x0020
+            registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0xE8: // RET PO - E8 - If the parity/overflow flag is unset, the top stack entry is popped into PC
@@ -8234,6 +8257,7 @@ actor microbee
                 registers.PCL = mmu.readByte(address: registers.SP)
                 registers.SP = registers.SP &+ 1
                 registers.PCH = mmu.readByte(address: registers.SP)
+                registers.WZ = registers.PC
                 registers.SP = registers.SP &+ 1
                 tStates = tStates + 11
             }
@@ -8250,6 +8274,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xEA: // JP PE,nn - EA n n - If the parity/overflow flag is set, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP PE,$nn", opcode: [0xEA], values: [opcode2,opcode3], programCounter: registers.PC)
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
@@ -8269,9 +8294,9 @@ actor microbee
         case 0xEC: // CALL PE,$nn - EC n n - If the parity/overflow flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL PE,$nn",opcode: [0xEC], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.ParityOverflow))
             {
-                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
@@ -8299,6 +8324,7 @@ actor microbee
             registers.SP = registers.SP &- 1
             mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
             registers.PC = 0x0028
+            registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0xF0: // RET P - F0 - If the sign flag is unset, the top stack entry is popped into PC
@@ -8314,6 +8340,7 @@ actor microbee
                 registers.SP = registers.SP &+ 1
                 registers.PCH = mmu.readByte(address: registers.SP)
                 registers.SP = registers.SP &+ 1
+                registers.WZ = registers.PC
                 tStates = tStates + 11
             }
             incrementR(opcodeCount:1)
@@ -8327,6 +8354,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xF2: // JP P,nn - F2 n n - If the sign flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP P,$nn", opcode: [0xF2], values: [opcode2,opcode3], programCounter: registers.PC)
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.PC = registers.PC &+ 3
@@ -8347,13 +8375,13 @@ actor microbee
         case 0xF4: // CALL P,$nn - F4 n n - If the sign flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
             logInstructionDetails(instructionDetails: "CALL P,$nn",opcode: [0xF4], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 tStates = tStates + 10
             }
             else
             {
-                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
@@ -8385,6 +8413,7 @@ actor microbee
             registers.SP = registers.SP &- 1
             mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
             registers.PC = 0x0030
+            registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
         case 0xF8: // RET M - F0 - If the sign flag is set, the top stack entry is popped into PC
@@ -8395,6 +8424,7 @@ actor microbee
                 registers.SP = registers.SP &+ 1
                 registers.PCH = mmu.readByte(address: registers.SP)
                 registers.SP = registers.SP &+ 1
+                registers.WZ = registers.PC
                 tStates = tStates + 11
             }
             else
@@ -8411,6 +8441,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xFA: // JP M,nn
             logInstructionDetails(instructionDetails: "JP M,$nn", opcode: [0xFA], values: [opcode2,opcode3], programCounter: registers.PC)
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
                 registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
@@ -8431,9 +8462,9 @@ actor microbee
         case 0xFC: // CALL M,$nn - FC n n - If the sign flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn
             logInstructionDetails(instructionDetails: "CALL M,$nn",opcode: [0xFC], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Sign))
             {
-                registers.PC = registers.PC &+ 3
                 registers.SP = registers.SP &- 1
                 mmu.writeByte(address: registers.SP, value: registers.PCH)
                 registers.SP = registers.SP &- 1
@@ -8462,6 +8493,7 @@ actor microbee
             registers.SP = registers.SP &- 1
             mmu.writeByte(address: registers.SP, value: UInt8(registers.PC & 0x00FF))
             registers.PC = 0x0038
+            registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
         default:

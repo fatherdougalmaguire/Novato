@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-let testCycles = 1
+let testCycles = 1000
 
 private class sentinelClass {} // is required to find the json tests.  Feels like some kind of bullshit to me
 
@@ -954,7 +954,7 @@ struct Z80Opcodes: testHelper
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate RST 0x28 (0xEF)",  arguments: loadJsonTests(named: "ef:").prefix(testCycles))
+        @Test("Validate RST 0x28 (0xEF)",  arguments: loadJsonTests(named: "ef").prefix(testCycles))
         func test_RST_0x28(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)

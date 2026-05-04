@@ -84,7 +84,7 @@
 
 let </string>
 				<key>trailing</key>
-				<string> = 1
+				<string> = 1000
 
 private class sentinelClass {} // is required to find the json tests.  Feels like some kind of bullshit to me
 </string>
@@ -131,6 +131,50 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 				<string>H,B - 40 - The contents of B are loaded into H
             logInstructionDetails(instructionDetails: "LD H,B", opcode: [0x60], programCounter: registers.PC)
             registers.H = registers.B
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>13</string>
+					<key>EndingLineNumber</key>
+					<string>680</string>
+					<key>StartingColumnNumber</key>
+					<string>9</string>
+					<key>StartingLineNumber</key>
+					<string>680</string>
+					<key>Timestamp</key>
+					<string>799483674.833757</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>NovatoTests/NovatoTests.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>Test</string>
+				<key>leading</key>
+				<string>        }
+        
+        @</string>
+				<key>trailing</key>
+				<string>("Validate LD A,B (0x78)",  arguments: loadJsonTests(named: "78").prefix(testCycles))
+        func test_LD_A_B(testCase: Z80Test) async throws
+        {
 </string>
 			</dict>
 			<key>type</key>
