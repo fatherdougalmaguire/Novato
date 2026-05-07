@@ -98,15 +98,15 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>25</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>7155</string>
+					<string>6468</string>
 					<key>StartingColumnNumber</key>
-					<string>24</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>7155</string>
+					<string>6467</string>
 					<key>Timestamp</key>
-					<string>799395277.434482</string>
+					<string>799671320.0282151</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -122,15 +122,16 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string> </string>
+				<string>    private func executeInstructions()
+</string>
 				<key>leading</key>
-				<string>            tStates = tStates + 4
-            incrementR(opcodeCount:1)
-        case 0x60: // LD</string>
+				<string>    }
+
+</string>
 				<key>trailing</key>
-				<string>H,B - 40 - The contents of B are loaded into H
-            logInstructionDetails(instructionDetails: "LD H,B", opcode: [0x60], programCounter: registers.PC)
-            registers.H = registers.B
+				<string>    {
+        let opcode1 = mmu.readByte(address: registers.PC)
+        let opcode2 = mmu.readByte(address: registers.PC &amp;+ 1)
 </string>
 			</dict>
 			<key>type</key>
@@ -142,15 +143,15 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>13</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>680</string>
+					<string>6129</string>
 					<key>StartingColumnNumber</key>
-					<string>9</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>680</string>
+					<string>6128</string>
 					<key>Timestamp</key>
-					<string>799483674.833757</string>
+					<string>799671320.028229</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -159,22 +160,246 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 					<key>payload</key>
 					<dict>
 						<key>relative-path</key>
-						<string>NovatoTests/NovatoTests.swift</string>
+						<string>Novato/Model/Microbee.swift</string>
 					</dict>
 				</dict>
 			</dict>
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>Test</string>
+				<string>    private func executeFDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+</string>
 				<key>leading</key>
-				<string>        }
+				<string>    }
         
-        @</string>
+</string>
 				<key>trailing</key>
-				<string>("Validate LD A,B (0x78)",  arguments: loadJsonTests(named: "78").prefix(testCycles))
-        func test_LD_A_B(testCase: Z80Test) async throws
+				<string>    {
+        switch opcode2
         {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>5230</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>5229</string>
+					<key>Timestamp</key>
+					<string>799671320.0282</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeFDCBInstructions(opcode3: UInt8, opcode4: UInt8)
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        switch opcode4 // FD CB opcodes
+        {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>4166</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>4165</string>
+					<key>Timestamp</key>
+					<string>799658959.9548939</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeEDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+</string>
+				<key>leading</key>
+				<string>    }
+     
+</string>
+				<key>trailing</key>
+				<string>    {
+       switch opcode2
+       {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>3266</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>3265</string>
+					<key>Timestamp</key>
+					<string>799657087.304189</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeDDCBInstructions(opcode3 : UInt8, opcode4: UInt8)
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        switch opcode4
+        {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>38</string>
+					<key>EndingLineNumber</key>
+					<string>2925</string>
+					<key>StartingColumnNumber</key>
+					<string>17</string>
+					<key>StartingLineNumber</key>
+					<string>2925</string>
+					<key>Timestamp</key>
+					<string>799654293.957497</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>executeDDInstructions</string>
+				<key>leading</key>
+				<string>    }
+    
+    private func </string>
+				<key>trailing</key>
+				<string>(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+    {
+        switch opcode2
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>16</string>
+					<key>EndingLineNumber</key>
+					<string>1079</string>
+					<key>StartingColumnNumber</key>
+					<string>12</string>
+					<key>StartingLineNumber</key>
+					<string>1079</string>
+					<key>Timestamp</key>
+					<string>799654349.6247129</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>func</string>
+				<key>leading</key>
+				<string>    }
+    
+    private </string>
+				<key>trailing</key>
+				<string> executeCBInstructions(opcode2: UInt8)
+    {
+        switch opcode2
 </string>
 			</dict>
 			<key>type</key>

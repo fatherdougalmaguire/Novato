@@ -623,6 +623,9 @@ actor microbee
         return afterTest
     }
     
+   // func loadPorts(port)
+   // }
+    
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
     {
         breakpoints[index] = value
@@ -2292,7 +2295,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x87: // RES 0,A - CB 87 - Resets bit 0 of A
             logInstructionDetails(instructionDetails: "RES 0,A", opcode: [0xCB,0x87], programCounter: registers.PC)
-            registers.A = registers.A & 0b11111101
+            registers.A = registers.A & 0b11111110
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x88: // RES 1,B - CB 88 - Resets bit 1 of B
@@ -2696,7 +2699,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xD6: // SET 2,(HL) - CB D6 - Sets bit 2 of (HL)
             logInstructionDetails(instructionDetails: "SET 2,(HL)", opcode: [0xCB,0xD6], programCounter: registers.PC)
-            let tempResult = mmu.readByte(address: registers.HL) | 0b00000001
+            let tempResult = mmu.readByte(address: registers.HL) | 0b00000100
             mmu.writeByte(address: registers.HL, value: tempResult)
             tStates = tStates + 15
             incrementR(opcodeCount:2)
@@ -2920,9 +2923,9 @@ actor microbee
         registers.PC = registers.PC &+ 2
     }
     
-    private func executeDDInstructions(opcode3: UInt8, opcode4: UInt8)
+    private func executeDDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
     {
-        switch opcode3
+        switch opcode2
         {
         case 0x09: // ADD IX,BC - DD 09 - The value of BC is added to IX
            logInstructionDetails(instructionDetails: "ADD IX,BC", opcode: [0xDD,0x09], programCounter: registers.PC)
@@ -2959,23 +2962,24 @@ actor microbee
         case 0x22: // LD ($nn),IX - DD 22 n n - Loads $nn into register IX
            logInstructionDetails(instructionDetails: "LD ($nn),IX", opcode: [0xDD,0x22], values: [opcode3,opcode4], programCounter: registers.PC)
            let tempResult =  UInt16(opcode4) << 8 | UInt16(opcode3)
-           mmu.writeByte(address: tempResult, value: UInt8(registers.IX & 0x00FF))
-           mmu.writeByte(address: tempResult &+ 1, value: UInt8(registers.IX >> 8))
+           registers.WZ = tempResult &+ 1
+           mmu.writeByte(address: tempResult, value: registers.IXL)
+           mmu.writeByte(address: tempResult &+ 1, value: registers.IXH)
            registers.PC = registers.PC &+ 4
            tStates = tStates + 20
            incrementR(opcodeCount:2)
         case 0x23: // INC IX - DD 23 - Adds one to IX
            logInstructionDetails(instructionDetails: "INC IX", opcode: [0xDD,0x23], programCounter: registers.PC)
-           registers.PC = registers.IX &+ 1
+           registers.IX = registers.IX &+ 1
            registers.PC = registers.PC &+ 2
            tStates = tStates + 10
            incrementR(opcodeCount:2)
         case 0x2A: // LD IX,($nn) - DD 2A n n - Loads the value pointed to by $nn into IX
            logInstructionDetails(instructionDetails: "LD IX,($nn)", opcode: [0xDD,0x2A], values: [opcode3,opcode4], programCounter: registers.PC)
            let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
-           let tempResultIXH = mmu.readByte(address: tempResult)
-           let tempResultIXL = mmu.readByte(address: tempResult &+ 1)
-           registers.IX = UInt16(tempResultIXH << 8) | UInt16(tempResultIXL)
+           registers.IXL = mmu.readByte(address: tempResult)
+           registers.IXH = mmu.readByte(address: tempResult &+ 1)
+           registers.WZ = tempResult &+ 1
            registers.PC = registers.PC &+ 4
            tStates = tStates + 20
            incrementR(opcodeCount:2)
@@ -3019,6 +3023,7 @@ actor microbee
         case 0x36: // LD (IX+$d),$n - DD 36 d n - Stores $n to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),$n", opcode: [0xDD,0x36], values: [opcode3,opcode4], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: opcode4)
            registers.PC = registers.PC &+ 4
            tStates = tStates + 19
@@ -3039,20 +3044,15 @@ actor microbee
        case 0x46: // LD B,(IX+$d) - DD 46 d - Loads the value pointed to by IX plus $d into B
            logInstructionDetails(instructionDetails: "LD B,(IX+$d)", opcode: [0xDD,0x46], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.B = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
            incrementR(opcodeCount:2)
-       case 0x4A: // ADC HL,BC - ED 4A - Adds BC and the carry flag to HL
-           logInstructionDetails(instructionDetails: "ADC HL,BC", opcode: [0xED,0x4A], programCounter: registers.PC)
-           let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
-           (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.BC,currentFlags: registers.F, addCarry: addCarry)
-           registers.PC = registers.PC &+ 2
-           tStates = tStates + 15
-           incrementR(opcodeCount:2)
        case 0x4E: // LD C,(IX+$d) - DD 4E d - Loads the value pointed to by IX plus $d into B
            logInstructionDetails(instructionDetails: "LD C,(IX+$d)", opcode: [0xDD,0x4E], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.C = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3060,6 +3060,7 @@ actor microbee
        case 0x56: // LD D,(IX+$d) - DD 56 d - Loads the value pointed to by IX plus $d into D
            logInstructionDetails(instructionDetails: "LD D,(IX+$d)", opcode: [0xDD,0x46], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.D = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3067,6 +3068,7 @@ actor microbee
        case 0x5E: // LD E,(IX+$d) - DD 5E d - Loads the value pointed to by IX plus $d into E
            logInstructionDetails(instructionDetails: "LD E,(IX+$d)", opcode: [0xDD,0x5E], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.E = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3074,61 +3076,23 @@ actor microbee
        case 0x66: // LD H,(IX+$d) - DD 66 d - Loads the value pointed to by IX plus $d into H
            logInstructionDetails(instructionDetails: "LD H,(IX+$d)", opcode: [0xDD,0x66], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.H = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
            incrementR(opcodeCount:2)
-       case 0x67: // RRD - ED 67 - The contents of the low-order nibble of (HL) are copied to the low-order nibble of A. The previous contents are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of (HL)
-           logInstructionDetails(instructionDetails: "RRD", opcode: [0xED,0x67], programCounter: registers.PC)
-           let carry = registers.F | z80Flags.Carry.rawValue
-           let contentsHL = mmu.readByte(address: registers.HL)
-           let upperHL = contentsHL >> 4
-           let lowerHL = contentsHL & 0b00001111
-           let lowerA = registers.A & 0b00001111
-           let newContentsHL = (lowerA << 4) | upperHL
-           let tempResultA = ( registers.A & 0b11110000 ) | lowerHL
-           (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResultA)
-           mmu.writeByte(address: registers.HL, value: newContentsHL)
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
-           registers.F = registers.F | carry
-           registers.PC = registers.PC &+ 2
-           tStates = tStates + 18
-           incrementR(opcodeCount:2)
-       case 0x6A: // ADC HL,HL - ED 6A - Adds HL and the carry flag to HL
-           logInstructionDetails(instructionDetails: "ADC HL,HL", opcode: [0xED,0x6A], programCounter: registers.PC)
-           let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
-           (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.HL,currentFlags: registers.F, addCarry: addCarry)
-           registers.PC = registers.PC &+ 2
-           tStates = tStates + 15
-           incrementR(opcodeCount:2)
        case 0x6E: // LD L,(IX+$d) - DD 6E d - Loads the value pointed to by IX plus $d into L
            logInstructionDetails(instructionDetails: "LD L,(IX+$d)", opcode: [0xDD,0x6E], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.L = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
            incrementR(opcodeCount:2)
-       case 0x6F: // RLD - ED 6F - The contents of the low-order nibble of (HL) are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of A. The previous contents are copied to the low-order nibble of (HL)
-           logInstructionDetails(instructionDetails: "RLD", opcode: [0xED,0x6F], programCounter: registers.PC)
-           let carry = registers.F | z80Flags.Carry.rawValue
-           let contentsHL = mmu.readByte(address: registers.HL)
-           let upperHL = contentsHL >> 4
-           let lowerHL = contentsHL & 0b00001111
-           let lowerA = registers.A & 0b00001111
-           let newContentsHL = (lowerHL << 4) | lowerA
-           let tempResultA = ( registers.A & 0b11110000 ) | upperHL
-           (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResultA)
-           mmu.writeByte(address: registers.HL, value: newContentsHL)
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
-           registers.F = registers.F | carry
-           registers.PC = registers.PC &+ 2
-           tStates = tStates + 18
-           incrementR(opcodeCount:2)
        case 0x70: // LD (IX+$d),B - DD 70 d - Stores B to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),B", opcode: [0xDD,0x70], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.B)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3136,6 +3100,7 @@ actor microbee
        case 0x71: // LD (IX+$d),C - DD 71 d - Stores C to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),C", opcode: [0xDD,0x71], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.C)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3143,6 +3108,7 @@ actor microbee
        case 0x72: // LD (IX+$d),D - DD 72 d - Stores D to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),D", opcode: [0xDD,0x72], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.D)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3150,6 +3116,7 @@ actor microbee
        case 0x73: // LD (IX+$d),E - DD 73 d - Stores E to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),E", opcode: [0xDD,0x73], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.E)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3157,6 +3124,7 @@ actor microbee
        case 0x74: // LD (IX+$d),H - DD 74 d - Stores H to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),H", opcode: [0xDD,0x74], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.H)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3164,6 +3132,7 @@ actor microbee
        case 0x75: // LD (IX+$d),L - DD 75 d - Stores L to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),L", opcode: [0xDD,0x36], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.L)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3171,20 +3140,15 @@ actor microbee
        case 0x77: // LD (IX+$d),A - DD 77 d - Stores A to the memory location pointed to by IX plus $d
            logInstructionDetails(instructionDetails: "LD (IX+$d),A", opcode: [0xDD,0x77], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            mmu.writeByte(address: tempResult, value: registers.A)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
            incrementR(opcodeCount:2)
-       case 0x7A: // ADC HL,SP - ED 7A - Adds SP and the carry flag to HL
-           logInstructionDetails(instructionDetails: "ADC HL,SP", opcode: [0xED,0x7A], programCounter: registers.PC)
-           let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
-           (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.SP,currentFlags: registers.F, addCarry: addCarry)
-           registers.PC = registers.PC &+ 2
-           tStates = tStates + 15
-           incrementR(opcodeCount:2)
        case 0x7E: // LD A,(IX+$d) - DD 7E d - Loads the value pointed to by IX plus $d into A
            logInstructionDetails(instructionDetails: "LD A,(IX+$d)", opcode: [0xDD,0x7E], values: [opcode3], programCounter: registers.PC)
            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+           registers.WZ = tempResult
            registers.A = mmu.readByte(address: tempResult)
            registers.PC = registers.PC &+ 3
            tStates = tStates + 19
@@ -3263,9 +3227,10 @@ actor microbee
             logInstructionDetails(instructionDetails: "EX (SP),IX", opcode: [0xDD,0xE3], programCounter: registers.PC)
             let tempSPCL = mmu.readByte(address: registers.SP)
             let tempSPCH = mmu.readByte(address: registers.SP &+ 1)
-            mmu.writeByte(address: registers.SP, value: UInt8(registers.IX >> 8))
-            mmu.writeByte(address: registers.SP &+ 1, value: UInt8(registers.IX & 0xFF))
+            mmu.writeByte(address: registers.SP, value: registers.IXL)
+            mmu.writeByte(address: registers.SP &+ 1, value: registers.IXH)
             registers.IX = UInt16(tempSPCH) << 8 | UInt16(tempSPCL)
+            registers.WZ = registers.IX
             registers.PC = registers.PC &+ 2
             tStates = tStates + 23
             incrementR(opcodeCount:2)
@@ -3316,7 +3281,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x0E: // RRC (IX+$d) - DD CB d 0E - The contents of (IX+$d) are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
             logInstructionDetails(instructionDetails: "RRC (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x0E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3346,7 +3311,7 @@ actor microbee
             registers.F = registers.F | newcarry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x1E: // RR (IX+$d) - DD CB d 1E - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
             logInstructionDetails(instructionDetails: "RR (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x1E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3361,7 +3326,7 @@ actor microbee
             registers.F = registers.F | newcarry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x26: // SLA (IX+$d) - DD CB d 26 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x26], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3375,7 +3340,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x2E: // SRA (IX+$d) - DD CB d 2E - The contents of (IX+$d) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
             logInstructionDetails(instructionDetails: "SRA (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x2E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3390,7 +3355,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x3E: // SRL SRL (IX+$d) - DD CB d 3E - The contents of SRL (IX+$d) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
             logInstructionDetails(instructionDetails: "SRL (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x3E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3404,7 +3369,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x40: // BIT 0,(IX+$d) - DD CB $d 40 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x40], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3414,7 +3379,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x41: // BIT 0,(IX+$d) - DD CB $d 41 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x41], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3424,7 +3389,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x42: // BIT 0,(IX+$d) - DD CB $d 42 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x42], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3434,7 +3399,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x43: // BIT 0,(IX+$d) - DD CB $d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x43], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3444,7 +3409,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x44: // BIT 0,(IX+$d) - DD CB $d 44 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x44], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3454,7 +3419,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x45: // BIT 0,(IX+$d) - DD CB $d 45 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x45], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3464,7 +3429,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x46: // BIT 0,(IX+$d) - DD CB $d 46 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x46], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3474,7 +3439,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x47: // BIT 0,(IX+$d) - DD CB $d 47 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x47], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3484,7 +3449,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x48: // BIT 1,(IX+$d) - DD CB $d 48 - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x48], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3494,7 +3459,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x49: // BIT 1,(IX+$d) - DD CB $d 49 - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x49], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3504,7 +3469,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4A: // BIT 1,(IX+$d) - DD CB $d 4A - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3514,7 +3479,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4B: // BIT 1,(IX+$d) - DD CB $d 4B - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3524,7 +3489,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4C: // BIT 1,(IX+$d) - DD CB $d 4C - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3534,7 +3499,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4D: // BIT 1,(IX+$d) - DD CB $d 4D - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3544,7 +3509,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4E: // BIT 1,(IX+$d) - DD CB $d 4E - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3554,7 +3519,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4F: // BIT 1,(IX+$d) - DD CB $d 4F - Tests bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3564,7 +3529,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x50: // BIT 2,(IX+$d) - DD CB $d 50 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x50], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3574,7 +3539,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x51: // BIT 2,(IX+$d) - DD CB $d 51 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x51], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3584,7 +3549,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x52: // BIT 2,(IX+$d) - DD CB $d 52 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x52], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3594,7 +3559,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x53: // BIT 2,(IX+$d) - DD CB $d 53 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x53], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3604,7 +3569,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x54: // BIT 2,(IX+$d) - DD CB $d 54 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x54], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3614,7 +3579,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x55: // BIT 2,(IX+$d) - DD CB $d 55 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x55], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3624,7 +3589,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x56: // BIT 2,(IX+$d) - DD CB $d 56 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x56], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3634,7 +3599,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x57: // BIT 2,(IX+$d) - DD CB $d 57 - Tests bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x57], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3644,7 +3609,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x58: // BIT 3,(IX+$d) - DD CB $d 58 - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x58], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3654,7 +3619,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x59: // BIT 3,(IX+$d) - DD CB $d 59 - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x59], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3664,7 +3629,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5A: // BIT 3,(IX+$d) - DD CB $d 5A - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3674,7 +3639,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5B: // BIT 3,(IX+$d) - DD CB $d 5B - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3684,7 +3649,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5C: // BIT 3,(IX+$d) - DD CB $d 5C - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3694,7 +3659,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5D: // BIT 3,(IX+$d) - DD CB $d 5D - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3704,7 +3669,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5E: // BIT 3,(IX+$d) - DD CB $d 5E - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3714,7 +3679,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5F: // BIT 3,(IX+$d) - DD CB $d 5F - Tests bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3724,7 +3689,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x60: // BIT 4,(IX+$d) - DD CB $d 60 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x60], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3734,7 +3699,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x61: // BIT 4,(IX+$d) - DD CB $d 61 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x61], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3744,7 +3709,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x62: // BIT 4,(IX+$d) - DD CB $d 62 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x62], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3754,7 +3719,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x63: // BIT 4,(IX+$d) - DD CB $d 63 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x63], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3764,7 +3729,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x64: // BIT 4,(IX+$d) - DD CB $d 64 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x64], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3774,7 +3739,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x65: // BIT 4,(IX+$d) - DD CB $d 65 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x65], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3784,7 +3749,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x66: // BIT 4,(IX+$d) - DD CB $d 66 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x66], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3794,7 +3759,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x67: // BIT 4,(IX+$d) - DD CB $d 67 - Tests bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x67], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3804,7 +3769,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x68: // BIT 5,(IX+$d) - DD CB $d 68 - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x68], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3814,7 +3779,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x69: // BIT 5,(IX+$d) - DD CB $d 69 - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x69], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3824,7 +3789,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6A: // BIT 5,(IX+$d) - DD CB $d 6A - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3834,7 +3799,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6B: // BIT 5,(IX+$d) - DD CB $d 6B - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3844,7 +3809,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6C: // BIT 5,(IX+$d) - DD CB $d 6C - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3854,7 +3819,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6D: // BIT 5,(IX+$d) - DD CB $d 6D - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3864,7 +3829,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6E: // BIT 5,(IX+$d) - DD CB $d 6E - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3874,7 +3839,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6F: // BIT 5,(IX+$d) - DD CB $d 6F - Tests bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3884,7 +3849,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x70: // BIT 6,(IX+$d) - DD CB $d 70 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x70], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3894,7 +3859,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x71: // BIT 6,(IX+$d) - DD CB $d 71 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x71], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3904,7 +3869,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x72: // BIT 6,(IX+$d) - DD CB $d 72 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x72], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3914,7 +3879,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x73: // BIT 6,(IX+$d) - DD CB $d 73 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x73], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3924,7 +3889,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x74: // BIT 6,(IX+$d) - DD CB $d 74 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x74], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3934,7 +3899,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x75: // BIT 6,(IX+$d) - DD CB $d 75 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x75], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3944,7 +3909,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x76: // BIT 6,(IX+$d) - DD CB $d 76 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x76], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3954,7 +3919,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x77: // BIT 6,(IX+$d) - DD CB $d 77 - Tests bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x77], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3974,7 +3939,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x79: // BIT 7,(IX+$d) - DD CB $d 79 - Tests bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x79], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3984,7 +3949,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7A: // BIT 7,(IX+$d) - DD CB $d 7A - Tests bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -3994,7 +3959,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7B: // BIT 7,(IX+$d) - DD CB $d 7B - Tests bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4004,7 +3969,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7C: // BIT 7,(IX+$d) - DD CB $d 7C - Tests bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4014,7 +3979,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7D: // BIT 7,(IX+$d) - DD CB $d 7D - Tests bit 7 of the memory location pointed to by IX plus $d L
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4024,7 +3989,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7E: // BIT 7,(IX+$d) - DD CB $d 7E - Tests bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4034,7 +3999,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7F: // BIT 7,(IX+$d) - DD CB $d 7F - Tests bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4044,140 +4009,156 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x86: // RES 0,(IX+$d) - DD CB d 86 - Resets bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x86], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11111110
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x8E: // RES 1,(IX+$d) - DD CB d 8E - Resets bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x8E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11111101
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x96: // RES 2,(IX+$d) - DD CB d 96 - Resets bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x96], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11111011
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x9E: // RES 3,(IX+$d) - DD CB d 9E - Resets bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x9E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11110111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xA6: // RES 4,(IX+$d) - DD CB d A6 - Resets bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xA6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11101111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xAE: // RES 5,(IX+$d) - DD CB d AE - Resets bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xAE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11011111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xB6: // RES 6,(IX+$d) - DD CB d B6 - Resets bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xB6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b10111111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xBE: // RES 7,(IX+$d) - DD CB d BE - Resets bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xBE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b01111111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xC6: // SET 0,(IX+$d) - DD CB d C6 - Sets bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xC6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00000001
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xCE: // SET 1,(IX+$d) - DD CB d CE - Sets bit 1 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xCE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00000010
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xD6: // SET 2,(IX+$d) - DD CB d D6 - Sets bit 2 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xD6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00000100
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xDE: // SET 3,(IX+$d) - DD CB d DE - Sets bit 3 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xDE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00001000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xE6: // SET 4,(IX+$d) - DD CB d E6 - Sets bit 4 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xE6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00010000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xEE: // SET 5,(IX+$d) - DD CB d EE - Sets bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xEE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00100000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xF6: // SET 6,(IX+$d) - DD CB d F6 - Sets bit 6 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xF6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b01000000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xFE: // SET 7,(IX+$d) - DD CB d FE - Sets bit 7 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0xFE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b10000000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         default:
             logInstructionDetails(opcode: [0xDD,0xCB,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
             tStates = tStates + 8
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
             // Assuming this is correct behaviour - confirm what decodes in missing ranges in real z80
         }
     }
@@ -4269,8 +4250,9 @@ actor microbee
        case 0x43: // LD ($nn),BC - ED 43 n n - Stores BC into the memory location pointed to by $nn
            logInstructionDetails(instructionDetails: "LD ($nn),BC", opcode: [0xED,0x43], values: [opcode3, opcode4], programCounter: registers.PC)
            let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
-           mmu.writeByte(address: tempResult, value: UInt8(registers.BC & 0x00FF))
-           mmu.writeByte(address: tempResult &+ 1, value: UInt8(registers.BC >> 8))
+           mmu.writeByte(address: tempResult, value: registers.C)
+           mmu.writeByte(address: tempResult &+ 1, value: registers.B)
+           registers.WZ = tempResult &+ 1
            registers.PC = registers.PC &+ 4
            tStates = tStates + 20
            incrementR(opcodeCount:2)
@@ -4287,6 +4269,7 @@ actor microbee
            registers.SP = registers.SP &+ 1
            registers.PCH = mmu.readByte(address: registers.SP)
            registers.SP = registers.SP &+ 1
+           registers.WZ = registers.PC
            tStates = tStates + 14
            incrementR(opcodeCount:2)
        case 0x46: // IM 0 - ED 46 - Sets interrupt mode 0
@@ -4375,12 +4358,20 @@ actor microbee
            registers.PC = registers.PC &+ 2
            tStates = tStates + 12
            incrementR(opcodeCount:2)
+       case 0x4A: // ADC HL,BC - ED 4A - Adds BC and the carry flag to HL
+           logInstructionDetails(instructionDetails: "ADC HL,BC", opcode: [0xED,0x4A], programCounter: registers.PC)
+           let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
+           (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.BC,currentFlags: registers.F, addCarry: addCarry)
+           registers.PC = registers.PC &+ 2
+           tStates = tStates + 15
+           incrementR(opcodeCount:2)
        case 0x4B: // LD BC,($nn) - ED 4B n n - Loads the value pointed to by $nn into BC
            logInstructionDetails(instructionDetails: "LD BC,($nn)", opcode: [0xED,0x4B], values: [opcode3,opcode4], programCounter: registers.PC)
            let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
            registers.C = mmu.readByte(address: tempResult)
            registers.B = mmu.readByte(address: tempResult &+ 1)
            registers.PC = registers.PC &+ 4
+           registers.WZ = tempResult &+ 1
            tStates = tStates + 20
            incrementR(opcodeCount:2)
        case 0x4D: // RETI - ED 4D - Used at the end of a maskable interrupt service routine. The top stack entry is popped into PC, and signals an I/O device that the interrupt has finished, allowing nested interrupts (not a consideration on the TI)
@@ -4389,6 +4380,7 @@ actor microbee
            registers.SP = registers.SP &+ 1
            registers.PCH = mmu.readByte(address: registers.SP)
            registers.SP = registers.SP &+ 1
+           registers.WZ = registers.PC
            tStates = tStates + 14
            incrementR(opcodeCount:2)
        case 0x4F: // LD R,A - ED 4F - Stores the value of A into register R
@@ -4396,7 +4388,6 @@ actor microbee
            registers.R = registers.A
            registers.PC = registers.PC &+ 2
            tStates = tStates + 9
-           incrementR(opcodeCount:2)
        case 0x50: // IN D,(C) - ED 50 - A byte from port C is written to D
            logInstructionDetails(instructionDetails: "IN D,(C)", opcode: [0xED,0x50], programCounter: registers.PC)
            registers.D = ports[Int(registers.C)]
@@ -4479,15 +4470,16 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x53: // LD ($nn),DE - ED 53 n n - Stores DE into the memory location pointed to by $nn
            logInstructionDetails(instructionDetails: "LD ($nn),DE", opcode: [0xED,0x53], values: [opcode3,opcode4], programCounter: registers.PC)
-           let tempResult = UInt16(opcode4 << 8) | UInt16(opcode3)
+           let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
            mmu.writeByte(address: tempResult, value: registers.E)
            mmu.writeByte(address: tempResult &+ 1, value: registers.D)
+           registers.WZ = tempResult &+ 1
            registers.PC = registers.PC &+ 4
            tStates = tStates + 20
            incrementR(opcodeCount:2)
        case 0x56: // IM 1 - ED 56 - Sets interrupt mode 1
            logInstructionDetails(instructionDetails: "IM 1", opcode: [0xED,0x56], programCounter: registers.PC)
-           registers.I = 1
+           registers.IM = 1
            registers.PC = registers.PC &+ 2
            tStates = tStates + 8
            incrementR(opcodeCount:2)
@@ -4597,11 +4589,12 @@ actor microbee
            registers.E = mmu.readByte(address: tempResult)
            registers.D = mmu.readByte(address: tempResult &+ 1)
            registers.PC = registers.PC &+ 4
+           registers.WZ = tempResult &+ 1
            tStates = tStates + 20
            incrementR(opcodeCount:2)
        case 0x5E: // IM 2 - ED 5E - Sets interrupt mode 2
            logInstructionDetails(instructionDetails: "IM 2", opcode: [0xED,0x5E], programCounter: registers.PC)
-           registers.I = 2
+           registers.IM = 2
            registers.PC = registers.PC &+ 2
            tStates = tStates + 8
            incrementR(opcodeCount:2)
@@ -4705,6 +4698,23 @@ actor microbee
            registers.PC = registers.PC &+ 2
            tStates = tStates + 15
            incrementR(opcodeCount:2)
+       case 0x67: // RRD - ED 67 - The contents of the low-order nibble of (HL) are copied to the low-order nibble of A. The previous contents are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of (HL)
+           logInstructionDetails(instructionDetails: "RRD", opcode: [0xED,0x67], programCounter: registers.PC)
+           let carry = registers.F | z80Flags.Carry.rawValue
+           let contentsHL = mmu.readByte(address: registers.HL)
+           let upperHL = contentsHL >> 4
+           let lowerHL = contentsHL & 0b00001111
+           let lowerA = registers.A & 0b00001111
+           let newContentsHL = (lowerA << 4) | upperHL
+           let tempResultA = ( registers.A & 0b11110000 ) | lowerHL
+           (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResultA)
+           mmu.writeByte(address: registers.HL, value: newContentsHL)
+           registers.F = registers.F & ~z80Flags.Negative.rawValue
+           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+           registers.F = registers.F | carry
+           registers.PC = registers.PC &+ 2
+           tStates = tStates + 18
+           incrementR(opcodeCount:2)
        case 0x68: // IN L,(C) - ED 68 - A byte from port C is written to L
            logInstructionDetails(instructionDetails: "IN L,(C)", opcode: [0xED,0x68], programCounter: registers.PC)
            registers.L = ports[Int(registers.C)]
@@ -4778,6 +4788,30 @@ actor microbee
            registers.PC = registers.PC &+ 2
            tStates = tStates + 12
            incrementR(opcodeCount:2)
+       case 0x6A: // ADC HL,HL - ED 6A - Adds HL and the carry flag to HL
+           logInstructionDetails(instructionDetails: "ADC HL,HL", opcode: [0xED,0x6A], programCounter: registers.PC)
+           let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
+           (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.HL,currentFlags: registers.F, addCarry: addCarry)
+           registers.PC = registers.PC &+ 2
+           tStates = tStates + 15
+           incrementR(opcodeCount:2)
+       case 0x6F: // RLD - ED 6F - The contents of the low-order nibble of (HL) are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of A. The previous contents are copied to the low-order nibble of (HL)
+           logInstructionDetails(instructionDetails: "RLD", opcode: [0xED,0x6F], programCounter: registers.PC)
+           let carry = registers.F | z80Flags.Carry.rawValue
+           let contentsHL = mmu.readByte(address: registers.HL)
+           let upperHL = contentsHL >> 4
+           let lowerHL = contentsHL & 0b00001111
+           let lowerA = registers.A & 0b00001111
+           let newContentsHL = (lowerHL << 4) | lowerA
+           let tempResultA = ( registers.A & 0b11110000 ) | upperHL
+           (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResultA)
+           mmu.writeByte(address: registers.HL, value: newContentsHL)
+           registers.F = registers.F & ~z80Flags.Negative.rawValue
+           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+           registers.F = registers.F | carry
+           registers.PC = registers.PC &+ 2
+           tStates = tStates + 18
+           incrementR(opcodeCount:2)
        case 0x72: // SBC HL,SP - ED 72 - Subtracts SP and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,SP", opcode: [0xED,0x72], programCounter: registers.PC)
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
@@ -4787,9 +4821,10 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x73: // LD ($nn),SP - ED 73 n n - Stores SP into the memory location pointed to by $nn
            logInstructionDetails(instructionDetails: "LD ($nn),SP", opcode: [0xED,0x73], values: [opcode3,opcode4], programCounter: registers.PC)
-           let tempResultAddress = UInt16(opcode4) << 8 | UInt16(opcode3)
-           mmu.writeByte(address: tempResultAddress, value: registers.SPL)
-           mmu.writeByte(address: tempResultAddress &+ 1, value: registers.SPH)
+           let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
+           mmu.writeByte(address: tempResult, value: registers.SPL)
+           mmu.writeByte(address: tempResult &+ 1, value: registers.SPH)
+           registers.WZ = tempResult &+ 1
            registers.PC = registers.PC &+ 4
            tStates = tStates + 20
            incrementR(opcodeCount:2)
@@ -4866,11 +4901,20 @@ actor microbee
            registers.PC = registers.PC &+ 2
            tStates = tStates + 12
            incrementR(opcodeCount:2)
+       case 0x7A: // ADC HL,SP - ED 7A - Adds SP and the carry flag to HL
+           logInstructionDetails(instructionDetails: "ADC HL,SP", opcode: [0xED,0x7A], programCounter: registers.PC)
+           let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
+           (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.SP,currentFlags: registers.F, addCarry: addCarry)
+           registers.PC = registers.PC &+ 2
+           tStates = tStates + 15
+           incrementR(opcodeCount:2)
        case 0x7B: // LD SP,($nn) - ED 7B n n - Loads the value pointed to by $nn into SP
            logInstructionDetails(instructionDetails: "LD SP,($nn)", opcode: [0xED,0x7B], values: [opcode3,opcode4], programCounter: registers.PC)
-           let tempResultAddress = UInt16(opcode4) << 8 | UInt16(opcode3)
-           registers.SP = UInt16(mmu.readByte(address: tempResultAddress &+ 1)) << 8 | UInt16(mmu.readByte(address: tempResultAddress))
+           let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
+           registers.SPL = mmu.readByte(address: tempResult)
+           registers.SPH = mmu.readByte(address: tempResult &+ 1)
            registers.PC = registers.PC &+ 4
+           registers.WZ = tempResult &+ 1
            tStates = tStates + 20
            incrementR(opcodeCount:2)
        case 0xA0: // LDI - ED A0 - Transfers a byte of data from the memory location pointed to by HL to the memory location pointed to by DE. Then HL and DE are incremented and BC is decremented. p/v is reset if BC becomes zero and set otherwise.
@@ -5201,7 +5245,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x0E: // RRC (IY+$d) - FD CB d 0E - The contents of (IY+$d) are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
             logInstructionDetails(instructionDetails: "RRC (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x0E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5231,7 +5275,7 @@ actor microbee
             registers.F = registers.F | newcarry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x1E: // RR (IY+$d) - FD CB d 1E - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
             logInstructionDetails(instructionDetails: "RR (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x1E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5246,7 +5290,7 @@ actor microbee
             registers.F = registers.F | newcarry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x26: // SLA (IY+$d) - FD CB d 26 - The contents of (IY+$d) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
             logInstructionDetails(instructionDetails: "SLA (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x26], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5260,7 +5304,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x2E: // SRA (IY+$d) - FD CB d 2E - The contents of (IY+$d) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
             logInstructionDetails(instructionDetails: "SRA (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x2E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5275,7 +5319,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x3E: // SRL SRL (IY+$d) - FD CB d 3E - The contents of SRL (IY+$d) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
             logInstructionDetails(instructionDetails: "SRL (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x3E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5289,7 +5333,7 @@ actor microbee
             registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x40: // BIT 0,(IY+$d) - FD CB $d 40 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x40], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5299,7 +5343,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x41: // BIT 0,(IY+$d) - FD CB $d 41 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x41], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5309,8 +5353,8 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
-        case 0x42: // BIT 0,(IY+$d) - FD CB $d 42 - Tests bit 0 of the memory location pointed to by IY plus $d
+            incrementR(opcodeCount:2)
+        case 0x42: // BIT 0,(IY+$d) - FD CB d 42 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x42], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 1
@@ -5319,8 +5363,8 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
-        case 0x43: // BIT 0,(IY+$d) - FD CB $d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
+            incrementR(opcodeCount:2)
+        case 0x43: // BIT 0,(IY+$d) - FD CB d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x43], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 1
@@ -5329,8 +5373,8 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
-        case 0x44: // BIT 0,(IY+$d) - FD CB $d 44 - Tests bit 0 of the memory location pointed to by IY plus $d
+            incrementR(opcodeCount:2)
+        case 0x44: // BIT 0,(IY+$d) - FD CB d 44 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x44], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 1
@@ -5339,7 +5383,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x45: // BIT 0,(IY+$d) - FD CB $d 45 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x45], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5349,7 +5393,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x46: // BIT 0,(IY+$d) - FD CB $d 46 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x46], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5359,7 +5403,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x47: // BIT 0,(IY+$d) - FD CB $d 47 - Tests bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x47], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5369,7 +5413,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x48: // BIT 1,(IY+$d) - FD CB $d 48 - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x48], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5379,7 +5423,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x49: // BIT 1,(IY+$d) - FD CB $d 49 - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x49], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5389,7 +5433,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4A: // BIT 1,(IY+$d) - FD CB $d 4A - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5399,7 +5443,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4B: // BIT 1,(IY+$d) - FD CB $d 4B - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5409,7 +5453,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4C: // BIT 1,(IY+$d) - FD CB $d 4C - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5419,7 +5463,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4D: // BIT 1,(IY+$d) - FD CB $d 4D - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5429,7 +5473,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4E: // BIT 1,(IY+$d) - FD CB $d 4E - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5439,7 +5483,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x4F: // BIT 1,(IY+$d) - FD CB $d 4F - Tests bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5449,7 +5493,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x50: // BIT 2,(IY+$d) - FD CB $d 50 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x50], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5459,7 +5503,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x51: // BIT 2,(IY+$d) - FD CB $d 51 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x51], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5469,7 +5513,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x52: // BIT 2,(IY+$d) - FD CB $d 52 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x52], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5479,7 +5523,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x53: // BIT 2,(IY+$d) - FD CB $d 53 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x53], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5489,7 +5533,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x54: // BIT 2,(IY+$d) - FD CB $d 54 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x54], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5499,7 +5543,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x55: // BIT 2,(IY+$d) - FD CB $d 55 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x55], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5509,7 +5553,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x56: // BIT 2,(IY+$d) - FD CB $d 56 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x56], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5519,7 +5563,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x57: // BIT 2,(IY+$d) - FD CB $d 57 - Tests bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x57], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5529,7 +5573,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x58: // BIT 3,(IY+$d) - FD CB $d 58 - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x58], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5539,7 +5583,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x59: // BIT 3,(IY+$d) - FD CB $d 59 - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x59], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5549,7 +5593,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5A: // BIT 3,(IY+$d) - FD CB $d 5A - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5559,7 +5603,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5B: // BIT 3,(IY+$d) - FD CB $d 5B - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5569,7 +5613,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5C: // BIT 3,(IY+$d) - FD CB $d 5C - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5579,7 +5623,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5D: // BIT 3,(IY+$d) - FD CB $d 5D - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5589,7 +5633,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5E: // BIT 3,(IY+$d) - FD CB $d 5E - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5599,7 +5643,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x5F: // BIT 3,(IY+$d) - FD CB $d 5F - Tests bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5609,7 +5653,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x60: // BIT 4,(IY+$d) - FD CB $d 60 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x60], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5619,7 +5663,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x61: // BIT 4,(IY+$d) - FD CB $d 61 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x61], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5629,7 +5673,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x62: // BIT 4,(IY+$d) - FD CB $d 62 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x62], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5639,7 +5683,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x63: // BIT 4,(IY+$d) - FD CB $d 63 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x63], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5649,7 +5693,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x64: // BIT 4,(IY+$d) - FD CB $d 64 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x64], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5659,7 +5703,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x65: // BIT 4,(IY+$d) - FD CB $d 65 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x65], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5669,7 +5713,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x66: // BIT 4,(IY+$d) - FD CB $d 66 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x66], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5679,7 +5723,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x67: // BIT 4,(IY+$d) - FD CB $d 67 - Tests bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x67], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5689,7 +5733,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x68: // BIT 5,(IY+$d) - FD CB $d 68 - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x68], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5699,7 +5743,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x69: // BIT 5,(IY+$d) - FD CB $d 69 - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x69], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5709,7 +5753,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6A: // BIT 5,(IY+$d) - FD CB $d 6A - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5719,7 +5763,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6B: // BIT 5,(IY+$d) - FD CB $d 6B - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5729,7 +5773,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6C: // BIT 5,(IY+$d) - FD CB $d 6C - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5739,7 +5783,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6D: // BIT 5,(IY+$d) - FD CB $d 6D - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5749,7 +5793,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6E: // BIT 5,(IY+$d) - FD CB $d 6E - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5759,7 +5803,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x6F: // BIT 5,(IY+$d) - FD CB $d 6F - Tests bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5769,7 +5813,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x70: // BIT 6,(IY+$d) - FD CB $d 70 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x70], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5779,7 +5823,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x71: // BIT 6,(IY+$d) - FD CB $d 71 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x71], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5789,7 +5833,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x72: // BIT 6,(IY+$d) - FD CB $d 72 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x72], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5799,7 +5843,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x73: // BIT 6,(IY+$d) - FD CB $d 73 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x73], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5809,7 +5853,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x74: // BIT 6,(IY+$d) - FD CB $d 74 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x74], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5819,7 +5863,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x75: // BIT 6,(IY+$d) - FD CB $d 75 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x75], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5829,7 +5873,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x76: // BIT 6,(IY+$d) - FD CB $d 76 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x76], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5839,7 +5883,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x77: // BIT 6,(IY+$d) - FD CB $d 77 - Tests bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x77], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5849,7 +5893,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x78: // BIT 7,(IY+$d) - FD CB $d 78 - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x78], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5859,7 +5903,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x79: // BIT 7,(IY+$d) - FD CB $d 79 - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x79], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5869,7 +5913,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7A: // BIT 7,(IY+$d) - FD CB $d 7A - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5879,7 +5923,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7B: // BIT 7,(IY+$d) - FD CB $d 7B - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5889,7 +5933,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7C: // BIT 7,(IY+$d) - FD CB $d 7C - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5899,7 +5943,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7D: // BIT 7,(IY+$d) - FD CB $d 7D - Tests bit 7 of the memory location pointed to by IY plus $d L
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5909,7 +5953,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7E: // BIT 7,(IY+$d) - FD CB $d 7E - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5919,7 +5963,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x7F: // BIT 7,(IY+$d) - FD CB $d 7F - Tests bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -5929,140 +5973,156 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x86: // RES 0,(IY+$d) - FD CB d 86 - Resets bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x86], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11111110
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x8E: // RES 1,(IY+$d) - FD CB d 8E - Resets bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x8E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11111101
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x96: // RES 2,(IX+$d) - FD CB d 96 - Resets bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x96], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11111011
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0x9E: // RES 3,(IX+$d) - FD CB d 9E - Resets bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x9E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11110111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xA6: // RES 4,(IY+$d) - FD CB d A6 - Resets bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xA6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11101111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xAE: // RES 5,(IY+$d) - FD CB d AE - Resets bit 5 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xAE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b11011111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xB6: // RES 6,(IY+$d) - FD CB d B6 - Resets bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xB6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b10111111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xBE: // RES 7,(IY+$d) - FD CB d BE - Resets bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d)", opcode: [0xFD,0xDB,opcode3,0xBE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) & 0b01111111
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xC6: // SET 0,(IY+$d) - FD CB d C6 - Sets bit 0 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xC6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00000001
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xCE: // SET 1,(IY+$d) - FD CB d CE - Sets bit 1 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xCE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00000010
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xD6: // SET 2,(IY+$d) - FD CB d D6 - Sets bit 2 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xD6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00000100
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xDE: // SET 3,(IY+$d) - FD CB d DE - Sets bit 3 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xDE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00001000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xE6: // SET 4,(IY+$d) - FD CB d E6 - Sets bit 4 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xE6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00010000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xEE: // SET 5,(IY+$d) - FD CB d EE - Sets bit 5 of the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xEE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b00100000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xF6: // SET 6,(IY+$d) - FD CB d F6 - Sets bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xF6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b01000000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         case 0xFE: // SET 7,(IY+$d) - FD CB d FE - Sets bit 7 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xFE], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = mmu.readByte(address: tempResultAddress) | 0b10000000
             mmu.writeByte(address: tempResultAddress, value: tempResult)
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             tStates = tStates + 23
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         default:
             logInstructionDetails(opcode: [0xFD,0xCB,opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 3
             tStates = tStates + 8
-            incrementR(opcodeCount:3)
+            incrementR(opcodeCount:2)
         }
     }
         
@@ -6105,14 +6165,15 @@ actor microbee
         case 0x22: // LD ($nn),IY - FD 22 n n - Stores IY into the memory location pointed to by $nn
             logInstructionDetails(instructionDetails: "LD ($nn),IY", opcode: [0xFD,0x22], values: [opcode3,opcode4], programCounter: registers.PC)
             let tempResult =  UInt16(opcode4) << 8 | UInt16(opcode3)
-            mmu.writeByte(address: tempResult, value: UInt8(registers.IY & 0x00FF))
-            mmu.writeByte(address: tempResult &+ 1, value: UInt8(registers.IY >> 8))
+            mmu.writeByte(address: tempResult, value: registers.IYL)
+            mmu.writeByte(address: tempResult &+ 1, value: registers.IYH)
+            registers.WZ = tempResult &+ 1
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
             incrementR(opcodeCount:2)
         case 0x23: // INC IY - FD 23 - Adds one to IY
             logInstructionDetails(instructionDetails: "INC IY", opcode: [0xFD,0x23], programCounter: registers.PC)
-            registers.PC = registers.IY &+ 1
+            registers.IY = registers.IY &+ 1
             registers.PC = registers.PC &+ 2
             tStates = tStates + 10
             incrementR(opcodeCount:2)
@@ -6132,9 +6193,9 @@ actor microbee
         case 0x2A: // LD IY,($nn) - FD 2A n n - Loads the value pointed to by $nn into IY
             logInstructionDetails(instructionDetails: "LD IY,($nn)", opcode: [0xFD,0x2A], values: [opcode3,opcode4], programCounter: registers.PC)
             let tempResult = UInt16(opcode4) << 8 | UInt16(opcode3)
-            let tempResultIYH = mmu.readByte(address: tempResult)
-            let tempResultIYL = mmu.readByte(address: tempResult &+ 1)
-            registers.IY = UInt16(tempResultIYH << 8) | UInt16(tempResultIYL)
+            registers.IYL = mmu.readByte(address: tempResult)
+            registers.IYH = mmu.readByte(address: tempResult &+ 1)
+            registers.WZ = tempResult &+ 1
             registers.PC = registers.PC &+ 4
             tStates = tStates + 20
             incrementR(opcodeCount:2)
@@ -6162,10 +6223,11 @@ actor microbee
             registers.PC = registers.PC &+ 3
             tStates = tStates + 23
             incrementR(opcodeCount:2)
-        case 0x36: // LD (IY+$d),$n - FD 36 n n - Stores $n to the memory location pointed to by IY plus $d
+        case 0x36: // LD (IY+$d),$n - FD 36 d n - Stores $n to the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "LD (IY+$d),$n", opcode: [0xFD,0x36], values: [opcode3,opcode4], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: opcode4)
+            registers.WZ = tempResult
             registers.PC = registers.PC &+ 4
             tStates = tStates + 19
             incrementR(opcodeCount:2)
@@ -6182,102 +6244,116 @@ actor microbee
             registers.PC = registers.PC &+ 2
             tStates = tStates + 15
             incrementR(opcodeCount:2)
-        case 0x46: // LD B,(IY+$d) - FD 46 n n - Loads the value pointed to by IY plus $d into B
+        case 0x46: // LD B,(IY+$d) - FD 46 d - Loads the value pointed to by IY plus $d into B
             logInstructionDetails(instructionDetails: "LD B,(IY+$d)", opcode: [0xFD,0x46], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.B = mmu.readByte(address: tempResult)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x4E: // LD C,(IY+$d) - FD 4E n n - Loads the value pointed to by IY plus $d into C
+        case 0x4E: // LD C,(IY+$d) - FD 4E d - Loads the value pointed to by IY plus $d into C
             logInstructionDetails(instructionDetails: "LD C,(IY+$d)", opcode: [0xFD,0x4E], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.C = mmu.readByte(address: tempResult)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x56: // LD D,(IY+$d) - FD 56 n n - Loads the value pointed to by IY plus $d into D
+        case 0x56: // LD D,(IY+$d) - FD 56 d - Loads the value pointed to by IY plus $d into D
             logInstructionDetails(instructionDetails: "LD D,(IY+$d)", opcode: [0xFD,0x46], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.D = mmu.readByte(address: tempResult)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x5E: // LD E,(IY+$d)- FD 5E n n - Loads the value pointed to by IY plus $d into E
+        case 0x5E: // LD E,(IY+$d)- FD 5E d - Loads the value pointed to by IY plus $d into E
             logInstructionDetails(instructionDetails: "LD E,(IY+$d)", opcode: [0xFD,0x5E], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.E = mmu.readByte(address: tempResult)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x66: // LD H,(IY+$d) - FD 66 n n - Loads the value pointed to by IY plus $d into H
+        case 0x66: // LD H,(IY+$d) - FD 66 d - Loads the value pointed to by IY plus $d into H
             logInstructionDetails(instructionDetails: "LD H,(IY+$d)", opcode: [0xFD,0x66], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.H = mmu.readByte(address: tempResult)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x6E: // LD L,(IY+$d) - FD 6E n n - Loads the value pointed to by IY plus $d into L
+        case 0x6E: // LD L,(IY+$d) - FD 6E d - Loads the value pointed to by IY plus $d into L
             logInstructionDetails(instructionDetails: "LD L,(IY+$d)", opcode: [0xFD,0x6E], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.L = mmu.readByte(address: tempResult)
+            registers.WZ = tempResult
             registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x70: // LD (IY+$d),B - FD 70 n n - Stores B to the memory location pointed to by IY plus $
+        case 0x70: // LD (IY+$d),B - FD 70 d - Stores B to the memory location pointed to by IY plus $
             logInstructionDetails(instructionDetails: "LD (IY+$d),B", opcode: [0xFD,0x70], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: registers.B)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x71: // LD (IY+$d),C - FD 71 n n - Stores C to the memory location pointed to by IY plus $d
+        case 0x71: // LD (IY+$d),C - FD 71 d - Stores C to the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "LD (IY+$d),C", opcode: [0xFD,0x71], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: registers.C)
+            registers.WZ = tempResult
             registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x72: // LD (IY+$d),D - FD 72 n n - Stores D to the memory location pointed to by IY plus $d
+        case 0x72: // LD (IY+$d),D - FD 72 d - Stores D to the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "LD (IY+$d),D", opcode: [0xFD,0x72], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: registers.D)
+            registers.WZ = tempResult
             registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x73: // LD (IY+$d),E - FD 73 n n - Stores E to the memory location pointed to by IY plus $d
+        case 0x73: // LD (IY+$d),E - FD 73 d - Stores E to the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "LD (IY+$d),E", opcode: [0xFD,0x73], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: registers.E)
-            registers.PC = registers.PC &+ 4
-            tStates = tStates + 19
-            incrementR(opcodeCount:2)
-        case 0x74: // LD (IY+$d),H - FD 74 n n - Stores H to the memory location pointed to by IY plus $d
-            logInstructionDetails(instructionDetails: "LD (IY+$d),H", opcode: [0xFD,0x74], values: [opcode3], programCounter: registers.PC)
-            let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-            mmu.writeByte(address: tempResult, value: registers.H)
+            registers.WZ = tempResult
             registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x75: // LD (IY+$d),L - FD 75 n n - Stores L to the memory location pointed to by IY plus $d
+        case 0x74: // LD (IY+$d),H - FD 74 d - Stores H to the memory location pointed to by IY plus $d
+            logInstructionDetails(instructionDetails: "LD (IY+$d),H", opcode: [0xFD,0x74], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            mmu.writeByte(address: tempResult, value: registers.H)
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
+            tStates = tStates + 19
+            incrementR(opcodeCount:2)
+        case 0x75: // LD (IY+$d),L - FD 75 d - Stores L to the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "LD (IY+$d),L", opcode: [0xFD,0x36], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: registers.L)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x77: // LD (IY+$d),A - FD 77 n n - Stores A to the memory location pointed to by IY plus $d
+        case 0x77: // LD (IY+$d),A - FD 77 d - Stores A to the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "LD (IY+$d),A", opcode: [0xFD,0x77], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             mmu.writeByte(address: tempResult, value: registers.A)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
-        case 0x7E: // LD A,(IY+$d) - FD 7E n n - Loads the value pointed to by IY plus $d into A
+        case 0x7E: // LD A,(IY+$d) - FD 7E d - Loads the value pointed to by IY plus $d into A
             logInstructionDetails(instructionDetails: "LD A,(IY+$d)", opcode: [0xFD,0x7E], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             registers.A = mmu.readByte(address: tempResult)
-            registers.PC = registers.PC &+ 4
+            registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
             tStates = tStates + 19
             incrementR(opcodeCount:2)
         case 0x86: // ADD A,(IY+$d) - FD 86 d - Adds the value pointed to by IY plus $d to A.
@@ -6354,9 +6430,10 @@ actor microbee
             logInstructionDetails(instructionDetails: "EX (SP),IY", opcode: [0xFD,0xE3], programCounter: registers.PC)
             let tempSPCL = mmu.readByte(address: registers.SP)
             let tempSPCH = mmu.readByte(address: registers.SP &+ 1)
-            mmu.writeByte(address: registers.SP, value: UInt8(registers.IY >> 8))
-            mmu.writeByte(address: registers.SP &+ 1, value: UInt8(registers.IY & 0xFF))
-            registers.IX = UInt16(tempSPCH) << 8 | UInt16(tempSPCL)
+            mmu.writeByte(address: registers.SP, value: registers.IYL)
+            mmu.writeByte(address: registers.SP &+ 1, value: registers.IYH)
+            registers.IY = UInt16(tempSPCH) << 8 | UInt16(tempSPCL)
+            registers.WZ = registers.IY
             registers.PC = registers.PC &+ 2
             tStates = tStates + 23
             incrementR(opcodeCount:2)
@@ -7966,7 +8043,8 @@ actor microbee
            }
            tStates = tStates + 10
            incrementR(opcodeCount:1)
-       case 0xD3: // OUT (n),A
+       case 0xD3: // OUT ($n),A - D3 n - The value of A is written to port $n
+           logInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [0xD3], values: [opcode2], programCounter: registers.PC)
            ports[Int(opcode2)] = registers.A
            switch opcode2
            {
@@ -8018,8 +8096,8 @@ actor microbee
            case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
            default: break // other ports go here
            }
-           logInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [0xD3], values: [opcode2], programCounter: registers.PC)
            registers.PC = registers.PC &+ 2
+           registers.WZ = UInt16(registers.A) << 8 | (UInt16(opcode2) &+ 1) & 0xFF
            tStates = tStates + 11
            incrementR(opcodeCount:1)
        case 0xD4: // CALL NC,$nn - D4 n n - If the carry flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
@@ -8105,6 +8183,8 @@ actor microbee
            tStates = tStates + 10
            incrementR(opcodeCount:1)
        case 0xDB: // IN A,($n) - DB n - A byte from port $n is written to A
+           logInstructionDetails(instructionDetails: "IN A,($n)", opcode: [0xDB], values: [opcode2], programCounter: registers.PC)
+           registers.WZ = UInt16(registers.A) << 8 | UInt16(opcode2) &+ 1
            registers.A = ports[Int(opcode2)]
            switch opcode2
            {
@@ -8115,7 +8195,7 @@ actor microbee
            case 0x0D: registers.A = crtc.readRegister(RegNum:ports[0x0C])
            default: break // other ports go here
            }
-           logInstructionDetails(instructionDetails: "IN A,($n)", opcode: [0xDB], values: [opcode2], programCounter: registers.PC)
+           
            registers.PC = registers.PC &+ 2
            tStates = tStates + 11
            incrementR(opcodeCount:1)
@@ -8137,7 +8217,7 @@ actor microbee
                tStates = tStates + 10
            }
            incrementR(opcodeCount:1)
-        case 0xDD : executeDDInstructions(opcode3: opcode3, opcode4: opcode4)
+        case 0xDD : executeDDInstructions(opcode2: opcode2, opcode3: opcode3, opcode4: opcode4)
         case 0xDE: // SBC A,$n - DE n - Subtracts $n and the carry flag from A
            logInstructionDetails(instructionDetails: "SBC A,$n", opcode: [0xDE], values: [opcode2], programCounter: registers.PC)
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0

@@ -15,10 +15,10 @@
          contextName = "microbee.loadCPUState(cpuState:):Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.altBC">
+               value = "registers.altDE">
             </PersistentString>
             <PersistentString
-               value = "registers.altDE">
+               value = "registers.altBC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -26,7 +26,7 @@
          contextName = "microbee.executeInstructions():Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.BC">
+               value = "registers.altBC">
             </PersistentString>
             <PersistentString
                value = "registers.altDE">
@@ -35,13 +35,16 @@
                value = "registers.DE">
             </PersistentString>
             <PersistentString
-               value = "registers.HL">
-            </PersistentString>
-            <PersistentString
-               value = "registers.altBC">
-            </PersistentString>
-            <PersistentString
                value = "registers.altHL">
+            </PersistentString>
+            <PersistentString
+               value = "registers.WZ">
+            </PersistentString>
+            <PersistentString
+               value = "registers.BC">
+            </PersistentString>
+            <PersistentString
+               value = "registers.HL">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -130,7 +133,7 @@
                value = "registers.DE">
             </PersistentString>
             <PersistentString
-               value = "registers.HL">
+               value = "registers.PC">
             </PersistentString>
             <PersistentString
                value = "mmu.readByte(address: registers.DE)">
@@ -139,7 +142,7 @@
                value = "registers.SP">
             </PersistentString>
             <PersistentString
-               value = "registers.PC">
+               value = "registers.HL">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

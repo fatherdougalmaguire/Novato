@@ -15,10 +15,16 @@ struct PortActivity: Decodable, Sendable, Equatable
 
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
+        
+        // 1. Decode Address (58361)
         self.address = try container.decode(UInt16.self)
+        
+        // 2. Decode Value (155)
         self.value = try container.decode(UInt8.self)
-        // Map 0 -> false (Read), 1 -> true (Write)
-        self.isWrite = try container.decode(Int.self) == 1
+        
+        // 3. Decode the mode string ("r" or "w")
+        let mode = try container.decode(String.self)
+        self.isWrite = (mode == "w")
     }
 }
 
@@ -44,10 +50,22 @@ struct Z80Test: Decodable, Sendable
     let name: String
     let initial: CPUState
     let final: CPUState
-   // let cycles : BusCycle
-   // let ports : PortActivity
-}
+    let ports: [PortActivity]
 
+    enum CodingKeys: String, CodingKey
+    {
+        case name, initial, final, ports
+    }
+
+    init(from decoder: Decoder) throws
+    {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.name = try container.decode(String.self, forKey: .name)
+        self.initial = try container.decode(CPUState.self, forKey: .initial)
+        self.final = try container.decode(CPUState.self, forKey: .final)
+        self.ports = try container.decodeIfPresent([PortActivity].self, forKey: .ports) ?? []
+    }
+}
 protocol testHelper {}
 
 extension testHelper
@@ -76,7 +94,7 @@ extension testHelper
         }
     }
     
-    func testError(finalState: CPUState, expected: CPUState, context: String)
+    func testError(finalState: CPUState, expected: CPUState, ports: [PortActivity], context: String)
     {
         #expect(finalState.A == expected.A, "Register A fail in \(context)")
         #expect(finalState.F == expected.F, "Register F fail in \(context)")
@@ -110,9 +128,10 @@ extension testHelper
     {
         let cpu = microbee()
         await cpu.loadCPUState(cpuState: testCase.initial)
+        //await cpu.loadPorts(ports: [PortActivity])
         await cpu.nextInstruction()
         let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
-        testError(finalState: finalState, expected: testCase.final, context: testCase.name)
+        testError(finalState: finalState, expected: testCase.final, ports: testCase.ports, context: testCase.name)
     }
 }
 
