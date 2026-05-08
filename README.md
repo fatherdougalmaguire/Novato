@@ -105,8 +105,9 @@ This emulator is still in what could charitably called *alpha* status.
 ### Test Harness
 
 * Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
-  - Missing support for P,Q and EI pseudo-registers and ports
-  - Opcodes currently tested - 0x00 to 0xF4 ( non-flag affecting instructions )
+  - Missing support for P,Q and EI pseudo-registers
+  - Opcodes currently tested
+    - all single opcode non-flag affecting instructions
     
 ## On the to-do list
 
