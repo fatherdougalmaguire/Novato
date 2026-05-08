@@ -1,0 +1,30 @@
+{
+  "configurations" : [
+    {
+      "id" : "6B10D385-E3FA-4BAA-8D52-2E56E330F120",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Novato.xcodeproj",
+      "identifier" : "EA58B6832E2F87680030E3C5",
+      "name" : "Novato"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Novato.xcodeproj",
+        "identifier" : "EA9E88972F8214020032907B",
+        "name" : "NovatoTests"
+      }
+    }
+  ],
+  "version" : 1
+}

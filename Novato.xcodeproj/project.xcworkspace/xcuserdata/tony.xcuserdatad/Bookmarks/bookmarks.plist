@@ -86,7 +86,7 @@ let </string>
 				<key>trailing</key>
 				<string> = 1000
 
-private class sentinelClass {} // is required to find the json tests.  Feels like some kind of bullshit to me
+var finalPortValue : UInt8 = 0
 </string>
 			</dict>
 			<key>type</key>
@@ -100,13 +100,13 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>6468</string>
+					<string>6477</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>6467</string>
+					<string>6476</string>
 					<key>Timestamp</key>
-					<string>799671320.0282151</string>
+					<string>799918669.683049</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -145,13 +145,13 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>6129</string>
+					<string>6138</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>6128</string>
+					<string>6137</string>
 					<key>Timestamp</key>
-					<string>799671320.028229</string>
+					<string>799918669.683025</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -190,13 +190,13 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>5230</string>
+					<string>5239</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>5229</string>
+					<string>5238</string>
 					<key>Timestamp</key>
-					<string>799671320.0282</string>
+					<string>799918669.683071</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -235,13 +235,13 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>4166</string>
+					<string>4131</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>4165</string>
+					<string>4130</string>
 					<key>Timestamp</key>
-					<string>799658959.9548939</string>
+					<string>799918669.683042</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -280,13 +280,13 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>3266</string>
+					<string>3231</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>3265</string>
+					<string>3230</string>
 					<key>Timestamp</key>
-					<string>799657087.304189</string>
+					<string>799918669.6830339</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -323,15 +323,15 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>38</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>2925</string>
+					<string>2891</string>
 					<key>StartingColumnNumber</key>
-					<string>17</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>2925</string>
+					<string>2890</string>
 					<key>Timestamp</key>
-					<string>799654293.957497</string>
+					<string>799918669.683064</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -347,15 +347,16 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>executeDDInstructions</string>
+				<string>    private func executeDDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+</string>
 				<key>leading</key>
 				<string>    }
     
-    private func </string>
+</string>
 				<key>trailing</key>
-				<string>(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
-    {
+				<string>    {
         switch opcode2
+        {
 </string>
 			</dict>
 			<key>type</key>
@@ -367,15 +368,15 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>16</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>1079</string>
+					<string>1045</string>
 					<key>StartingColumnNumber</key>
-					<string>12</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>1079</string>
+					<string>1044</string>
 					<key>Timestamp</key>
-					<string>799654349.6247129</string>
+					<string>799918669.683057</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -391,15 +392,16 @@ private class sentinelClass {} // is required to find the json tests.  Feels lik
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>func</string>
+				<string>    private func executeCBInstructions(opcode2: UInt8)
+</string>
 				<key>leading</key>
 				<string>    }
     
-    private </string>
+</string>
 				<key>trailing</key>
-				<string> executeCBInstructions(opcode2: UInt8)
-    {
+				<string>    {
         switch opcode2
+        {
 </string>
 			</dict>
 			<key>type</key>

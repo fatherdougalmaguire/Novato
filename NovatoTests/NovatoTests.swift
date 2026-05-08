@@ -3,6 +3,8 @@ import Testing
 
 let testCycles = 1000
 
+var finalPortValue : UInt8 = 0
+
 private class sentinelClass {} // is required to find the json tests.  Feels like some kind of bullshit to me
 
 @testable import Novato
@@ -16,13 +18,8 @@ struct PortActivity: Decodable, Sendable, Equatable
     init(from decoder: Decoder) throws {
         var container = try decoder.unkeyedContainer()
         
-        // 1. Decode Address (58361)
         self.address = try container.decode(UInt16.self)
-        
-        // 2. Decode Value (155)
         self.value = try container.decode(UInt8.self)
-        
-        // 3. Decode the mode string ("r" or "w")
         let mode = try container.decode(String.self)
         self.isWrite = (mode == "w")
     }
@@ -35,10 +32,8 @@ struct BusCycle: Decodable
     let signals: String
 
     init(from decoder: Decoder) throws {
-        // UnkeyedContainer lets us step through an array one-by-one
         var container = try decoder.unkeyedContainer()
         
-        // We decode each "slot" in the array into the specific type we want
         self.address = try container.decode(UInt16.self)
         self.data = try container.decode(UInt8.self)
         self.signals = try container.decode(String.self)
@@ -94,7 +89,7 @@ extension testHelper
         }
     }
     
-    func testError(finalState: CPUState, expected: CPUState, ports: [PortActivity], context: String)
+    func testError(finalState: CPUState, expected: CPUState, finalPortValue: UInt8, ports: [PortActivity], context: String)
     {
         #expect(finalState.A == expected.A, "Register A fail in \(context)")
         #expect(finalState.F == expected.F, "Register F fail in \(context)")
@@ -122,16 +117,21 @@ extension testHelper
         // #expect(finalState.Q == testCase.final.Q,"Register Q fail in \(context)")
         // #expect(finalState.P == testCase.final.P,"Register P fail in \(context)")
         // #expect(finalState.EI == testCase.final.EI,"Register EI fail in \(context)")
+        if ports[0].isWrite
+        {
+            #expect( finalPortValue == ports[0].value, "Ports fail in \(context)")
+        }
     }
     
     func runTest(_ testCase: Z80Test) async throws
     {
         let cpu = microbee()
         await cpu.loadCPUState(cpuState: testCase.initial)
-        //await cpu.loadPorts(ports: [PortActivity])
+        await cpu.loadPorts(portNum: testCase.ports[0].address, portValue: testCase.ports[0].value)
         await cpu.nextInstruction()
         let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
-        testError(finalState: finalState, expected: testCase.final, ports: testCase.ports, context: testCase.name)
+        let finalPortValue = await cpu.returnPortValue(portNum: testCase.ports[0].address)
+        testError(finalState: finalState, expected: testCase.final, finalPortValue: finalPortValue, ports: testCase.ports, context: testCase.name)
     }
 }
 
@@ -889,6 +889,8 @@ struct Z80Opcodes: testHelper
             try await parent.runTest(testCase)
         }
         
+        // use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
+        
         @Test("Validate CALL C,$nn (0xDC)",  arguments: loadJsonTests(named: "dc").prefix(testCycles))
         func test_CALL_C_NN(testCase: Z80Test) async throws
         {
@@ -1009,7 +1011,7 @@ struct Z80Opcodes: testHelper
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate PUSH AF (0xF5)",  arguments: loadJsonTests(named: "f5").prefix(testCycles))
+        @Test("Validate PUSH AF (0xF5)",  .timeLimit(.minutes(2)), arguments: loadJsonTests(named: "f5").prefix(testCycles))
         func test_PUSH_AF(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)

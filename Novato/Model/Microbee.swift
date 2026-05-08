@@ -463,49 +463,7 @@ actor microbee
     
     var registers = Registers()
     
-    var ports = [UInt8](repeating: 0, count: 256)
-    
-    //    00 or 10 PIO port A data port
-    //    01 or 11 PIO port A control port
-    //    02 or 12 PIO port B data port
-    //    03 or 13 PIO port B control port
-    //    08 or 18 COLOUR control port
-    //    09 or 19 Colour "Wait off"
-    //    0A or 1A Extended addressing port
-    //    OB or 1B Character ROM CPU access - makes character generator ROM appear from F000h to F7FFh when bit 0 of this port is set.
-    //    OC or 1C 6545 CRTC address/status port
-    //    OD or 1D 6545 CRTC data port
-    //    44 FDC command/status
-    //    45 FDC track register
-    //    46 FDC sector register
-    //    47 FDC data register
-    //    48 Controller select/side/DD latch
-    
-    //    PORT B DATA PORT BIT ASSIGNMENTS
-    //    bit 0 Cassette data in
-    //    bit 1 Cassette data out
-    //    bit 2 RS232 CLOCK or DTR line
-    //    bit 3 RS232 CTS line (0-> clear to send)
-    //    bit 4 RS232 input (0 = mark)
-    //    bit 5 RS232 output (1 = mark)
-    //    bit 6 Speaker bit (1 = on)
-    //    bit 7 Network interrupt bit
-    
-    //    FLOPPY DISC CONTROLLER
-    //    Controller select/side/DD latch bit assignments (write only)
-    //    bit 0 LSB of drive address
-    //    bit 1 MSB of drive address
-    //    bit 2 Side select (0 = side 0; 1 = side 1)
-    //    bit 3 DD select (0 = single density)
-    //
-    //    Controller TRANSFER status bit - bit 7 when port 48H is read gives (INTRQ or DRQ)
-    
-    //    COLOUR PORT BIT ASSIGNMENT
-    //    bit 0 Not used
-    //    bit 1 RED background intensity (1 = full)
-    //    bit 2 GREEN backgroung intensity
-    //    bit 3 BLUE background intensity
-    //    bit 6 COLOUR RAM enable (0 = PCG, 1= RAM)
+    var ports = IOPorts()
     
     var tStates : UInt64 = 0
     
@@ -623,8 +581,15 @@ actor microbee
         return afterTest
     }
     
-   // func loadPorts(port)
-   // }
+    func loadPorts(portNum: UInt16, portValue: UInt8)
+    {
+        ports.writePort(portNum: portNum, portValue: portValue)
+    }
+    
+    func returnPortValue(portNum: UInt16) -> UInt8
+    {
+        return ports.readPort(portNum: portNum)
+    }
     
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
     {
@@ -886,7 +851,7 @@ actor microbee
         
         interruptPending = false
         
-        ports.indices.forEach { ports[$0] = 0 }
+        ports.resetPorts()
         
         z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
         z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
@@ -4169,14 +4134,15 @@ actor microbee
        {
        case 0x40: // IN B,(C) - ED 40 - A byte from port C is written to B
            logInstructionDetails(instructionDetails: "IN B,(C)", opcode: [0xED,0x40], programCounter: registers.PC)
-           registers.B = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.B = ports.readPort(portNum: tempResult)
            switch registers.C
            {
            case 0x08: break // registers.B contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.B contains value of font rom control port
            case 0x0C: registers.B = crtc.readStatusRegister()
-           case 0x0D: registers.B = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.B = crtc.readRegister(RegNum:ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4185,7 +4151,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x41: // OUT (C),B - ED 41 - The value of B is written to port C
-           ports[Int(registers.C)] = registers.B
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: registers.B)
+           //ports[Int(registers.C)] = registers.B
            switch registers.B
            {
            case 0x08:
@@ -4233,7 +4201,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),B", opcode: [0xED,0x41], programCounter: registers.PC)
@@ -4287,14 +4255,17 @@ actor microbee
        case 0x48: // IN C,(C) - ED 48 - A byte from port C is written to B
            logInstructionDetails(instructionDetails: "IN C,(C)", opcode: [0xED,0x48], programCounter: registers.PC)
            let tempValue = registers.C
-           registers.C = ports[Int(tempValue)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.C = ports.readPort(portNum: tempResult)
+           //registers.C = ports[Int(tempValue)]
            switch tempValue
            {
            case 0x08: break // registers.C contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.C contains value of font rom control port
            case 0x0C: registers.C = crtc.readStatusRegister()
-           case 0x0D: registers.C = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.C = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
+           //case 0x0D: registers.C = crtc.readRegister(RegNum:ports[0x0C])
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4303,7 +4274,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x49: // OUT (C),C - ED 49 - The value of C is written to port C
-           ports[Int(registers.C)] = registers.C
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: registers.C)
+           //ports[Int(registers.C)] = registers.C
            switch registers.C
            {
            case 0x08:
@@ -4351,7 +4324,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),C", opcode: [0xED,0x49], programCounter: registers.PC)
@@ -4390,14 +4363,16 @@ actor microbee
            tStates = tStates + 9
        case 0x50: // IN D,(C) - ED 50 - A byte from port C is written to D
            logInstructionDetails(instructionDetails: "IN D,(C)", opcode: [0xED,0x50], programCounter: registers.PC)
-           registers.D = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.D = ports.readPort(portNum: tempResult)
+           //registers.D = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.D contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.D contains value of font rom control port
            case 0x0C: registers.D = crtc.readStatusRegister()
-           case 0x0D: registers.D = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.D = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4406,7 +4381,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x51: // OUT (C),D - ED 51 - The value of D is written to port C
-           ports[Int(registers.C)] = registers.D
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           registers.D = ports.readPort(portNum: tempResult)
+           //ports[Int(registers.C)] = registers.D
            switch registers.D
            {
            case 0x08:
@@ -4454,7 +4431,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),D", opcode: [0xED,0x51], programCounter: registers.PC)
@@ -4505,14 +4482,16 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x58: // IN E,(C) - ED 50 - A byte from port C is written to E
            logInstructionDetails(instructionDetails: "IN E,(C)", opcode: [0xED,0x58], programCounter: registers.PC)
-           registers.E = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           registers.E = ports.readPort(portNum: tempResult)
+           //registers.E = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.E contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.E contains value of font rom control port
            case 0x0C: registers.E = crtc.readStatusRegister()
-           case 0x0D: registers.E = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.E = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4521,7 +4500,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x59: // OUT (C),E - ED 59 - The value of E is written to port C
-           ports[Int(registers.C)] = registers.E
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: registers.E)
+           //ports[Int(registers.C)] = registers.E
            switch registers.E
            {
            case 0x08:
@@ -4569,7 +4550,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),E", opcode: [0xED,0x59], programCounter: registers.PC)
@@ -4620,14 +4601,16 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x60: // IN H,(C) - ED 60 - A byte from port C is written to H
            logInstructionDetails(instructionDetails: "IN H,(C)", opcode: [0xED,0x60], programCounter: registers.PC)
-           registers.H = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           registers.H = ports.readPort(portNum: tempResult)
+           // registers.H = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.H contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.H contains value of font rom control port
            case 0x0C: registers.H = crtc.readStatusRegister()
-           case 0x0D: registers.H = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.H = crtc.readRegister(RegNum:  ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4636,7 +4619,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x61: // OUT (C),H - ED 61 - The value of H is written to port C
-           ports[Int(registers.C)] = registers.H
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: registers.H)
+           //ports[Int(registers.C)] = registers.H
            switch registers.H
            {
            case 0x08:
@@ -4684,7 +4669,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum:ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),H", opcode: [0xED,0x61], programCounter: registers.PC)
@@ -4717,14 +4702,16 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x68: // IN L,(C) - ED 68 - A byte from port C is written to L
            logInstructionDetails(instructionDetails: "IN L,(C)", opcode: [0xED,0x68], programCounter: registers.PC)
-           registers.L = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           registers.L = ports.readPort(portNum: tempResult)
+           //registers.L = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.L contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.L contains value of font rom control port
            case 0x0C: registers.L = crtc.readStatusRegister()
-           case 0x0D: registers.L = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.L = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4733,7 +4720,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x69: // OUT (C),L - ED 69 - The value of L is written to port C
-           ports[Int(registers.C)] = registers.L
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: registers.L)
+           //ports[Int(registers.C)] = registers.L
            switch registers.L
            {
            case 0x08:
@@ -4781,7 +4770,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),L", opcode: [0xED,0x69], programCounter: registers.PC)
@@ -4830,14 +4819,16 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x78: // IN A,(C) - ED 78 - A byte from port C is written to A
            logInstructionDetails(instructionDetails: "IN A,(C)", opcode: [0xED,0x78], programCounter: registers.PC)
-           registers.A = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           registers.A = ports.readPort(portNum: tempResult)
+           //registers.A = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.A contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.A contains value of font rom control port
            case 0x0C: registers.A = crtc.readStatusRegister()
-           case 0x0D: registers.A = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.A = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -4846,7 +4837,9 @@ actor microbee
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x79: // OUT (C),A - ED 79 - The value of A is written to port C
-           ports[Int(registers.C)] = registers.A
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: registers.A)
+           //ports[Int(registers.C)] = registers.A
            switch registers.A
            {
            case 0x08:
@@ -4894,7 +4887,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            logInstructionDetails(instructionDetails: "OUT (C),A", opcode: [0xED,0x79], programCounter: registers.PC)
@@ -4958,7 +4951,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xA2: // INI - ED A2 - A byte from port C is written to the memory location pointed to by HL. Then HL is incremented and B is decremented
            logInstructionDetails(instructionDetails: "INI", opcode: [0xED,0xA2], programCounter: registers.PC)
-           let tempValue = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           let tempValue = ports.readPort(portNum: tempResult)
+           //let tempValue = ports[Int(registers.C)]
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &+ 1
            registers.B = registers.B &- 1
@@ -4976,7 +4971,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xA3: // OUTI - ED AB - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented
            logInstructionDetails(instructionDetails: "OUTI", opcode: [0xED,0xA3], programCounter: registers.PC)
-           ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
+           //ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
            registers.HL = registers.HL &+ 1
            registers.B = registers.B &- 1
            registers.F = registers.F | z80Flags.Negative.rawValue
@@ -5028,7 +5025,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xAA: // IND - ED AA - A byte from port C is written to the memory location pointed to by HL. Then HL and B are decremented
            logInstructionDetails(instructionDetails: "IND", opcode: [0xED,0xAA], programCounter: registers.PC)
-           let tempValue = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           let tempValue = ports.readPort(portNum: tempResult)
+           //let tempValue = ports[Int(registers.C)]
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &- 1
            registers.B = registers.B &- 1
@@ -5046,7 +5045,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xAB: // OUTD - ED AB - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is decremented
            logInstructionDetails(instructionDetails: "OUTD", opcode: [0xED,0xAB], programCounter: registers.PC)
-           ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
+           // ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
            registers.HL = registers.HL &- 1
            registers.B = registers.B &- 1
            registers.F = registers.F | z80Flags.Negative.rawValue
@@ -5107,7 +5108,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xB2: // INIR - ED B2 - A byte from port C is written to the memory location pointed to by HL. Then HL is incremented and B is decremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "INIR", opcode: [0xED,0xB2], programCounter: registers.PC)
-           let tempValue = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           let tempValue = ports.readPort(portNum: tempResult)
+           //let tempValue = ports[Int(registers.C)]
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &+ 1
            registers.B = registers.B &- 1
@@ -5143,7 +5146,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xBA: // INDR - ED BA - A byte from port C is written to the memory location pointed to by HL. Then HL and B are decremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing.
            logInstructionDetails(instructionDetails: "INIR", opcode: [0xED,0xBA], programCounter: registers.PC)
-           let tempValue = ports[Int(registers.C)]
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           let tempValue = ports.readPort(portNum: tempResult)
+           //let tempValue = ports[Int(registers.C)]
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &- 1
            registers.B = registers.B &- 1
@@ -5160,7 +5165,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xB3: // OTIR - ED B3 - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "OTIR", opcode: [0xED,0xB3], programCounter: registers.PC)
-           ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
+           //ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
            registers.HL = registers.HL &+ 1
            registers.B = registers.B &- 1
            registers.F = registers.F | z80Flags.Negative.rawValue | z80Flags.Zero.rawValue
@@ -5204,7 +5211,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xBB: // OTDR - ED BB - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is decremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "OTDR", opcode: [0xED,0xBB], programCounter: registers.PC)
-           ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
+           //ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
            registers.HL = registers.HL &- 1
            registers.B = registers.B &- 1
            registers.F = registers.F | z80Flags.Negative.rawValue | z80Flags.Zero.rawValue
@@ -8045,7 +8054,9 @@ actor microbee
            incrementR(opcodeCount:1)
        case 0xD3: // OUT ($n),A - D3 n - The value of A is written to port $n
            logInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [0xD3], values: [opcode2], programCounter: registers.PC)
-           ports[Int(opcode2)] = registers.A
+           let tempResult = UInt16(registers.A) << 8 | UInt16(opcode2)
+           ports.writePort(portNum: tempResult, portValue: registers.A)
+           //ports[Int(opcode2)] = registers.A
            switch opcode2
            {
            case 0x08:
@@ -8093,7 +8104,7 @@ actor microbee
                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                }
            case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum:ports[0x0C], RegValue:ports[0x0D])
+           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
            default: break // other ports go here
            }
            registers.PC = registers.PC &+ 2
@@ -8185,17 +8196,18 @@ actor microbee
        case 0xDB: // IN A,($n) - DB n - A byte from port $n is written to A
            logInstructionDetails(instructionDetails: "IN A,($n)", opcode: [0xDB], values: [opcode2], programCounter: registers.PC)
            registers.WZ = UInt16(registers.A) << 8 | UInt16(opcode2) &+ 1
-           registers.A = ports[Int(opcode2)]
+           let tempResult = UInt16(registers.A) << 8 | UInt16(opcode2)
+           registers.A = ports.readPort(portNum: tempResult)
+           //registers.A = ports[Int(opcode2)]
            switch opcode2
            {
            case 0x08: break // registers.A contains value of colour control port
            case 0x0A: break // NET selection INPUT from port - whatever this means
            case 0x0B: break // registers.A contains value of font rom control port
            case 0x0C: registers.A = crtc.readStatusRegister()
-           case 0x0D: registers.A = crtc.readRegister(RegNum:ports[0x0C])
+           case 0x0D: registers.A = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
            default: break // other ports go here
            }
-           
            registers.PC = registers.PC &+ 2
            tStates = tStates + 11
            incrementR(opcodeCount:1)
@@ -8703,7 +8715,7 @@ actor microbee
                 tStates: tStates,
                 emulatorState: emulatorState,
                 executionMode: executionMode,
-                ports: ports,
+                ports: ports.returnPorts(),
                 orderedZ80Queue: sortZ80Queue(),
                 breakpointQueue: sortBreakpointQueue(),
                 breakpointQueueMask : sortBreakpointQueueMask(),
