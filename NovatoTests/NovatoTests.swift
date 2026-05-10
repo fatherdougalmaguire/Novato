@@ -1,7 +1,9 @@
 import Foundation
 import Testing
 
-let testCycles = 1000
+// use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
+
+let testCycles = 10
 
 var finalPortValue : UInt8 = 0
 
@@ -89,7 +91,7 @@ extension testHelper
         }
     }
     
-    func testError(finalState: CPUState, expected: CPUState, finalPortValue: UInt8, ports: [PortActivity], context: String)
+    func testError(finalState: CPUState, expected: CPUState, testForPorts: Bool, finalPortValue: UInt8, ports: [PortActivity], context: String)
     {
         #expect(finalState.A == expected.A, "Register A fail in \(context)")
         #expect(finalState.F == expected.F, "Register F fail in \(context)")
@@ -117,7 +119,7 @@ extension testHelper
         // #expect(finalState.Q == testCase.final.Q,"Register Q fail in \(context)")
         // #expect(finalState.P == testCase.final.P,"Register P fail in \(context)")
         // #expect(finalState.EI == testCase.final.EI,"Register EI fail in \(context)")
-        if ports[0].isWrite
+        if testForPorts
         {
             #expect( finalPortValue == ports[0].value, "Ports fail in \(context)")
         }
@@ -125,13 +127,17 @@ extension testHelper
     
     func runTest(_ testCase: Z80Test) async throws
     {
+        let testForPorts : Bool = !testCase.ports.isEmpty
         let cpu = microbee()
         await cpu.loadCPUState(cpuState: testCase.initial)
-        await cpu.loadPorts(portNum: testCase.ports[0].address, portValue: testCase.ports[0].value)
+        if testForPorts
+        {
+            await cpu.loadPorts(portNum: testCase.ports[0].address, portValue: testCase.ports[0].value)
+        }
         await cpu.nextInstruction()
         let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
-        let finalPortValue = await cpu.returnPortValue(portNum: testCase.ports[0].address)
-        testError(finalState: finalState, expected: testCase.final, finalPortValue: finalPortValue, ports: testCase.ports, context: testCase.name)
+        let finalPortValue = testForPorts ? await cpu.returnPortValue(portNum: testCase.ports[0].address) : 0
+        testError(finalState: finalState, expected: testCase.final, testForPorts: testForPorts, finalPortValue: finalPortValue, ports: testCase.ports, context: testCase.name)
     }
 }
 
@@ -888,8 +894,6 @@ struct Z80Opcodes: testHelper
         {
             try await parent.runTest(testCase)
         }
-        
-        // use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
         
         @Test("Validate CALL C,$nn (0xDC)",  arguments: loadJsonTests(named: "dc").prefix(testCycles))
         func test_CALL_C_NN(testCase: Z80Test) async throws

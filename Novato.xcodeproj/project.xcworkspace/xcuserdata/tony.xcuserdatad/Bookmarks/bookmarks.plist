@@ -54,15 +54,15 @@
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>14</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>3</string>
+					<string>6</string>
 					<key>StartingColumnNumber</key>
-					<string>4</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>3</string>
+					<string>5</string>
 					<key>Timestamp</key>
-					<string>799395254.245733</string>
+					<string>800091245.876048</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -78,15 +78,16 @@
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>testCycles</string>
+				<string>let testCycles = 10
+</string>
 				<key>leading</key>
-				<string>import Testing
+				<string>// use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
 
-let </string>
+</string>
 				<key>trailing</key>
-				<string> = 1000
-
+				<string>
 var finalPortValue : UInt8 = 0
+
 </string>
 			</dict>
 			<key>type</key>
