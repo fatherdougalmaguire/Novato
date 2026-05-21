@@ -75,7 +75,8 @@ This emulator is still in what could charitably called *alpha* status.
   - Apperance of debug windows
   
 ### Instruction decoding
-* All documented instructions are decoded
+* All documened instructions are decoded
+* All non-documented instructions are stubs at this point
 * Flags are now precomputed for S,P and Z general instructions
 * Flags are now precomputed for 8 bit increment and decrement instructions
 * A small number of flag affecting instructions are decoded
@@ -105,9 +106,11 @@ This emulator is still in what could charitably called *alpha* status.
 ### Test Harness
 
 * Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
-  - Missing support for P,Q and EI pseudo-registers
+  - Supports ports, ram, t-states, real registers ( including WZ ) and Q psuedo-register
+  - Missing support for P and EI pseudo-registers and IFF1/IFF2 ( all related to interrupt handling )
+  - Test harnesses in place for all documented and non-documented instructions
   - Opcodes currently tested
-    - all single opcode non-flag affecting instructions
+    - all documented non-flag affecting instructions
     
 ## On the to-do list
 
