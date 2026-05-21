@@ -127,6 +127,7 @@ struct CPUState: Decodable, Sendable, Equatable
     let I,R : UInt8
     
     let IM : UInt8
+    
     let IFF1,IFF2 : UInt8
     
     let IX,IY : UInt16
