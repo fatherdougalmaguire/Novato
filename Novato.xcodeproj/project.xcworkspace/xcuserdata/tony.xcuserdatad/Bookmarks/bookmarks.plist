@@ -84,7 +84,7 @@
 
 let </string>
 				<key>trailing</key>
-				<string> = 100
+				<string> = 30
 let testTiming = 30
 
 </string>
@@ -100,13 +100,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>4329</string>
+					<string>4332</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>4328</string>
+					<string>4331</string>
 					<key>Timestamp</key>
-					<string>801054508.267731</string>
+					<string>801128431.660059</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -143,15 +143,15 @@ let testTiming = 30
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>36</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>11015</string>
+					<string>11024</string>
 					<key>StartingColumnNumber</key>
-					<string>17</string>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>11015</string>
+					<string>11023</string>
 					<key>Timestamp</key>
-					<string>801057013.814514</string>
+					<string>801177898.424378</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -167,15 +167,150 @@ let testTiming = 30
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>executeInstructions</string>
+				<string>    private func executeInstructions()
+</string>
 				<key>leading</key>
 				<string>    }
 
+</string>
+				<key>trailing</key>
+				<string>    {
+        let opcode1 = mmu.readByte(address: registers.PC)
+        let opcode2 = mmu.readByte(address: registers.PC &amp;+ 1)
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>9776</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>9775</string>
+					<key>Timestamp</key>
+					<string>801177898.424333</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeFDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+</string>
+				<key>leading</key>
+				<string>    }
+        
+</string>
+				<key>trailing</key>
+				<string>    {
+        switch opcode2
+        {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>7615</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>7614</string>
+					<key>Timestamp</key>
+					<string>801177898.4243619</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeFDCBInstructions(opcode3: UInt8, opcode4: UInt8)
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        switch opcode4 // FD CB opcodes
+        {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>38</string>
+					<key>EndingLineNumber</key>
+					<string>6452</string>
+					<key>StartingColumnNumber</key>
+					<string>17</string>
+					<key>StartingLineNumber</key>
+					<string>6452</string>
+					<key>Timestamp</key>
+					<string>801177617.768455</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>executeEDInstructions</string>
+				<key>leading</key>
+				<string>    }
+     
     private func </string>
 				<key>trailing</key>
-				<string>()
+				<string>(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
     {
-        let opcode1 = mmu.readByte(address: registers.PC)
+       switch opcode2
 </string>
 			</dict>
 			<key>type</key>

@@ -441,14 +441,16 @@ actor microbee
         var IFF1 : Bool = false     // Interrupt Flip-flop 1
         var IFF2 : Bool = false     // Interrupt Flip-flop 2
         
-        var WZ : UInt16 = 0         // the mysterious WZ register - 16 bit - not handled yet
+        var WZ : UInt16 = 0         // the mysterious WZ/MEMPTR register - 16 bit
         
-        var Q : UInt8 = 0           // preservation of output of last flag modifying instruction -  8 bit - not handled yet - JSMOO
+        var Q : UInt8 = 0           // preservation of output of last flag modifying instruction -  8 bit
         
-        //var P : Bool = false        // preservation of IFF2 - not handled yet - JSMOO
+        var P : UInt8 = 0           // JSON psuedo-register - track whether previous instruction was LD A,I or LD A,R - 8 bit
         
-        var EI : UInt8 = 0          // track interrput enable - not handled yet - JSMOO
+        var EI : UInt8 = 0          // JSON psuedo-register - track whether previous instruction was EI - 8 bit
     }
+    
+    private var preserveEI : UInt8 = 0
     
     private var pausedBreakpoint : Bool = false
     
@@ -527,8 +529,7 @@ actor microbee
         registers.IM = cpuState.IM
         
         registers.IFF1 = (cpuState.IFF1 != 0)
-        //registers.IFF2 = (cpuState.IFF2 != 0)
-        registers.IFF2 = (cpuState.P != 0)
+        registers.IFF2 = (cpuState.IFF2 != 0)
         
         registers.IX = cpuState.IX
         registers.IY = cpuState.IY
@@ -540,7 +541,7 @@ actor microbee
         
         registers.Q  = cpuState.Q
         
-        //registers.P = (cpuState.P != 0)
+        registers.P = cpuState.P
         
         registers.EI = cpuState.EI
         
@@ -579,7 +580,7 @@ actor microbee
             PC: registers.PC, SP: registers.SP,
             WZ: registers.WZ,
             Q: registers.Q,
-            P: registers.IFF2 ? 1:0,
+            P: registers.P,
             EI: registers.EI,
             ram : tempRam
             )
@@ -843,9 +844,11 @@ actor microbee
         
         registers.Q = 0
         
-        //registers.P = false
+        registers.P = 0
         
         registers.EI = 0
+        
+        preserveEI = 0
         
         tStates = 0
         
@@ -6679,6 +6682,7 @@ actor microbee
            registers.SP = registers.SP &+ 1
            registers.PCH = mmu.readByte(address: registers.SP)
            registers.SP = registers.SP &+ 1
+           registers.IFF1 = registers.IFF2
            registers.WZ = registers.PC
            registers.Q = 0
            tStates = tStates + 14
@@ -6808,6 +6812,8 @@ actor microbee
            {
                registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
            }
+           registers.P = 1
+           registers.EI = preserveEI
            registers.PC = registers.PC &+ 2
            tStates = tStates + 9
            incrementR(opcodeCount:2)
@@ -6930,6 +6936,8 @@ actor microbee
            {
                registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
            }
+           registers.P = 1
+           registers.EI = preserveEI
            registers.PC = registers.PC &+ 2
            tStates = tStates + 9
            incrementR(opcodeCount:2)
@@ -11022,6 +11030,9 @@ actor microbee
         z80Queue[z80QueueHead] = registers.PC
         z80QueueFilled[z80QueueHead] = true
         z80QueueHead = (z80QueueHead + 1) % 16
+        registers.P = 0 // default value for all instructions except LD A,I and LD A,R
+        preserveEI = registers.EI
+        registers.EI = 0 // default value for all instructions except LD A,I and LD A,R
         switch opcode1
         {
         case 0x00: // NOP - 00 - No operation is performed
@@ -11063,6 +11074,7 @@ actor microbee
             (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
             registers.PC = registers.PC &+ 1
             tStates = tStates + 4
+            registers.P = 0
             incrementR(opcodeCount:1)
         case 0x06: // LD B,$n - 06 n - Loads $n into B
             logInstructionDetails(instructionDetails: "LD B,$n", opcode: [0x06], values: [opcode2], programCounter: registers.PC)
@@ -11108,6 +11120,7 @@ actor microbee
             registers.WZ = registers.BC &+ 1
             registers.PC = registers.PC &+ 1
             registers.Q = 0
+            registers.P = 0
             tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0x0B: // DEC BC - 0B - Subtracts one from BC
@@ -13145,6 +13158,7 @@ actor microbee
             logInstructionDetails(instructionDetails: "DI", opcode: [0xF3], programCounter: registers.PC)
             registers.IFF1 = false
             registers.IFF2 = false
+            registers.EI = 0
             registers.PC = registers.PC &+ 1
             registers.Q = 0
             tStates = tStates + 4
@@ -13235,10 +13249,11 @@ actor microbee
             registers.Q = 0
             tStates = tStates + 10
             incrementR(opcodeCount:1)
-        case 0xFB: // EI- FB - Sets both interrupt flip-flops, thus allowing maskable interrupts to occur. An interrupt will not occur until after the immediately following instruction
+        case 0xFB: // EI - FB - Sets both interrupt flip-flops, thus allowing maskable interrupts to occur. An interrupt will not occur until after the immediately following instruction
             logInstructionDetails(instructionDetails: "EI", opcode: [0xFB], programCounter: registers.PC)
             registers.IFF1 = true
             registers.IFF2 = true
+            registers.EI = 1
             registers.PC = registers.PC &+ 1
             registers.Q = 0
             tStates = tStates + 4

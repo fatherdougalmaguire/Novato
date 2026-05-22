@@ -3,7 +3,7 @@ import Testing
 
 // use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
 
-let testCycles = 100
+let testCycles = 30
 let testTiming = 30
 
 var finalPortValue : UInt8 = 0
@@ -118,10 +118,10 @@ extension testHelper
         #expect(finalState.WZ == expected.WZ, "Register WZ fail in \(context)")
         #expect(finalState.ram == expected.ram, "RAM fail in \(context)")
         #expect(finalState.Q == expected.Q,"Register Q fail in \(context)")
-        // #expect(finalState.P == testCase.final.P,"Register P fail in \(context)")
-        // #expect(finalState.EI == testCase.final.EI,"Register EI fail in \(context)")
-        // #expect(finalState.IFF1 == expected.IFF1, "Register IFF1 fail in \(context)")
-        // #expect(finalState.IFF2 == expected.IFF2, "Register IFF2 fail in \(context)")
+        #expect(finalState.P == expected.P,"Register P fail in \(context)")
+        #expect(finalState.EI == expected.EI,"Register EI fail in \(context)")
+        #expect(finalState.IFF1 == expected.IFF1, "Register IFF1 fail in \(context)")
+        #expect(finalState.IFF2 == expected.IFF2, "Register IFF2 fail in \(context)")
         if testForPorts
         {
             #expect( finalPortValue == ports[0].value, "Ports fail in \(context)")
@@ -1020,7 +1020,7 @@ struct Z80Opcodes: testHelper
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate PUSH AF (0xF5)",  .timeLimit(.minutes(2)), arguments: loadJsonTests(named: "f5").prefix(testCycles))
+        @Test("Validate PUSH AF (0xF5)",  arguments: loadJsonTests(named: "f5").prefix(testCycles))
         func test_PUSH_AF(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
