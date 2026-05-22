@@ -106,8 +106,7 @@ This emulator is still in what could charitably called *alpha* status.
 ### Test Harness
 
 * Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
-  - Supports ports, ram, t-states, real registers ( including WZ ) and Q psuedo-register
-  - Missing support for P and EI pseudo-registers and IFF1/IFF2 ( all related to interrupt handling )
+  - Supports ports, ram, t-states, real registers ( including WZ ) and P,Q and EI psuedo-register
   - Test harnesses in place for all documented and non-documented instructions
   - Opcodes currently tested
     - all documented non-flag affecting instructions
