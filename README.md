@@ -110,6 +110,7 @@ This emulator is still in what could charitably called *alpha* status.
   - Test harnesses in place for all documented and non-documented instructions
   - Opcodes currently tested
     - all documented non-flag affecting instructions
+    - all documented flag affecting instructions ( in progress )
     
 ## On the to-do list
 
