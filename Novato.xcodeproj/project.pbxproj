@@ -17,6 +17,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		EA0ABFF32FC3C53C00A62A74 /* Novato.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Novato.xctestplan; sourceTree = "<group>"; };
 		EA58B6842E2F87680030E3C5 /* Novato.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Novato.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA9E88982F8214020032907B /* NovatoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NovatoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -55,6 +56,7 @@
 		EA58B67B2E2F87680030E3C5 = {
 			isa = PBXGroup;
 			children = (
+				EA0ABFF32FC3C53C00A62A74 /* Novato.xctestplan */,
 				EA58B6862E2F87680030E3C5 /* Novato */,
 				EA9E88992F8214020032907B /* NovatoTests */,
 				EA58B6852E2F87680030E3C5 /* Products */,
@@ -332,7 +334,7 @@
 				CODE_SIGN_ENTITLEMENTS = novato/novato.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5VUXP3WKH8;
 				ENABLE_APP_SANDBOX = YES;
@@ -365,7 +367,7 @@
 				CODE_SIGN_ENTITLEMENTS = novato/novato.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5VUXP3WKH8;
 				ENABLE_APP_SANDBOX = YES;

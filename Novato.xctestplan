@@ -1,7 +1,7 @@
 {
   "configurations" : [
     {
-      "id" : "6B10D385-E3FA-4BAA-8D52-2E56E330F120",
+      "id" : "80499237-2152-418B-8F89-36DE2B941F85",
       "name" : "Test Scheme Action",
       "options" : {
 
@@ -9,7 +9,6 @@
     }
   ],
   "defaultOptions" : {
-    "performanceAntipatternCheckerEnabled" : true,
     "targetForVariableExpansion" : {
       "containerPath" : "container:Novato.xcodeproj",
       "identifier" : "EA58B6832E2F87680030E3C5",

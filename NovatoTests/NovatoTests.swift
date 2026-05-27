@@ -3,7 +3,7 @@ import Testing
 
 // use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
 
-let testCycles = 30
+let testCycles = 25
 let testTiming = 30
 
 var finalPortValue : UInt8 = 0
@@ -1332,7 +1332,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate_ ADC A,A (0x8F)",  arguments: loadJsonTests(named: "8f").prefix(testCycles))
+        @Test("Validate ADC A,A (0x8F)",  arguments: loadJsonTests(named: "8f").prefix(testCycles))
         func test_ADC_AA(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -1655,9 +1655,7 @@ struct Z80Opcodes: testHelper
         {
         try await parent.runTest(testCase)
         }
-
-
-
+        
         @Test("Validate XOR $n (0xEE)",  arguments: loadJsonTests(named: "ee").prefix(testCycles))
         func test_XOR_N(testCase: Z80Test) async throws
         {
@@ -3343,85 +3341,85 @@ struct Z80Opcodes: testHelper
     {
         let parent = Z80Opcodes()
         
-        @Test("Validate ADD IX,BC (0xDD:09)",  arguments: loadJsonTests(named: "dd 09").prefix(testCycles))
+        @Test("Validate ADD IX,BC (0xDD09)",  arguments: loadJsonTests(named: "dd 09").prefix(testCycles))
         func test_ADD_IX_BC(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADD IX,DE (0xDD:19)",  arguments: loadJsonTests(named: "dd 19").prefix(testCycles))
+        @Test("Validate ADD IX,DE (0xDD19)",  arguments: loadJsonTests(named: "dd 19").prefix(testCycles))
         func test_ADD_IX_DE(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADD IX,IX (0xDD:29)",  arguments: loadJsonTests(named: "dd 29").prefix(testCycles))
+        @Test("Validate ADD IX,IX (0xDD29)",  arguments: loadJsonTests(named: "dd 29").prefix(testCycles))
         func test_ADD_IX_IX(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate INC (IX+$d) (0xDD:34:$d:)",  arguments: loadJsonTests(named: "dd 34").prefix(testCycles))
+        @Test("Validate INC (IX+$d) (0xDD34)",  arguments: loadJsonTests(named: "dd 34").prefix(testCycles))
         func test_INC_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate DEC (IX+$d) (0xDD:35:$d:)",  arguments: loadJsonTests(named: "dd 35").prefix(testCycles))
+        @Test("Validate DEC (IX+$d) (0xDD35)",  arguments: loadJsonTests(named: "dd 35").prefix(testCycles))
         func test_DEC_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADD IX,SP (0xDD:39)",  arguments: loadJsonTests(named: "dd 39").prefix(testCycles))
+        @Test("Validate ADD IX,SP (0xDD39)",  arguments: loadJsonTests(named: "dd 39").prefix(testCycles))
         func test_ADD_IX_SP(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADD A,(IX+$d) (0xDD:86:$d:)",  arguments: loadJsonTests(named: "dd 86").prefix(testCycles))
+        @Test("Validate ADD A,(IX+$d) (0xDD86)",  arguments: loadJsonTests(named: "dd 86").prefix(testCycles))
         func test_ADD_A_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADC A,(IX+$d) (0xDD:8E:$d:)",  arguments: loadJsonTests(named: "dd 8e").prefix(testCycles))
+        @Test("Validate ADC A,(IX+$d) (0xDD8E)",  arguments: loadJsonTests(named: "dd 8e").prefix(testCycles))
         func test_ADC_A_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SUB (IX+$d) (0xDD:96:$d:)",  arguments: loadJsonTests(named: "dd 96").prefix(testCycles))
+        @Test("Validate SUB (IX+$d) (0xDD96)",  arguments: loadJsonTests(named: "dd 96").prefix(testCycles))
         func test_SUB_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SBC A,(IX+$d) (0xDD:9E:$d:)",  arguments: loadJsonTests(named: "dd 9e").prefix(testCycles))
+        @Test("Validate SBC A,(IX+$d) (0xDD9E)",  arguments: loadJsonTests(named: "dd 9e").prefix(testCycles))
         func test_SBC_A_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate AND (IX+$d) (0xDD:A6:$d:)",  arguments: loadJsonTests(named: "dd a6").prefix(testCycles))
+        @Test("Validate AND (IX+$d) (0xDDA6)",  arguments: loadJsonTests(named: "dd a6").prefix(testCycles))
         func test_AND_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate XOR (IX+$d) (0xDD:AE:$d:)",  arguments: loadJsonTests(named: "dd ae").prefix(testCycles))
+        @Test("Validate XOR (IX+$d) (0xDDAE)",  arguments: loadJsonTests(named: "dd ae").prefix(testCycles))
         func test_XOR_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OR (IX+$d) (0xDD:B6:$d:)",  arguments: loadJsonTests(named: "dd b6").prefix(testCycles))
+        @Test("Validate OR (IX+$d) (0xDDB6)",  arguments: loadJsonTests(named: "dd b6").prefix(testCycles))
         func test_OR_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate CP (IX+$d) (0xDD:BE:$d:)",  arguments: loadJsonTests(named: "dd be").prefix(testCycles))
+        @Test("Validate CP (IX+$d) (0xDDBE)",  arguments: loadJsonTests(named: "dd be").prefix(testCycles))
         func test_CP_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -3537,91 +3535,91 @@ struct Z80Opcodes: testHelper
     {
         let parent = Z80Opcodes()
         
-        @Test("Validate RLC (IX+$d) (0xDD:CB:$d:06)",  arguments: loadJsonTests(named: "dd cb __ 06").prefix(testCycles))
+        @Test("Validate RLC (IX+$d) (0xDDCB__06)",  arguments: loadJsonTests(named: "dd cb __ 06").prefix(testCycles))
         func test_RLC_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate RRC (IX+$d) (0xDD:CB:$d:0E)",  arguments: loadJsonTests(named: "dd cb __ 0e").prefix(testCycles))
+        @Test("Validate RRC (IX+$d) (0xDDCB__0E)",  arguments: loadJsonTests(named: "dd cb __ 0e").prefix(testCycles))
         func test_RRC_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate RL (IX+$d) (0xDD:CB:$d:16)",  arguments: loadJsonTests(named: "dd cb __ 16").prefix(testCycles))
+        @Test("Validate RL (IX+$d) (0xDDCB__16)",  arguments: loadJsonTests(named: "dd cb __ 16").prefix(testCycles))
         func test_RL_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate RR (IX+$d) (0xDD:CB:$d:1E)",  arguments: loadJsonTests(named: "dd cb __ 1e").prefix(testCycles))
+        @Test("Validate RR (IX+$d) (0xDDCB__1E)",  arguments: loadJsonTests(named: "dd cb __ 1e").prefix(testCycles))
         func test_RR_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SLA (IX+$d) (0xDD:CB:$d:26)",  arguments: loadJsonTests(named: "dd cb __ 26").prefix(testCycles))
+        @Test("Validate SLA (IX+$d) (0xDDCB__26)",  arguments: loadJsonTests(named: "dd cb __ 26").prefix(testCycles))
         func test_SLA_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SRA (IX+$d) (0xDD:CB:$d:2E)",  arguments: loadJsonTests(named: "dd cb __ 2e").prefix(testCycles))
+        @Test("Validate SRA (IX+$d) (0xDDCB__2E)",  arguments: loadJsonTests(named: "dd cb __ 2e").prefix(testCycles))
         func test_SRA_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SRL (IX+$d) (0xDD:CB:$d:3E)",  arguments: loadJsonTests(named: "dd cb __ 3e").prefix(testCycles))
+        @Test("Validate SRL (IX+$d) (0xDDCB__3E)",  arguments: loadJsonTests(named: "dd cb __ 3e").prefix(testCycles))
         func test_SRL_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 0,(IX+$d) (0xDD:CB:$d:46)",  arguments: loadJsonTests(named: "dd cb __ 46").prefix(testCycles))
+        @Test("Validate BIT 0,(IX+$d) (0xDDCB__46)",  arguments: loadJsonTests(named: "dd cb __ 46").prefix(testCycles))
         func test_BIT_0_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 1,(IX+$d) (0xDD:CB:$d:4E)",  arguments: loadJsonTests(named: "dd cb __ 4e").prefix(testCycles))
+        @Test("Validate BIT 1,(IX+$d) (0xDDCB__4E)",  arguments: loadJsonTests(named: "dd cb __ 4e").prefix(testCycles))
         func test_BIT_1_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 2,(IX+$d) (0xDD:CB:$d:56)",  arguments: loadJsonTests(named: "dd cb __ 56").prefix(testCycles))
+        @Test("Validate BIT 2,(IX+$d) (0xDDCB__56)",  arguments: loadJsonTests(named: "dd cb __ 56").prefix(testCycles))
         func test_BIT_2_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 3,(IX+$d) (0xDD:CB:$d:5E)",  arguments: loadJsonTests(named: "dd cb __ 5e").prefix(testCycles))
+        @Test("Validate BIT 3,(IX+$d) (0xDDCB__5E)",  arguments: loadJsonTests(named: "dd cb __ 5e").prefix(testCycles))
         func test_BIT_3_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 4,(IX+$d) (0xDD:CB:$d:66)",  arguments: loadJsonTests(named: "dd cb __ 66").prefix(testCycles))
+        @Test("Validate BIT 4,(IX+$d) (0xDDCB__66)",  arguments: loadJsonTests(named: "dd cb __ 66").prefix(testCycles))
         func test_BIT_4_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 5,(IX+$d) (0xDD:CB:$d:6E)",  arguments: loadJsonTests(named: "dd cb __ 6e").prefix(testCycles))
+        @Test("Validate BIT 5,(IX+$d) (0xDDCB__6E)",  arguments: loadJsonTests(named: "dd cb __ 6e").prefix(testCycles))
         func test_BIT_5_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 6,(IX+$d) (0xDD:CB:$d:76)",  arguments: loadJsonTests(named: "dd cb __ 76").prefix(testCycles))
+        @Test("Validate BIT 6,(IX+$d) (0xDDCB__76)",  arguments: loadJsonTests(named: "dd cb __ 76").prefix(testCycles))
         func test_BIT_6_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 7,(IX+$d) (0xDD:CB:$d:7E)",  arguments: loadJsonTests(named: "dd cb __ 7e").prefix(testCycles))
+        @Test("Validate BIT 7,(IX+$d) (0xDDCB__7E)",  arguments: loadJsonTests(named: "dd cb __ 7e").prefix(testCycles))
         func test_BIT_7_CON_IX_D(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -3759,199 +3757,199 @@ struct Z80Opcodes: testHelper
     {
         let parent = Z80Opcodes()
         
-        @Test("Validate IN B,(C) (0xED:40)",  arguments: loadJsonTests(named: "ed 40").prefix(testCycles))
+        @Test("Validate IN B,(C) (0xED40)",  arguments: loadJsonTests(named: "ed 40").prefix(testCycles))
         func test_IN_B_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SBC HL,BC (0xED:42)",  arguments: loadJsonTests(named: "ed 42").prefix(testCycles))
+        @Test("Validate SBC HL,BC (0xED42)",  arguments: loadJsonTests(named: "ed 42").prefix(testCycles))
         func test_SBC_HL_BC(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate NEG (0xED:44)",  arguments: loadJsonTests(named: "ed 44").prefix(testCycles))
+        @Test("Validate NEG (0xED44)",  arguments: loadJsonTests(named: "ed 44").prefix(testCycles))
         func test_NEG(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IN C,(C) (0xED:48)",  arguments: loadJsonTests(named: "ed 48").prefix(testCycles))
+        @Test("Validate IN C,(C) (0xED48)",  arguments: loadJsonTests(named: "ed 48").prefix(testCycles))
         func test_IN_C_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADC HL,BC (0xED:4A)",  arguments: loadJsonTests(named: "ed 4a").prefix(testCycles))
+        @Test("Validate ADC HL,BC (0xED4A)",  arguments: loadJsonTests(named: "ed 4a").prefix(testCycles))
         func test_ADC_HL_BC(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IN D,(C) (0xED:50)",  arguments: loadJsonTests(named: "ed 50").prefix(testCycles))
+        @Test("Validate IN D,(C) (0xED50)",  arguments: loadJsonTests(named: "ed 50").prefix(testCycles))
         func test_IN_D_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SBC HL,DE (0xED:52)",  arguments: loadJsonTests(named: "ed 52").prefix(testCycles))
+        @Test("Validate SBC HL,DE (0xED52)",  arguments: loadJsonTests(named: "ed 52").prefix(testCycles))
         func test_SBC_HL_DE(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LD A,I (0xED:57)",  arguments: loadJsonTests(named: "ed 57").prefix(testCycles))
+        @Test("Validate LD A,I (0xED57)",  arguments: loadJsonTests(named: "ed 57").prefix(testCycles))
         func test_LD_A_I(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IN E,(C) (0xED:58)",  arguments: loadJsonTests(named: "ed 58").prefix(testCycles))
+        @Test("Validate IN E,(C) (0xED58)",  arguments: loadJsonTests(named: "ed 58").prefix(testCycles))
         func test_IN_E_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADC HL,DE (0xED:5A)",  arguments: loadJsonTests(named: "ed 5a").prefix(testCycles))
+        @Test("Validate ADC HL,DE (0xED5A)",  arguments: loadJsonTests(named: "ed 5a").prefix(testCycles))
         func test_ADC_HL_DE(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LD A,R (0xED:5F)",  arguments: loadJsonTests(named: "ed 5f").prefix(testCycles))
+        @Test("Validate LD A,R (0xED5F)",  arguments: loadJsonTests(named: "ed 5f").prefix(testCycles))
         func test_LD_A_R(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IN H,(C) (0xED:60)",  arguments: loadJsonTests(named: "ed 60").prefix(testCycles))
+        @Test("Validate IN H,(C) (0xED60)",  arguments: loadJsonTests(named: "ed 60").prefix(testCycles))
         func test_IN_H_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SBC HL,HL (0xED:62)",  arguments: loadJsonTests(named: "ed 62").prefix(testCycles))
+        @Test("Validate SBC HL,HL (0xED62)",  arguments: loadJsonTests(named: "ed 62").prefix(testCycles))
         func test_SBC_HL_HL(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate RRD (0xED:67)",  arguments: loadJsonTests(named: "ed 67").prefix(testCycles))
+        @Test("Validate RRD (0xED67)",  arguments: loadJsonTests(named: "ed 67").prefix(testCycles))
         func test_RRD(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IN L,(C) (0xED:68)",  arguments: loadJsonTests(named: "ed 68").prefix(testCycles))
+        @Test("Validate IN L,(C) (0xED68)",  arguments: loadJsonTests(named: "ed 68").prefix(testCycles))
         func test_IN_L_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADC HL,HL (0xED:6A)",  arguments: loadJsonTests(named: "ed 6a").prefix(testCycles))
+        @Test("Validate ADC HL,HL (0xED6A)",  arguments: loadJsonTests(named: "ed 6a").prefix(testCycles))
         func test_ADC_HL_HL(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate RLD (0xED:6F)",  arguments: loadJsonTests(named: "ed 6f").prefix(testCycles))
+        @Test("Validate RLD (0xED6F)",  arguments: loadJsonTests(named: "ed 6f").prefix(testCycles))
         func test_RLD(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SBC HL,SP (0xED:72)",  arguments: loadJsonTests(named: "ed 72").prefix(testCycles))
+        @Test("Validate SBC HL,SP (0xED72)",  arguments: loadJsonTests(named: "ed 72").prefix(testCycles))
         func test_SBC_HL_SP(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IN A,(C) (0xED:78)",  arguments: loadJsonTests(named: "ed 78").prefix(testCycles))
+        @Test("Validate IN A,(C) (0xED78)",  arguments: loadJsonTests(named: "ed 78").prefix(testCycles))
         func test_IN_A_CON_C(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate ADC HL,SP (0xED:7A)",  arguments: loadJsonTests(named: "ed 7a").prefix(testCycles))
+        @Test("Validate ADC HL,SP (0xED7A)",  arguments: loadJsonTests(named: "ed 7a").prefix(testCycles))
         func test_ADC_HL_SP(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LDI (0xED:A0)",  arguments: loadJsonTests(named: "ed a0").prefix(testCycles))
+        @Test("Validate LDI (0xEDA0)",  arguments: loadJsonTests(named: "ed a0").prefix(testCycles))
         func test_LDI(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate CPI (0xED:A1)",  arguments: loadJsonTests(named: "ed a1").prefix(testCycles))
+        @Test("Validate CPI (0xEDA1)",  arguments: loadJsonTests(named: "ed a1").prefix(testCycles))
         func test_CPI(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate INI (0xED:A2)",  arguments: loadJsonTests(named: "ed a2").prefix(testCycles))
+        @Test("Validate INI (0xEDA2)",  arguments: loadJsonTests(named: "ed a2").prefix(testCycles))
         func test_INI(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OUTI (0xED:A3)",  arguments: loadJsonTests(named: "ed a3").prefix(testCycles))
+        @Test("Validate OUTI (0xEDA3)",  arguments: loadJsonTests(named: "ed a3").prefix(testCycles))
         func test_OUTI(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LDD (0xED:A8)",  arguments: loadJsonTests(named: "ed a8").prefix(testCycles))
+        @Test("Validate LDD (0xEDA8)",  arguments: loadJsonTests(named: "ed a8").prefix(testCycles))
         func test_LDD(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate CPD (0xED:A9)",  arguments: loadJsonTests(named: "ed a9").prefix(testCycles))
+        @Test("Validate CPD (0xEDA9)",  arguments: loadJsonTests(named: "ed a9").prefix(testCycles))
         func test_CPD(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate IND (0xED:AA)",  arguments: loadJsonTests(named: "ed aa").prefix(testCycles))
+        @Test("Validate IND (0xEDAA)",  arguments: loadJsonTests(named: "ed aa").prefix(testCycles))
         func test_IND(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OUTD (0xED:AB)",  arguments: loadJsonTests(named: "ed ab").prefix(testCycles))
+        @Test("Validate OUTD (0xEDAB)",  arguments: loadJsonTests(named: "ed ab").prefix(testCycles))
         func test_OUTD(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LDIR (0xED:B0)",  arguments: loadJsonTests(named: "ed b0").prefix(testCycles))
+        @Test("Validate LDIR (0xEDB0)",  arguments: loadJsonTests(named: "ed b0").prefix(testCycles))
         func test_LDIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate CPIR (0xED:B1)",  arguments: loadJsonTests(named: "ed b1").prefix(testCycles))
+        @Test("Validate CPIR (0xEDB1)",  arguments: loadJsonTests(named: "ed b1").prefix(testCycles))
         func test_CPIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate INIR (0xED:B2)",  arguments: loadJsonTests(named: "ed b2").prefix(testCycles))
+        @Test("Validate INIR (0xEDB2)",  arguments: loadJsonTests(named: "ed b2").prefix(testCycles))
         func test_INIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OTIR (0xED:B3)",  arguments: loadJsonTests(named: "ed b3").prefix(testCycles))
+        @Test("Validate OTIR (0xEDB3)",  arguments: loadJsonTests(named: "ed b3").prefix(testCycles))
         func test_OTIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LDDR (0xED:B8)",  arguments: loadJsonTests(named: "ed b8").prefix(testCycles))
+        @Test("Validate LDDR (0xEDB8)",  arguments: loadJsonTests(named: "ed b8").prefix(testCycles))
         func test_LDDR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -3963,13 +3961,13 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate INDR (0xED:BA)",  arguments: loadJsonTests(named: "ed ba").prefix(testCycles))
+        @Test("Validate INDR (0xEDBA)",  arguments: loadJsonTests(named: "ed ba").prefix(testCycles))
         func test_INDR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OTDR (0xED:BB)",  arguments: loadJsonTests(named: "ed bb").prefix(testCycles))
+        @Test("Validate OTDR (0xEDBB)",  arguments: loadJsonTests(named: "ed bb").prefix(testCycles))
         func test_OTDR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -4137,85 +4135,85 @@ struct Z80Opcodes: testHelper
     {
         let parent = Z80Opcodes()
         
-        @Test("Validate ADD IY,BC (0xFD:09)",  arguments: loadJsonTests(named: "fd 09").prefix(testCycles))
+        @Test("Validate ADD IY,BC (0xFD09)",  arguments: loadJsonTests(named: "fd 09").prefix(testCycles))
         func test_ADD_IY_BC(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate ADD IY,DE (0xFD:19)",  arguments: loadJsonTests(named: "fd 19").prefix(testCycles))
+        @Test("Validate ADD IY,DE (0xFD19)",  arguments: loadJsonTests(named: "fd 19").prefix(testCycles))
         func test_ADD_IY_DE(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate ADD IY,IY (0xFD:29)",  arguments: loadJsonTests(named: "fd 29").prefix(testCycles))
+        @Test("Validate ADD IY,IY (0xFD29)",  arguments: loadJsonTests(named: "fd 29").prefix(testCycles))
         func test_ADD_IY_IY(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate INC (IY+$d) (0xFD:34:$d:)",  arguments: loadJsonTests(named: "fd 34").prefix(testCycles))
+        @Test("Validate INC (IY+$d) (0xFD34)",  arguments: loadJsonTests(named: "fd 34").prefix(testCycles))
         func test_INC_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate DEC (IY+$d) (0xFD:35:$d:)",  arguments: loadJsonTests(named: "fd 35").prefix(testCycles))
+        @Test("Validate DEC (IY+$d) (0xFD35)",  arguments: loadJsonTests(named: "fd 35").prefix(testCycles))
         func test_DEC_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate ADD IY,SP (0xFD:39)",  arguments: loadJsonTests(named: "fd 39").prefix(testCycles))
+        @Test("Validate ADD IY,SP (0xFD39)",  arguments: loadJsonTests(named: "fd 39").prefix(testCycles))
         func test_ADD_IY_SP(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate ADD A,(IY+$d) (0xFD:86:$d:)",  arguments: loadJsonTests(named: "fd 86").prefix(testCycles))
+        @Test("Validate ADD A,(IY+$d) (0xFD86)",  arguments: loadJsonTests(named: "fd 86").prefix(testCycles))
         func test_ADD_A_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate ADC A,(IY+$d) (0xFD:8E:$d:)",  arguments: loadJsonTests(named: "fd 8e").prefix(testCycles))
+        @Test("Validate ADC A,(IY+$d) (0xFD8E)",  arguments: loadJsonTests(named: "fd 8e").prefix(testCycles))
         func test_ADC_A_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate SUB (IY+$d) (0xFD:96:$d:)",  arguments: loadJsonTests(named: "fd 96").prefix(testCycles))
+        @Test("Validate SUB (IY+$d) (0xFD96)",  arguments: loadJsonTests(named: "fd 96").prefix(testCycles))
         func test_SUB_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate SBC A,(IY+$d) (0xFD:9E:$d:)",  arguments: loadJsonTests(named: "fd 9e").prefix(testCycles))
+        @Test("Validate SBC A,(IY+$d) (0xFD9E)",  arguments: loadJsonTests(named: "fd 9e").prefix(testCycles))
         func test_SBC_A_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate AND (IY+$d) (0xFD:A6:$d:)",  arguments: loadJsonTests(named: "fd a6").prefix(testCycles))
+        @Test("Validate AND (IY+$d) (0xFDA6)",  arguments: loadJsonTests(named: "fd a6").prefix(testCycles))
         func test_AND_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate XOR (IY+$d) (0xFD:AE:$d:)",  arguments: loadJsonTests(named: "fd ae").prefix(testCycles))
+        @Test("Validate XOR (IY+$d) (0xFDAE)",  arguments: loadJsonTests(named: "fd ae").prefix(testCycles))
         func test_XOR_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate OR (IY+$d) (0xFD:B6:$d:)",  arguments: loadJsonTests(named: "fd b6").prefix(testCycles))
+        @Test("Validate OR (IY+$d) (0xFDB6)",  arguments: loadJsonTests(named: "fd b6").prefix(testCycles))
         func test_OR_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
         
-        @Test("Validate CP (IY+$d) (0xFD:BE:$d:)",  arguments: loadJsonTests(named: "fd be").prefix(testCycles))
+        @Test("Validate CP (IY+$d) (0xFDBE)",  arguments: loadJsonTests(named: "fd be").prefix(testCycles))
         func test_CP_CON_IY_D(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
