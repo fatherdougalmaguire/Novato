@@ -1064,93 +1064,93 @@ actor microbee
         {
         case 0x00: // RLC B - CB 00 - The contents of B are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC B", opcode: [0xCB,0x00], programCounter: registers.PC)
-            let carry = registers.B & z80Flags.Carry.rawValue
-            let tempResult = (registers.B << 1) | (registers.B >> 7)
+            let carry = registers.B >> 7
+            let tempResult = (registers.B << 1) | carry
             (registers.B,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x01: // RLC C - CB 01 - The contents of C are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC C", opcode: [0xCB,0x01], programCounter: registers.PC)
-            let carry = registers.C & z80Flags.Carry.rawValue
-            let tempResult = (registers.C << 1) | (registers.C >> 7)
+            let carry = registers.C >> 7
+            let tempResult = (registers.C << 1) | carry
             (registers.C,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x02: // RLC D - CB 02 - The contents of D are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC D", opcode: [0xCB,0x02], programCounter: registers.PC)
-            let carry = registers.D & z80Flags.Carry.rawValue
-            let tempResult = (registers.D << 1) | (registers.D >> 7)
+            let carry = registers.D >> 7
+            let tempResult = (registers.D << 1) | carry
             (registers.D,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x03: // RLC E - CB 03 - The contents of E are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC E", opcode: [0xCB,0x03], programCounter: registers.PC)
-            let carry = registers.E & z80Flags.Carry.rawValue
-            let tempResult = (registers.E << 1) | (registers.E >> 7)
+            let carry = registers.E >> 7
+            let tempResult = (registers.E << 1) | carry
             (registers.E,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x04: // RLC H - CB 04 - The contents of H are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC H", opcode: [0xCB,0x04], programCounter: registers.PC)
-            let carry = registers.H & z80Flags.Carry.rawValue
-            let tempResult = (registers.H << 1) | (registers.H >> 7)
+            let carry = registers.H >> 7
+            let tempResult = (registers.H << 1) | carry
             (registers.H,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x05: // RLC L - CB 05 - The contents of L are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC L", opcode: [0xCB,0x05], programCounter: registers.PC)
-            let carry = registers.L & z80Flags.Carry.rawValue
-            let tempResult = (registers.L << 1) | (registers.L >> 7)
+            let carry = registers.L >> 7
+            let tempResult = (registers.L << 1) | carry
             (registers.L,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x06: // RLC (HL)) - CB 06 - The contents of B are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC (HL)", opcode: [0xCB,0x06], programCounter: registers.PC)
             let tempOldValue = mmu.readByte(address: registers.HL)
-            let carry = tempOldValue & z80Flags.Carry.rawValue
-            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = tempOldValue >> 7
+            let tempResult = (tempOldValue << 1) | carry
             var tempNewValue : UInt8
             (tempNewValue,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             mmu.writeByte(address: registers.HL, value: tempNewValue)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x07: // RLC A - CB 07 - The contents of A are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC A", opcode: [0xCB,0x07], programCounter: registers.PC)
-            let carry = registers.A & z80Flags.Carry.rawValue
-            let tempResult = (registers.A << 1) | (registers.A >> 7)
+            let carry = registers.A >> 7
+            let tempResult = (registers.A << 1) | carry
             (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x08: // RRC B - CB 08 - The contents of B are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7.
@@ -1161,7 +1161,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x09: // RRC C - CB 09 - The contents of C are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1172,7 +1172,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x0A: // RRC D - CB 0A - The contents of D are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1183,7 +1183,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x0B: // RRC E - CB 0B - The contents of E are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1194,7 +1194,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x0C: // RRC H - CB 0C - The contents of H are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1205,7 +1205,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x0D: // RRC L - CB 0D - The contents of D are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1216,7 +1216,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x0E: // RRC (HL) - CB 0E - The contents of (HL) are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1230,7 +1230,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x0F: // RRC A - CB 0F - The contents of A are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -1241,7 +1241,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x10: // RL B - CB 10 - The contents of B are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1253,7 +1253,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x11: // RL C - CB 11 - The contents of C are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1265,7 +1265,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x12: // RL D - CB 12 - The contents of D are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1277,7 +1277,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x13: // RL E - CB 13 - The contents of E are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1289,7 +1289,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x14: // RL H - CB 14 - The contents of H are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1301,7 +1301,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x15: // RL L - CB 15 - The contents of L are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1313,7 +1313,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x16: // RL (HL)) - CB 16 - The contents of (HL) are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1327,7 +1327,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x17: // RL A - CB 17 - The contents of A are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0.
@@ -1335,11 +1335,11 @@ actor microbee
             let newcarry = registers.A >> 7
             let oldcarry = registers.F & z80Flags.Carry.rawValue
             let tempResult = (registers.A << 1) | oldcarry
-            (registers.B,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x18: // RR B - CB 18 - The contents of B are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1351,7 +1351,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x19: // RR C - CB 19 - The contents of C are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1363,7 +1363,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x1A: // RR D - CB 1A - The contents of D are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1375,7 +1375,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x1B: // RR E - CB 1B - The contents of E are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1387,7 +1387,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x1C: // RR H - CB 1C - The contents of H are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1399,7 +1399,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x1D: // RR L - CB 1D - The contents of L are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1411,7 +1411,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x1E: // RR (HL) - CB 1E - The contents of (HL) are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
@@ -1425,8 +1425,8 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
-            tStates = tStates + 8
+            registers.Q = registers.F
+            tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x1F: // RR A - CB 1F - The contents of A are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7
             logInstructionDetails(instructionDetails: "RR A", opcode: [0xCB,0x1F], programCounter: registers.PC)
@@ -1437,97 +1437,97 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | newcarry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x20: // SLA B - CB 20 - The contents of B are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA B", opcode: [0xCB,0x20], programCounter: registers.PC)
-            let carry = registers.B & 0b10000000
+            let carry = registers.B >> 7
             let tempResult = registers.B << 1
             (registers.B,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x21: // SLA C - CB 21 - The contents of C are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA C", opcode: [0xCB,0x21], programCounter: registers.PC)
-            let carry = registers.C & 0b10000000
+            let carry = registers.C >> 7
             let tempResult = registers.C << 1
             (registers.C,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x22: // SLA D - CB 22 - The contents of D are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA D", opcode: [0xCB,0x22], programCounter: registers.PC)
-            let carry = registers.D & 0b10000000
+            let carry = registers.D >> 7
             let tempResult = registers.D << 1
             (registers.D,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x23: // SLA E - CB 23 - The contents of E are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA E", opcode: [0xCB,0x23], programCounter: registers.PC)
-            let carry = registers.E & 0b10000000
+            let carry = registers.E >> 7
             let tempResult = registers.E << 1
             (registers.E,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x24: // SLA H - CB 24 - The contents of H are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA H", opcode: [0xCB,0x24], programCounter: registers.PC)
-            let carry = registers.H & 0b10000000
+            let carry = registers.H >> 7
             let tempResult = registers.H << 1
             (registers.H,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x25: // SLA L - CB 25 - The contents of L are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA L", opcode: [0xCB,0x25], programCounter: registers.PC)
-            let carry = registers.L & 0b10000000
+            let carry = registers.L >> 7
             let tempResult = registers.L << 1
             (registers.L,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x26: // SLA (HL) - CB 26 - The contents of (HL) are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA (HL)", opcode: [0xCB,0x26], programCounter: registers.PC)
             var oldValue = mmu.readByte(address: registers.HL)
-            let carry = oldValue & 0b10000000
+            let carry = oldValue >> 7
             let tempResult = oldValue << 1
             (oldValue,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             mmu.writeByte(address: registers.HL, value: oldValue)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x27: // SLA A - CB 27 - The contents of A are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0
             logInstructionDetails(instructionDetails: "SLA A", opcode: [0xCB,0x27], programCounter: registers.PC)
-            let carry = registers.A & 0b10000000
+            let carry = registers.A >> 7
             let tempResult = registers.A << 1
             (registers.A,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x28: // SRA B - CB 28 - The contents of C are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1539,7 +1539,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x29: // SRA C - CB 29 - The contents of C are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1551,7 +1551,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x2A: // SRA D - CB 2A - The contents of D are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1563,7 +1563,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x2B: // SRA E - CB 2B - The contents of E are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1575,7 +1575,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x2C: // SRA H - CB 2C - The contents of H are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1587,7 +1587,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x2D: // SRA L - CB 2D - The contents of L are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1599,7 +1599,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x2E: // SRA (HL) - CB 2E - The contents of (HL) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1613,7 +1613,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x2F: // SRA A - CB 2F - The contents of A are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged
@@ -1625,21 +1625,19 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x30: // Undocumented - SLL B - CB 30 - The contents of B are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL B", opcode: [0xCB,0x30], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x31: // Undocumented - SLL C - CB 31 - The contents of C are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL C", opcode: [0xCB,0x31], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x32: // Undocumented - SLL D - CB 32 - The contents of D are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
@@ -1652,36 +1650,31 @@ actor microbee
         case 0x33: // Undocumented - SLL E - CB 33 - The contents of E are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL E", opcode: [0xCB,0x33], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x34: // Undocumented - SLL H - CB 34 - The contents of H are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL H", opcode: [0xCB,0x34], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x35: // Undocumented - SLL L - CB 35 - The contents of L are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL L", opcode: [0xCB,0x35], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x36: // Undocumented - SLL (HL) - CB 36 - The contents of (HL) are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL (HL)", opcode: [0xCB,0x36], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x37: // Undocumented - SLL A - CB 37 - The contents of A are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
             logInstructionDetails(instructionDetails: "SLL A", opcode: [0xCB,0x37], programCounter: registers.PC)
-            registers.PC = registers.PC &+ 2
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x38: // SRL B - CB 38 - The contents of B are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1692,7 +1685,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x39: // SRL C - CB 39 - The contents of C are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1703,7 +1696,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x3A: // SRL D - CB 3A - The contents of D are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1714,7 +1707,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x3B: // SRL E - CB 3B - The contents of E are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1725,7 +1718,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x3C: // SRL H - CB 3C - The contents of H are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1736,7 +1729,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x3D: // SRL L - CB 3D - The contents of L are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1747,7 +1740,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x3E: // SRL (HL) - CB 3E - The contents of (HL)) are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1760,7 +1753,7 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 15
             incrementR(opcodeCount:2)
         case 0x3F: // SRL A - CB 3F - The contents of A are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7
@@ -1771,527 +1764,983 @@ actor microbee
             registers.F = registers.F & ~z80Flags.Negative.rawValue
             registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
             registers.F = registers.F | carry
-            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x40: // BIT 0,B - CB 40 - Tests bit 0 of B
             logInstructionDetails(instructionDetails: "BIT 0,B", opcode: [0xCB,0x40], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x41: // BIT 0,C - CB 41 - Tests bit 0 of C
             logInstructionDetails(instructionDetails: "BIT 0,C", opcode: [0xCB,0x41], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x42: // BIT 0,D - CB 42 - Tests bit 0 of D
             logInstructionDetails(instructionDetails: "BIT 0,D", opcode: [0xCB,0x42], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x43: // BIT 0,E - CB 43 - Tests bit 0 of E
             logInstructionDetails(instructionDetails: "BIT 0,E", opcode: [0xCB,0x43], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x44: // BIT 0,H - CB 44 - Tests bit 0 of H
             logInstructionDetails(instructionDetails: "BIT 0,H", opcode: [0xCB,0x44], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x45: // BIT 0,L - CB 45 - Tests bit 0 of L
             logInstructionDetails(instructionDetails: "BIT 0,L", opcode: [0xCB,0x45], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x46: // BIT 0,(HL) - CB 46 - Tests bit 0 of (HL)
             logInstructionDetails(instructionDetails: "BIT 0,(HL)", opcode: [0xCB,0x46], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x47: // BIT 0,A - CB 47 - Tests bit 0 of A
             logInstructionDetails(instructionDetails: "BIT 0,A", opcode: [0xCB,0x47], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 1) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x01) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x48: // BIT 1,B - CB 48 - Tests bit 1 of B
             logInstructionDetails(instructionDetails: "BIT 1,B", opcode: [0xCB,0x48], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x49: // BIT 1,C - CB 49 - Tests bit 1 of C
             logInstructionDetails(instructionDetails: "BIT 1,C", opcode: [0xCB,0x49], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x4A: // BIT 1,D - CB 4A - Tests bit 1 of D
             logInstructionDetails(instructionDetails: "BIT 1,D", opcode: [0xCB,0x4A], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.D & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x4B: // BIT 1,E - CB 4B - Tests bit 1 of E
             logInstructionDetails(instructionDetails: "BIT 1,E", opcode: [0xCB,0x4B], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x4C: // BIT 1,H - CB 4C - Tests bit 1 of H
             logInstructionDetails(instructionDetails: "BIT 1,H", opcode: [0xCB,0x4C], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x4D: // BIT 1,L - CB 4D - Tests bit 1 of L
             logInstructionDetails(instructionDetails: "BIT 1,L", opcode: [0xCB,0x4D], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x4E: // BIT 1,(HL) - CB 4E - Tests bit 1 of (HL)
             logInstructionDetails(instructionDetails: "BIT 1,(HL)", opcode: [0xCB,0x4E], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x4F: // BIT 1,A - CB 4F - Tests bit 1 of A
             logInstructionDetails(instructionDetails: "BIT 1,A", opcode: [0xCB,0x4F], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 2) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x02) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x02) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x50: // BIT 2,B - CB 50 - Tests bit 2 of B
             logInstructionDetails(instructionDetails: "BIT 2,B", opcode: [0xCB,0x50], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x51: // BIT 2,C - CB 51 - Tests bit 2 of C
             logInstructionDetails(instructionDetails: "BIT 2,C", opcode: [0xCB,0x51], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x52: // BIT 2,D - CB 52 - Tests bit 2 of D
             logInstructionDetails(instructionDetails: "BIT 2,D", opcode: [0xCB,0x52], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.D & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x53: // BIT 2,E - CB 53 - Tests bit 2 of E
             logInstructionDetails(instructionDetails: "BIT 2,E", opcode: [0xCB,0x53], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x54: // BIT 2,H - CB 54 - Tests bit 2 of H
             logInstructionDetails(instructionDetails: "BIT 2,H", opcode: [0xCB,0x54], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x55: // BIT 2,L - CB 55 - Tests bit 2 of L
             logInstructionDetails(instructionDetails: "BIT 2,L", opcode: [0xCB,0x55], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x56: // BIT 2,(HL) - CB 56 - Tests bit 2 of (HL)
             logInstructionDetails(instructionDetails: "BIT 2,(HL)", opcode: [0xCB,0x56], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 1) ^ 4) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x57: // BIT 2,A - CB 57 - Tests bit 2 of A
             logInstructionDetails(instructionDetails: "BIT 2,A", opcode: [0xCB,0x57], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 4) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x04) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x04) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x58: // BIT 3,B - CB 58 - Tests bit 3 of B
             logInstructionDetails(instructionDetails: "BIT 3,B", opcode: [0xCB,0x58], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x59: // BIT 3,C - CB 59 - Tests bit 3 of C
             logInstructionDetails(instructionDetails: "BIT 3,C", opcode: [0xCB,0x59], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x5A: // BIT 3,D - CB 5A - Tests bit 3 of D
             logInstructionDetails(instructionDetails: "BIT 3,D", opcode: [0xCB,0x5A], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.D & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x5B: // BIT 3,E - CB 5B - Tests bit 3 of E
             logInstructionDetails(instructionDetails: "BIT 3,E", opcode: [0xCB,0x5B], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x5C: // BIT 3,H - CB 5C - Tests bit 3 of H
             logInstructionDetails(instructionDetails: "BIT 3,H", opcode: [0xCB,0x5C], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x5D: // BIT 3,L - CB 5D - Tests bit 3 of L
             logInstructionDetails(instructionDetails: "BIT 3,L", opcode: [0xCB,0x5D], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x5E: // BIT 3,(HL) - CB 5E - Tests bit 3 of (HL)
             logInstructionDetails(instructionDetails: "BIT 3,(HL)", opcode: [0xCB,0x5E], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x5F: // BIT 3,A - CB 5F - Tests bit 3 of A
             logInstructionDetails(instructionDetails: "BIT 3,A", opcode: [0xCB,0x5F], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 8) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x08) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x08) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x60: // BIT 4,B - CB 60 - Tests bit 4 of B
             logInstructionDetails(instructionDetails: "BIT 4,B", opcode: [0xCB,0x60], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x61: // BIT 4,C - CB 61 - Tests bit 4 of C
             logInstructionDetails(instructionDetails: "BIT 4,C", opcode: [0xCB,0x61], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x62: // BIT 4,D - CB 62 - Tests bit 4 of D
             logInstructionDetails(instructionDetails: "BIT 4,D", opcode: [0xCB,0x62], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.D & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x63: // BIT 4,E - CB 63 - Tests bit 4 of E
             logInstructionDetails(instructionDetails: "BIT 4,E", opcode: [0xCB,0x63], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x64: // BIT 4,H - CB 64 - Tests bit 4 of H
             logInstructionDetails(instructionDetails: "BIT 4,H", opcode: [0xCB,0x64], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x65: // BIT 4,L - CB 65 - Tests bit 4 of L
             logInstructionDetails(instructionDetails: "BIT 4,L", opcode: [0xCB,0x65], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x66: // BIT 4,(HL) - CB 66 - Tests bit 4 of (HL)
             logInstructionDetails(instructionDetails: "BIT 4,(HL)", opcode: [0xCB,0x66], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x67: // BIT 4,A - CB 67 - Tests bit 4 of A
             logInstructionDetails(instructionDetails: "BIT 4,A", opcode: [0xCB,0x67], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 16) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x10) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x10) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x68: // BIT 5,B - CB 68 - Tests bit 5 of B
             logInstructionDetails(instructionDetails: "BIT 5,B", opcode: [0xCB,0x68], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x69: // BIT 5,C - CB 69 - Tests bit 5 of C
             logInstructionDetails(instructionDetails: "BIT 5,C", opcode: [0xCB,0x69], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x6A: // BIT 5,D - CB 6A - Tests bit 5 of D
             logInstructionDetails(instructionDetails: "BIT 5,D", opcode: [0xCB,0x6A], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.D & 0x020) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x6B: // BIT 5,E - CB 6B - Tests bit 5 of E
             logInstructionDetails(instructionDetails: "BIT 5,E", opcode: [0xCB,0x6B], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x6C: // BIT 5,H - CB 6C - Tests bit 5 of H
             logInstructionDetails(instructionDetails: "BIT 5,H", opcode: [0xCB,0x6C], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x6D: // BIT 5,L - CB 6D - Tests bit 5 of L
             logInstructionDetails(instructionDetails: "BIT 5,L", opcode: [0xCB,0x6D], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x6E: // BIT 5,(HL) - CB 6E - Tests bit 5 of (HL)
             logInstructionDetails(instructionDetails: "BIT 5,(HL)", opcode: [0xCB,0x6E], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x6F: // BIT 5,A - CB 6F - Tests bit 5 of A
             logInstructionDetails(instructionDetails: "BIT 5,A", opcode: [0xCB,0x6F], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 32) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x20) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x20) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x70: // BIT 6,B - CB 70 - Tests bit 6 of B
             logInstructionDetails(instructionDetails: "BIT 6,B", opcode: [0xCB,0x70], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.B & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x71: // BIT 6,C - CB 71 - Tests bit 6 of C
             logInstructionDetails(instructionDetails: "BIT 6,C", opcode: [0xCB,0x71], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.C & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x72: // BIT 6,D - CB 72 - Tests bit 6 of D
             logInstructionDetails(instructionDetails: "BIT 6,D", opcode: [0xCB,0x72], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.D & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x73: // BIT 6,E - CB 73 - Tests bit 6 of E
             logInstructionDetails(instructionDetails: "BIT 6,E", opcode: [0xCB,0x73], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.E & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x74: // BIT 6,H - CB 74 - Tests bit 6 of H
             logInstructionDetails(instructionDetails: "BIT 6,H", opcode: [0xCB,0x74], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.H & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x75: // BIT 6,L - CB 75 - Tests bit 6 of L
             logInstructionDetails(instructionDetails: "BIT 6,L", opcode: [0xCB,0x75], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.L & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x76: // BIT 6,(HL) - CB 76 - Tests bit 6 of (HL)
             logInstructionDetails(instructionDetails: "BIT 6,(HL)", opcode: [0xCB,0x76], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (tempResult & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x77: // BIT 6,A - CB 77 - Tests bit 6 of A
             logInstructionDetails(instructionDetails: "BIT 6,A", opcode: [0xCB,0x77], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 64) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
+            let tempZero : UInt8 = (registers.A & 0x40) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x40) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x78: // BIT 7,B - CB 78 - Tests bit 7 of B
             logInstructionDetails(instructionDetails: "BIT 7,B", opcode: [0xCB,0x78], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.B & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.B & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.B & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.B & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.B & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.B & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x79: // BIT 7,C - CB 79 - Tests bit 7 of C
             logInstructionDetails(instructionDetails: "BIT 7,C", opcode: [0xCB,0x79], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.C & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.C & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.C & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.C & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x7A: // BIT 7,D - CB 7A - Tests bit 7 of D
             logInstructionDetails(instructionDetails: "BIT 7,D", opcode: [0xCB,0x7A], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.D & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.D & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.D & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x7B: // BIT 7,E - CB 7B - Tests bit 7 of E
             logInstructionDetails(instructionDetails: "BIT 7,E", opcode: [0xCB,0x7B], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.E & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.E & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.E & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.E & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.E & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.E & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x7C: // BIT 7,H - CB 7C - Tests bit 7 of H
             logInstructionDetails(instructionDetails: "BIT 7,H", opcode: [0xCB,0x7C], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.H & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.H & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.H & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.H & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.H & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.H & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x7D: // BIT 7,L - CB 7D - Tests bit 7 of L
             logInstructionDetails(instructionDetails: "BIT 7,L", opcode: [0xCB,0x7D], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.L & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.L & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.L & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.L & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.L & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.L & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x7E: // BIT 7,(HL) - CB 7E - Tests bit 7 of (HL)
             logInstructionDetails(instructionDetails: "BIT 7,(HL)", opcode: [0xCB,0x7E], programCounter: registers.PC)
             let tempResult = mmu.readByte(address: registers.HL)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((tempResult & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let WZH = UInt8((registers.WZ >> 8) & 0xFF)
+            let tempX : UInt8 = WZH & 0x08
+            let tempY : UInt8 = WZH & 0x20
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempSign : UInt8 = (tempResult & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (tempResult & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (tempResult & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 12
             incrementR(opcodeCount:2)
         case 0x7F: // BIT 7,A - CB 7F - Tests bit 7 of A
             logInstructionDetails(instructionDetails: "BIT 7,A", opcode: [0xCB,0x7F], programCounter: registers.PC)
-            registers.F = (registers.F & ~z80Flags.Zero.rawValue) | (((registers.A & 128) ^ 1) << 6)
-            registers.F = registers.F | z80Flags.HalfCarry.rawValue
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.PC = registers.PC &+ 2
+            let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
+            let tempX : UInt8 = registers.A & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
+            let tempSign : UInt8 = (registers.A & 0x80) == 0 ? 0x00 : 0x80
+            let tempZero : UInt8 = (registers.A & 0x80) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.A & 0x80) == 0 ? 0x04 : 0x00
+            let tempNegative : UInt8 = 0x00
+            let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+            registers.Q = registers.F
             tStates = tStates + 8
             incrementR(opcodeCount:2)
         case 0x80: // RES 0,B - CB 80 - Resets bit 0 of B

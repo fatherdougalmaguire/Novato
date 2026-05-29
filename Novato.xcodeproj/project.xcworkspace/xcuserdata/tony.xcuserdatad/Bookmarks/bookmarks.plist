@@ -100,13 +100,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>11297</string>
+					<string>11746</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>11296</string>
+					<string>11745</string>
 					<key>Timestamp</key>
-					<string>801537534.231683</string>
+					<string>801725978.077744</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -145,13 +145,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>38</string>
 					<key>EndingLineNumber</key>
-					<string>3090</string>
+					<string>1060</string>
 					<key>StartingColumnNumber</key>
 					<string>17</string>
 					<key>StartingLineNumber</key>
-					<string>3090</string>
+					<string>1060</string>
 					<key>Timestamp</key>
-					<string>801300931.884202</string>
+					<string>801549427.832588</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -167,13 +167,13 @@ let testTiming = 30
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>executeDDInstructions</string>
+				<string>executeCBInstructions</string>
 				<key>leading</key>
 				<string>    }
     
     private func </string>
 				<key>trailing</key>
-				<string>(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+				<string>(opcode2: UInt8)
     {
         switch opcode2
 </string>
@@ -189,13 +189,58 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>4377</string>
+					<string>3540</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>4376</string>
+					<string>3539</string>
 					<key>Timestamp</key>
-					<string>801303575.594615</string>
+					<string>801725978.077637</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeDDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        switch opcode2
+        {
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>4826</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>4825</string>
+					<key>Timestamp</key>
+					<string>801725978.077583</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -234,13 +279,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>6597</string>
+					<string>7046</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>6596</string>
+					<string>7045</string>
 					<key>Timestamp</key>
-					<string>801537534.2317359</string>
+					<string>801725978.077529</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -279,13 +324,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>10011</string>
+					<string>10460</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>10010</string>
+					<string>10459</string>
 					<key>Timestamp</key>
-					<string>801537534.2318341</string>
+					<string>801725978.07769</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -324,13 +369,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>7759</string>
+					<string>8208</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>7758</string>
+					<string>8207</string>
 					<key>Timestamp</key>
-					<string>801537534.231784</string>
+					<string>801725978.077467</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -356,95 +401,6 @@ let testTiming = 30
 				<string>    {
         switch opcode4 // FD CB opcodes
         {
-</string>
-			</dict>
-			<key>type</key>
-			<string>bookmark</string>
-		</dict>
-		<dict>
-			<key>destination</key>
-			<dict>
-				<key>location-parameters</key>
-				<dict>
-					<key>EndingColumnNumber</key>
-					<string>0</string>
-					<key>EndingLineNumber</key>
-					<string>7805</string>
-					<key>StartingColumnNumber</key>
-					<string>0</string>
-					<key>StartingLineNumber</key>
-					<string>7804</string>
-					<key>Timestamp</key>
-					<string>801537534.231883</string>
-				</dict>
-				<key>rebasable-url</key>
-				<dict>
-					<key>base</key>
-					<string>workspace</string>
-					<key>payload</key>
-					<dict>
-						<key>relative-path</key>
-						<string>Novato/Model/Microbee.swift</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>text-context</key>
-			<dict>
-				<key>focused</key>
-				<string>        case 0x06: // RLC (IY+$d) - FD CB d 06 - The contents of (IY+$d) are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-</string>
-				<key>leading</key>
-				<string>            tStates = tStates + 23
-            incrementR(opcodeCount:2)
-</string>
-				<key>trailing</key>
-				<string>            logInstructionDetails(instructionDetails: "RLC (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x06], values: [opcode3], programCounter: registers.PC)
-            let tempResultAddress = registers.IY &amp;+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-            registers.WZ = tempResultAddress
-</string>
-			</dict>
-			<key>type</key>
-			<string>bookmark</string>
-		</dict>
-		<dict>
-			<key>destination</key>
-			<dict>
-				<key>location-parameters</key>
-				<dict>
-					<key>EndingColumnNumber</key>
-					<string>27</string>
-					<key>EndingLineNumber</key>
-					<string>4422</string>
-					<key>StartingColumnNumber</key>
-					<string>26</string>
-					<key>StartingLineNumber</key>
-					<string>4422</string>
-					<key>Timestamp</key>
-					<string>801536489.046168</string>
-				</dict>
-				<key>rebasable-url</key>
-				<dict>
-					<key>base</key>
-					<string>workspace</string>
-					<key>payload</key>
-					<dict>
-						<key>relative-path</key>
-						<string>Novato/Model/Microbee.swift</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>text-context</key>
-			<dict>
-				<key>focused</key>
-				<string>(</string>
-				<key>leading</key>
-				<string>            tStates = tStates + 23
-            incrementR(opcodeCount:2)
-        case 0x06: // RLC </string>
-				<key>trailing</key>
-				<string>IX+$d) - DD CB d 06 - The contents of (IX+$d) are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-            logInstructionDetails(instructionDetails: "RLC (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x06], values: [opcode3], programCounter: registers.PC)
-            let tempResultAddress = registers.IX &amp;+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
 </string>
 			</dict>
 			<key>type</key>

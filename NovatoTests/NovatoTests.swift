@@ -2771,7 +2771,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate SRL H (0xCB3C)",  arguments: loadJsonTests(named: "cb3c").prefix(testCycles))
+        @Test("Validate SRL H (0xCB3C)",  arguments: loadJsonTests(named: "cb 3c").prefix(testCycles))
         func test_SRL_H(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -2885,7 +2885,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate BIT 1,A (0xCB4F)",  arguments: loadJsonTests(named: "cb4f").prefix(testCycles))
+        @Test("Validate BIT 1,A (0xCB4F)",  arguments: loadJsonTests(named: "cb 4f").prefix(testCycles))
         func test_BIT_1_A(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
