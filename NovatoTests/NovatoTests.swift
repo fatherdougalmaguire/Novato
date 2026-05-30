@@ -3,7 +3,7 @@ import Testing
 
 // use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
 
-let testCycles = 25
+let testCycles = 1000
 let testTiming = 30
 
 var finalPortValue : UInt8 = 0

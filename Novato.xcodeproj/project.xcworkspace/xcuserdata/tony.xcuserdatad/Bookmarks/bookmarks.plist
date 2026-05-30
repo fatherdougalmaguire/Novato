@@ -84,7 +84,7 @@
 
 let </string>
 				<key>trailing</key>
-				<string> = 25
+				<string> = 1000
 let testTiming = 30
 
 </string>
@@ -100,13 +100,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>11746</string>
+					<string>11748</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>11745</string>
+					<string>11747</string>
 					<key>Timestamp</key>
-					<string>801725978.077744</string>
+					<string>801731177.933102</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -324,13 +324,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>10460</string>
+					<string>10462</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>10459</string>
+					<string>10461</string>
 					<key>Timestamp</key>
-					<string>801725978.07769</string>
+					<string>801731177.932988</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -369,13 +369,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>8208</string>
+					<string>8210</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>8207</string>
+					<string>8209</string>
 					<key>Timestamp</key>
-					<string>801725978.077467</string>
+					<string>801731177.9330601</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>

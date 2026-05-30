@@ -7050,6 +7050,7 @@ actor microbee
        case 0x40: // IN B,(C) - ED 40 - A byte from port C is written to B
            logInstructionDetails(instructionDetails: "IN B,(C)", opcode: [0xED,0x40], programCounter: registers.PC)
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.B = ports.readPort(portNum: tempResult)
            switch registers.C
            {
@@ -7063,6 +7064,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.B) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x41: // OUT (C),B - ED 41 - The value of B is written to port C
