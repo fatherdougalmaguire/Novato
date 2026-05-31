@@ -9,10 +9,10 @@
          contextName = "Z80CPU.init():Z80CPU.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #1 in closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
+         contextName = "closure #2 in closure #1 in closure #1 in memoryAndInstructionView.body.getter:MemoryAndInstructionView.swift">
          <PersistentStrings>
             <PersistentString
-               value = "0 &amp;- 16">
+               value = "String(format: &quot;0x%04X&quot;, snapshot.z80Snapshot.PC)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -23,10 +23,10 @@
          contextName = "microbee.loadCPUState(cpuState:):Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.altBC">
+               value = "registers.altDE">
             </PersistentString>
             <PersistentString
-               value = "registers.altDE">
+               value = "registers.altBC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -49,10 +49,10 @@
                value = "(registers.H &amp; z80Flags.X.rawValue)">
             </PersistentString>
             <PersistentString
-               value = "registers.DE">
+               value = "registers.altHL">
             </PersistentString>
             <PersistentString
-               value = "registers.altHL">
+               value = "registers.DE">
             </PersistentString>
             <PersistentString
                value = "registers.HL">
@@ -147,7 +147,7 @@
                value = "registers.DE">
             </PersistentString>
             <PersistentString
-               value = "registers.HL">
+               value = "registers.PC">
             </PersistentString>
             <PersistentString
                value = "mmu.readByte(address: registers.DE)">
@@ -156,7 +156,7 @@
                value = "registers.SP">
             </PersistentString>
             <PersistentString
-               value = "registers.PC">
+               value = "registers.HL">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -178,6 +178,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "microbee.executeEDInstructions(opcode2:opcode3:opcode4:):Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "preserveEI">
+            </PersistentString>
+            <PersistentString
+               value = "registers.F">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "EmulatorView.VDURam(_:_:):EmulatorView.swift">
          <PersistentStrings>
             <PersistentString
@@ -189,15 +200,23 @@
          contextName = "microbee.executeFDCBInstructions(opcode3:opcode4:):Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.F">
+               value = "registers.IY">
             </PersistentString>
             <PersistentString
-               value = "registers.IY">
+               value = "registers.F">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "closure #1 in closure #1 in closure #1 in closure #1 in closure #1 in EmulatorView.body.getter:EmulatorView.swift">
+      </ContextState>
+      <ContextState
+         contextName = "closure #1 in closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "0 &amp;- 16">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):MMU.swift">
@@ -215,14 +234,6 @@
       </ContextState>
       <ContextState
          contextName = "EmulatorView.body.getter:EmulatorView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "closure #2 in closure #1 in closure #1 in memoryAndInstructionView.body.getter:MemoryAndInstructionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "String(format: &quot;0x%04X&quot;, snapshot.z80Snapshot.PC)">
-            </PersistentString>
-         </PersistentStrings>
       </ContextState>
    </ContextStates>
 </VariablesViewState>

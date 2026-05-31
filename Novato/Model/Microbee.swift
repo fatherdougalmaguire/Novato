@@ -151,9 +151,13 @@ actor microbee
             let carry: UInt32 = addCarry ? 1 : 0
             let tempResultOverflow = UInt32(operand1) + UInt32(operand2) + carry
             let tempResult = UInt16(tempResultOverflow & 0xFFFF)
-            var tempFlags = currentFlags & ~(z80Flags.Negative.rawValue | z80Flags.Carry.rawValue |
-                                   z80Flags.HalfCarry.rawValue | z80Flags.ParityOverflow.rawValue |
-                                   z80Flags.Sign.rawValue | z80Flags.Zero.rawValue)
+            
+            let tempResultHigh = UInt8(tempResult >> 8)
+            let tempX = tempResultHigh & 0x08
+            let tempY = tempResultHigh & 0x20
+
+            var tempFlags =  tempX | tempY
+            
             if tempResultOverflow > 0xFFFF
             {
                 tempFlags = tempFlags | z80Flags.Carry.rawValue
@@ -220,11 +224,11 @@ actor microbee
             let tempResultOverflow = Int32(operand1) - Int32(operand2) - carry
             let tempResult = UInt16(tempResultOverflow & 0xFFFF)
             
-            var tempFlags = currentFlags & ~(z80Flags.Negative.rawValue | z80Flags.Carry.rawValue |
-                                   z80Flags.HalfCarry.rawValue | z80Flags.ParityOverflow.rawValue |
-                                   z80Flags.Sign.rawValue | z80Flags.Zero.rawValue)
+            let tempResultHigh = UInt8(tempResult >> 8)
+            let tempX = tempResultHigh & 0x08
+            let tempY = tempResultHigh & 0x20
 
-            tempFlags |= z80Flags.Negative.rawValue
+            var tempFlags = z80Flags.Negative.rawValue | tempX | tempY
 
             if tempResultOverflow  < 0
             {
@@ -7128,9 +7132,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x42: // SBC HL,BC - ED 42 - Subtracts BC and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,BC", opcode: [0xED,0x42], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.subHelper16(operand1: registers.HL, operand2: registers.BC,currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x43: // LD ($nn),BC - ED 43 n n - Stores BC into the memory location pointed to by $nn
@@ -7147,6 +7153,7 @@ actor microbee
            logInstructionDetails(instructionDetails: "NEG", opcode: [0xED,0x44], programCounter: registers.PC)
            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: 0, operand2: registers.A)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 8
            incrementR(opcodeCount:2)
        case 0x45: // RETN - ED 45 - Used at the end of a non-maskable interrupt service routine (located at 0066h) to pop the top stack entry into PC. The value of IFF2 is copied to IFF1 so that maskable interrupts are allowed to continue as before. NMIs are not enabled on the TI
@@ -7178,8 +7185,8 @@ actor microbee
            logInstructionDetails(instructionDetails: "IN C,(C)", opcode: [0xED,0x48], programCounter: registers.PC)
            let tempValue = registers.C
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.C = ports.readPort(portNum: tempResult)
-           //registers.C = ports[Int(tempValue)]
            switch tempValue
            {
            case 0x08: break // registers.C contains value of colour control port
@@ -7193,6 +7200,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.C) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x49: // OUT (C),C - ED 49 - The value of C is written to port C
@@ -7256,9 +7264,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x4A: // ADC HL,BC - ED 4A - Adds BC and the carry flag to HL
            logInstructionDetails(instructionDetails: "ADC HL,BC", opcode: [0xED,0x4A], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.BC,currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x4B: // LD BC,($nn) - ED 4B n n - Loads the value pointed to by $nn into BC
@@ -7291,8 +7301,8 @@ actor microbee
        case 0x50: // IN D,(C) - ED 50 - A byte from port C is written to D
            logInstructionDetails(instructionDetails: "IN D,(C)", opcode: [0xED,0x50], programCounter: registers.PC)
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.D = ports.readPort(portNum: tempResult)
-           //registers.D = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.D contains value of colour control port
@@ -7305,6 +7315,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.D) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x51: // OUT (C),D - ED 51 - The value of D is written to port C
@@ -7368,9 +7379,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x52: // SBC HL,DE - ED 52 - Subtracts DE and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,DE", opcode: [0xED,0x52], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.subHelper16(operand1: registers.HL, operand2: registers.DE, currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x53: // LD ($nn),DE - ED 53 n n - Stores DE into the memory location pointed to by $nn
@@ -7408,15 +7421,16 @@ actor microbee
                registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
            }
            registers.P = 1
-           registers.EI = preserveEI
+           registers.EI = preserveEI == 1 ? 0 : registers.EI
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 9
            incrementR(opcodeCount:2)
        case 0x58: // IN E,(C) - ED 50 - A byte from port C is written to E
            logInstructionDetails(instructionDetails: "IN E,(C)", opcode: [0xED,0x58], programCounter: registers.PC)
-           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.E = ports.readPort(portNum: tempResult)
-           //registers.E = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.E contains value of colour control port
@@ -7429,6 +7443,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.E) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x59: // OUT (C),E - ED 59 - The value of E is written to port C
@@ -7492,9 +7507,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x5A: // ADC HL,DE - ED 5A - Adds DE and the carry flag to HL
            logInstructionDetails(instructionDetails: "ADC HL,DE", opcode: [0xED,0x5A], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.DE,currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x5B: // LD DE,($nn) - ED 5B n n - Loads the value pointed to by $nn into DE
@@ -7517,6 +7534,7 @@ actor microbee
        case 0x5F: // LD A,R - ED 5F - Stores the value of register R into A
            // If an interrupt occurs during execution of this instruction, the parity flag contains a 0
            logInstructionDetails(instructionDetails: "LD A,R", opcode: [0xED,0x5F], programCounter: registers.PC)
+           incrementR(opcodeCount:2)
            registers.A = registers.R
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.R) | carry
@@ -7532,15 +7550,16 @@ actor microbee
                registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
            }
            registers.P = 1
-           registers.EI = preserveEI
+           registers.EI = preserveEI == 1 ? 0 : registers.EI
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 9
-           incrementR(opcodeCount:2)
+           
        case 0x60: // IN H,(C) - ED 60 - A byte from port C is written to H
            logInstructionDetails(instructionDetails: "IN H,(C)", opcode: [0xED,0x60], programCounter: registers.PC)
-           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.H = ports.readPort(portNum: tempResult)
-           // registers.H = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.H contains value of colour control port
@@ -7553,6 +7572,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.H) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x61: // OUT (C),H - ED 61 - The value of H is written to port C
@@ -7616,9 +7636,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x62: // SBC HL,HL - ED 62 - Subtracts HL and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,HL", opcode: [0xED,0x62], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.subHelper16(operand1: registers.HL, operand2: registers.HL, currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x63: // Undocumented - LD ($nn),HL - ED 63 n n - Stores HL into the memory location pointed to by $nn
@@ -7630,8 +7652,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x67: // RRD - ED 67 - The contents of the low-order nibble of (HL) are copied to the low-order nibble of A. The previous contents are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of (HL)
            logInstructionDetails(instructionDetails: "RRD", opcode: [0xED,0x67], programCounter: registers.PC)
-           let carry = registers.F | z80Flags.Carry.rawValue
+           let carry = registers.F & z80Flags.Carry.rawValue
            let contentsHL = mmu.readByte(address: registers.HL)
+           registers.WZ = registers.HL &+ 1
            let upperHL = contentsHL >> 4
            let lowerHL = contentsHL & 0b00001111
            let lowerA = registers.A & 0b00001111
@@ -7643,13 +7666,14 @@ actor microbee
            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
            registers.F = registers.F | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 18
            incrementR(opcodeCount:2)
        case 0x68: // IN L,(C) - ED 68 - A byte from port C is written to L
            logInstructionDetails(instructionDetails: "IN L,(C)", opcode: [0xED,0x68], programCounter: registers.PC)
-           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.L = ports.readPort(portNum: tempResult)
-           //registers.L = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.L contains value of colour control port
@@ -7662,6 +7686,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.L) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x69: // OUT (C),L - ED 69 - The value of L is written to port C
@@ -7725,9 +7750,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x6A: // ADC HL,HL - ED 6A - Adds HL and the carry flag to HL
            logInstructionDetails(instructionDetails: "ADC HL,HL", opcode: [0xED,0x6A], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.HL,currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x6B: // Undocumented - LD HL,($nn) - ED 6B n n - Loads the value pointed to by $nn into HL
@@ -7739,7 +7766,8 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x6F: // RLD - ED 6F - The contents of the low-order nibble of (HL) are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of A. The previous contents are copied to the low-order nibble of (HL)
            logInstructionDetails(instructionDetails: "RLD", opcode: [0xED,0x6F], programCounter: registers.PC)
-           let carry = registers.F | z80Flags.Carry.rawValue
+           let carry = registers.F & z80Flags.Carry.rawValue
+           registers.WZ = registers.HL &+ 1
            let contentsHL = mmu.readByte(address: registers.HL)
            let upperHL = contentsHL >> 4
            let lowerHL = contentsHL & 0b00001111
@@ -7752,6 +7780,7 @@ actor microbee
            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
            registers.F = registers.F | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 18
            incrementR(opcodeCount:2)
        case 0x70: // Undocumented - IN (C) - ED 70 - Inputs a byte from port C and affects flags only
@@ -7770,9 +7799,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x72: // SBC HL,SP - ED 72 - Subtracts SP and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,SP", opcode: [0xED,0x72], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.subHelper16(operand1: registers.HL, operand2: registers.SP, currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x73: // LD ($nn),SP - ED 73 n n - Stores SP into the memory location pointed to by $nn
@@ -7787,9 +7818,9 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x78: // IN A,(C) - ED 78 - A byte from port C is written to A
            logInstructionDetails(instructionDetails: "IN A,(C)", opcode: [0xED,0x78], programCounter: registers.PC)
-           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+           registers.WZ = tempResult + 1
            registers.A = ports.readPort(portNum: tempResult)
-           //registers.A = ports[Int(registers.C)]
            switch registers.C
            {
            case 0x08: break // registers.A contains value of colour control port
@@ -7802,6 +7833,7 @@ actor microbee
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.A) | carry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 12
            incrementR(opcodeCount:2)
        case 0x79: // OUT (C),A - ED 79 - The value of A is written to port C
@@ -7865,9 +7897,11 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x7A: // ADC HL,SP - ED 7A - Adds SP and the carry flag to HL
            logInstructionDetails(instructionDetails: "ADC HL,SP", opcode: [0xED,0x7A], programCounter: registers.PC)
+           registers.WZ = registers.HL &+ 1
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0
            (registers.HL,registers.F) = z80FastFlags.addHelper16(operand1: registers.HL, operand2: registers.SP,currentFlags: registers.F, addCarry: addCarry)
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 15
            incrementR(opcodeCount:2)
        case 0x7B: // LD SP,($nn) - ED 7B n n - Loads the value pointed to by $nn into SP
