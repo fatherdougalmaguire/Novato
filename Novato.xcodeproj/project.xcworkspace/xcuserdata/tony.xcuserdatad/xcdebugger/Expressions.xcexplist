@@ -9,12 +9,7 @@
          contextName = "Z80CPU.init():Z80CPU.swift">
       </ContextState>
       <ContextState
-         contextName = "closure #2 in closure #1 in closure #1 in memoryAndInstructionView.body.getter:MemoryAndInstructionView.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "String(format: &quot;0x%04X&quot;, snapshot.z80Snapshot.PC)">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
       </ContextState>
       <ContextState
          contextName = "Z80Disasm.addToQueue(address:opCodes:):Z80Disasm.swift">
@@ -147,13 +142,13 @@
                value = "registers.DE">
             </PersistentString>
             <PersistentString
-               value = "registers.PC">
+               value = "registers.SP">
             </PersistentString>
             <PersistentString
                value = "mmu.readByte(address: registers.DE)">
             </PersistentString>
             <PersistentString
-               value = "registers.SP">
+               value = "registers.PC">
             </PersistentString>
             <PersistentString
                value = "registers.HL">
@@ -181,10 +176,19 @@
          contextName = "microbee.executeEDInstructions(opcode2:opcode3:opcode4:):Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "preserveEI">
+               value = "registers.HL">
+            </PersistentString>
+            <PersistentString
+               value = "registers.DE">
             </PersistentString>
             <PersistentString
                value = "registers.F">
+            </PersistentString>
+            <PersistentString
+               value = "registers.A">
+            </PersistentString>
+            <PersistentString
+               value = "registers.BC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -219,6 +223,17 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "closure #2 in closure #1 in closure #1 in memoryAndInstructionView.body.getter:MemoryAndInstructionView.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "String(format: &quot;0x%04X&quot;, snapshot.z80Snapshot.PC)">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "EmulatorView.body.getter:EmulatorView.swift">
+      </ContextState>
+      <ContextState
          contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):MMU.swift">
       </ContextState>
       <ContextState
@@ -228,12 +243,6 @@
                value = "vm.memoryDump.count">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "closure #1 in closure #1 in closure #1 in MemoryView.body.getter:MemoryView.swift">
-      </ContextState>
-      <ContextState
-         contextName = "EmulatorView.body.getter:EmulatorView.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

@@ -54,15 +54,15 @@
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>14</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>5</string>
-					<key>StartingColumnNumber</key>
 					<string>4</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>5</string>
+					<string>3</string>
 					<key>Timestamp</key>
-					<string>800607012.899102</string>
+					<string>801986453.956465</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -78,15 +78,16 @@
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>testCycles</string>
+				<string>let testCycles = 1000
+</string>
 				<key>leading</key>
-				<string>// use .filter { $0.name == "DB 0145" } against loadJsonTests to filter specific use case
+				<string>import Testing
 
-let </string>
+</string>
 				<key>trailing</key>
-				<string> = 1000
-let testTiming = 30
+				<string>let testTiming = 30
 
+var finalPortValue : UInt8 = 0
 </string>
 			</dict>
 			<key>type</key>
@@ -100,13 +101,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>11782</string>
+					<string>11802</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>11781</string>
+					<string>11801</string>
 					<key>Timestamp</key>
-					<string>801830691.895404</string>
+					<string>802001896.861172</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -311,7 +312,7 @@ let testTiming = 30
 				<key>trailing</key>
 				<string>    {
        switch opcode2
-       {
+        {
 </string>
 			</dict>
 			<key>type</key>
@@ -325,13 +326,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>10496</string>
+					<string>10516</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>10495</string>
+					<string>10515</string>
 					<key>Timestamp</key>
-					<string>801830691.8954279</string>
+					<string>802001896.861142</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -370,13 +371,13 @@ let testTiming = 30
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>8244</string>
+					<string>8264</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>8243</string>
+					<string>8263</string>
 					<key>Timestamp</key>
-					<string>801830691.895435</string>
+					<string>802001896.861165</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>

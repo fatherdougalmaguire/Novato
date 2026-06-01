@@ -7050,7 +7050,7 @@ actor microbee
     private func executeEDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8)
     {
        switch opcode2
-       {
+        {
        case 0x40: // IN B,(C) - ED 40 - A byte from port C is written to B
            logInstructionDetails(instructionDetails: "IN B,(C)", opcode: [0xED,0x40], programCounter: registers.PC)
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
@@ -7080,7 +7080,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.B, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.B, bitPosition: 1)
                {
@@ -7194,7 +7194,7 @@ actor microbee
            case 0x0B: break // registers.C contains value of font rom control port
            case 0x0C: registers.C = crtc.readStatusRegister()
            case 0x0D: registers.C = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
-           //case 0x0D: registers.C = crtc.readRegister(RegNum:ports[0x0C])
+               //case 0x0D: registers.C = crtc.readRegister(RegNum:ports[0x0C])
            default: break // other ports go here
            }
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -7212,7 +7212,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.C, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.C, bitPosition: 1)
                {
@@ -7327,7 +7327,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.D, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.D, bitPosition: 1)
                {
@@ -7455,7 +7455,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.E, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.E, bitPosition: 1)
                {
@@ -7554,7 +7554,6 @@ actor microbee
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
            tStates = tStates + 9
-           
        case 0x60: // IN H,(C) - ED 60 - A byte from port C is written to H
            logInstructionDetails(instructionDetails: "IN H,(C)", opcode: [0xED,0x60], programCounter: registers.PC)
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
@@ -7584,7 +7583,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.H, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.H, bitPosition: 1)
                {
@@ -7698,7 +7697,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.L, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.L, bitPosition: 1)
                {
@@ -7845,7 +7844,7 @@ actor microbee
            case 0x08:
                if testBit(value: registers.A, bitPosition: 1)
                {
-                  crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
                }
                if !testBit(value: registers.A, bitPosition: 1)
                {
@@ -7922,45 +7921,59 @@ actor microbee
            registers.DE = registers.DE &+ 1
            registers.BC = registers.BC &- 1
            registers.F = registers.F &  ~z80Flags.Negative.rawValue
-           if registers.BC == 0
-           {
-               registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
-           }
-           else
+           registers.F = registers.F &  ~z80Flags.HalfCarry.rawValue
+           let tempResult = tempValue &+ registers.A
+           let tempX = tempResult & 0x08
+           let tempY = (tempResult & 0x02) << 4
+           registers.F = registers.F & ~z80Flags.X.rawValue & ~z80Flags.Y.rawValue & ~z80Flags.ParityOverflow.rawValue
+           registers.F = registers.F | tempX | tempY
+           if registers.BC != 0
            {
                registers.F = registers.F | z80Flags.ParityOverflow.rawValue
            }
            tStates = tStates + 16
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            incrementR(opcodeCount:2)
        case 0xA1: // CPI - ED A1 - Compares the value of the memory location pointed to by HL with A. Then HL is incremented and BC is decremented. p/v is reset if BC becomes zero and set otherwise
            logInstructionDetails(instructionDetails: "CPI", opcode: [0xED,0xA1], programCounter: registers.PC)
+           registers.WZ = registers.WZ &+ 1
            let tempValue = mmu.readByte(address: registers.HL)
-           let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempValue)
            let oldCarry = registers.F & z80Flags.Carry.rawValue
-           registers.F = tempFlags | z80Flags.Negative.rawValue
-           registers.F = registers.F | oldCarry
+           let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempValue)
+           let tempResult = registers.A &- tempValue &- ((tempFlags & z80Flags.HalfCarry.rawValue) >> 4)
+           let tempX = tempResult & 0x08
+           let tempY = (tempResult & 0x02) << 4
+           registers.F = tempFlags
+           registers.F = registers.F & ~z80Flags.X.rawValue & ~z80Flags.Y.rawValue & ~z80Flags.ParityOverflow.rawValue & ~z80Flags.Carry.rawValue
+           registers.F = registers.F | tempX | tempY | z80Flags.Negative.rawValue | oldCarry
            registers.HL = registers.HL &+ 1
            registers.BC = registers.BC &- 1
-           if registers.BC == 0
+           if registers.BC != 0
            {
-               registers.F = registers.F & ~z80Flags.Zero.rawValue
-           }
-           else
-           {
-               registers.F = registers.F | z80Flags.Zero.rawValue
+               registers.F = registers.F | z80Flags.ParityOverflow.rawValue
            }
            tStates = tStates + 16
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            incrementR(opcodeCount:2)
        case 0xA2: // INI - ED A2 - A byte from port C is written to the memory location pointed to by HL. Then HL is incremented and B is decremented
            logInstructionDetails(instructionDetails: "INI", opcode: [0xED,0xA2], programCounter: registers.PC)
+           registers.WZ = registers.BC &+ 1
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            let tempValue = ports.readPort(portNum: tempResult)
-           //let tempValue = ports[Int(registers.C)]
+           switch tempValue
+           {
+           case 0x08: break // registers.A contains value of colour control port
+           case 0x0A: break // NET selection INPUT from port - whatever this means
+           case 0x0B: break // registers.A contains value of font rom control port
+           case 0x0C: registers.A = crtc.readStatusRegister()
+           case 0x0D: registers.A = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
+           default: break // other ports go here
+           }
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &+ 1
-           registers.B = registers.B &- 1
+           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
            if registers.B == 0
            {
                registers.F = registers.F | z80Flags.Zero.rawValue
@@ -7971,6 +7984,7 @@ actor microbee
            }
            registers.F = registers.F | z80Flags.Negative.rawValue
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 16
            incrementR(opcodeCount:2)
        case 0xA3: // OUTI - ED AB - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented
@@ -7995,37 +8009,42 @@ actor microbee
            registers.HL = registers.HL &- 1
            registers.DE = registers.DE &- 1
            registers.BC = registers.BC &- 1
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           if registers.BC == 0
-           {
-               registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
-           }
-           else
+           registers.F = registers.F &  ~z80Flags.Negative.rawValue
+           registers.F = registers.F &  ~z80Flags.HalfCarry.rawValue
+           let tempResult = tempValue &+ registers.A
+           let tempX = tempResult & 0x08
+           let tempY = (tempResult & 0x02) << 4
+           registers.F = registers.F & ~z80Flags.X.rawValue & ~z80Flags.Y.rawValue & ~z80Flags.ParityOverflow.rawValue
+           registers.F = registers.F | tempX | tempY
+           if registers.BC != 0
            {
                registers.F = registers.F | z80Flags.ParityOverflow.rawValue
            }
            tStates = tStates + 16
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            incrementR(opcodeCount:2)
        case 0xA9: // CPD - ED A9 - Compares the value of the memory location pointed to by HL with A. Then HL and BC are decremented. p/v is reset if BC becomes zero and set otherwise
            logInstructionDetails(instructionDetails: "CPD", opcode: [0xED,0xA9], programCounter: registers.PC)
+           registers.WZ = registers.WZ &- 1
            let tempValue = mmu.readByte(address: registers.HL)
-           let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempValue)
            let oldCarry = registers.F & z80Flags.Carry.rawValue
-           registers.F = tempFlags | z80Flags.Negative.rawValue
-           registers.F = registers.F | oldCarry
+           let (_,tempFlags) = z80FastFlags.subHelper(operand1: registers.A, operand2: tempValue)
+           let tempResult = registers.A &- tempValue &- ((tempFlags & z80Flags.HalfCarry.rawValue) >> 4)
+           let tempX = tempResult & 0x08
+           let tempY = (tempResult & 0x02) << 4
+           registers.F = tempFlags
+           registers.F = registers.F & ~z80Flags.X.rawValue & ~z80Flags.Y.rawValue & ~z80Flags.ParityOverflow.rawValue & ~z80Flags.Carry.rawValue
+           registers.F = registers.F | tempX | tempY | z80Flags.Negative.rawValue | oldCarry
            registers.HL = registers.HL &- 1
            registers.BC = registers.BC &- 1
-           if registers.BC == 0
+           if registers.BC != 0
            {
-               registers.F = registers.F & ~z80Flags.Zero.rawValue
-           }
-           else
-           {
-               registers.F = registers.F | z80Flags.Zero.rawValue
+               registers.F = registers.F | z80Flags.ParityOverflow.rawValue
            }
            tStates = tStates + 16
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            incrementR(opcodeCount:2)
        case 0xAA: // IND - ED AA - A byte from port C is written to the memory location pointed to by HL. Then HL and B are decremented
            logInstructionDetails(instructionDetails: "IND", opcode: [0xED,0xAA], programCounter: registers.PC)
@@ -8064,23 +8083,22 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xB0: // LDIR - ED B0 - Transfers a byte of data from the memory location pointed to by HL to the memory location pointed to by DE. Then HL and DE are incremented and BC is decremented. If BC is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "LDIR", opcode: [0xED,0xB0], programCounter: registers.PC)
-           mmu.writeByte(address: registers.DE, value : mmu.readByte(address: registers.HL))
+           let tempValue = mmu.readByte(address: registers.HL)
+           mmu.writeByte(address: registers.DE, value : tempValue)
            registers.HL = registers.HL &+ 1
            registers.DE = registers.DE &+ 1
            registers.BC = registers.BC &- 1
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
-           if registers.BC == 0
-           {
-               registers.F = registers.F | z80Flags.ParityOverflow.rawValue
-               tStates = tStates + 16
-               registers.PC = registers.PC &+ 2
-           }
-           else
-           {
-               registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
-               tStates = tStates + 21
-           }
+           let tempResult = registers.A &+ tempValue
+           let tempX = tempResult & 0x08
+           let tempY = (tempResult & 0x02) << 4
+           let tempParityOverflow = registers.BC != 0 ? z80Flags.ParityOverflow.rawValue : 0x00
+           let tempFlags = registers.F & (z80Flags.Sign.rawValue | z80Flags.Zero.rawValue | z80Flags.Carry.rawValue)
+           registers.F = tempFlags | tempY | tempX | tempParityOverflow // something is wrong here
+           let repeating = registers.BC != 0
+           tStates = tStates + (repeating ? 21 : 16)
+           registers.PC = registers.PC &+ (repeating ? 0 : 2)
+           registers.WZ = registers.BC == 1 ? registers.WZ : registers.PC &+ 1
+           registers.Q = registers.F
            incrementR(opcodeCount:2)
        case 0xB1: // CPIR - ED B1 - Compares the value of the memory location pointed to by HL with A. Then HL is incremented and BC is decremented. If BC is not zero and z is not set, this operation is repeated. p/v is reset if BC becomes zero and set otherwise, acting as an indicator that HL reached a memory location whose value equalled A before the counter went to zero. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "CPIR", opcode: [0xED,0xB1], programCounter: registers.PC)
@@ -8129,16 +8147,15 @@ actor microbee
                tStates = tStates + 21
            }
            incrementR(opcodeCount:2)
-       case 0xB8: // LDDR - ED B8 - Transfers a byte of data from the memory location pointed to by HL to the memory location pointed to by DE. Then HL, DE, and BC are decremented. If BC is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
-           logInstructionDetails(instructionDetails: "LDDR", opcode: [0xED,0xB8], programCounter: registers.PC)
-           mmu.writeByte(address: registers.DE, value : mmu.readByte(address: registers.HL))
-           registers.HL = registers.HL &- 1
-           registers.DE = registers.DE &- 1
-           registers.BC = registers.BC &- 1
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
-           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
-           if registers.BC == 0
+       case 0xB3: // OTIR - ED B3 - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
+           logInstructionDetails(instructionDetails: "OTIR", opcode: [0xED,0xB3], programCounter: registers.PC)
+           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
+           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
+           //ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           registers.HL = registers.HL &+ 1
+           registers.B = registers.B &- 1
+           registers.F = registers.F | z80Flags.Negative.rawValue | z80Flags.Zero.rawValue
+           if registers.B == 0
            {
                tStates = tStates + 16
                registers.PC = registers.PC &+ 2
@@ -8147,6 +8164,26 @@ actor microbee
            {
                tStates = tStates + 21
            }
+           incrementR(opcodeCount:2)
+       case 0xB8: // LDDR - ED B8 - Transfers a byte of data from the memory location pointed to by HL to the memory location pointed to by DE. Then HL, DE, and BC are decremented. If BC is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
+           logInstructionDetails(instructionDetails: "LDDR", opcode: [0xED,0xB8], programCounter: registers.PC)
+           let tempValue = mmu.readByte(address: registers.HL)
+           mmu.writeByte(address: registers.DE, value : tempValue)
+           registers.HL = registers.HL &- 1
+           registers.DE = registers.DE &- 1
+           registers.BC = registers.BC &- 1
+           let tempResult = registers.A &+ tempValue
+           let tempX = tempResult & 0x08
+           let tempY = (tempResult & 0x02) << 4
+           let tempParityOverflow = registers.BC != 0 ? z80Flags.ParityOverflow.rawValue : 0x00
+           let tempFlags = registers.F & (z80Flags.Sign.rawValue | z80Flags.Zero.rawValue | z80Flags.Carry.rawValue)
+           registers.F = tempFlags | tempY | tempX | tempParityOverflow // why is tempX calculating wrong
+           //registers.F = tempFlags | tempY | tempParityOverflow // why is tempX calculating wrong
+           let repeating = registers.BC != 0
+           tStates = tStates + (repeating ? 21 : 16)
+           registers.PC = registers.PC &+ (repeating ? 0 : 2)
+           registers.WZ = registers.BC == 1 ? registers.WZ : registers.PC &+ 1
+           registers.Q = registers.F
            incrementR(opcodeCount:2)
        case 0xBA: // INDR - ED BA - A byte from port C is written to the memory location pointed to by HL. Then HL and B are decremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing.
            logInstructionDetails(instructionDetails: "INIR", opcode: [0xED,0xBA], programCounter: registers.PC)
@@ -8167,24 +8204,7 @@ actor microbee
                tStates = tStates + 21
            }
            incrementR(opcodeCount:2)
-       case 0xB3: // OTIR - ED B3 - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
-           logInstructionDetails(instructionDetails: "OTIR", opcode: [0xED,0xB3], programCounter: registers.PC)
-           let tempResult = UInt16(registers.A) << 8 | UInt16(registers.C)
-           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
-           //ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
-           registers.HL = registers.HL &+ 1
-           registers.B = registers.B &- 1
-           registers.F = registers.F | z80Flags.Negative.rawValue | z80Flags.Zero.rawValue
-           if registers.B == 0
-           {
-               tStates = tStates + 16
-               registers.PC = registers.PC &+ 2
-           }
-           else
-           {
-               tStates = tStates + 21
-           }
-           incrementR(opcodeCount:2)
+       
        case 0xB9: // CPDR - ED B9 - Compares the value of the memory location pointed to by HL with A. Then HL and BC are decremented. If BC is not zero and z is not set, this operation is repeated. p/v is reset if BC becomes zero and set otherwise, acting as an indicator that HL reached a memory location whose value equalled A before the counter went to zero. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "CPDR", opcode: [0xED,0xB9], programCounter: registers.PC)
            let tempValue = mmu.readByte(address: registers.HL)
