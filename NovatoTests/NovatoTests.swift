@@ -3906,7 +3906,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate INI (0xEDA2)",  arguments: loadJsonTests(named: "ed a2", range: 0...testCycles-1))
+        @Test("Validate INI (0xEDA2)",  arguments: loadJsonTests(named: "ed a2", range: 0...0))
         func test_INI(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)

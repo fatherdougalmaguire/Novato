@@ -7962,27 +7962,27 @@ actor microbee
            registers.WZ = registers.BC &+ 1
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            let tempValue = ports.readPort(portNum: tempResult)
-           switch tempValue
-           {
-           case 0x08: break // registers.A contains value of colour control port
-           case 0x0A: break // NET selection INPUT from port - whatever this means
-           case 0x0B: break // registers.A contains value of font rom control port
-           case 0x0C: registers.A = crtc.readStatusRegister()
-           case 0x0D: registers.A = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
-           default: break // other ports go here
-           }
+//           switch tempValue
+//           {
+//           case 0x08: break // registers.A contains value of colour control port
+//           case 0x0A: break // NET selection INPUT from port - whatever this means
+//           case 0x0B: break // registers.A contains value of font rom control port
+//           case 0x0C: registers.A = crtc.readStatusRegister()
+//           case 0x0D: registers.A = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
+//           default: break // other ports go here
+//           }
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &+ 1
            (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
-           if registers.B == 0
-           {
-               registers.F = registers.F | z80Flags.Zero.rawValue
-           }
-           else
-           {
-               registers.F = registers.F & ~z80Flags.Zero.rawValue
-           }
-           registers.F = registers.F | z80Flags.Negative.rawValue
+           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
+           let tempNegative : UInt8 = (tempValue & 0x80) >> 6
+           let tempFlagCalc : UInt8 = (tempValue &+ ((registers.C &+ 1) & 0xFF) > 0xFF) ? 1 : 0
+           let tempHalfCarry : UInt8 = tempFlagCalc << 4
+           let tempCarry : UInt8 = tempFlagCalc
+           let tempParityCalc : UInt8 = (tempValue &+ ((registers.C &+ 1) & 0x07) ^ registers.B)
+           let (_,tempFlagParity) = z80FastFlags.logicHelper(tempResult: tempParityCalc)
+           let tempParityOverflow = tempFlagParity & z80Flags.ParityOverflow.rawValue
+           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
            tStates = tStates + 16
