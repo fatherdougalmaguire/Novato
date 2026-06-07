@@ -1804,11 +1804,11 @@ actor microbee
         case 0x42: // BIT 0,D - CB 42 - Tests bit 0 of D
             logInstructionDetails(instructionDetails: "BIT 0,D", opcode: [0xCB,0x42], programCounter: registers.PC)
             let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
-            let tempX : UInt8 = registers.C & z80Flags.X.rawValue
-            let tempY : UInt8 = registers.C & z80Flags.Y.rawValue
+            let tempX : UInt8 = registers.D & z80Flags.X.rawValue
+            let tempY : UInt8 = registers.D & z80Flags.Y.rawValue
             let tempSign : UInt8 = 0x00 // 0x80 for Bit 7, 0x00 otherwise
-            let tempZero : UInt8 = (registers.C & 0x01) == 0 ? 0x40 : 0x00
-            let tempParityOverflow : UInt8 = (registers.C & 0x01) == 0 ? 0x04 : 0x00
+            let tempZero : UInt8 = (registers.D & 0x01) == 0 ? 0x40 : 0x00
+            let tempParityOverflow : UInt8 = (registers.D & 0x01) == 0 ? 0x04 : 0x00
             let tempNegative : UInt8 = 0x00
             let tempHalfCarry : UInt8 = z80Flags.HalfCarry.rawValue
             registers.F = tempSign | tempZero | tempY | tempHalfCarry
@@ -7056,15 +7056,15 @@ actor microbee
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            registers.WZ = tempResult + 1
            registers.B = ports.readPort(portNum: tempResult)
-           switch registers.C
-           {
-           case 0x08: break // registers.B contains value of colour control port
-           case 0x0A: break // NET selection INPUT from port - whatever this means
-           case 0x0B: break // registers.B contains value of font rom control port
-           case 0x0C: registers.B = crtc.readStatusRegister()
-           case 0x0D: registers.B = crtc.readRegister(RegNum:ports.readPort(portNum: 0x000C))
-           default: break // other ports go here
-           }
+//           switch registers.C
+//           {
+//           case 0x08: break // registers.B contains value of colour control port
+//           case 0x0A: break // NET selection INPUT from port - whatever this means
+//           case 0x0B: break // registers.B contains value of font rom control port
+//           case 0x0C: registers.B = crtc.readStatusRegister()
+//           case 0x0D: registers.B = crtc.readRegister(RegNum:ports.readPort(portNum: 0x000C))
+//           default: break // other ports go here
+//           }
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.B) | carry
            registers.PC = registers.PC &+ 2
@@ -7075,56 +7075,56 @@ actor microbee
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            ports.writePort(portNum: tempResult, portValue: registers.B)
            registers.WZ = registers.BC &+ 1
-           switch registers.B
-           {
-           case 0x08:
-               if testBit(value: registers.B, bitPosition: 1)
-               {
-                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
-               }
-               if !testBit(value: registers.B, bitPosition: 1)
-               {
-                   crtc.registers.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
-               }
-               if testBit(value: registers.B, bitPosition: 2)
-               {
-                   crtc.registers.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
-               }
-               if !testBit(value: registers.B, bitPosition: 2)
-               {
-                   crtc.registers.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
-               }
-               if testBit(value: registers.B, bitPosition: 3)
-               {
-                   crtc.registers.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
-               }
-               if !testBit(value: registers.B, bitPosition: 3)
-               {
-                   crtc.registers.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
-               }
-               if testBit(value: registers.B, bitPosition: 6)
-               {
-                   mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram
-               }
-               if !testBit(value: registers.B, bitPosition: 6)
-               {
-                   mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)        // swap in pcg ram
-               }
-           case 0x0A: break //PAK N selection - need some mechanism to map PAK number to memory device
-           case 0x0B:
-               if registers.B == 1
-               {
-                   mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-               }
-               if registers.B == 0
-               {
-                   mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                   mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
-               }
-           case 0x0C: break // writing to port 0x0C needs no further processing
-           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
-           default: break // other ports go here
-           }
+//           switch registers.B
+//           {
+//           case 0x08:
+//               if testBit(value: registers.B, bitPosition: 1)
+//               {
+//                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+//               }
+//               if !testBit(value: registers.B, bitPosition: 1)
+//               {
+//                   crtc.registers.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
+//               }
+//               if testBit(value: registers.B, bitPosition: 2)
+//               {
+//                   crtc.registers.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
+//               }
+//               if !testBit(value: registers.B, bitPosition: 2)
+//               {
+//                   crtc.registers.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
+//               }
+//               if testBit(value: registers.B, bitPosition: 3)
+//               {
+//                   crtc.registers.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
+//               }
+//               if !testBit(value: registers.B, bitPosition: 3)
+//               {
+//                   crtc.registers.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
+//               }
+//               if testBit(value: registers.B, bitPosition: 6)
+//               {
+//                   mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram
+//               }
+//               if !testBit(value: registers.B, bitPosition: 6)
+//               {
+//                   mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)        // swap in pcg ram
+//               }
+//           case 0x0A: break //PAK N selection - need some mechanism to map PAK number to memory device
+//           case 0x0B:
+//               if registers.B == 1
+//               {
+//                   mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+//               }
+//               if registers.B == 0
+//               {
+//                   mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+//                   mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
+//               }
+//           case 0x0C: break // writing to port 0x0C needs no further processing
+//           case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: ports.readPort(portNum: 0x000D))
+//           default: break // other ports go here
+//           }
            logInstructionDetails(instructionDetails: "OUT (C),B", opcode: [0xED,0x41], programCounter: registers.PC)
            registers.Q = 0
            registers.PC = registers.PC &+ 2
@@ -7183,20 +7183,19 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0x48: // IN C,(C) - ED 48 - A byte from port C is written to B
            logInstructionDetails(instructionDetails: "IN C,(C)", opcode: [0xED,0x48], programCounter: registers.PC)
-           let tempValue = registers.C
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            registers.WZ = tempResult + 1
            registers.C = ports.readPort(portNum: tempResult)
-           switch tempValue
-           {
-           case 0x08: break // registers.C contains value of colour control port
-           case 0x0A: break // NET selection INPUT from port - whatever this means
-           case 0x0B: break // registers.C contains value of font rom control port
-           case 0x0C: registers.C = crtc.readStatusRegister()
-           case 0x0D: registers.C = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
-               //case 0x0D: registers.C = crtc.readRegister(RegNum:ports[0x0C])
-           default: break // other ports go here
-           }
+//           switch tempValue
+//           {
+//           case 0x08: break // registers.C contains value of colour control port
+//           case 0x0A: break // NET selection INPUT from port - whatever this means
+//           case 0x0B: break // registers.C contains value of font rom control port
+//           case 0x0C: registers.C = crtc.readStatusRegister()
+//           case 0x0D: registers.C = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
+//               //case 0x0D: registers.C = crtc.readRegister(RegNum:ports[0x0C])
+//           default: break // other ports go here
+//           }
            let carry = registers.F & z80Flags.Carry.rawValue
            registers.F = z80FastFlags.basicHelper(tempResult: registers.C) | carry
            registers.PC = registers.PC &+ 2
@@ -7962,26 +7961,17 @@ actor microbee
            registers.WZ = registers.BC &+ 1
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            let tempValue = ports.readPort(portNum: tempResult)
-//           switch tempValue
-//           {
-//           case 0x08: break // registers.A contains value of colour control port
-//           case 0x0A: break // NET selection INPUT from port - whatever this means
-//           case 0x0B: break // registers.A contains value of font rom control port
-//           case 0x0C: registers.A = crtc.readStatusRegister()
-//           case 0x0D: registers.A = crtc.readRegister(RegNum: ports.readPort(portNum: 0x000C))
-//           default: break // other ports go here
-//           }
+           // port reading code here
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &+ 1
            (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
            let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
            let tempNegative : UInt8 = (tempValue & 0x80) >> 6
-           let tempFlagCalc : UInt8 = (tempValue &+ ((registers.C &+ 1) & 0xFF) > 0xFF) ? 1 : 0
-           let tempHalfCarry : UInt8 = tempFlagCalc << 4
-           let tempCarry : UInt8 = tempFlagCalc
-           let tempParityCalc : UInt8 = (tempValue &+ ((registers.C &+ 1) & 0x07) ^ registers.B)
-           let (_,tempFlagParity) = z80FastFlags.logicHelper(tempResult: tempParityCalc)
-           let tempParityOverflow = tempFlagParity & z80Flags.ParityOverflow.rawValue
+           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C) + 1
+           let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
+           let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
+           let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
+           let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
            registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
@@ -7989,16 +7979,22 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xA3: // OUTI - ED AB - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented
            logInstructionDetails(instructionDetails: "OUTI", opcode: [0xED,0xA3], programCounter: registers.PC)
+           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
+           registers.WZ = registers.BC &+ 1
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
-           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
-           //ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           let tempValue = mmu.readByte(address: registers.HL)
+           ports.writePort(portNum: tempResult, portValue: tempValue)
+           // port writing code here
            registers.HL = registers.HL &+ 1
-           registers.B = registers.B &- 1
-           registers.F = registers.F | z80Flags.Negative.rawValue
-           if registers.B == 0
-           {
-               registers.F = registers.F | z80Flags.Zero.rawValue
-           }
+           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
+           let tempNegative : UInt8 = (tempValue & 0x80) >> 6
+           let tempResultFlags = UInt16(tempValue) + UInt16(registers.L)
+           let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
+           let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
+           let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
+           let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
+           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
+           registers.Q = registers.F
            tStates = tStates + 16
            registers.PC = registers.PC &+ 2
            incrementR(opcodeCount:2)
@@ -8048,58 +8044,70 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xAA: // IND - ED AA - A byte from port C is written to the memory location pointed to by HL. Then HL and B are decremented
            logInstructionDetails(instructionDetails: "IND", opcode: [0xED,0xAA], programCounter: registers.PC)
+           registers.WZ = registers.BC &- 1
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            let tempValue = ports.readPort(portNum: tempResult)
-           //let tempValue = ports[Int(registers.C)]
+           // port reading code here
            mmu.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &- 1
-           registers.B = registers.B &- 1
-           if registers.B == 0
-           {
-               registers.F = registers.F | z80Flags.Zero.rawValue
-           }
-           else
-           {
-               registers.F = registers.F & ~z80Flags.Zero.rawValue
-           }
-           registers.F = registers.F | z80Flags.Negative.rawValue
+           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
+           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
+           let tempNegative : UInt8 = (tempValue & 0x80) >> 6
+           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C) - 1
+           let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
+           let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
+           let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
+           let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
+           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
            registers.PC = registers.PC &+ 2
+           registers.Q = registers.F
            tStates = tStates + 16
            incrementR(opcodeCount:2)
        case 0xAB: // OUTD - ED AB - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is decremented
            logInstructionDetails(instructionDetails: "OUTD", opcode: [0xED,0xAB], programCounter: registers.PC)
+           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
+           registers.WZ = registers.BC &- 1
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
-           ports.writePort(portNum: tempResult, portValue: mmu.readByte(address: registers.HL))
-           // ports[Int(registers.C)] = mmu.readByte(address: registers.HL)
+           let tempValue = mmu.readByte(address: registers.HL)
+           ports.writePort(portNum: tempResult, portValue: tempValue)
+           // port writing code here
            registers.HL = registers.HL &- 1
-           registers.B = registers.B &- 1
-           registers.F = registers.F | z80Flags.Negative.rawValue
-           if registers.B == 0
-           {
-               registers.F = registers.F | z80Flags.Zero.rawValue
-           }
+           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
+           let tempNegative : UInt8 = (tempValue & 0x80) >> 6
+           let tempResultFlags = UInt16(tempValue) + UInt16(registers.L)
+           let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
+           let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
+           let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
+           let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
+           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
+           registers.Q = registers.F
            tStates = tStates + 16
            registers.PC = registers.PC &+ 2
            incrementR(opcodeCount:2)
        case 0xB0: // LDIR - ED B0 - Transfers a byte of data from the memory location pointed to by HL to the memory location pointed to by DE. Then HL and DE are incremented and BC is decremented. If BC is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
-           logInstructionDetails(instructionDetails: "LDIR", opcode: [0xED,0xB0], programCounter: registers.PC)
-           let tempValue = mmu.readByte(address: registers.HL)
-           mmu.writeByte(address: registers.DE, value : tempValue)
-           registers.HL = registers.HL &+ 1
-           registers.DE = registers.DE &+ 1
-           registers.BC = registers.BC &- 1
-           let tempResult = registers.A &+ tempValue
-           let tempX = tempResult & 0x08
-           let tempY = (tempResult & 0x02) << 4
-           let tempParityOverflow = registers.BC != 0 ? z80Flags.ParityOverflow.rawValue : 0x00
-           let tempFlags = registers.F & (z80Flags.Sign.rawValue | z80Flags.Zero.rawValue | z80Flags.Carry.rawValue)
-           registers.F = tempFlags | tempY | tempX | tempParityOverflow // something is wrong here
-           let repeating = registers.BC != 0
-           tStates = tStates + (repeating ? 21 : 16)
-           registers.PC = registers.PC &+ (repeating ? 0 : 2)
-           registers.WZ = registers.BC == 1 ? registers.WZ : registers.PC &+ 1
-           registers.Q = registers.F
-           incrementR(opcodeCount:2)
+          logInstructionDetails(instructionDetails: "LDIR", opcode: [0xED,0xB0], programCounter: registers.PC)
+          let tempValue = mmu.readByte(address: registers.HL)
+          mmu.writeByte(address: registers.DE, value : tempValue)
+          registers.HL = registers.HL &+ 1
+          registers.DE = registers.DE &+ 1
+          registers.BC = registers.BC &- 1
+          let tempResult = registers.A &+ tempValue
+          let tempX = tempResult & 0x08
+          let tempY = tempResult & 0x02 << 4
+          let tempParityOverflow = registers.BC != 0 ? z80Flags.ParityOverflow.rawValue : 0x00
+          let tempSign = registers.F & z80Flags.Sign.rawValue
+          let tempZero = registers.F & z80Flags.Zero.rawValue
+          let tempCarry = registers.F & z80Flags.Carry.rawValue
+          let tempHalfCarry = registers.F & z80Flags.HalfCarry.rawValue
+          let tempNegative : UInt8 = 0x00
+          registers.F = tempSign | tempZero | tempY | tempHalfCarry
+          registers.F = registers.F | tempX | tempNegative | tempParityOverflow | tempCarry
+          let repeating = registers.BC != 0
+          tStates = tStates + (repeating ? 21 : 16)
+          registers.PC = registers.PC &+ (repeating ? 0 : 2)
+          registers.WZ = registers.BC == 1 ? registers.WZ : registers.PC &+ 1
+          registers.Q = registers.F
+          incrementR(opcodeCount:2)
        case 0xB1: // CPIR - ED B1 - Compares the value of the memory location pointed to by HL with A. Then HL is incremented and BC is decremented. If BC is not zero and z is not set, this operation is repeated. p/v is reset if BC becomes zero and set otherwise, acting as an indicator that HL reached a memory location whose value equalled A before the counter went to zero. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "CPIR", opcode: [0xED,0xB1], programCounter: registers.PC)
            let tempValue = mmu.readByte(address: registers.HL)
@@ -12388,16 +12396,16 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x37: // SCF - 37 - Sets the carry flag
             logInstructionDetails(instructionDetails: "SCF", opcode: [0x37], programCounter: registers.PC)
-            var tempFlags = registers.F
-                
-            tempFlags &= ~z80Flags.Negative.rawValue      // N = 0
-            tempFlags &= ~z80Flags.HalfCarry.rawValue     // H = 0
-            tempFlags |= z80Flags.Carry.rawValue          // C = 1
-                
-                // Undocumented flags: copy bit 3 and 5 from A
-            tempFlags = (tempFlags & ~(z80Flags.X.rawValue | z80Flags.Y.rawValue)) | (registers.A & (z80Flags.X.rawValue | z80Flags.Y.rawValue))
-                
-                registers.F = tempFlags
+            let tempSign = registers.F & z80Flags.Sign.rawValue
+            let tempZero = registers.F & z80Flags.Zero.rawValue
+            let tempParityOverflow = registers.F & z80Flags.ParityOverflow.rawValue
+            let tempNegative : UInt8 = 0x00   // N = 0
+            let tempHalfCarry : UInt8 = 0x00  // H = 0
+            let tempCarry : UInt8 = 0x01     // C = 1
+            let tempX = ((registers.Q ^ registers.F) | registers.A)  & z80Flags.X.rawValue
+            let tempY = ((registers.Q ^ registers.F) | registers.A)  & z80Flags.Y.rawValue
+            registers.F = tempSign | tempZero | tempY | tempHalfCarry
+            registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
             registers.PC = registers.PC &+ 1
             registers.Q = registers.F
             tStates = tStates + 4
@@ -12474,18 +12482,21 @@ actor microbee
             tStates = tStates + 7
             incrementR(opcodeCount:1)
         case 0x3F: // CCF - 3F - Inverts the carry flag
-            logInstructionDetails(instructionDetails: "CCF", opcode: [0x3F], programCounter: registers.PC)
-            let previousCarry = registers.F & z80Flags.Carry.rawValue
-            let newHalfCarry = previousCarry << 4
-            registers.F = registers.F & ~z80Flags.Negative.rawValue
-            registers.F = registers.F | newHalfCarry
-            registers.F = registers.F ^ previousCarry
-            let tempQ = (registers.Q ^ registers.F) | registers.A
-            registers.F = registers.F | (tempQ & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
-            registers.F = registers.F | (tempQ & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
-            registers.PC = registers.PC &+ 1
-            tStates = tStates + 4
-            incrementR(opcodeCount:1)
+                logInstructionDetails(instructionDetails: "CCF", opcode: [0x3F], programCounter: registers.PC)
+                let tempSign = registers.F & z80Flags.Sign.rawValue
+                let tempZero = registers.F & z80Flags.Zero.rawValue
+                let tempParityOverflow = registers.F & z80Flags.ParityOverflow.rawValue
+                let tempNegative : UInt8 = 0x00   // N = 0
+                let tempHalfCarry = (registers.F & z80Flags.Carry.rawValue) << 4
+                let tempCarry = (registers.F & z80Flags.Carry.rawValue) == 0 ? z80Flags.Carry.rawValue : 0
+                let tempX = ((registers.Q ^ registers.F) | registers.A)  & z80Flags.X.rawValue
+                let tempY = ((registers.Q ^ registers.F) | registers.A)  & z80Flags.Y.rawValue
+                registers.F = tempSign | tempZero | tempY | tempHalfCarry
+                registers.F = registers.F | tempX | tempParityOverflow | tempNegative | tempCarry
+                registers.PC = registers.PC &+ 1
+                registers.Q = registers.F
+                tStates = tStates + 4
+                incrementR(opcodeCount:1)
         case 0x40: // LD B,B - 40 - The contents of B are loaded into B
             logInstructionDetails(instructionDetails: "LD B,B", opcode: [0x40], programCounter: registers.PC)
             registers.PC = registers.PC &+ 1
