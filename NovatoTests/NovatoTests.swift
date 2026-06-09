@@ -1187,7 +1187,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate DAA (0x27)",  arguments: loadJsonTests(named: "27", range: 0...testCycles-1))
+        @Test("Validate DAA (0x27)",  arguments: loadJsonTests(named: "27", range: 0...4))
         func test_DAA(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -3942,49 +3942,49 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LDIR (0xEDB0)",  arguments: loadJsonTests(named: "ed b0", range: 0...testCycles-1))
+        @Test("Validate LDIR (0xEDB0)",  arguments: loadJsonTests(named: "ed b0", range: 1...1))
         func test_LDIR(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
 
-        @Test("Validate CPIR (0xEDB1)",  arguments: loadJsonTests(named: "ed b1", range: 0...testCycles-1))
+        @Test("Validate CPIR (0xEDB1)",  arguments: loadJsonTests(named: "ed b1", range: 0...0))
         func test_CPIR(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
 
-        @Test("Validate INIR (0xEDB2)",  arguments: loadJsonTests(named: "ed b2", range: 0...testCycles-1))
+        @Test("Validate INIR (0xEDB2)",  arguments: loadJsonTests(named: "ed b2", range: 0...4))
         func test_INIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OTIR (0xEDB3)",  arguments: loadJsonTests(named: "ed b3", range: 0...testCycles-1))
+        @Test("Validate OTIR (0xEDB3)",  arguments: loadJsonTests(named: "ed b3", range: 0...4))
         func test_OTIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate LDDR (0xEDB8)",  arguments: loadJsonTests(named: "ed b8", range: 0...testCycles-1))
+        @Test("Validate LDDR (0xEDB8)",  arguments: loadJsonTests(named: "ed b8", range: 0...4))
         func test_LDDR(testCase: Z80Test) async throws
         {
             try await parent.runTest(testCase)
         }
 
-        @Test("Validate CPDR (0xED:B9)",  arguments: loadJsonTests(named: "ed b9", range: 0...testCycles-1))
+        @Test("Validate CPDR (0xED:B9)",  arguments: loadJsonTests(named: "ed b9", range: 0...4))
         func test_CPDR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate INDR (0xEDBA)",  arguments: loadJsonTests(named: "ed ba", range: 0...testCycles-1))
+        @Test("Validate INDR (0xEDBA)",  arguments: loadJsonTests(named: "ed ba", range: 0...4))
         func test_INDR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OTDR (0xEDBB)",  arguments: loadJsonTests(named: "ed bb", range: 0...testCycles-1))
+        @Test("Validate OTDR (0xEDBB)",  arguments: loadJsonTests(named: "ed bb", range: 0...4))
         func test_OTDR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)

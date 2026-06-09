@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "microbee.executeEDInstructions(opcode2:opcode3:opcode4:):Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.A">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
