@@ -1187,7 +1187,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate DAA (0x27)",  arguments: loadJsonTests(named: "27", range: 0...4))
+        @Test("Validate DAA (0x27)",  arguments: loadJsonTests(named: "27", range: 0...24))
         func test_DAA(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)
@@ -3960,7 +3960,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate OTIR (0xEDB3)",  arguments: loadJsonTests(named: "ed b3", range: 0...4))
+        @Test("Validate OTIR (0xEDB3)",  arguments: loadJsonTests(named: "ed b3", range: 190...190))
         func test_OTIR(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)

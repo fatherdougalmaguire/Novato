@@ -3,12 +3,42 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "BUS.writePort(portNum:portValue:):Bus.swift">
+      </ContextState>
+      <ContextState
+         contextName = "mach_msg2_trap:(null)">
+         <PersistentStrings>
+            <PersistentString
+               value = "bus">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.executeInstructions():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.A">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "-[NSObject(SwiftUIAccessibilityPrivate) accessibilityLockSourceForAttribute:]:(null)">
+         <PersistentStrings>
+            <PersistentString
+               value = "bus.crtc">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "microbee.executeEDInstructions(opcode2:opcode3:opcode4:):Microbee.swift">
          <PersistentStrings>
             <PersistentString
                value = "registers.A">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.splashScreen():Microbee.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>
