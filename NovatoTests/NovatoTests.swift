@@ -151,6 +151,7 @@ extension testHelper
         let testForPorts : Bool = !testCase.ports.isEmpty
         let cpu = microbee()
         await cpu.loadCPUState(cpuState: testCase.initial)
+        await cpu.bus.portTesting()
         if testForPorts
         {
             await cpu.loadPorts(portNum: testCase.ports[0].address, portValue: testCase.ports[0].value)
@@ -1187,7 +1188,7 @@ struct Z80Opcodes: testHelper
         try await parent.runTest(testCase)
         }
 
-        @Test("Validate DAA (0x27)",  arguments: loadJsonTests(named: "27", range: 0...24))
+        @Test("Validate DAA (0x27)",  arguments: loadJsonTests(named: "27", range: 0...testCycles-1))
         func test_DAA(testCase: Z80Test) async throws
         {
         try await parent.runTest(testCase)

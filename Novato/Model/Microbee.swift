@@ -7591,15 +7591,18 @@ actor microbee
            let tempValue = bus.readPort(portNum: tempResult)
            bus.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &+ 1
-           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
-           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
+           registers.B = registers.B &- 1
            let tempNegative : UInt8 = (tempValue & 0x80) >> 6
-           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C) + 1
+           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C &+ 1)
            let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
            let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
            let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
            let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
-           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
+           let tempSign = registers.B & z80Flags.Sign.rawValue
+           let tempZero: UInt8 = registers.B == 0 ? z80Flags.Zero.rawValue : 0
+           let tempY = registers.B & z80Flags.Y.rawValue
+           let tempX = registers.B & z80Flags.X.rawValue
+           registers.F = tempSign | tempZero | tempY | tempHalfCarry | tempX | tempParityOverflow | tempNegative | tempCarry
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
            tStates = tStates + 16
@@ -7675,15 +7678,18 @@ actor microbee
            let tempValue = bus.readPort(portNum: tempResult)
            bus.writeByte(address: registers.HL, value: tempValue)
            registers.HL = registers.HL &- 1
-           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
-           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
+           registers.B = registers.B &- 1
            let tempNegative : UInt8 = (tempValue & 0x80) >> 6
-           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C) - 1
+           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C &- 1)
            let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
            let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
            let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
            let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
-           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
+           let tempSign = registers.B & z80Flags.Sign.rawValue
+           let tempZero: UInt8 = registers.B == 0 ? z80Flags.Zero.rawValue : 0
+           let tempY = registers.B & z80Flags.Y.rawValue
+           let tempX = registers.B & z80Flags.X.rawValue
+           registers.F = tempSign | tempZero | tempY | tempHalfCarry | tempX | tempParityOverflow | tempNegative | tempCarry
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
            tStates = tStates + 16
@@ -7756,24 +7762,82 @@ actor microbee
            incrementR(opcodeCount:2)
        case 0xB2: // INIR - ED B2 - A byte from port C is written to the memory location pointed to by HL. Then HL is incremented and B is decremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "INIR", opcode: [0xED,0xB2], programCounter: registers.PC)
-           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
-           let tempValue = bus.readPort(portNum: tempResult)
-           bus.writeByte(address: registers.HL, value: tempValue)
-           registers.HL = registers.HL &+ 1
-           (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
-           let tempFlags = registers.F & ~z80Flags.Negative.rawValue & ~z80Flags.Carry.rawValue & ~z80Flags.HalfCarry.rawValue & ~z80Flags.ParityOverflow.rawValue
-           let tempNegative : UInt8 = (tempValue & 0x80) >> 6
-           let tempResultFlags = UInt16(tempValue) + UInt16(registers.C) + 1
-           let tempCarry : UInt8 = tempResultFlags > 0xFF ? 0x01 : 0x00
-           let tempHalfCarry : UInt8 = tempResultFlags > 0xFF ? 0x10 : 0x00
-           let tempParityCalc = UInt8(tempResultFlags & 0x07) ^ registers.B
-           let tempParityOverflow: UInt8 = tempParityCalc.nonzeroBitCount % 2 == 0 ? 0x04 : 0x00
-           registers.F = tempFlags | tempHalfCarry | tempParityOverflow | tempNegative | tempCarry
-           let repeating = registers.BC != 0
-           tStates = tStates + (repeating ? 21 : 16)
-           registers.PC = registers.PC &+ (repeating ? 0 : 2)
-           registers.WZ = registers.BC == 1 ? registers.WZ : registers.PC &+ 1
-           incrementR(opcodeCount:2)
+           let port = UInt16(registers.B) << 8 | UInt16(registers.C)
+
+           let value = bus.readPort(portNum: port)
+
+           bus.writeByte(address: registers.HL, value: value)
+
+           registers.HL &+= 1
+           registers.B &-= 1
+
+           let sum = UInt16(value) + UInt16(registers.C) + 1
+
+           // H and C
+           let hcCarry = sum > 0xFF
+
+           let carry: UInt8 =
+               hcCarry ? z80Flags.Carry.rawValue : 0
+
+           let halfCarry: UInt8 =
+               hcCarry ? z80Flags.HalfCarry.rawValue : 0
+
+           // N
+           let negative: UInt8 =
+               (value & 0x80) != 0
+               ? z80Flags.Negative.rawValue
+               : 0
+
+           // PV
+           let k = UInt8(sum & 0x07)
+
+           let pvInput = k ^ registers.B
+
+           let parityOverflow: UInt8 =
+               pvInput.nonzeroBitCount % 2 == 0
+               ? z80Flags.ParityOverflow.rawValue
+               : 0
+
+           // S,Z
+           let sign = registers.B & z80Flags.Sign.rawValue
+
+           let zero: UInt8 =
+               registers.B == 0
+               ? z80Flags.Zero.rawValue
+               : 0
+
+           // undocumented
+           let wrappedSum = UInt8(truncatingIfNeeded: sum)
+
+           let x = wrappedSum & z80Flags.X.rawValue
+           let y = (wrappedSum & 0x02) << 4
+
+           registers.F =
+               sign |
+               zero |
+               y |
+               halfCarry |
+               x |
+               parityOverflow |
+               negative |
+               carry
+
+           registers.Q = registers.F
+
+           let repeating = registers.B != 0
+
+           if repeating
+           {
+               registers.WZ = registers.PC &+ 1
+               tStates += 21
+           }
+           else
+           {
+               registers.PC &+= 2
+               tStates += 16
+           }
+
+           incrementR(opcodeCount: 2)
        case 0xB3: // OTIR - ED B3 - B is decremented. A byte from the memory location pointed to by HL is written to port C. Then HL is incremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing
            logInstructionDetails(instructionDetails: "OTIR", opcode: [0xED,0xB3], programCounter: registers.PC)
            (registers.B,registers.F) = z80FastFlags.decHelper(operand: registers.B, currentFlags: registers.F)
@@ -7838,7 +7902,7 @@ actor microbee
            registers.WZ = registers.BC == 1 ? registers.WZ : registers.PC &+ 1
            incrementR(opcodeCount:2)
        case 0xBA: // INDR - ED BA - A byte from port C is written to the memory location pointed to by HL. Then HL and B are decremented. If B is not zero, this operation is repeated. Interrupts can trigger while this instruction is processing.
-           logInstructionDetails(instructionDetails: "INIR", opcode: [0xED,0xBA], programCounter: registers.PC)
+           logInstructionDetails(instructionDetails: "INDR", opcode: [0xED,0xBA], programCounter: registers.PC)
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
            let tempValue = bus.readPort(portNum: tempResult)
            bus.writeByte(address: registers.HL, value: tempValue)
@@ -11798,43 +11862,28 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0x27: // DAA - 27 - Adjusts A for BCD addition and subtraction operations
             logInstructionDetails(instructionDetails: "DAA", opcode: [0x27], programCounter: registers.PC)
-            let tempCarry = registers.F & z80Flags.Carry.rawValue
+            let previousA = registers.A
+            let tempCarry = (registers.F & z80Flags.Carry.rawValue) != 0
             let tempHalfCarry = (registers.F & z80Flags.HalfCarry.rawValue) != 0
-                let tempNegative = registers.F & z80Flags.Negative.rawValue != 0   // renamed for clarity
-                
-                let daaIndex = (Int(tempCarry == 1 ? 1 : 0) << 9) |
-                               (Int(tempHalfCarry ? 1 : 0) << 8) |
-                               Int(registers.A)
+            let tempNegative = (registers.F & z80Flags.Negative.rawValue) != 0
 
+            let daaIndex = (tempCarry ? 0x200 : 0) | (tempHalfCarry ? 0x100 : 0) | Int(previousA)
             let difference = z80FastFlags.daaHelper(tempResult: daaIndex)
 
-            let newNegative : UInt8 = tempNegative ? 0x02 : 0x00
-
-            let newCarry  = (difference & 0x60) != 0 || tempCarry == 1 ? z80Flags.Carry.rawValue : 0
-
-            var newHalfCarry: UInt8 = 0
-            
             if tempNegative
             {
-                newHalfCarry = ((registers.A & 0x0F) < (difference & 0x0F)) ? z80Flags.HalfCarry.rawValue : 0
+                registers.A = previousA &- difference
             }
             else
             {
-                newHalfCarry = (tempHalfCarry || (registers.A & 0x0F) > 9) ? z80Flags.HalfCarry.rawValue : 0
+                registers.A = previousA &+ difference
             }
 
-            if tempNegative
-            {
-                registers.A = registers.A &- difference
-            }
-            else
-            {
-                registers.A = registers.A &+ difference
-            }
-            
+            let newHalfCarry: UInt8 = ((previousA ^ registers.A ^ difference) & 0x10) != 0 ? z80Flags.HalfCarry.rawValue : 0
+            let newCarry: UInt8 = ((difference & 0x60) != 0 || tempCarry) ? z80Flags.Carry.rawValue : 0
+            let newNegative: UInt8 = tempNegative ? z80Flags.Negative.rawValue : 0
             let tempFlags = z80FastFlags.lookupSZP[Int(registers.A)]
-            registers.F = ( tempFlags & ~z80Flags.HalfCarry.rawValue ) | newHalfCarry | newNegative | newCarry
-            
+            registers.F = tempFlags | newCarry | newHalfCarry | newNegative
             registers.PC = registers.PC &+ 1
             registers.Q = registers.F
             tStates = tStates + 4

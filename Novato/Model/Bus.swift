@@ -340,6 +340,8 @@ final class BUS
     var crtc = CRTC()
     var mmu = memoryMapper()
     
+    var underTest = false
+    
     let mainRAM = memoryBlock(size: 0x8000)
     let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
     let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM)
@@ -366,59 +368,68 @@ final class BUS
         fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         
         mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
+        
+        mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
     }
     
     @inline(__always)
     func writePort(portNum : UInt16, portValue : UInt8)
     {
         let realPort = Int(portNum & 0x00FF)
-        switch realPort
+        if underTest
         {
+            
+        }
+        else
+        {
+            switch realPort
+            {
             case 0x08:
                 if portValue & 0x01 == 0x01
-               {
-                   crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
-               }
+                {
+                    crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
+                }
                 if portValue & 0x01 == 0x00
-               {
-                   crtc.registers.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
-               }
+                {
+                    crtc.registers.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
+                }
                 if portValue & 0x02 == 0x02
-               {
-                   crtc.registers.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
-               }
+                {
+                    crtc.registers.greenBackgroundIntensity = 1 // set global background blue intensity to 1 = full
+                }
                 if portValue & 0x02 == 0x00
-               {
-                   crtc.registers.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
-               }
+                {
+                    crtc.registers.greenBackgroundIntensity = 0 // set global background blue intensity to 0 = half
+                }
                 if portValue & 0x04 == 0x04
-               {
-                   crtc.registers.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
-               }
+                {
+                    crtc.registers.blueBackgroundIntensity = 1 // set global background green intensity to 1 = full
+                }
                 if portValue & 0x04 == 0x00
-               {
-                   crtc.registers.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
-               }
+                {
+                    crtc.registers.blueBackgroundIntensity = 0 // set global background green intensity to 0 = half
+                }
                 if portValue & 0x40 == 0x40
-               {
-                   mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram
-               }
+                {
+                    mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram
+                }
                 if portValue & 0x40 == 0x00
-               {
-                   mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)        // swap in pcg ram
-               }
+                {
+                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)        // swap in pcg ram
+                }
             case 0x0B:
-               if portValue & 0x01 == 1
-               {
-                   mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-               }
-               if portValue & 0x01 == 0
-               {
-                   mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                   mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
-               }
+                if portValue & 0x01 == 1
+                {
+                    mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                }
+                if portValue & 0x01 == 0
+                {
+                    mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
+                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
+                }
             case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: portValue)
             default: break // other ports go here
+            }
         }
         ports.writePort(portNum : realPort, portValue : portValue)
     }
@@ -429,11 +440,19 @@ final class BUS
         var tempValue : UInt8 = 0
         let realPort = Int(portNum & 0x00FF)
         
-        switch realPort
+        if underTest
         {
+            tempValue = ports.readPort(portNum : realPort)
+        }
+        else
+        {
+            
+            switch realPort
+            {
             case 0x0C: tempValue = crtc.readStatusRegister()
             case 0x0D: tempValue = crtc.readRegister(RegNum:ports.readPort(portNum: 0x000C))
             default: tempValue = ports.readPort(portNum : realPort) // other ports go here
+            }
         }
         return tempValue
     }
@@ -490,6 +509,11 @@ final class BUS
     func returnCurrentRAM() -> ContiguousArray<UInt8>
     {
         return mmu.returnCurrentRAM()
+    }
+    
+    func portTesting()
+    {
+      underTest = true
     }
 }
 
