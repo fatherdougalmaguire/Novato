@@ -54,6 +54,8 @@ Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.
 
 This emulator is still in what could charitably called *alpha* status.
 
+Whilst it does boot BASIC,  there are some tricky bugs hiding somewhere related to the colour port
+
 ### UI controls
 * You can start and stop the emulator via button control.
 * You can restart the emulator via button control.
@@ -110,7 +112,7 @@ This emulator is still in what could charitably called *alpha* status.
   - Test harnesses in place for all documented and non-documented instructions
   - Opcodes currently tested
     - all documented non-flag affecting instructions
-    - all documented flag affecting instructions ( in progress )
+    - all documented flag affecting instructions
     
 ## On the to-do list
 
