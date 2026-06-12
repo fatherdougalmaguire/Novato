@@ -79,9 +79,6 @@ Whilst it does boot BASIC,  there are some tricky bugs hiding somewhere related 
 ### Instruction decoding
 * All documented instructions are decoded
 * All non-documented instructions are stubs at this point
-* Flags are now precomputed for S,P and Z general instructions
-* Flags are now precomputed for 8 bit increment and decrement instructions
-* A small number of flag affecting instructions are decoded
 * t-states are captured
 
 ### Display output
