@@ -367,8 +367,11 @@ final class BUS
 //        netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
         fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         
-        mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
-        
+       // mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
+       // mainRAM.fillMemoryFromFile(fileName: "emu-j", fileExtension: "bee", memOffset: 0x900)
+        // mainRAM.fillMemoryFromFile(fileName: "kilopede", fileExtension: "bee", memOffset: 0x900)
+       // mainRAM.fillMemoryFromFile(fileName: "sp-inv", fileExtension: "bee", memOffset: 0x900)
+        mainRAM.fillMemoryFromFile(fileName: "beemark", fileExtension: "bee", memOffset: 0x900)
         mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
     }
     

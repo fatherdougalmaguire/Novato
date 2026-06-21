@@ -961,7 +961,12 @@ actor microbee
 //        bus.netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
         bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         
-        bus.mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
+        // bus.mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
+        //bus.mainRAM.fillMemoryFromFile(fileName: "emu-j", fileExtension: "bee", memOffset: 0x900)
+        //bus.mainRAM.fillMemoryFromFile(fileName: "kilopede", fileExtension: "bee", memOffset: 0x900)
+         bus.mainRAM.fillMemoryFromFile(fileName: "sp-inv", fileExtension: "bee", memOffset: 0x900)
+        
+        bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
     }
     
     private func runLoop()
@@ -1050,22 +1055,24 @@ actor microbee
     func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
     #if DEBUG
-        var instructionString : String = instructionDetails
+        let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
         
-        switch values.count
-        {
-        case 1 :
-            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
-            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
-        case 2 :
-            instructionString = instructionString.replacingOccurrences(of: "$nn", with: "0x"+String(format:"%04X",UInt16(values[1]) << 8 | UInt16(values[0])))
-            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
-            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
-        default: break
-        }
-        let noValues = values.count == 0
-        let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: " ") + (noValues ? "" : " ") + values.map { String(format:"%02X",$0) }.joined(separator: " ")
-        let logString = String(format:"0x%04X",registers.PC) + "   " + opcodeString + "    " + instructionString
+//        var instructionString : String = instructionDetails
+//        
+//        switch values.count
+//        {
+//        case 1 :
+//            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
+//            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
+//        case 2 :
+//            instructionString = instructionString.replacingOccurrences(of: "$nn", with: "0x"+String(format:"%04X",UInt16(values[1]) << 8 | UInt16(values[0])))
+//            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
+//            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
+//        default: break
+//        }
+//        let noValues = values.count == 0
+//        let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: " ") + (noValues ? "" : " ") + values.map { String(format:"%02X",$0) }.joined(separator: " ")
+//        let logString = String(format:"0x%04X",registers.PC) + "   " + opcodeString + "    " + instructionString
         appLog.cpu.debug("\(logString)")
     #endif
     }
@@ -13099,7 +13106,7 @@ actor microbee
             tStates = tStates + 10
             incrementR(opcodeCount:1)
         case 0xC2: // JP NZ,$nn - C2 n n - If the zero flag is unset, $nn is copied to PC
-            logInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [0xC2], programCounter: registers.PC)
+            logInstructionDetails(instructionDetails: "JP NZ,$nn", opcode: [0xC2], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {

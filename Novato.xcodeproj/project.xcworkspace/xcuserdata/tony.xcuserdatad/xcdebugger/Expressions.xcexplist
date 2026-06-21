@@ -3,9 +3,6 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "BUS.writePort(portNum:portValue:):Bus.swift">
-      </ContextState>
-      <ContextState
          contextName = "mach_msg2_trap:(null)">
          <PersistentStrings>
             <PersistentString
@@ -14,10 +11,10 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "microbee.executeInstructions():Microbee.swift">
+         contextName = "find_or_create_queue_info:(null)">
          <PersistentStrings>
             <PersistentString
-               value = "registers.A">
+               value = "bus">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -26,6 +23,17 @@
          <PersistentStrings>
             <PersistentString
                value = "bus.crtc">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.executeInstructions():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "bus.mainRAM">
+            </PersistentString>
+            <PersistentString
+               value = "registers.A">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -39,6 +47,9 @@
       </ContextState>
       <ContextState
          contextName = "microbee.splashScreen():Microbee.swift">
+      </ContextState>
+      <ContextState
+         contextName = "BUS.writePort(portNum:portValue:):Bus.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>
