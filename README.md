@@ -6,11 +6,9 @@
 
 ![Static Badge](https://img.shields.io/badge/Architecture-Apple_Silicon-D19D00?style=plastic&logo=apple)
 ![Static Badge](https://img.shields.io/badge/Architecture-Intel-D19D00?style=plastic&logo=apple)
-
 ![Static Badge](https://img.shields.io/badge/Security-Signed_&_Notarised-D19D00?style=plastic&logo=apple)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-D19D00.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
 ![Latest Version](https://img.shields.io/github/v/release/fatherdougalmaguire/novato?style=plastic&color=D19D00)
 ![Last Commit](https://img.shields.io/github/last-commit/fatherdougalmaguire/novato?style=plastic&color=D19D00)
 
@@ -54,7 +52,9 @@ Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.
 
 This emulator is still in what could charitably called *alpha* status.
 
-Whilst it does boot BASIC,  there are some tricky bugs hiding somewhere related to the colour port
+It has a functional z80 core,  mmu and video output.
+
+But not much else.
 
 ### UI controls
 * You can start and stop the emulator via button control.
@@ -110,6 +110,16 @@ Whilst it does boot BASIC,  there are some tricky bugs hiding somewhere related 
   - Opcodes currently tested
     - all documented non-flag affecting instructions
     - all documented flag affecting instructions
+   
+## What currently runs
+
+### Applied Technology Colour Basic v5.22e
+
+<img width="2528" height="1940" alt="image" src="https://github.com/user-attachments/assets/0ea9bf2b-0933-4fc4-aec1-17f037a82272" />
+
+### Microspace Invaders
+
+<img width="2528" height="1940" alt="image" src="https://github.com/user-attachments/assets/55758a1f-4bce-4d75-bab2-21e9d9a4d35a" />
     
 ## On the to-do list
 
