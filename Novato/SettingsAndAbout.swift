@@ -65,12 +65,6 @@ struct SettingsView: View
     {
         TabView
         {
-            //            modelSettingsView()
-            //                .tabItem { Label("Pick your model", systemImage: "gear") }
-            //                .tag("model")
-            bootSettingsView()
-                .tabItem { Label("Boot Settings", systemImage: "gear") }
-                .tag("general")
             screenSettingsView()
                 .tabItem { Label("Screen Settings", systemImage: "gear") }
                 .tag("general")

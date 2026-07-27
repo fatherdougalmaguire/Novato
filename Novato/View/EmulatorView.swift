@@ -264,26 +264,7 @@ struct emulatorView: View
                                     {
                                         await vm.stopEmulation()
                                         await vm.resetEmulation()
-                                        
-                                        switch bootModeSelection
-                                        {
-                                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
-                                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
-                                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
-                                            case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
-                                            default: break
-                                        }
-                                        if autoStartSelection
-                                        {
-                                            isRunning =  true
-                                            await vm.startEmulation()
-                                        }
-                                        else
-                                        {
-                                            isRunning =  false
-                                            await vm.ClearEmulationScreen()
-                                            await vm.splashScreen()
-                                        }
+                                        await vm.startEmulation()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -304,22 +285,8 @@ struct emulatorView: View
                     focusWindow(withId: "emulatorWindow")
                     Task
                     {
-                        switch bootModeSelection
-                        {
-                            case "Demo #1 - Basic" : await vm.updateProgramCounter(address: 0x0900)
-                            case "Demo #2 - CP/M" : await vm.updateProgramCounter(address: 0x0903)
-                            case "Demo #3 - Viatel" : await vm.updateProgramCounter(address: 0x0906)
-                            case "MicroWorld Basic 5.22e" : await vm.updateProgramCounter(address: 0x8000)
-                            default: break
-                        }
-                        if autoStartSelection
-                        {
-                            await vm.startEmulation()
-                        }
-                        else
-                        {
-                            await vm.splashScreen()
-                        }
+                        await vm.updateProgramCounter(address: 0x8000)
+                        await vm.startEmulation()
                     }
                 }
             }

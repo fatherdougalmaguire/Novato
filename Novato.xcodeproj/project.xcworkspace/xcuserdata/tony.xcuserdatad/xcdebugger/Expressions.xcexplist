@@ -30,10 +30,10 @@
          contextName = "microbee.executeInstructions():Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "bus.mainRAM">
+               value = "registers.A">
             </PersistentString>
             <PersistentString
-               value = "registers.A">
+               value = "registers.F">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -42,6 +42,14 @@
          <PersistentStrings>
             <PersistentString
                value = "registers.A">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.reset():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.PC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

@@ -25,6 +25,11 @@ final class emulatorViewModel
         self.cpu = cpu
         Task { await takeSnapshot() }
     }
+    
+    func quickload(path: URL, loadAddress: UInt16) async
+    {
+        await cpu.bus.quickLoad(path: path, loadAddress: loadAddress)
+    }
 
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
     {

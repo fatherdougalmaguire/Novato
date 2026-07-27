@@ -957,15 +957,11 @@ actor microbee
         bus.mmu.map(readDevice: bus.pcgRAM, writeDevice: bus.pcgRAM, memoryLocation: 0xF800)         // 2K PCG RAM
         
         bus.basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
-//        bus.pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-//        bus.netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        bus.pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
+        bus.netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
         bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         
-        // bus.mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
-        //bus.mainRAM.fillMemoryFromFile(fileName: "emu-j", fileExtension: "bee", memOffset: 0x900)
-        //bus.mainRAM.fillMemoryFromFile(fileName: "kilopede", fileExtension: "bee", memOffset: 0x900)
-         bus.mainRAM.fillMemoryFromFile(fileName: "sp-inv", fileExtension: "bee", memOffset: 0x900)
-        
+        bus.mainRAM.fillMemory(memValue: 0x00) // needs hard reset to boot basic again.   Can you warm reboot a microbee ?
         bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
     }
     
@@ -1056,23 +1052,6 @@ actor microbee
     {
     #if DEBUG
         let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
-        
-//        var instructionString : String = instructionDetails
-//        
-//        switch values.count
-//        {
-//        case 1 :
-//            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[0]))
-//            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
-//        case 2 :
-//            instructionString = instructionString.replacingOccurrences(of: "$nn", with: "0x"+String(format:"%04X",UInt16(values[1]) << 8 | UInt16(values[0])))
-//            instructionString = instructionString.replacingOccurrences(of: "$d", with: "0x"+String(format:"%02X",values[0]))
-//            instructionString = instructionString.replacingOccurrences(of: "$n", with: "0x"+String(format:"%02X",values[1]))
-//        default: break
-//        }
-//        let noValues = values.count == 0
-//        let opcodeString = opcode.map { String(format:"%02X",$0) }.joined(separator: " ") + (noValues ? "" : " ") + values.map { String(format:"%02X",$0) }.joined(separator: " ")
-//        let logString = String(format:"0x%04X",registers.PC) + "   " + opcodeString + "    " + instructionString
         appLog.cpu.debug("\(logString)")
     #endif
     }
@@ -13174,7 +13153,7 @@ actor microbee
             registers.WZ = registers.PC
             tStates = tStates + 11
             incrementR(opcodeCount:1)
-        case 0xC8: // RETZ - C8 - If the zero flag is set, the top stack entry is popped into PC
+        case 0xC8: // RET Z - C8 - If the zero flag is set, the top stack entry is popped into PC
             logInstructionDetails(instructionDetails: "RETZ", opcode: [0xC8], programCounter: registers.PC)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Zero))
             {

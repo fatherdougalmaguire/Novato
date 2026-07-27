@@ -1,9 +1,22 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 @main
 struct NovatoApp: App
 {
+    @Environment(\.openWindow) private var openWindow
     @State private var vm = emulatorViewModel(cpu: microbee())
+    
+    @State private var isImporting = false
+    
+    private var restrictedTypes: [UTType]
+    {
+        let binType = UTType(filenameExtension: "bin") ?? .item
+        let beeType = UTType(filenameExtension: "bee") ?? .item
+        let romType = UTType(filenameExtension: "rom") ?? .item
+        
+        return [binType, beeType, romType]
+    }
     
     var body: some Scene
     {
@@ -28,6 +41,10 @@ struct NovatoApp: App
         {
             breakpointsView().environment(vm)
         }
+//        Window("QuickLoad", id: "quickloadWindow")
+//        {
+//            fileLoadView().environment(vm)
+//        }
         Settings { SettingsView() }
         .commands
         {
@@ -38,8 +55,35 @@ struct NovatoApp: App
             )
             CommandGroup(replacing: .newItem)
             {
-                Button("Load binary")
+                Button("QuickLoad")
                 {
+                    isImporting = true
+                }
+                    .fileImporter(
+                        isPresented: $isImporting,
+                        allowedContentTypes: restrictedTypes,
+                        allowsMultipleSelection: false
+                    )
+                    {
+                        result in
+
+                        switch result
+                        {
+                        case .success(let urls):
+
+                            guard let url = urls.first else { return }
+
+                            Task
+                            {
+                                await vm.quickload(path: url, loadAddress: 0x900)
+                                await vm.updateProgramCounter(address: 0x900)
+                                await vm.startEmulation()
+                            }
+
+                        case .failure(let error):
+
+                            print(error)
+                        }
                 }.keyboardShortcut("L")
             }
             CommandMenu("Assembler")

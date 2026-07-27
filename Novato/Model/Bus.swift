@@ -60,12 +60,12 @@ final class memoryBlock
             }
             catch
             {
-                print("Problem loading ROM")
+                print("Problem loading ROM "+fileName+"."+fileExtension)
             }
         }
         else
         {
-            print("Can't find ROM")
+            print("Can't find ROM "+fileName+"."+fileExtension)
         }
     }
     
@@ -166,6 +166,39 @@ final class memoryMapper
             tempRAM.append(contentsOf: readPages[counter].addressBlock)
         }
         return tempRAM
+    }
+    
+    func quickLoad(path: URL, loadAddress: UInt16)
+    {
+        var memoryAddress : UInt16 = loadAddress
+        
+        guard path.startAccessingSecurityScopedResource()
+        else
+        {
+            print("Unable to access \(path)")
+            return
+        }
+        
+        defer
+        {
+            path.stopAccessingSecurityScopedResource()
+        }
+
+        do
+        {
+            let fileContents = try Data(contentsOf: path)
+            for fileValue in fileContents
+            {
+                writeByte(address: memoryAddress, value: fileValue)
+                memoryAddress = memoryAddress &+ 1
+            }
+        }
+        
+        catch
+        {
+            print(error)
+            print("Problem loading binary "+path.absoluteString)
+        }
     }
 }
 
@@ -363,15 +396,10 @@ final class BUS
         mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)         // 2K PCG RAM
         
         basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
-//        pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-//        netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
+        netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
         fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
-        
-       // mainRAM.fillMemoryFromFile(fileName: "demo", fileExtension: "bin", memOffset: 0x900)
-       // mainRAM.fillMemoryFromFile(fileName: "emu-j", fileExtension: "bee", memOffset: 0x900)
-        // mainRAM.fillMemoryFromFile(fileName: "kilopede", fileExtension: "bee", memOffset: 0x900)
-       // mainRAM.fillMemoryFromFile(fileName: "sp-inv", fileExtension: "bee", memOffset: 0x900)
-        mainRAM.fillMemoryFromFile(fileName: "beemark", fileExtension: "bee", memOffset: 0x900)
+
         mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
     }
     
@@ -517,6 +545,11 @@ final class BUS
     func portTesting()
     {
       underTest = true
+    }
+    
+    func quickLoad(path: URL, loadAddress: UInt16)
+    {
+        mmu.quickLoad(path: path, loadAddress: loadAddress)
     }
 }
 

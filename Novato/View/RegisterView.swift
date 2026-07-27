@@ -36,7 +36,6 @@ struct registerView: View
         {
             Text(label)
                 .foregroundColor(.orange)
-               // .font(.headline)
                 .font(.system(.body, design: .monospaced))
             Text(getFlags(flag: value))
                 .font(.system(.body, design: .monospaced))
@@ -72,7 +71,7 @@ struct registerView: View
         }
     }
     
-    func getFlags( flag : UInt8) -> String
+    func getFlags(flag : UInt8) -> String
     {
         
         var result : String = ""
