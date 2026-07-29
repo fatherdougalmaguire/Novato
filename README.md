@@ -66,7 +66,6 @@ But not much else.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
 * You can quick load binary files from disk into location 0x900 and execute them
-* You can choose to start the emulator automatically or go to the splash screen first
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
@@ -77,7 +76,7 @@ But not much else.
   - Aspect ratio
   - Screen scaling
   - Visible scanline mode
-  - Apperance of debug windows
+  - Appearance of debug windows
   
 ### Instruction decoding
 * All documented instructions are decoded
