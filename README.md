@@ -126,7 +126,7 @@ A animated .gif of games that currently boot.
 Some file due to reliance on missing ROM's and/or specific ROM versions.
 Some also have some display artefacts.
 
-<img width="2528" height="900" alt="output" src="https://github.com/user-attachments/assets/4c506711-b345-4072-86f9-a6b040fee3ad" />
+<img alt="output" src="https://github.com/user-attachments/assets/4c506711-b345-4072-86f9-a6b040fee3ad" />
 
 ## On the to-do list
 
