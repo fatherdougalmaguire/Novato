@@ -45,7 +45,7 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 ## AI declaration
 
 This code base has been written entirely by me.
-There have been no coding agents use.
+There have been no coding agents used.
 
 ## Acknowledgements
 
