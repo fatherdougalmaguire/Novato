@@ -49,8 +49,6 @@ struct emulatorView: View
     @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
     @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
     
-    @State private var isRunning = false
-    
     let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
     // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
     
@@ -222,7 +220,7 @@ struct emulatorView: View
                 {
                     ToolbarItem(placement: .primaryAction)
                     {
-                        StatusLED(isOn: isRunning)
+                        StatusLED(isOn: vm.emulatorState == .running)
                     }
                     ToolbarItem(placement: .principal)
                     {
@@ -230,12 +228,11 @@ struct emulatorView: View
                         {
                             HStack(spacing: 12)
                             {
-                                Button(isRunning ? "Pause" : "Start", systemImage: isRunning ? "pause.fill" : "play.fill")
+                                Button(vm.emulatorState == .running ? "Pause" : "Start", systemImage: vm.emulatorState == .running ? "pause.fill" : "play.fill")
                                 {
                                     Task
                                     {
-                                        
-                                        if isRunning
+                                        if vm.emulatorState == .running
                                         {
                                             await vm.pauseEmulation()
                                         }
@@ -243,7 +240,7 @@ struct emulatorView: View
                                         {
                                             await vm.startEmulation()
                                         }
-                                        isRunning.toggle()
+                                        await vm.refreshEmulatorState()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -252,6 +249,7 @@ struct emulatorView: View
                                     Task
                                     {
                                         await vm.stepEmulation()
+                                        await vm.refreshEmulatorState()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -265,6 +263,7 @@ struct emulatorView: View
                                         await vm.stopEmulation()
                                         await vm.resetEmulation()
                                         await vm.startEmulation()
+                                        await vm.refreshEmulatorState()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -287,6 +286,7 @@ struct emulatorView: View
                     {
                         await vm.updateProgramCounter(address: 0x8000)
                         await vm.startEmulation()
+                        await vm.refreshEmulatorState()
                     }
                 }
             }

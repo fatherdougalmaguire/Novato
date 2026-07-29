@@ -4,6 +4,8 @@ import Foundation
 final class emulatorViewModel
 {
     private let cpu: microbee
+    
+    var emulatorState: emulatorState = .paused
 
     private(set) var snapshot: microbeeSnapshot?
     private var snapshotTask: Task<Void, Never>?
@@ -24,6 +26,12 @@ final class emulatorViewModel
     {
         self.cpu = cpu
         Task { await takeSnapshot() }
+    }
+    
+    func refreshEmulatorState() async
+    
+    {
+        emulatorState = await cpu.returnEmulatorState()
     }
     
     func quickload(path: URL, loadAddress: UInt16) async

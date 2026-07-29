@@ -614,6 +614,12 @@ actor microbee
         return Int(tStates)
     }
     
+    func returnEmulatorState() async -> emulatorState
+    
+    {
+        return emulatorState
+    }
+    
     func returnCPUState(cpuState: CPUState) async -> CPUState
     {
         var tempRam : [[Int]] = []
