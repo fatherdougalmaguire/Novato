@@ -42,6 +42,11 @@ Universal binaries can be found in the [Releases](https://github.com/fatherdouga
 At some point,  I may build iOS and iPadOS versions off the same codebase.  
 And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 
+## AI declaration
+
+This code base has been written entirely by me.
+There have been no coding agents use.
+
 ## Acknowledgements
 
 The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
@@ -60,7 +65,7 @@ But not much else.
 * You can start and stop the emulator via button control.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
-* There is a splash screen displaying the application logo as PCG characters
+* You can quick load binary files from disk into location 0x900 and execute them
 * You can choose to start the emulator automatically or go to the splash screen first
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
@@ -68,8 +73,6 @@ But not much else.
 * You can define up to 16 breakpoints
 * There is now a **Settings** module so you can dynamically set ( and retain ):
   
-  - Start-up mode ( automatic or splash screen )
-  - Select boot code ( Basic demo, CP/M demo, Viatel demo, Microworld Basic 5.22e )
   - Colour mode
   - Aspect ratio
   - Screen scaling
@@ -79,7 +82,7 @@ But not much else.
 ### Instruction decoding
 * All documented instructions are decoded
 * All non-documented instructions are stubs at this point
-* t-states are captured
+* T-states are captured
 
 ### Display output
 * The screen buffer is output to the display using a SwiftUI Shader library .ColorEffect shader
@@ -107,7 +110,7 @@ But not much else.
 * Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
   - Supports ports, ram, t-states, real registers ( including WZ ) and P,Q and EI psuedo-register
   - Test harnesses in place for all documented and non-documented instructions
-  - Opcodes currently tested
+  - Opcodes that have passed testing
     - all documented non-flag affecting instructions
     - all documented flag affecting instructions
    
@@ -117,10 +120,15 @@ But not much else.
 
 <img width="2528" height="1940" alt="image" src="https://github.com/user-attachments/assets/0ea9bf2b-0933-4fc4-aec1-17f037a82272" />
 
-### Microspace Invaders
+### Miscellaneous Games
 
-<img width="2528" height="1940" alt="image" src="https://github.com/user-attachments/assets/55758a1f-4bce-4d75-bab2-21e9d9a4d35a" />
-    
+A animated .gif of games that currently boot.
+
+Some file due to reliance on missing ROM's and/or specific ROM versions.
+Some also have some display artefacts.
+
+<img width="2528" height="900" alt="output" src="https://github.com/user-attachments/assets/4c506711-b345-4072-86f9-a6b040fee3ad" />
+
 ## On the to-do list
 
 * Watch breakpoints for registers and memory locations
