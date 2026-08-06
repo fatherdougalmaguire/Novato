@@ -62,7 +62,8 @@ It has a functional z80 core,  mmu and video output.
 But not much else.
 
 ### UI controls
-* You can start and stop the emulator via button control.
+* You can pause and resume the emulator via button control.
+* You can instruction step the emulator via button control.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
 * You can quick load binary files from disk into location 0x900 and execute them
@@ -82,6 +83,9 @@ But not much else.
 * All documented instructions are decoded
 * All non-documented instructions are stubs at this point
 * T-states are captured
+
+### Emulator core
+* A calibrated run loop executes the emulator at an equivalent speed to a 3.375Mhz microbee
 
 ### Display output
 * The screen buffer is output to the display using a SwiftUI Shader library .ColorEffect shader
@@ -137,27 +141,16 @@ Some also have some display artefacts.
 * Full emulation of Z80 including undocumented instructions
 * Interrupt processing
 * Sound output
-* Capture keyboard input
-* Proper emulator state machine
-  
-  - rejig the basic state machine to stop the emulator actor burning cycles when paused
-    
+* Capture keyboard input    
 * Frame based emulation
-  
-  - rewrite the emulator loop to run 50hz worth of cycles before emitting CPU state to view model
   - rewrite the emulator loop to process interrupts
   - rewrite the emulator loop to fill sound buffer
   - rewrite the emulator loop to trigger vblank update of 6545 for video and keypressed
-    
 * Cassette load/save functionality
 
 ## Emulator screenshots
 
-### Splash Screen
-
-<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/b1a3c31c-8eac-42bb-b47f-28bfd4c665a4" />
-
-### Breakpoints
+### Breakpoint View
 
 <img width="536" height="1232" alt="image" src="https://github.com/user-attachments/assets/df78c080-2505-41b4-b982-9ca47428137f" />
 
@@ -173,22 +166,6 @@ Some also have some display artefacts.
 
 <img width="1734" height="924" alt="image" src="https://github.com/user-attachments/assets/4ee67221-22d3-4699-b9c9-dae6de76b8bf" />
 
-## Demo Screens
-
-Below are demo screens for all three video modes ( 64x16, 80x24 and 40x25 ).  
-These screens are drawn using internally loaded Z80 assembler.
-
-### 64 columns x 16 rows 
-
-<img width="2272" height="1660" alt="image" src="https://github.com/user-attachments/assets/9a00e753-b8c9-498a-a738-21a67b8665bb" />
-
-### 80 columns x 24 rows 
-
-<img width="2272" height="1762" alt="image" src="https://github.com/user-attachments/assets/da0b5472-400d-4b5b-9e4b-31c0a41e1b85" />
-
-### 40 columns x 25 rows 
-
-<img width="2184" height="1674" alt="image" src="https://github.com/user-attachments/assets/bf22f597-08ff-4a0e-b575-316c8aa3178c" />
 
 
 
