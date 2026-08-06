@@ -45,7 +45,7 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 ## AI declaration
 
 This code base has been written entirely by me.
-There have been no coding agents use.
+There have been no coding agents used.
 
 ## Acknowledgements
 
@@ -66,7 +66,6 @@ But not much else.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
 * You can quick load binary files from disk into location 0x900 and execute them
-* You can choose to start the emulator automatically or go to the splash screen first
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
@@ -77,7 +76,7 @@ But not much else.
   - Aspect ratio
   - Screen scaling
   - Visible scanline mode
-  - Apperance of debug windows
+  - Appearance of debug windows
   
 ### Instruction decoding
 * All documented instructions are decoded
@@ -127,7 +126,7 @@ A animated .gif of games that currently boot.
 Some file due to reliance on missing ROM's and/or specific ROM versions.
 Some also have some display artefacts.
 
-<img width="2528" height="900" alt="output" src="https://github.com/user-attachments/assets/4c506711-b345-4072-86f9-a6b040fee3ad" />
+<img alt="output" src="https://github.com/user-attachments/assets/4c506711-b345-4072-86f9-a6b040fee3ad" />
 
 ## On the to-do list
 
