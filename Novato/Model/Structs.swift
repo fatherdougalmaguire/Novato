@@ -4,10 +4,6 @@ enum emulatorState {
     case stopped, running, paused, halted
 }
 
-enum executionMode {
-    case continuous,singleStep
-}
-
 struct z80Snapshot: Sendable, Equatable
 {
     let PC: UInt16
@@ -92,10 +88,9 @@ struct memorySnapshot: Sendable, Equatable
 
 struct executionSnapshot: Sendable, Equatable
 {
-    let tStates: UInt64
+    let totalTStates: UInt64
     
     let emulatorState: emulatorState
-    let executionMode: executionMode
     
     let ports: [UInt8]
     
@@ -112,6 +107,8 @@ struct microbeeSnapshot: Sendable, Equatable, Identifiable
     let id: UUID
     let timestamp: Date
 
+    let stepping: Bool
+    
     let z80Snapshot: z80Snapshot
     let crtcSnapshot: crtcSnapshot
     let executionSnapshot: executionSnapshot

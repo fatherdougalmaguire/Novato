@@ -75,6 +75,7 @@ struct NovatoApp: App
 
                             Task
                             {
+                                await vm.pauseEmulation()
                                 await vm.quickload(path: url, loadAddress: 0x900)
                                 await vm.updateProgramCounter(address: 0x900)
                                 await vm.startEmulation()

@@ -10,15 +10,15 @@
 				<key>location-parameters</key>
 				<dict>
 					<key>EndingColumnNumber</key>
-					<string>3</string>
+					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>3</string>
+					<string>11447</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>3</string>
+					<string>11446</string>
 					<key>Timestamp</key>
-					<string>802934489.0405</string>
+					<string>807692213.910736</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -27,22 +27,427 @@
 					<key>payload</key>
 					<dict>
 						<key>relative-path</key>
-						<string>NovatoTests/NovatoTests.swift</string>
+						<string>Novato/Model/Microbee.swift</string>
 					</dict>
 				</dict>
 			</dict>
 			<key>text-context</key>
 			<dict>
 				<key>focused</key>
-				<string>let</string>
+				<string>    private func executeInstructions() -&gt; UInt8
+</string>
 				<key>leading</key>
-				<string>import Testing
+				<string>    }
 
 </string>
 				<key>trailing</key>
-				<string> testCycles = 1000
-let testTiming = 30
+				<string>    {
+        let opcode1 = bus.readByte(address: registers.PC)
+        let opcode2 = bus.readByte(address: registers.PC &amp;+ 1)
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>10159</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>10158</string>
+					<key>Timestamp</key>
+					<string>807692213.9106981</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeFDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8) -&gt; UInt8
+</string>
+				<key>leading</key>
+				<string>    }
+        
+</string>
+				<key>trailing</key>
+				<string>    {
+        var tStates : UInt8
+        
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>7904</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>7903</string>
+					<key>Timestamp</key>
+					<string>807692213.91073</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeFDCBInstructions(opcode3: UInt8, opcode4: UInt8) -&gt; UInt8
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        var tStates : UInt8
+        
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>7037</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>7036</string>
+					<key>Timestamp</key>
+					<string>807692213.910717</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeEDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8) -&gt; UInt8
+</string>
+				<key>leading</key>
+				<string>    }
+     
+</string>
+				<key>trailing</key>
+				<string>    {
+        var tStates : UInt8
+        
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>4814</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>4813</string>
+					<key>Timestamp</key>
+					<string>807692213.910741</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeDDCBInstructions(opcode3 : UInt8, opcode4: UInt8) -&gt; UInt8
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        var tStates : UInt8
+        
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>3525</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>3524</string>
+					<key>Timestamp</key>
+					<string>807692213.9107471</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeDDInstructions(opcode2: UInt8, opcode3: UInt8, opcode4: UInt8) -&gt; UInt8
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        var tStates : UInt8
+        
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>1043</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>1042</string>
+					<key>Timestamp</key>
+					<string>807692213.910758</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>    private func executeCBInstructions(opcode2: UInt8) -&gt; UInt8
+</string>
+				<key>leading</key>
+				<string>    }
+    
+</string>
+				<key>trailing</key>
+				<string>    {
+        var tStates : UInt8
+        
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>12468</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>12467</string>
+					<key>Timestamp</key>
+					<string>807692213.9107521</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>        case 0x76: // HALT - 76 - Suspends CPU operation until an interrupt or reset occurs
+</string>
+				<key>leading</key>
+				<string>            tStates = 7
+            incrementR(opcodeCount:1)
+</string>
+				<key>trailing</key>
+				<string>            emulatorState = .halted
+            logInstructionDetails(instructionDetails: "HALT", opcode: [0x76], programCounter: registers.PC)
+            registers.PC = registers.PC &amp;+ 1
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>0</string>
+					<key>EndingLineNumber</key>
+					<string>13154</string>
+					<key>StartingColumnNumber</key>
+					<string>0</string>
+					<key>StartingLineNumber</key>
+					<string>13153</string>
+					<key>Timestamp</key>
+					<string>807692213.910724</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string>        case 0xC9: // RET - C9 - The top stack entry is popped into PC
+</string>
+				<key>leading</key>
+				<string>            registers.Q = 0
+            incrementR(opcodeCount:1)
+</string>
+				<key>trailing</key>
+				<string>            logInstructionDetails(instructionDetails: "RET", opcode: [0xC9], programCounter: registers.PC)
+            registers.PCL = bus.readByte(address: registers.SP)
+            registers.SP = registers.SP &amp;+ 1
+</string>
+			</dict>
+			<key>type</key>
+			<string>bookmark</string>
+		</dict>
+		<dict>
+			<key>destination</key>
+			<dict>
+				<key>location-parameters</key>
+				<dict>
+					<key>EndingColumnNumber</key>
+					<string>17</string>
+					<key>EndingLineNumber</key>
+					<string>862</string>
+					<key>StartingColumnNumber</key>
+					<string>16</string>
+					<key>StartingLineNumber</key>
+					<string>862</string>
+					<key>Timestamp</key>
+					<string>807689516.944795</string>
+				</dict>
+				<key>rebasable-url</key>
+				<dict>
+					<key>base</key>
+					<string>workspace</string>
+					<key>payload</key>
+					<dict>
+						<key>relative-path</key>
+						<string>Novato/Model/Microbee.swift</string>
+					</dict>
+				</dict>
+			</dict>
+			<key>text-context</key>
+			<dict>
+				<key>focused</key>
+				<string> </string>
+				<key>leading</key>
+				<string>    }
 
+    private func</string>
+				<key>trailing</key>
+				<string>runLoop() async
+    {
+        let clock = ContinuousClock()
 </string>
 			</dict>
 			<key>type</key>

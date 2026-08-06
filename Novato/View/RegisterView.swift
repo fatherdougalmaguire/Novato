@@ -181,7 +181,7 @@ struct registerView: View
                 FlagRegister(label: "S   Z   X   H   Y  P/V  N   C   ", value: snapshot.z80Snapshot.F)
                 
                 Text("T-States").font(.headline).foregroundColor(.orange)
-                Text(snapshot.executionSnapshot.tStates.formatted()).foregroundColor(.orange)
+                Text(snapshot.executionSnapshot.totalTStates.formatted()).foregroundColor(.orange)
             }
             .fixedSize()
             .padding(10)

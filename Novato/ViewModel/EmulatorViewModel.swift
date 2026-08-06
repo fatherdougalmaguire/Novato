@@ -5,15 +5,27 @@ final class emulatorViewModel
 {
     private let cpu: microbee
     
-    var emulatorState: emulatorState = .paused
-
+    var isStepActive = false
+    
     private(set) var snapshot: microbeeSnapshot?
     private var snapshotTask: Task<Void, Never>?
 
     func startSnapshots()
     {
         snapshotTask?.cancel()
-        snapshotTask = Task { await takeSnapshot() }
+
+        snapshotTask = Task
+        {
+            let stream = await cpu.snapshots
+
+               for await snapshot in stream
+               {
+                   await MainActor.run
+                   {
+                       self.snapshot = snapshot
+                   }
+               }
+        }
     }
 
     func stopSnapshots()
@@ -21,17 +33,11 @@ final class emulatorViewModel
         snapshotTask?.cancel()
         snapshotTask = nil
     }
-        
+    
     init(cpu: microbee)
     {
         self.cpu = cpu
-        Task { await takeSnapshot() }
-    }
-    
-    func refreshEmulatorState() async
-    
-    {
-        emulatorState = await cpu.returnEmulatorState()
+        startSnapshots()
     }
     
     func quickload(path: URL, loadAddress: UInt16) async
@@ -44,15 +50,15 @@ final class emulatorViewModel
         await cpu.updateBreakpoints(index: index, value: value, mask: mask)
     }
     
-    func ClearEmulationScreen() async
-    {
-        await cpu.ClearVideoMemory()
-    }
-    
-    func splashScreen() async
-    {
-        await cpu.splashScreen()
-    }
+//    func ClearEmulationScreen() async
+//    {
+//        await cpu.ClearVideoMemory()
+//    }
+//    
+//    func splashScreen() async
+//    {
+//        await cpu.splashScreen()
+//    }
     
     func writeToMemory(address : UInt16, value : UInt8) async
     {
@@ -93,7 +99,7 @@ final class emulatorViewModel
     {
         while !Task.isCancelled
         {
-            let currentSnapshot = await cpu.returnSnapshot()
+            let currentSnapshot = await cpu.returnSnapshot(stepping: false)
 
             guard !Task.isCancelled else { break }
 

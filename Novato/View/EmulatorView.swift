@@ -13,7 +13,7 @@ func focusWindow(withId id: String)
 
 struct StatusLED: View
 {
-    let isOn: Bool
+    let colour: Color
     
     private let ledOnColor = Color.green
     private let ledOffColor = Color.red
@@ -21,16 +21,16 @@ struct StatusLED: View
     var body: some View
     {
         Circle()
-            .fill(isOn ? ledOnColor : ledOffColor)
+            .fill(colour != ledOffColor ? colour : ledOffColor)
             .frame(width: 15, height: 15)
             .overlay(
                 Circle()
-                    .fill(Color.white.opacity(isOn ? 0.4 : 0.1))
+                    .fill(Color.white.opacity(colour != ledOffColor ? 0.4 : 0.1))
                     .frame(width: 3, height: 3)
                     .offset(x: -2, y: -2)
             )
-            .shadow(color: isOn ? ledOnColor.opacity(0.8) : .clear, radius: 3)
-            .animation(.easeInOut(duration: 0.1), value: isOn)
+            .shadow(color: colour != ledOffColor ? ledOnColor.opacity(0.8) : .clear, radius: 3)
+            .animation(.easeInOut(duration: 0.1), value: colour != ledOffColor)
     }
 }
 
@@ -208,19 +208,25 @@ struct emulatorView: View
     
     var body: some View
     {
-        if let snapshot = vm.snapshot
-        {
+        
             NavigationStack
             {
                 VStack
                 {
-                    CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
+                    if let snapshot = vm.snapshot
+                    {
+                        CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
+                    }
+                    else
+                    {
+                        Color.black
+                    }
                 }
                 .toolbar
                 {
                     ToolbarItem(placement: .primaryAction)
                     {
-                        StatusLED(isOn: vm.emulatorState == .running)
+                        StatusLED(colour: vm.isStepActive ? .orange : vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
                     }
                     ToolbarItem(placement: .principal)
                     {
@@ -228,11 +234,11 @@ struct emulatorView: View
                         {
                             HStack(spacing: 12)
                             {
-                                Button(vm.emulatorState == .running ? "Pause" : "Start", systemImage: vm.emulatorState == .running ? "pause.fill" : "play.fill")
+                                Button(vm.snapshot?.executionSnapshot.emulatorState == .running ? "Pause" : "Resume", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
                                 {
                                     Task
                                     {
-                                        if vm.emulatorState == .running
+                                        if vm.snapshot?.executionSnapshot.emulatorState == .running
                                         {
                                             await vm.pauseEmulation()
                                         }
@@ -240,7 +246,6 @@ struct emulatorView: View
                                         {
                                             await vm.startEmulation()
                                         }
-                                        await vm.refreshEmulatorState()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -248,8 +253,10 @@ struct emulatorView: View
                                 {
                                     Task
                                     {
+                                        vm.isStepActive = true
+                                        try? await Task.sleep(for: .milliseconds(200))
+                                        vm.isStepActive = false
                                         await vm.stepEmulation()
-                                        await vm.refreshEmulatorState()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -261,9 +268,9 @@ struct emulatorView: View
                                     Task
                                     {
                                         await vm.stopEmulation()
+                                        try? await Task.sleep(for: .milliseconds(20))
                                         await vm.resetEmulation()
                                         await vm.startEmulation()
-                                        await vm.refreshEmulatorState()
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
@@ -286,15 +293,9 @@ struct emulatorView: View
                     {
                         await vm.updateProgramCounter(address: 0x8000)
                         await vm.startEmulation()
-                        await vm.refreshEmulatorState()
                     }
                 }
             }
-        }
-        else
-        {
-            Text("Nothing to see here folks")
-        }
     } //body
 } // emulatorView
 

@@ -379,9 +379,9 @@ final class BUS
     let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
     let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM)
     let netROM = memoryBlock(size: 0x1000, deviceType : .ROM)
-    let videoRAM = memoryBlock(size: 0x800)
+    let videoRAM = memoryBlock(size: 0x800, fillValue: 0x20)
     let pcgRAM = memoryBlock(size: 0x800)
-    let colourRAM = memoryBlock(size: 0x800)
+    let colourRAM = memoryBlock(size: 0x800, fillValue: 0x02)
     let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM)
     
     let testRAM = memoryBlock(size:0x10000)

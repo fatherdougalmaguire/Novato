@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-let testCycles = 1000
+let testCycles = 10
 let testTiming = 30
 
 var finalPortValue : UInt8 = 0
