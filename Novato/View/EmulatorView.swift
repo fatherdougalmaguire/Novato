@@ -34,6 +34,36 @@ struct StatusLED: View
     }
 }
 
+struct LedBar: View
+{
+    var value: Int          // whole number 0–8
+    let maxValue: Int = 8   // fixed number of LEDs
+    
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(0..<maxValue, id: \.self) { index in
+                let isLit = index < value
+                
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(isLit ? litColor(for: index) : Color.black.opacity(0.15))
+                    .frame(width: 10, height: 18)   // macOS toolbar-friendly size
+                    .shadow(color: isLit ? litColor(for: index).opacity(0.6) : .clear,
+                            radius: isLit ? 2 : 0)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+    
+    private func litColor(for index: Int) -> Color {
+        let fraction = Double(index) / Double(maxValue)
+        switch fraction {
+        case 0..<0.5: return .green
+        case 0.5..<0.75: return .yellow
+        default: return .red
+        }
+    }
+}
+
 struct emulatorView: View
 {
     @Environment(emulatorViewModel.self) private var vm
@@ -48,6 +78,7 @@ struct emulatorView: View
     @AppStorage("portWindowVisible") private var portWindowVisible: Bool = true
     @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
     @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
+    @AppStorage("speedSelection") private var speedSelection: Double = 1.0
     
     let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
     // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
@@ -208,7 +239,6 @@ struct emulatorView: View
     
     var body: some View
     {
-        
             NavigationStack
             {
                 VStack
@@ -226,7 +256,17 @@ struct emulatorView: View
                 {
                     ToolbarItem(placement: .primaryAction)
                     {
-                        StatusLED(colour: vm.isStepActive ? .orange : vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
+                        HStack(spacing: 32)
+                        {
+                            
+                            LedBar(value: Int(speedSelection))
+                            
+                            Text("\(speedSelection, specifier: "%.0f")×")
+                                .monospacedDigit()
+                            
+                            StatusLED(colour: vm.isStepActive ? .orange : vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
+                            
+                        }
                     }
                     ToolbarItem(placement: .principal)
                     {

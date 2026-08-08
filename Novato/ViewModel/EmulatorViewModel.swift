@@ -6,6 +6,7 @@ final class emulatorViewModel
     private let cpu: microbee
     
     var isStepActive = false
+    private var lastUIUpdate = ContinuousClock.now
     
     private(set) var snapshot: microbeeSnapshot?
     private var snapshotTask: Task<Void, Never>?
@@ -20,10 +21,20 @@ final class emulatorViewModel
 
                for await snapshot in stream
                {
+//                   let start = ContinuousClock.now
+//                   
+//                   if start - lastUIUpdate < .milliseconds(50)
+//                   {
+//                       continue
+//                   }
+//
+//                   lastUIUpdate = start
+                   
                    await MainActor.run
                    {
                        self.snapshot = snapshot
                    }
+                //   print("Main Actor update:", start.duration(to: .now))
                }
         }
     }
@@ -38,6 +49,11 @@ final class emulatorViewModel
     {
         self.cpu = cpu
         startSnapshots()
+    }
+    
+    func setClockSpeedMultiplier(multiplier: Double) async
+    {
+        await cpu.setClockSpeedMultiplier(multiplier: multiplier)
     }
     
     func quickload(path: URL, loadAddress: UInt16) async
@@ -95,17 +111,17 @@ final class emulatorViewModel
         await cpu.reset()
     }
     
-    private func takeSnapshot() async
-    {
-        while !Task.isCancelled
-        {
-            let currentSnapshot = await cpu.returnSnapshot(stepping: false)
-
-            guard !Task.isCancelled else { break }
-
-            snapshot = currentSnapshot
-                
-            try? await Task.sleep(nanoseconds: 20_000_000)
-        }
-    }
+//    private func takeSnapshot() async
+//    {
+//        while !Task.isCancelled
+//        {
+//            let currentSnapshot = await cpu.returnSnapshot(stepping: false)
+//
+//            guard !Task.isCancelled else { break }
+//
+//            snapshot = currentSnapshot
+//                
+//            try? await Task.sleep(nanoseconds: 20_000_000)
+//        }
+//    }
 }

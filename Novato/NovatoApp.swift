@@ -41,11 +41,10 @@ struct NovatoApp: App
         {
             breakpointsView().environment(vm)
         }
-//        Window("QuickLoad", id: "quickloadWindow")
-//        {
-//            fileLoadView().environment(vm)
-//        }
-        Settings { SettingsView() }
+        Settings
+        {
+            SettingsView().environment(vm)
+        }
         .commands
         {
             AboutMenu(

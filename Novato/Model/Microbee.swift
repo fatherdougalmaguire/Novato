@@ -554,11 +554,14 @@ actor microbee
 
     let bus = BUS()
     
-    private let clockSpeed: Double
-    private let frameRate: Double
+    private let baseClockSpeed: Double = 3_375_000
+    private let frameRate: Double = 50
+    
+    private var clockSpeedMultiplier: Double = 1
+    private var pendingClockSpeedMultiplier: Double?
 
     private let frameDuration : Duration
-    private let tStatesPerFrame : Int
+    private var tStatesPerFrame : UInt64
     
     private let snapshotsStream: AsyncStream<microbeeSnapshot>
     private let snapshotContinuation: AsyncStream<microbeeSnapshot>.Continuation
@@ -572,24 +575,30 @@ actor microbee
     {
         snapshotsStream
     }
-
-    init(clockSpeed: Double = 3_375_000, frameRate: Double = 50.0)
+    
+    init()
     {
         let (stream, continuation) = AsyncStream.makeStream(of: microbeeSnapshot.self)
 
         self.snapshotsStream = stream
         self.snapshotContinuation = continuation
         
-        self.clockSpeed = clockSpeed
-        self.frameRate = frameRate
-
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "speedSelection": 1.0
+            ]
+        )
+        
+        self.clockSpeedMultiplier = UserDefaults.standard.double(forKey: "speedSelection")
+        
         self.frameDuration = .seconds(1.0 / frameRate)
-        self.tStatesPerFrame = Int(clockSpeed / frameRate)
+        self.tStatesPerFrame = UInt64(baseClockSpeed * self.clockSpeedMultiplier / frameRate)
     }
     
     private var runTask: Task<Void, Never>?
     
-    func loadCPUState(cpuState: CPUState) async
+    func loadCPUState(cpuState: CPUState)
     {
         registers.A = cpuState.A
         registers.F = cpuState.F
@@ -637,18 +646,18 @@ actor microbee
         }
     }
     
-    func returnTStates() async -> Int
+    func returnTStates() -> Int
     {
         return Int(totalTStates)
     }
     
-    func returnEmulatorState() async -> emulatorState
+//    func returnEmulatorState() async -> emulatorState
+//    
+//    {
+//        return emulatorState
+//    }
     
-    {
-        return emulatorState
-    }
-    
-    func returnCPUState(cpuState: CPUState) async -> CPUState
+    func returnCPUState(cpuState: CPUState) -> CPUState
     {
         var tempRam : [[Int]] = []
         for location in cpuState.ram
@@ -685,10 +694,15 @@ actor microbee
         return bus.readPort(portNum: portNum)
     }
     
-    func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
+    func updateBreakpoints(index: Int, value: UInt16, mask: Bool)
     {
         breakpoints[index] = value
         breakpointMask[index] = (mask ? 1 : 0)
+    }
+    
+    func setClockSpeedMultiplier(multiplier: Double)
+    {
+        pendingClockSpeedMultiplier = multiplier
     }
     
     func reset()
@@ -875,6 +889,21 @@ actor microbee
         {
             var executedTStates : UInt64 = 0
             
+            if let multiplier = pendingClockSpeedMultiplier
+            {
+                clockSpeedMultiplier = multiplier
+
+                let clockSpeed = baseClockSpeed * clockSpeedMultiplier
+
+                tStatesPerFrame = UInt64(clockSpeed / frameRate)
+
+//                print("Applied multiplier:", clockSpeedMultiplier)
+//                print("Clock speed:", clockSpeed)
+//                print("T-states/frame:", tStatesPerFrame)
+
+                pendingClockSpeedMultiplier = nil
+            }
+            
             switch emulatorState
             {
             case .stopped:
@@ -890,7 +919,10 @@ actor microbee
             #if DEBUG
                 let cpuStart = clock.now
             #endif
-            while executedTStates < tStatesPerFrame
+            
+            let frameTStates = tStatesPerFrame
+            
+            while executedTStates < frameTStates
             {
                 if Task.isCancelled
                 {
@@ -908,7 +940,7 @@ actor microbee
                 totalTStates = totalTStates + UInt64(tStates)
                 
                 #if DEBUG
-                    appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
+                   appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
                 #endif
 
                 // crtc.tick(tStates: tStates)
@@ -935,11 +967,18 @@ actor microbee
                     nextFrame = clock.now
                 }
             }
+        
+//            if (executedTStates & 0x0FFF) == 0
+//            {
+//                print("yiedld")
+//                await Task.yield()
+//            }
             
             let snapshot = returnSnapshot(stepping: false)
             snapshotContinuation.yield(snapshot)
             await Task.yield()
         }
+        
     }
     
     func requestInterrupt()
@@ -12479,7 +12518,7 @@ actor microbee
 //
 //                print("Wall clock      : \(elapsed)")
 //                print("T-states        : \(executedTStates)")
-//                print("Emulated time   : \(Double(executedTStates) / clockSpeed) s")
+//                print("Emulated time   : \(Double(executedTStates) / baseClockSpeed / clockSpeedMultiplier) seconds")
 //
 //                benchmarkStartClock = nil
 //            }

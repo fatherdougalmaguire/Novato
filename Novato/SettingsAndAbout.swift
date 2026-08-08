@@ -66,13 +66,82 @@ struct SettingsView: View
         TabView
         {
             screenSettingsView()
-                .tabItem { Label("Screen Settings", systemImage: "gear") }
+                .tabItem { Label("Screen", systemImage: "gear") }
                 .tag("general")
             windowsView()
-                .tabItem { Label("Windows Settings", systemImage: "gear") }
+                .tabItem { Label("Windows", systemImage: "gear") }
+                .tag("general")
+            speedSettingsView()
+                .tabItem { Label("CPU Speed", systemImage: "gear") }
                 .tag("general")
         }
         .frame(width: 450, height: 250)
+    }
+}
+
+struct TooltipSlider: View
+{
+    let label: String
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+    var step: Double = 1.0
+    let formatter: (Double) -> String
+    
+    var onEditingChanged: ((Bool) -> Void)? = nil
+
+    @State private var isHovering = false
+
+    var body: some View
+    {
+        LabeledContent(label)
+        {
+            HStack(spacing: 8)
+            {
+                Text(formatter(range.lowerBound))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Slider(value: $value, in: range, step: step, onEditingChanged: { editing in onEditingChanged?(editing) })
+                    .onHover { isHovering = $0 }
+                    .popover(isPresented: $isHovering, attachmentAnchor: .point(.top), arrowEdge: .bottom)
+                {
+                    Text(formatter(value)).font(.caption.bold()).padding(8)
+                }
+                Text(formatter(range.upperBound))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+struct speedSettingsView: View
+{
+    @AppStorage("speedSelection") private var speedSelection: Double = 1.0
+    @Environment(emulatorViewModel.self) private var vm
+    
+    var body: some View
+    {
+        Form
+        {
+            TooltipSlider(
+                label: "CPU Speed",
+                value: $speedSelection,
+                range: 1...8,
+                step: 1.0,
+                formatter: { "\($0)x" },
+                onEditingChanged: { editing in
+                    if !editing
+                    {
+                        //let value = speedSelection
+                        Task
+                        {
+                            await vm.setClockSpeedMultiplier(multiplier: speedSelection)
+                        }
+                    }
+                }
+            )
+        }
+        .formStyle(.grouped)
     }
 }
 
@@ -125,7 +194,6 @@ struct bootSettingsView: View
             .pickerStyle(.menu)
         }
         .formStyle(.grouped)
-
     }
 }
 
@@ -142,16 +210,9 @@ struct screenSettingsView: View
         
         Form
         {
-            Slider(value: $scalingSelection, in: 1...4, step: 0.25)
-            { Text("Screen Scaling") }
-            minimumValueLabel: { Text("1") }
-            maximumValueLabel: { Text("4") }
-   
-            Slider(value: $aspectSelection, in: 0...2, step: 0.1)
-            { Text("Aspect Ratio") }
-            minimumValueLabel: { Text("0") }
-            maximumValueLabel: { Text("2") }
-            
+            TooltipSlider(label: "Screen Scaling", value: $scalingSelection, range: 1...4, step: 0.25) { String(format: "%.2fx", $0) }
+            TooltipSlider(label: "Aspect Ratio", value: $aspectSelection, range: 0...2, step: 0.1) { String(format: "%.1fx", $0)}
+
             Picker("Colour Mode:", selection: $colourSelection)
             {
                 ForEach(themes, id: \.self) { theme in Text(theme) }
@@ -181,6 +242,5 @@ struct windowsView: View
             Toggle("Show breakpoint window", isOn: $breakpointWindowVisible)
         }
         .formStyle(.grouped)
-
     }
 }
