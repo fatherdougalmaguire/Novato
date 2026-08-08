@@ -47,6 +47,8 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 This code base has been written entirely by me.
 There have been no coding agents used.
 
+LLM's have been used to answer questions on Swift syntax and help debug.
+
 ## Acknowledgements
 
 The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled with the kind permission of Ewan J. Wordsworth of [Microbee Technology](http://www.microbeetechnology.com.au/)
