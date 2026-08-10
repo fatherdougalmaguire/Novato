@@ -47,7 +47,7 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 This code base has been written entirely by me.
 There have been no coding agents used.
 
-LLM's have been used to answer questions on Swift syntax and help debug.
+LLM's have been used to answer questions on Swift syntax and to help with debug.
 
 ## Acknowledgements
 
@@ -80,6 +80,7 @@ But not much else.
   - Screen scaling
   - Visible scanline mode
   - Appearance of debug windows
+  - CPU speed selection (1x to 8x)
   
 ### Instruction decoding
 * All documented instructions are decoded
@@ -88,6 +89,8 @@ But not much else.
 
 ### Emulator core
 * A calibrated run loop executes the emulator at an equivalent speed to a 3.375Mhz microbee
+* You can overclock the CPU at up to 8x ( equivalent of 27Mhz ) on Apple Silicon
+* There are currently issues on Intel based machines where the UI is unresponsive.  This is likely due to the SwiftUI view being starved of updates and will take some thinking to work around
 
 ### Display output
 * The screen buffer is output to the display using a SwiftUI Shader library .ColorEffect shader
@@ -123,7 +126,7 @@ But not much else.
 
 ### Applied Technology Colour Basic v5.22e
 
-<img width="2528" height="1940" alt="image" src="https://github.com/user-attachments/assets/0ea9bf2b-0933-4fc4-aec1-17f037a82272" />
+<img width="1092" height="888" alt="image" src="https://github.com/user-attachments/assets/2dad80d4-a200-47cc-a3f0-d729eb3b92ea" />
 
 ### Miscellaneous Games
 
