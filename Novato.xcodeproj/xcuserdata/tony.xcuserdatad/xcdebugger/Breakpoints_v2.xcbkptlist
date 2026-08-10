@@ -366,8 +366,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1070"
-            endingLineNumber = "1070"
+            startingLineNumber = "1072"
+            endingLineNumber = "1072"
             landmarkName = "nextInstruction()"
             landmarkType = "7">
          </BreakpointContent>
@@ -462,25 +462,9 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1088"
-            endingLineNumber = "1088"
+            startingLineNumber = "1090"
+            endingLineNumber = "1090"
             landmarkName = "executeCBInstructions(opcode2:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "1D8D1034-DB26-46CD-BA32-DF8D9A2A3EDC"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/ViewModel/EmulatorViewModel.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
-            landmarkName = "updateBreakpoints(index:value:mask:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -494,8 +478,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1098"
-            endingLineNumber = "1098"
+            startingLineNumber = "1100"
+            endingLineNumber = "1100"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -526,8 +510,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7169"
-            endingLineNumber = "7169"
+            startingLineNumber = "7171"
+            endingLineNumber = "7171"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -542,8 +526,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7191"
-            endingLineNumber = "7191"
+            startingLineNumber = "7193"
+            endingLineNumber = "7193"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -558,8 +542,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7236"
-            endingLineNumber = "7236"
+            startingLineNumber = "7238"
+            endingLineNumber = "7238"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -590,8 +574,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11531"
-            endingLineNumber = "11531"
+            startingLineNumber = "11533"
+            endingLineNumber = "11533"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -606,8 +590,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11532"
-            endingLineNumber = "11532"
+            startingLineNumber = "11534"
+            endingLineNumber = "11534"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -622,8 +606,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11553"
-            endingLineNumber = "11553"
+            startingLineNumber = "11555"
+            endingLineNumber = "11555"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -638,8 +622,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11552"
-            endingLineNumber = "11552"
+            startingLineNumber = "11554"
+            endingLineNumber = "11554"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -654,8 +638,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11574"
-            endingLineNumber = "11574"
+            startingLineNumber = "11576"
+            endingLineNumber = "11576"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -670,8 +654,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11957"
-            endingLineNumber = "11957"
+            startingLineNumber = "11959"
+            endingLineNumber = "11959"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -686,8 +670,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7994"
-            endingLineNumber = "7994"
+            startingLineNumber = "7996"
+            endingLineNumber = "7996"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -702,8 +686,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8127"
-            endingLineNumber = "8127"
+            startingLineNumber = "8129"
+            endingLineNumber = "8129"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -718,8 +702,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8196"
-            endingLineNumber = "8196"
+            startingLineNumber = "8198"
+            endingLineNumber = "8198"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -734,8 +718,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8263"
-            endingLineNumber = "8263"
+            startingLineNumber = "8265"
+            endingLineNumber = "8265"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -750,8 +734,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8545"
-            endingLineNumber = "8545"
+            startingLineNumber = "8547"
+            endingLineNumber = "8547"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -766,8 +750,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "9223"
-            endingLineNumber = "9223"
+            startingLineNumber = "9225"
+            endingLineNumber = "9225"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -782,8 +766,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "9224"
-            endingLineNumber = "9224"
+            startingLineNumber = "9226"
+            endingLineNumber = "9226"
             landmarkName = "executeFDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -798,8 +782,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1092"
-            endingLineNumber = "1092"
+            startingLineNumber = "1094"
+            endingLineNumber = "1094"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -814,8 +798,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1112"
-            endingLineNumber = "1112"
+            startingLineNumber = "1114"
+            endingLineNumber = "1114"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -830,8 +814,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1884"
-            endingLineNumber = "1884"
+            startingLineNumber = "1886"
+            endingLineNumber = "1886"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -846,8 +830,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2694"
-            endingLineNumber = "2694"
+            startingLineNumber = "2696"
+            endingLineNumber = "2696"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -862,8 +846,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7084"
-            endingLineNumber = "7084"
+            startingLineNumber = "7086"
+            endingLineNumber = "7086"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -878,8 +862,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7384"
-            endingLineNumber = "7384"
+            startingLineNumber = "7386"
+            endingLineNumber = "7386"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -894,8 +878,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7256"
-            endingLineNumber = "7256"
+            startingLineNumber = "7258"
+            endingLineNumber = "7258"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -910,8 +894,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7328"
-            endingLineNumber = "7328"
+            startingLineNumber = "7330"
+            endingLineNumber = "7330"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -926,8 +910,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7530"
-            endingLineNumber = "7530"
+            startingLineNumber = "7532"
+            endingLineNumber = "7532"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -942,8 +926,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7552"
-            endingLineNumber = "7552"
+            startingLineNumber = "7554"
+            endingLineNumber = "7554"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -958,8 +942,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7850"
-            endingLineNumber = "7850"
+            startingLineNumber = "7852"
+            endingLineNumber = "7852"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -974,8 +958,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7579"
-            endingLineNumber = "7579"
+            startingLineNumber = "7581"
+            endingLineNumber = "7581"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -990,8 +974,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7575"
-            endingLineNumber = "7575"
+            startingLineNumber = "7577"
+            endingLineNumber = "7577"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1006,8 +990,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7587"
-            endingLineNumber = "7587"
+            startingLineNumber = "7589"
+            endingLineNumber = "7589"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1022,8 +1006,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7592"
-            endingLineNumber = "7592"
+            startingLineNumber = "7594"
+            endingLineNumber = "7594"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1038,8 +1022,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7704"
-            endingLineNumber = "7704"
+            startingLineNumber = "7706"
+            endingLineNumber = "7706"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1054,8 +1038,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13313"
-            endingLineNumber = "13313"
+            startingLineNumber = "13315"
+            endingLineNumber = "13315"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1070,8 +1054,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13411"
-            endingLineNumber = "13411"
+            startingLineNumber = "13413"
+            endingLineNumber = "13413"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1086,8 +1070,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13195"
-            endingLineNumber = "13195"
+            startingLineNumber = "13197"
+            endingLineNumber = "13197"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1150,8 +1134,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7318"
-            endingLineNumber = "7318"
+            startingLineNumber = "7320"
+            endingLineNumber = "7320"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1167,8 +1151,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "12115"
-            endingLineNumber = "12115"
+            startingLineNumber = "12117"
+            endingLineNumber = "12117"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1184,8 +1168,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11662"
-            endingLineNumber = "11662"
+            startingLineNumber = "11664"
+            endingLineNumber = "11664"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1201,8 +1185,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "11994"
-            endingLineNumber = "11994"
+            startingLineNumber = "11996"
+            endingLineNumber = "11996"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1218,8 +1202,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "7723"
-            endingLineNumber = "7723"
+            startingLineNumber = "7725"
+            endingLineNumber = "7725"
             landmarkName = "executeEDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1234,8 +1218,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13812"
-            endingLineNumber = "13812"
+            startingLineNumber = "13814"
+            endingLineNumber = "13814"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1250,8 +1234,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13177"
-            endingLineNumber = "13177"
+            startingLineNumber = "13179"
+            endingLineNumber = "13179"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1314,8 +1298,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "813"
-            endingLineNumber = "813"
+            startingLineNumber = "815"
+            endingLineNumber = "815"
             landmarkName = "reset()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1378,8 +1362,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "879"
-            endingLineNumber = "879"
+            startingLineNumber = "881"
+            endingLineNumber = "881"
             landmarkName = "runLoop()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1394,8 +1378,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "956"
-            endingLineNumber = "956"
+            startingLineNumber = "958"
+            endingLineNumber = "958"
             landmarkName = "runLoop()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1410,8 +1394,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "12513"
-            endingLineNumber = "12513"
+            startingLineNumber = "12515"
+            endingLineNumber = "12515"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1426,8 +1410,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "12525"
-            endingLineNumber = "12525"
+            startingLineNumber = "12527"
+            endingLineNumber = "12527"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>

@@ -10,35 +10,46 @@ final class emulatorViewModel
     
     private(set) var snapshot: microbeeSnapshot?
     private var snapshotTask: Task<Void, Never>?
-
+    
     func startSnapshots()
     {
         snapshotTask?.cancel()
-
+        
         snapshotTask = Task
         {
             let stream = await cpu.snapshots
-
-               for await snapshot in stream
-               {
-//                   let start = ContinuousClock.now
-//                   
-//                   if start - lastUIUpdate < .milliseconds(50)
-//                   {
-//                       continue
-//                   }
-//
-//                   lastUIUpdate = start
-                   
-                   await MainActor.run
-                   {
-                       self.snapshot = snapshot
-                   }
-                //   print("Main Actor update:", start.duration(to: .now))
-               }
+            
+#if arch(arm64)
+            let minimumUIUpdateInterval = Duration.milliseconds(20)
+#elseif arch(x86_64)
+            let minimumUIUpdateInterval = Duration.milliseconds(50)
+#endif
+            
+            var lastUIUpdate = ContinuousClock.now - minimumUIUpdateInterval
+            
+            for await snapshot in stream
+            {
+                guard !Task.isCancelled else
+                {
+                    break
+                }
+                
+                let now = ContinuousClock.now
+                
+                guard now - lastUIUpdate >= minimumUIUpdateInterval else {
+                    continue
+                }
+                
+                lastUIUpdate = now
+                
+                await MainActor.run
+                {
+                    self.snapshot = snapshot
+                }
+            }
         }
     }
-
+    
     func stopSnapshots()
     {
         snapshotTask?.cancel()
@@ -60,21 +71,21 @@ final class emulatorViewModel
     {
         await cpu.bus.quickLoad(path: path, loadAddress: loadAddress)
     }
-
+    
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
     {
         await cpu.updateBreakpoints(index: index, value: value, mask: mask)
     }
     
-//    func ClearEmulationScreen() async
-//    {
-//        await cpu.ClearVideoMemory()
-//    }
-//    
-//    func splashScreen() async
-//    {
-//        await cpu.splashScreen()
-//    }
+    //    func ClearEmulationScreen() async
+    //    {
+    //        await cpu.ClearVideoMemory()
+    //    }
+    //
+    //    func splashScreen() async
+    //    {
+    //        await cpu.splashScreen()
+    //    }
     
     func writeToMemory(address : UInt16, value : UInt8) async
     {
@@ -95,12 +106,12 @@ final class emulatorViewModel
     {
         await cpu.step()
     }
-
+    
     func stopEmulation() async
     {
         await cpu.stop()
     }
-
+    
     func pauseEmulation() async
     {
         await cpu.pause()
@@ -111,17 +122,17 @@ final class emulatorViewModel
         await cpu.reset()
     }
     
-//    private func takeSnapshot() async
-//    {
-//        while !Task.isCancelled
-//        {
-//            let currentSnapshot = await cpu.returnSnapshot(stepping: false)
-//
-//            guard !Task.isCancelled else { break }
-//
-//            snapshot = currentSnapshot
-//                
-//            try? await Task.sleep(nanoseconds: 20_000_000)
-//        }
-//    }
+    //    private func takeSnapshot() async
+    //    {
+    //        while !Task.isCancelled
+    //        {
+    //            let currentSnapshot = await cpu.returnSnapshot(stepping: false)
+    //
+    //            guard !Task.isCancelled else { break }
+    //
+    //            snapshot = currentSnapshot
+    //
+    //            try? await Task.sleep(nanoseconds: 20_000_000)
+    //        }
+    //    }
 }

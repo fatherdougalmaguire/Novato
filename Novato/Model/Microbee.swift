@@ -705,6 +705,8 @@ actor microbee
         pendingClockSpeedMultiplier = multiplier
     }
     
+   
+    
     func reset()
     {
         //confirm Z80 and 6545 reset behaviour
