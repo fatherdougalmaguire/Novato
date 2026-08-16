@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float FontLocationOffset, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float colorMode, float backGroundIntensity, float timeElapsed, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize)
+[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float displayOffset, float alternateFontROM, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float colorMode, float backGroundIntensity, float timeElapsed, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize)
 {
     half4 ForegroundColour;
     half4 BackgroundColour;
@@ -79,8 +79,12 @@ using namespace metal;
         
     screenpos = trunc(position.y/int(ScanLineHeight))*int(DisplayColumns)+trunc(position.x/CellWidth);  // return linear co-ordinates of character location based on pixel position
     
+    screenpos = screenpos + int(displayOffset);
+    
     int bitmask = (128 >> int(xcursor));
     
+    int FontLocationOffset = int(alternateFontROM)*2048;
+        
     if (screenram[screenpos] < 128)
     {
         fontpos = int(FontLocationOffset)+int(screenram[screenpos])*CellHeight+int(ycursor);  // return linear co-ordinates of font rom data

@@ -71,8 +71,11 @@ struct SettingsView: View
             windowsView()
                 .tabItem { Label("Windows", systemImage: "gear") }
                 .tag("general")
-            speedSettingsView()
-                .tabItem { Label("CPU Speed", systemImage: "gear") }
+            cpuSettingsView()
+                .tabItem { Label("CPU", systemImage: "gear") }
+                .tag("general")
+            modelSettingsView()
+                .tabItem { Label("Model", systemImage: "gear") }
                 .tag("general")
         }
         .frame(width: 450, height: 250)
@@ -114,9 +117,10 @@ struct TooltipSlider: View
     }
 }
 
-struct speedSettingsView: View
+struct cpuSettingsView: View
 {
     @AppStorage("speedSelection") private var speedSelection: Double = 1.0
+    @AppStorage("quickLoadAddress") private var quickLoadAddress: String = "0900"
     @Environment(emulatorViewModel.self) private var vm
     
     var body: some View
@@ -124,7 +128,7 @@ struct speedSettingsView: View
         Form
         {
             TooltipSlider(
-                label: "CPU Speed",
+                label: "CPU",
                 value: $speedSelection,
                 range: 1...8,
                 step: 1.0,
@@ -140,6 +144,29 @@ struct speedSettingsView: View
                     }
                 }
             )
+            LabeledContent("Quick Load Address")
+            {
+                        TextField("",text: $quickLoadAddress)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 80)
+                            .monospaced()
+                            .onChange(of: quickLoadAddress)
+                            {
+                                _, newValue in
+
+                                let filtered = String(
+                                    newValue
+                                        .uppercased()
+                                        .filter { $0.isHexDigit }
+                                        .prefix(4)
+                                )
+
+                                if filtered != newValue
+                                {
+                                    quickLoadAddress = filtered
+                                }
+                            }
+            }
         }
         .formStyle(.grouped)
     }
@@ -147,11 +174,11 @@ struct speedSettingsView: View
 
 struct modelSettingsView: View
 {
-    @AppStorage("modelSelection") private var modelSelection = "Microbee 16K/32K IC"
+    @AppStorage("modelSelection") private var modelSelection = "Microbee 32IC"
     
     var body: some View
     {
-        let themes = ["Microbee Kit","Microbee 16K/32K","Microbee 64K","Microbee 16K/32K Plus","Microbee 64K Plus","Microbee 16K/32K IC","Experimenter","Educator","Personal Communicator (PC)","Advanced Personal Computer (APC)","16K Educator","32K Communicator","64K Computer in a Book (CIAB)","128K Small Business Computer (SBC)","PC85","PC85 Premium","64K Computer in a Book Premium (CIAB Premium)","128K Small Business Computer Premium (SBC Premium)","128K Overdrive","TeleTerm","256TC (Telecomputer)"]
+        let themes = ["Microbee 32IC","64K Computer in a Book (CIAB)","128K Small Business Computer Premium (SBC Premium)","FreeBee Freemium"]
         Form
         {
             Picker("Model:", selection: $modelSelection)
@@ -162,7 +189,7 @@ struct modelSettingsView: View
             
             Divider()
             
-            Text("Changes will be applied immediately.")
+            Text("Currently disabled")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }

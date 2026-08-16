@@ -111,7 +111,8 @@ struct emulatorView: View
             // Shader inputs
             let scanLineHeight: Float
             let displayColumns: Float
-            let fontLocationOffset: Float
+            let displayOffset: Float
+            let alternateFontROM: Float
             let cursorPosition: Float
             let cursorStartScanLine: Float
             let cursorEndScanLine: Float
@@ -131,7 +132,8 @@ struct emulatorView: View
                         ShaderLibrary.ScreenBuffer(
                             .float(scanLineHeight),
                             .float(displayColumns),
-                            .float(fontLocationOffset),
+                            .float(displayOffset),
+                            .float(alternateFontROM),
                             .float(cursorPosition),
                             .float(cursorStartScanLine),
                             .float(cursorEndScanLine),
@@ -182,22 +184,30 @@ struct emulatorView: View
             let cursorStartScanLine: Float = Float(Int(snapshot.crtcSnapshot.R10) & 0b00011111)
             let cursorEndScanLine: Float = Float(snapshot.crtcSnapshot.R11)
             let cursorBlinkType: Float = Float(Int(snapshot.crtcSnapshot.R10 >> 5))
-            let fontLocationOffset: Float = Float(Int(snapshot.crtcSnapshot.R12) << 8 | Int(snapshot.crtcSnapshot.R13))
+            let displayOffset: Float = Float(Int(snapshot.crtcSnapshot.R13))
+            let alternateFontROM: Float = Float(Int(snapshot.crtcSnapshot.R12) >> 5) // Is MA13 set to 1 ?  If so, select alternate font ROM
             let cursorPosition: Float = Float(Int(snapshot.crtcSnapshot.R14) << 8 | Int(snapshot.crtcSnapshot.R15))
 
             let colourMode: Float = Float(colourOptions[colourSelection] ?? 0)
 
-            // Base and scaled sizes
-            let baseWidth: CGFloat = max(CGFloat(frameWidth), 1)
-            let baseHeight: CGFloat = max(CGFloat(frameHeight), 1)
-            let scaledWidth: CGFloat = baseWidth * charScale * CGFloat(frameXScale)
-            let scaledHeight: CGFloat = baseHeight * charScale * charAspect * CGFloat(frameYScale)
+            // Base and scaled sizes (broken into smaller sub-expressions for type-checker)
+            let baseWidthInt: Int = max(frameWidth, 1)
+            let baseHeightInt: Int = max(frameHeight, 1)
+            let baseWidth: CGFloat = CGFloat(baseWidthInt)
+            let baseHeight: CGFloat = CGFloat(baseHeightInt)
 
-            let backGroundIntensity: Float = Float(
-                (Int(snapshot.crtcSnapshot.redBackgroundIntensity) << 2) +
-                (Int(snapshot.crtcSnapshot.greenBackgroundIntensity) << 1) +
-                Int(snapshot.crtcSnapshot.blueBackgroundIntensity)
-            )
+            let xScale: CGFloat = charScale * CGFloat(frameXScale)
+            let yScale: CGFloat = charScale * charAspect * CGFloat(frameYScale)
+
+            let scaledWidth: CGFloat = baseWidth * xScale
+            let scaledHeight: CGFloat = baseHeight * yScale
+
+            // Background intensity broken up for compile-time performance
+            let redBG: Int = Int(snapshot.crtcSnapshot.redBackgroundIntensity)
+            let greenBG: Int = Int(snapshot.crtcSnapshot.greenBackgroundIntensity)
+            let blueBG: Int = Int(snapshot.crtcSnapshot.blueBackgroundIntensity)
+            let bgPacked: Int = (redBG << 2) | (greenBG << 1) | blueBG
+            let backGroundIntensity: Float = Float(bgPacked)
 
             // Pre-extract large arrays to avoid recomputation and inference across modifier chains
             let vduArray: [Float] = snapshot.memorySnapshot.VDU
@@ -205,7 +215,7 @@ struct emulatorView: View
             let pcgRamArray: [Float] = snapshot.memorySnapshot.PcgRam
             let colourRamArray: [Float] = snapshot.memorySnapshot.ColourRam
 
-            TimelineView(.periodic(from: startDate, by: 0.02)) { context in
+            TimelineView(.periodic(from: startDate, by: 0.02), content: { context in
                 let elapsedTime: Float = Float(context.date.timeIntervalSince(startDate))
 
                 ScreenPipelineView(
@@ -218,9 +228,11 @@ struct emulatorView: View
                     frameXScale: frameXScale,
                     frameYScale: frameYScale,
                     interlaceEnabled: interlaceEnabled,
+                    // Shader inputs
                     scanLineHeight: scanLineHeight,
                     displayColumns: displayColumns,
-                    fontLocationOffset: fontLocationOffset,
+                    displayOffset: displayOffset,
+                    alternateFontROM: alternateFontROM,
                     cursorPosition: cursorPosition,
                     cursorStartScanLine: cursorStartScanLine,
                     cursorEndScanLine: cursorEndScanLine,
@@ -233,110 +245,143 @@ struct emulatorView: View
                     pcgRamArray: pcgRamArray,
                     colourRamArray: colourRamArray
                 )
-            }
+            })
         }
     }
     
     var body: some View
     {
-            NavigationStack
+        NavigationStack
+        {
+            VStack
             {
-                VStack
+                if let snapshot = vm.snapshot
                 {
-                    if let snapshot = vm.snapshot
+                    
+                    ZStack
                     {
                         CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
-                    }
-                    else
-                    {
-                        Color.black
+                        KeyboardResponderView(
+                            onKeyDown: { event in
+                                guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                else { return }
+                                
+                                Task
+                                {
+                                    await vm.keyDown(key)
+                                }
+                            },
+                            
+                            onKeyUp: { event in
+                                guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                else { return }
+                                
+                                Task
+                                {
+                                    await vm.keyUp(key)
+                                }
+                            },
+                            onFlagsChanged:
+                                { event in
+
+                                    Task
+                                    {
+                                        await vm.modifiersChanged(event.modifierFlags)
+                                    }
+                                }
+                        )
+                      //  .opacity(0.001)
                     }
                 }
-                .toolbar
+                else
                 {
-                    ToolbarItem(placement: .primaryAction)
+                    Color.black
+                }
+            }
+            .toolbar
+            {
+                ToolbarItem(placement: .primaryAction)
+                {
+                    HStack(spacing: 32)
                     {
-                        HStack(spacing: 32)
-                        {
-                            
-                            LedBar(value: Int(speedSelection))
-                            
-                            Text("\(speedSelection, specifier: "%.0f")×")
-                                .monospacedDigit()
-                            
-                            StatusLED(colour: vm.isStepActive ? .orange : vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
-                            
-                        }
+                        
+                        LedBar(value: Int(speedSelection))
+                        
+                        Text("\(speedSelection, specifier: "%.0f")×")
+                            .monospacedDigit()
+                        
+                        StatusLED(colour: vm.isStepActive ? .orange : vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
+                        
                     }
-                    ToolbarItem(placement: .principal)
+                }
+                ToolbarItem(placement: .principal)
+                {
+                    HStack(spacing: 40)
                     {
-                        HStack(spacing: 40)
+                        HStack(spacing: 12)
                         {
-                            HStack(spacing: 12)
+                            Button(vm.snapshot?.executionSnapshot.emulatorState == .running ? "Pause" : "Resume", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
                             {
-                                Button(vm.snapshot?.executionSnapshot.emulatorState == .running ? "Pause" : "Resume", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
+                                Task
                                 {
-                                    Task
+                                    if vm.snapshot?.executionSnapshot.emulatorState == .running
                                     {
-                                        if vm.snapshot?.executionSnapshot.emulatorState == .running
-                                        {
-                                            await vm.pauseEmulation()
-                                        }
-                                        else
-                                        {
-                                            await vm.startEmulation()
-                                        }
+                                        await vm.pauseEmulation()
                                     }
-                                }
-                                .labelStyle(.titleAndIcon)
-                                Button("Step", systemImage: "forward.frame.fill")
-                                {
-                                    Task
+                                    else
                                     {
-                                        vm.isStepActive = true
-                                        try? await Task.sleep(for: .milliseconds(200))
-                                        vm.isStepActive = false
-                                        await vm.stepEmulation()
-                                    }
-                                }
-                                .labelStyle(.titleAndIcon)
-                            }
-                            HStack(spacing: 12)
-                            {
-                                Button("Reset", systemImage: "arrow.counterclockwise")
-                                {
-                                    Task
-                                    {
-                                        await vm.stopEmulation()
-                                        try? await Task.sleep(for: .milliseconds(20))
-                                        await vm.resetEmulation()
                                         await vm.startEmulation()
                                     }
                                 }
-                                .labelStyle(.titleAndIcon)
-                                Button("Quit", systemImage: "xmark.circle")
-                                { NSApp.terminate(nil) }
-                                    .labelStyle(.titleAndIcon)
                             }
+                            .labelStyle(.titleAndIcon)
+                            Button("Step", systemImage: "forward.frame.fill")
+                            {
+                                Task
+                                {
+                                    vm.isStepActive = true
+                                    try? await Task.sleep(for: .milliseconds(200))
+                                    vm.isStepActive = false
+                                    await vm.stepEmulation()
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
                         }
-                        .fixedSize()
+                        HStack(spacing: 12)
+                        {
+                            Button("Reset", systemImage: "arrow.counterclockwise")
+                            {
+                                Task
+                                {
+                                    await vm.stopEmulation()
+                                    try? await Task.sleep(for: .milliseconds(20))
+                                    await vm.resetEmulation()
+                                    await vm.startEmulation()
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
+                            Button("Quit", systemImage: "xmark.circle")
+                            { NSApp.terminate(nil) }
+                                .labelStyle(.titleAndIcon)
+                        }
                     }
+                    .fixedSize()
                 }
-                .onAppear
+            }
+            .onAppear
+            {
+                if registerWindowVisible { openWindow(id: "registerWindow") }
+                if portWindowVisible { openWindow(id: "portAndCrtcWindow") }
+                if memoryWindowVisible { openWindow(id: "memoryAndInstructionWindow") }
+                if breakpointWindowVisible { openWindow(id: "breakpointsWindow") }
+                focusWindow(withId: "emulatorWindow")
+                Task
                 {
-                    if registerWindowVisible { openWindow(id: "registerWindow") }
-                    if portWindowVisible { openWindow(id: "portAndCrtcWindow") }
-                    if memoryWindowVisible { openWindow(id: "memoryAndInstructionWindow") }
-                    if breakpointWindowVisible { openWindow(id: "breakpointsWindow") }
-                    focusWindow(withId: "emulatorWindow")
-                    Task
-                    {
-                        await vm.updateProgramCounter(address: 0x8000)
-                        await vm.startEmulation()
-                    }
+                    await vm.updateProgramCounter(address: 0x8000)
+                    await vm.startEmulation()
                 }
+            }
             }
     } //body
 } // emulatorView
-
 

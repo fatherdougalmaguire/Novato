@@ -9,6 +9,8 @@ struct NovatoApp: App
     
     @State private var isImporting = false
     
+    @AppStorage("quickLoadAddress") private var quickLoadAddress: String = "0900"
+    
     private var restrictedTypes: [UTType]
     {
         let binType = UTType(filenameExtension: "bin") ?? .item
@@ -74,9 +76,11 @@ struct NovatoApp: App
 
                             Task
                             {
+                                let address = UInt16(quickLoadAddress, radix: 16) ?? 2304
+                                
                                 await vm.pauseEmulation()
-                                await vm.quickload(path: url, loadAddress: 0x900)
-                                await vm.updateProgramCounter(address: 0x900)
+                                await vm.quickload(path: url, loadAddress: address)
+                                await vm.updateProgramCounter(address: address)
                                 await vm.startEmulation()
                             }
 

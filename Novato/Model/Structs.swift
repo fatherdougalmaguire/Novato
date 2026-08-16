@@ -1,7 +1,168 @@
 import Foundation
+import AppKit
 
-enum emulatorState {
+enum emulatorState
+{
     case stopped, running, paused, halted
+}
+
+enum MicrobeeKey: Hashable
+{
+    case aKey
+    case bKey
+    case cKey
+    case dKey
+    case eKey
+    case fKey
+    case gKey
+    case hKey
+    case iKey
+    case jKey
+    case kKey
+    case lKey
+    case mKey
+    case nKey
+    case oKey
+    case pKey
+    case qKey
+    case rKey
+    case sKey
+    case tKey
+    case uKey
+    case vKey
+    case wKey
+    case xKey
+    case yKey
+    case zKey
+
+    case zeroKey
+    case oneKey
+    case twoKey
+    case threeKey
+    case fourKey
+    case fiveKey
+    case sixKey
+    case sevenKey
+    case eightKey
+    case nineKey
+
+    case spaceKey
+    case returnKey
+    case backspaceKey
+    case escapeKey
+    case tabKey
+
+    case shiftKey
+    case controlKey
+    case capslockKey
+
+    case resetKey
+    case linefeedKey
+    case breakKey
+
+    case backtickKey
+    case dashKey
+    case equalsKey
+    case rightSquareBracketKey
+    case leftSquareBracketKey
+    case backslashKey
+    case semicolonKey
+    case forwardtickKey
+    case commaKey
+    case periodKey
+    case forwardslashKey
+    
+    case tildeKey
+    case exclamationKey
+    case atsignKey
+    case hashKey
+    case dollarsignKey
+    case percentageKey
+    case caretKey
+    case ampersandKey
+    case asteriskKey
+    case leftRoundBracketKey
+    case rightRoundBracketKey
+    case plusKey
+    case leftParenthesisKey
+    case rightParenthesisKey
+    case pipeKey
+    case colonKey
+    case doubleQuoteKey
+    case lessThanKey
+    case greaterThanKey
+    case questionMarkKey
+}
+
+struct MicrobeeKeyboardMapper
+{
+
+    static func key(for event: NSEvent) -> MicrobeeKey?
+    {
+        switch event.keyCode
+        {
+            
+        case 0x12: return .oneKey    
+        case 0x13: return .twoKey
+        case 0x14: return .threeKey
+        case 0x15: return .fourKey
+        case 0x16: return .sixKey
+        case 0x17: return .fiveKey
+        case 0x19: return .nineKey
+        case 0x1A: return .sevenKey
+        case 0x1C: return .eightKey
+        case 0x1D: return .zeroKey
+            
+        case 0x00: return .aKey
+        case 0x0B: return .bKey
+        case 0x08: return .cKey
+        case 0x02: return .dKey
+        case 0x0E: return .eKey
+        case 0x03: return .fKey
+        case 0x05: return .gKey
+        case 0x04: return .hKey
+        case 0x22: return .iKey
+        case 0x26: return .jKey
+        case 0x28: return .kKey
+        case 0x25: return .lKey
+        case 0x2E: return .mKey
+        case 0x2D: return .nKey
+        case 0x1F: return .oKey
+        case 0x23: return .pKey
+        case 0x0C: return .qKey
+        case 0x0F: return .rKey
+        case 0x11: return .tKey
+        case 0x20: return .uKey
+        case 0x09: return .vKey
+        case 0x0D: return .wKey
+        case 0x07: return .xKey
+        case 0x10: return .yKey
+        case 0x06: return .zKey
+
+        case 0x31: return .spaceKey
+        case 0x24: return .returnKey
+        case 0x33: return .backspaceKey
+        case 0x35: return .escapeKey
+            
+        case 0x32: return .backtickKey
+            
+        case 0x30: return .tabKey
+        
+        case 0x1B: return .dashKey
+        case 0x18: return .equalsKey
+        case 0x21: return .rightSquareBracketKey
+        case 0x1E: return .leftSquareBracketKey
+        case 0x2A: return .backslashKey
+        case 0x29: return .semicolonKey
+        case 0x27: return .forwardtickKey
+        case 0x2B: return .commaKey
+        case 0x2F: return .periodKey
+        case 0x2C: return .forwardslashKey
+
+        default:
+            return nil
+        }
+    }
 }
 
 struct z80Snapshot: Sendable, Equatable

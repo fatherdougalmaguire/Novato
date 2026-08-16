@@ -1,4 +1,5 @@
 import Foundation
+import AppKit
 
 @Observable
 final class emulatorViewModel
@@ -77,16 +78,6 @@ final class emulatorViewModel
         await cpu.updateBreakpoints(index: index, value: value, mask: mask)
     }
     
-    //    func ClearEmulationScreen() async
-    //    {
-    //        await cpu.ClearVideoMemory()
-    //    }
-    //
-    //    func splashScreen() async
-    //    {
-    //        await cpu.splashScreen()
-    //    }
-    
     func writeToMemory(address : UInt16, value : UInt8) async
     {
         await cpu.writeToMemory(address : address, value : value)
@@ -122,17 +113,24 @@ final class emulatorViewModel
         await cpu.reset()
     }
     
-    //    private func takeSnapshot() async
-    //    {
-    //        while !Task.isCancelled
-    //        {
-    //            let currentSnapshot = await cpu.returnSnapshot(stepping: false)
-    //
-    //            guard !Task.isCancelled else { break }
-    //
-    //            snapshot = currentSnapshot
-    //
-    //            try? await Task.sleep(nanoseconds: 20_000_000)
-    //        }
-    //    }
+    func keyDown(_ key: MicrobeeKey) async
+    {
+        print("key down",key)
+        await cpu.keyDown(key)
+    }
+
+    func keyUp(_ key: MicrobeeKey) async
+    {
+        print("key up",key)
+        await cpu.keyUp(key)
+    }
+    
+    func modifiersChanged(_ modifiers: NSEvent.ModifierFlags) async
+    {
+        print("Modifier pressed",modifiers)
+        await cpu.modifiersChanged(
+            shift: modifiers.contains(.shift),
+            control: modifiers.contains(.control)
+        )
+    }
 }

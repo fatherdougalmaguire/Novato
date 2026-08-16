@@ -705,7 +705,59 @@ actor microbee
         pendingClockSpeedMultiplier = multiplier
     }
     
-   
+    struct MicrobeeKeyboard {
+
+        private var pressedKeys:Set<MicrobeeKey> = []
+        
+        var shiftKey: Bool = false
+        var controlKey: Bool = false
+
+        mutating func keyDown(_ key: MicrobeeKey)
+        {
+            pressedKeys.insert(key)
+        }
+
+        mutating func keyUp(_ key: MicrobeeKey)
+        {
+            pressedKeys.remove(key)
+        }
+
+        func isPressed(_ key: MicrobeeKey) -> Bool
+        {
+            pressedKeys.contains(key)
+        }
+        
+        mutating func setShift(_ shift: Bool)
+        {
+            shiftKey = shift
+        }
+        
+        mutating func setControl(_ control: Bool)
+        {
+            controlKey = control
+        }
+    }
+    
+    private var keyboard = MicrobeeKeyboard()
+
+    func keyDown(_ key: MicrobeeKey)
+    {
+        keyboard.keyDown(key)
+    }
+
+    func keyUp(_ key: MicrobeeKey)
+    {
+        keyboard.keyUp(key)
+    }
+    
+    func modifiersChanged(
+        shift: Bool,
+        control: Bool
+    )
+    {
+        keyboard.setShift(shift)
+        keyboard.setControl(control)
+    }
     
     func reset()
     {
