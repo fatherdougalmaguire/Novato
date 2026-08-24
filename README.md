@@ -94,16 +94,18 @@ But not much else.
 
 ### Display output
 * The screen buffer is output to the display using a SwiftUI Shader library .ColorEffect shader
-* Rudimentary 6545 functionality is emulated:
+* 6545 functionality is mostly emulated:
   
-  - Supports definition of the nummber of display rows and columns.
-  - Supports definition of cursor position.
-  - Supports selection of Character ROM address.
-  - Supports selection of cursor start and end scanline.
-  - Supports cursor flash mode ( On/Off/slow flash/fast flash ).
+  - Supports definition of the nummber of display rows and columns
+  - Supports definition of cursor position
+  - Supports selection of display start position
+  - Supports selection of cursor start and end scanline
+  - Supports selection of normal/small font from character ROM
+  - Supports cursor flash mode ( On/Off/slow flash/fast flash )
+  - Supports vertical blanking bit in status register
 
 * Shader will automatically scale the output resolution to the same display size.
-* Colour support has been added ( green mono, amber mono, blue mono, white mono and non-premium colour )
+* Colour support has been added ( green mono, amber mono, blue mono, white mono and alpha model colour )
 
 ### Memory
 * Working MMU has been implemented
@@ -147,10 +149,6 @@ Some also have some display artefacts.
 * Interrupt processing
 * Sound output
 * Capture keyboard input    
-* Frame based emulation
-  - rewrite the emulator loop to process interrupts
-  - rewrite the emulator loop to fill sound buffer
-  - rewrite the emulator loop to trigger vblank update of 6545 for video and keypressed
 * Cassette load/save functionality
 
 ## Emulator screenshots
