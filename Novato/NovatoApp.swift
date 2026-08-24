@@ -10,6 +10,7 @@ struct NovatoApp: App
     @State private var isImporting = false
     
     @AppStorage("quickLoadAddress") private var quickLoadAddress: String = "0900"
+    @AppStorage("quickLoadExecuteAddress") private var quickLoadExecuteAddress: String = "0900"
     
     private var restrictedTypes: [UTType]
     {
@@ -76,11 +77,12 @@ struct NovatoApp: App
 
                             Task
                             {
-                                let address = UInt16(quickLoadAddress, radix: 16) ?? 2304
+                                let loadAddress = UInt16(quickLoadAddress, radix: 16) ?? 2304
+                                let executeAddress = UInt16(quickLoadExecuteAddress, radix: 16) ?? 2304
                                 
                                 await vm.pauseEmulation()
-                                await vm.quickload(path: url, loadAddress: address)
-                                await vm.updateProgramCounter(address: address)
+                                await vm.quickload(path: url, loadAddress: loadAddress)
+                                await vm.updateProgramCounter(address: executeAddress)
                                 await vm.startEmulation()
                             }
 

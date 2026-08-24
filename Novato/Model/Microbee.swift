@@ -651,12 +651,6 @@ actor microbee
         return Int(totalTStates)
     }
     
-//    func returnEmulatorState() async -> emulatorState
-//    
-//    {
-//        return emulatorState
-//    }
-    
     func returnCPUState(cpuState: CPUState) -> CPUState
     {
         var tempRam : [[Int]] = []
@@ -920,7 +914,7 @@ actor microbee
         appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
         #endif
         
-        // crtc.tick(tStates: tStates)
+        bus.crtc.tick(tStates: tStates)
         // sound.tick(tStates: tStates)
         // keyboard.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
@@ -997,7 +991,7 @@ actor microbee
                    appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
                 #endif
 
-                // crtc.tick(tStates: tStates)
+                bus.crtc.tick(tStates: tStates)
                 // sound.tick(tStates: tStates)
                 // keyboard.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
@@ -14005,6 +13999,7 @@ actor microbee
                 R17: bus.crtc.registers.R17,
                 R18: bus.crtc.registers.R18,
                 R19: bus.crtc.registers.R19,
+                R31: bus.crtc.registers.R31,
                 statusRegister: bus.crtc.registers.statusRegister,
                 redBackgroundIntensity: bus.crtc.registers.redBackgroundIntensity,
                 greenBackgroundIntensity: bus.crtc.registers.greenBackgroundIntensity,

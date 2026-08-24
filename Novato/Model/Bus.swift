@@ -206,40 +206,69 @@ final class CRTC
 {
     struct crtcRegisters
     {
-        var R0 : UInt8 = 0x00                               // Ignored by emulator - Total length of line (displayed and non-displayed cycles (retrace) in CCLK cylces minus 1
-        var R1 : UInt8 = 0x40                               // Number of characters displayed in a line - initialise as 64
-        var R2 : UInt8 = 0x00                               // Ignored by emulator - The position of the horizontal sync pulse start in distance from line start
-        var R3 : UInt8 = 0x00                               // Ignored by emulator
-        var R4 : UInt8 = 0x12                               // The number of character lines of the screen minus 1 - initialise as 18
-        var R5 : UInt8 = 0x00                               // Ignored by emulator - The additional number of scanlines to complete a screen
-        var R6 : UInt8 = 0x10                               // Number character lines that are displayed - initialise as 16
-        var R7 : UInt8 = 0x00                               // Ignored by emulator - Position of the vertical sync pulse in character lines.
-        var R8 : UInt8 = 0x00                               // Ignored by emulator
-        var R9 : UInt8 = 0x0F                               // Number of scanlines per character minus 1 - initialise as 15
-        var R10 : UInt8 = 0x20                              // Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no cursor and scanline start of 0
-        var R11 : UInt8 = 0x00                              // Cursor scanline end ( bits 0-4 ) - initialise as scanlin end of 0
-        var R12 : UInt8 = 0x00                              // Character Generator Rom start address ( high byte )
-        var R13 : UInt8 = 0x00                              // Character Generator Rom start address ( low byte )
-        var R14 : UInt8 = 0x00                              // Cursor address ( high byte )
-        var R15 : UInt8 = 0x00                              // Cursor address ( low byte )
-        var R16 : UInt8 = 0x00                              // Ignored by emulator
-        var R17 : UInt8 = 0x00                              // Ignored by emulator
-        var R18 : UInt8 = 0x00                              // Ignored by emulator
-        var R19 : UInt8 = 0x00                              // Ignored by emulator
+        // initialise as 64x16
+        
+        var R0 : UInt8 = 0x6B                               // Horizontal Total-1 : Total length of line (displayed and non-displayed) in CCLK cylces minus 1
+        var R1 : UInt8 = 0x40                               // Horizontal Displayed : number of characters displayed in a line
+        var R2 : UInt8 = 0x51                               // Horizontal Sync Position : The position of the horizontal sync pulse start in distance from line start
+        var R3 : UInt8 = 0x37                               // Sync Width : lower 4 bits are width of hsync pulse in character clock periods, upper 4 bits are width of vsync pulse in character clock periods
+        var R4 : UInt8 = 0x12                               // Vertical Total-1 : The number of character lines of the screen minus 1
+        var R5 : UInt8 = 0x09                               // Vertical Total Adjust : The additional number of scanlines to complete a screen
+        var R6 : UInt8 = 0x10                               // Vertical Displayed : Number character lines that are displayed
+        var R7 : UInt8 = 0x00                               // Vert Sync Position : Position of the vertical sync pulse in character lines
+        var R8 : UInt8 = 0x48                               // Mode Control : ignored by emulator at this point
+        var R9 : UInt8 = 0x0F                               // Scan Lines-1 : Number of scanlines per character minus 1
+        var R10 : UInt8 = 0x20                              // Cursor Start : Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no cursor and scanline start of 0
+        var R11 : UInt8 = 0x00                              // Cursor End : Cursor scanline end ( bits 0-4 ) - initialise as scanlin end of 0
+        var R12 : UInt8 = 0x00                              // Display Start Address ( high byte ) :  6 bits  - bit 5 switches in 80x24 font - clamped to 3 bits inside the shader so R12/R13 offset address is 0x0000-0x7FF
+        var R13 : UInt8 = 0x00                              // Display Start Address ( low byte ) : 8 bits
+        var R14 : UInt8 = 0x00                              // Cursor Position ( high byte ) : 6 bits - clamped to 3 bits inside the shader so R14/R15 offset address is 0x0000-0x7FF
+        var R15 : UInt8 = 0x00                              // Cursor Position ( low byte ) : 8 bits
+        var R16 : UInt8 = 0x00                              // Light Pen Register ( high byte ) : 6 bits -
+        var R17 : UInt8 = 0x00                              // Light Pen Register ( high byte ) : 8 bits
+        var R18 : UInt8 = 0x00                              // Update Address Register ( high byte ) : 6 bits -
+        var R19 : UInt8 = 0x00                              // Update Address Register ( low byte ) : 8 bits
+        var R31 : UInt8 = 0x00                              // Dummy Location Register : when read or written to,  will
         
         var statusRegister : UInt8 = 0b10000000
         
-        var redBackgroundIntensity : UInt8 = 0x00                         // red background intensity 0 = half 1 = full
-        var greenBackgroundIntensity : UInt8 = 0x00                       // green background intensity 0 = half 1 = full
-        var blueBackgroundIntensity : UInt8 = 0x00                        // blue background intensity 0 = half 1 = full
+        var redBackgroundIntensity : UInt8 = 0x00           // red background intensity 0 = half 1 = full
+        var greenBackgroundIntensity : UInt8 = 0x00         // green background intensity 0 = half 1 = full
+        var blueBackgroundIntensity : UInt8 = 0x00          // blue background intensity 0 = half 1 = full
         
     }
     
     var registers = crtcRegisters()
     
+    var characterClock : UInt8 = 0
+    
+    let tStatesPerCharacterClock = 2                        // 3.375Mhz divide by 1.6875 Mhz.  Make this speed independent later
+    
+    var columnCounter : UInt8 = 0
+    var rowCounter : UInt8 = 0
+    
+    var scanlineCounter : UInt8 = 0
+       
+    var displayEnable : Bool = false
+    
+    var verticalAdjustCounter : UInt8 = 0
+    var inVerticalAdjust : Bool = false
+
+    var verticalBlank : Bool = false
+    
+    var frameComplete : Bool = false
+    
+    let verticalBlankingMask : UInt8 = 0x20
+    
     func readStatusRegister() -> UInt8
     {
-        return registers.statusRegister
+        var tempStatus : UInt8 = registers.statusRegister
+        
+        if verticalBlank
+        {
+            tempStatus = tempStatus | verticalBlankingMask
+        }
+        return tempStatus
     }
     
     func writeRegister(RegNum:UInt8, RegValue:UInt8)
@@ -266,6 +295,7 @@ final class CRTC
         case 17: registers.R17 = RegValue
         case 18: registers.R18 = RegValue
         case 19: registers.R19 = RegValue
+        case 31: registers.R31 = RegValue
         default: break
         }
     }
@@ -294,7 +324,75 @@ final class CRTC
         case 17: return registers.R17
         case 18: return registers.R18
         case 19: return registers.R19
+        case 31: return registers.R31
         default: return 0
+        }
+    }
+    
+    func startNewFrame()
+    {
+        columnCounter = 0
+        rowCounter = 0
+        scanlineCounter = 0
+
+        verticalAdjustCounter = 0
+        inVerticalAdjust = false
+
+        verticalBlank = false
+        frameComplete = true
+    }
+    
+    func endScanline()
+    {
+        if inVerticalAdjust
+        {
+           verticalAdjustCounter = verticalAdjustCounter + 1
+
+           if verticalAdjustCounter >= registers.R5
+           {
+               startNewFrame()
+           }
+
+           return
+        }
+
+        scanlineCounter = scanlineCounter + 1
+
+        if scanlineCounter <= registers.R9
+        {
+           return
+        }
+
+        scanlineCounter = 0
+        
+        rowCounter = rowCounter + 1
+        
+        if rowCounter >= registers.R6
+        {
+            verticalBlank = true
+        }
+        
+        if rowCounter >= registers.R4 + 1
+        {
+            inVerticalAdjust = true
+            verticalAdjustCounter = 0
+        }
+    }
+    
+    func tick(tStates: UInt8)
+    {
+        characterClock = characterClock + tStates
+        
+        while characterClock >= tStatesPerCharacterClock
+        {
+            characterClock = characterClock - 2
+            columnCounter = columnCounter + 1
+        }
+        
+        if columnCounter >= registers.R0
+        {
+            columnCounter = 0
+            endScanline()
         }
     }
 }

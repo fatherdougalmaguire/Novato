@@ -121,6 +121,7 @@ struct cpuSettingsView: View
 {
     @AppStorage("speedSelection") private var speedSelection: Double = 1.0
     @AppStorage("quickLoadAddress") private var quickLoadAddress: String = "0900"
+    @AppStorage("quickLoadExecuteAddress") private var quickLoadExecuteAddress: String = "0900"
     @Environment(emulatorViewModel.self) private var vm
     
     var body: some View
@@ -164,6 +165,29 @@ struct cpuSettingsView: View
                                 if filtered != newValue
                                 {
                                     quickLoadAddress = filtered
+                                }
+                            }
+            }
+            LabeledContent("Quick Load Execute Address")
+            {
+                        TextField("",text: $quickLoadExecuteAddress)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(width: 80)
+                            .monospaced()
+                            .onChange(of: quickLoadExecuteAddress)
+                            {
+                                _, newValue in
+
+                                let filtered = String(
+                                    newValue
+                                        .uppercased()
+                                        .filter { $0.isHexDigit }
+                                        .prefix(4)
+                                )
+
+                                if filtered != newValue
+                                {
+                                    quickLoadExecuteAddress = filtered
                                 }
                             }
             }

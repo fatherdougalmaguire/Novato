@@ -79,7 +79,9 @@ using namespace metal;
         
     screenpos = trunc(position.y/int(ScanLineHeight))*int(DisplayColumns)+trunc(position.x/CellWidth);  // return linear co-ordinates of character location based on pixel position
     
-    screenpos = screenpos + int(displayOffset);
+    screenpos = (screenpos + int(displayOffset)) & 2047;
+    
+    int clampedCursorPosition = int(CursorPosition) & 2047;
     
     int bitmask = (128 >> int(xcursor));
     
@@ -105,7 +107,7 @@ using namespace metal;
         pixelset = false;
     }
     
-    if (screenpos == int(CursorPosition))
+    if (screenpos == clampedCursorPosition)
     {
         
         bool cursorInside = (ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine));

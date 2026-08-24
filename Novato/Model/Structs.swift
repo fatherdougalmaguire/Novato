@@ -230,6 +230,7 @@ struct crtcSnapshot: Sendable, Equatable
     let R17: UInt8        // Light Pen Reg (L)
     let R18: UInt8         // Update Address Reg (H)
     let R19: UInt8         // Update Address Reg (L)
+    let R31: UInt8         // Dummy register
     
     let statusRegister : UInt8
     
