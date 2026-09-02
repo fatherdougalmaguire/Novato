@@ -115,22 +115,16 @@ final class emulatorViewModel
     
     func keyDown(_ key: MicrobeeKey) async
     {
-        print("key down",key)
         await cpu.keyDown(key)
     }
 
     func keyUp(_ key: MicrobeeKey) async
     {
-        print("key up",key)
         await cpu.keyUp(key)
     }
     
-    func modifiersChanged(_ modifiers: NSEvent.ModifierFlags) async
+    func modifierChanged(_ modifier: HostModifier, pressed: Bool) async
     {
-        print("Modifier pressed",modifiers)
-        await cpu.modifiersChanged(
-            shift: modifiers.contains(.shift),
-            control: modifiers.contains(.control)
-        )
+        await cpu.modifierChanged(modifier, pressed: pressed)
     }
 }

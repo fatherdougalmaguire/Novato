@@ -202,201 +202,6 @@ final class memoryMapper
     }
 }
 
-final class CRTC
-{
-    struct crtcRegisters
-    {
-        // initialise as 64x16
-        
-        var R0 : UInt8 = 0x6B                               // Horizontal Total-1 : Total length of line (displayed and non-displayed) in CCLK cylces minus 1
-        var R1 : UInt8 = 0x40                               // Horizontal Displayed : number of characters displayed in a line
-        var R2 : UInt8 = 0x51                               // Horizontal Sync Position : The position of the horizontal sync pulse start in distance from line start
-        var R3 : UInt8 = 0x37                               // Sync Width : lower 4 bits are width of hsync pulse in character clock periods, upper 4 bits are width of vsync pulse in character clock periods
-        var R4 : UInt8 = 0x12                               // Vertical Total-1 : The number of character lines of the screen minus 1
-        var R5 : UInt8 = 0x09                               // Vertical Total Adjust : The additional number of scanlines to complete a screen
-        var R6 : UInt8 = 0x10                               // Vertical Displayed : Number character lines that are displayed
-        var R7 : UInt8 = 0x00                               // Vert Sync Position : Position of the vertical sync pulse in character lines
-        var R8 : UInt8 = 0x48                               // Mode Control : ignored by emulator at this point
-        var R9 : UInt8 = 0x0F                               // Scan Lines-1 : Number of scanlines per character minus 1
-        var R10 : UInt8 = 0x20                              // Cursor Start : Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no cursor and scanline start of 0
-        var R11 : UInt8 = 0x00                              // Cursor End : Cursor scanline end ( bits 0-4 ) - initialise as scanlin end of 0
-        var R12 : UInt8 = 0x00                              // Display Start Address ( high byte ) :  6 bits  - bit 5 switches in 80x24 font - clamped to 3 bits inside the shader so R12/R13 offset address is 0x0000-0x7FF
-        var R13 : UInt8 = 0x00                              // Display Start Address ( low byte ) : 8 bits
-        var R14 : UInt8 = 0x00                              // Cursor Position ( high byte ) : 6 bits - clamped to 3 bits inside the shader so R14/R15 offset address is 0x0000-0x7FF
-        var R15 : UInt8 = 0x00                              // Cursor Position ( low byte ) : 8 bits
-        var R16 : UInt8 = 0x00                              // Light Pen Register ( high byte ) : 6 bits -
-        var R17 : UInt8 = 0x00                              // Light Pen Register ( high byte ) : 8 bits
-        var R18 : UInt8 = 0x00                              // Update Address Register ( high byte ) : 6 bits -
-        var R19 : UInt8 = 0x00                              // Update Address Register ( low byte ) : 8 bits
-        var R31 : UInt8 = 0x00                              // Dummy Location Register : when read or written to,  will
-        
-        var statusRegister : UInt8 = 0b10000000
-        
-        var redBackgroundIntensity : UInt8 = 0x00           // red background intensity 0 = half 1 = full
-        var greenBackgroundIntensity : UInt8 = 0x00         // green background intensity 0 = half 1 = full
-        var blueBackgroundIntensity : UInt8 = 0x00          // blue background intensity 0 = half 1 = full
-        
-    }
-    
-    var registers = crtcRegisters()
-    
-    var characterClock : UInt8 = 0
-    
-    let tStatesPerCharacterClock = 2                        // 3.375Mhz divide by 1.6875 Mhz.  Make this speed independent later
-    
-    var columnCounter : UInt8 = 0
-    var rowCounter : UInt8 = 0
-    
-    var scanlineCounter : UInt8 = 0
-       
-    var displayEnable : Bool = false
-    
-    var verticalAdjustCounter : UInt8 = 0
-    var inVerticalAdjust : Bool = false
-
-    var verticalBlank : Bool = false
-    
-    var frameComplete : Bool = false
-    
-    let verticalBlankingMask : UInt8 = 0x20
-    
-    func readStatusRegister() -> UInt8
-    {
-        var tempStatus : UInt8 = registers.statusRegister
-        
-        if verticalBlank
-        {
-            tempStatus = tempStatus | verticalBlankingMask
-        }
-        return tempStatus
-    }
-    
-    func writeRegister(RegNum:UInt8, RegValue:UInt8)
-    {
-        switch RegNum
-        {
-        case 0: registers.R0 = RegValue
-        case 1: registers.R1 = RegValue
-        case 2: registers.R2 = RegValue
-        case 3: registers.R3 = RegValue
-        case 4: registers.R4 = RegValue
-        case 5: registers.R5 = RegValue
-        case 6: registers.R6 = RegValue
-        case 7: registers.R7 = RegValue
-        case 8: registers.R8 = RegValue
-        case 9: registers.R9 = RegValue
-        case 10: registers.R10 = RegValue
-        case 11: registers.R11 = RegValue
-        case 12: registers.R12 = RegValue
-        case 13: registers.R13 = RegValue
-        case 14: registers.R14 = RegValue
-        case 15: registers.R15 = RegValue
-        case 16: registers.R16 = RegValue
-        case 17: registers.R17 = RegValue
-        case 18: registers.R18 = RegValue
-        case 19: registers.R19 = RegValue
-        case 31: registers.R31 = RegValue
-        default: break
-        }
-    }
-    
-    func readRegister(RegNum:UInt8) -> UInt8
-    {
-        switch RegNum
-        {
-        case 0: return registers.R0
-        case 1: return registers.R1
-        case 2: return registers.R2
-        case 3: return registers.R3
-        case 4: return registers.R4
-        case 5: return registers.R5
-        case 6: return registers.R6
-        case 7: return registers.R7
-        case 8: return registers.R8
-        case 9: return registers.R9
-        case 10: return registers.R10
-        case 11: return registers.R11
-        case 12: return registers.R12
-        case 13: return registers.R13
-        case 14: return registers.R14
-        case 15: return registers.R15
-        case 16: return registers.R16
-        case 17: return registers.R17
-        case 18: return registers.R18
-        case 19: return registers.R19
-        case 31: return registers.R31
-        default: return 0
-        }
-    }
-    
-    func startNewFrame()
-    {
-        columnCounter = 0
-        rowCounter = 0
-        scanlineCounter = 0
-
-        verticalAdjustCounter = 0
-        inVerticalAdjust = false
-
-        verticalBlank = false
-        frameComplete = true
-    }
-    
-    func endScanline()
-    {
-        if inVerticalAdjust
-        {
-           verticalAdjustCounter = verticalAdjustCounter + 1
-
-           if verticalAdjustCounter >= registers.R5
-           {
-               startNewFrame()
-           }
-
-           return
-        }
-
-        scanlineCounter = scanlineCounter + 1
-
-        if scanlineCounter <= registers.R9
-        {
-           return
-        }
-
-        scanlineCounter = 0
-        
-        rowCounter = rowCounter + 1
-        
-        if rowCounter >= registers.R6
-        {
-            verticalBlank = true
-        }
-        
-        if rowCounter >= registers.R4 + 1
-        {
-            inVerticalAdjust = true
-            verticalAdjustCounter = 0
-        }
-    }
-    
-    func tick(tStates: UInt8)
-    {
-        characterClock = characterClock + tStates
-        
-        while characterClock >= tStatesPerCharacterClock
-        {
-            characterClock = characterClock - 2
-            columnCounter = columnCounter + 1
-        }
-        
-        if columnCounter >= registers.R0
-        {
-            columnCounter = 0
-            endScanline()
-        }
-    }
-}
-
 final class IOPorts
 {
     //    00 or 10 PIO port A data port
@@ -465,13 +270,340 @@ final class IOPorts
     }
 }
 
+final class CRTC
+{
+    struct crtcRegisters
+    {
+        // initialise as 64x16
+        
+        var R0 : UInt8 = 0x6B                               // Horizontal Total-1 : Total length of line (displayed and non-displayed) in CCLK cylces minus 1
+        var R1 : UInt8 = 0x40                               // Horizontal Displayed : number of characters displayed in a line
+        var R2 : UInt8 = 0x51                               // Horizontal Sync Position : The position of the horizontal sync pulse start in distance from line start
+        var R3 : UInt8 = 0x37                               // Sync Width : lower 4 bits are width of hsync pulse in character clock periods, upper 4 bits are width of vsync pulse in character clock periods
+        var R4 : UInt8 = 0x12                               // Vertical Total-1 : The number of character lines of the screen minus 1
+        var R5 : UInt8 = 0x09                               // Vertical Total Adjust : The additional number of scanlines to complete a screen
+        var R6 : UInt8 = 0x10                               // Vertical Displayed : Number character lines that are displayed
+        var R7 : UInt8 = 0x00                               // Vert Sync Position : Position of the vertical sync pulse in character lines
+        var R8 : UInt8 = 0x48                               // Mode Control : ignored by emulator at this point
+        var R9 : UInt8 = 0x0F                               // Scan Lines-1 : Number of scanlines per character minus 1
+        var R10 : UInt8 = 0x20                              // Cursor Start : Cursor scanline start ( bits 0-4 ) and blink mode ( bits 5 and 6 )  - initialse as no cursor and scanline start of 0
+        var R11 : UInt8 = 0x00                              // Cursor End : Cursor scanline end ( bits 0-4 ) - initialise as scanlin end of 0
+        var R12 : UInt8 = 0x00                              // Display Start Address ( high byte ) :  6 bits  - bit 5 switches in 80x24 font - clamped to 3 bits inside the shader so R12/R13 offset address is 0x0000-0x7FF
+        var R13 : UInt8 = 0x00                              // Display Start Address ( low byte ) : 8 bits
+        var R14 : UInt8 = 0x00                              // Cursor Position ( high byte ) : 6 bits - clamped to 3 bits inside the shader so R14/R15 offset address is 0x0000-0x7FF
+        var R15 : UInt8 = 0x00                              // Cursor Position ( low byte ) : 8 bits
+        var R16 : UInt8 = 0x00                              // Light Pen Register ( high byte ) : 6 bits -
+        var R17 : UInt8 = 0x00                              // Light Pen Register ( high byte ) : 8 bits
+        var R18 : UInt8 = 0x00                              // Update Address Register ( high byte ) : 6 bits -
+        var R19 : UInt8 = 0x00                              // Update Address Register ( low byte ) : 8 bits
+        var R31 : UInt8 = 0x00                              // Dummy Location Register : when read or written to,  will
+        
+        var statusRegister : UInt8 = 0b10000000             // Status registers Bit 7 is required to be intially set.  but how is it turned off ?
+        
+        var redBackgroundIntensity : UInt8 = 0x00           // red background intensity 0 = half 1 = full
+        var greenBackgroundIntensity : UInt8 = 0x00         // green background intensity 0 = half 1 = full
+        var blueBackgroundIntensity : UInt8 = 0x00          // blue background intensity 0 = half 1 = full
+        
+    }
+    
+    var registers = crtcRegisters()
+    
+    var characterClock : UInt8 = 0
+    
+    let tStatesPerCharacterClock = 2                        // 3.375Mhz divide by 1.6875 Mhz.  Make this speed independent later
+    
+    var columnCounter : UInt8 = 0
+    var rowCounter : UInt8 = 0
+    
+    var scanlineCounter : UInt8 = 0
+       
+    var displayEnable : Bool = false
+    
+    var verticalAdjustCounter : UInt8 = 0
+    var inVerticalAdjust : Bool = false
+
+    var verticalBlank : Bool = false
+    
+    var frameComplete : Bool = false
+    
+    var lightPenReady : Bool = false
+    
+    var updateReady : Bool = false
+    
+    var lightPenAddress : UInt64 = 0
+    
+    let verticalBlankingMask : UInt8 = 0x20
+    
+    var keyboardScanPosition : UInt8 = 0
+    
+    var romReadLatch : Bool = false
+    
+    var triggerKeyScan : Bool = false
+    
+    private let keyboard: MicrobeeKeyboard
+    
+    init(keyboard: MicrobeeKeyboard)
+    {
+        self.keyboard = keyboard
+    }
+    
+    func readStatusRegister() -> UInt8
+    {
+        var tempStatus : UInt8 = registers.statusRegister
+        
+        if verticalBlank
+        {
+            tempStatus = tempStatus | verticalBlankingMask
+        }
+        
+        if verticalBlank
+        {
+            tempStatus = tempStatus | verticalBlankingMask
+        }
+ 
+        return tempStatus
+    }
+    
+    func writeRegister(RegNum: UInt8, RegValue: UInt8)
+    {
+        switch RegNum
+        {
+        case 0: registers.R0 = RegValue
+        case 1: registers.R1 = RegValue
+        case 2: registers.R2 = RegValue
+        case 3: registers.R3 = RegValue
+        case 4: registers.R4 = RegValue
+        case 5: registers.R5 = RegValue
+        case 6: registers.R6 = RegValue
+        case 7: registers.R7 = RegValue
+        case 8: registers.R8 = RegValue
+        case 9: registers.R9 = RegValue
+        case 10: registers.R10 = RegValue
+        case 11: registers.R11 = RegValue
+        case 12: registers.R12 = RegValue
+        case 13: registers.R13 = RegValue
+        case 14: registers.R14 = RegValue
+        case 15: registers.R15 = RegValue
+        case 16: registers.R16 = RegValue
+        case 17: registers.R17 = RegValue
+        case 18: registers.R18 = RegValue
+        case 19: registers.R19 = RegValue
+        case 31:
+            registers.statusRegister = registers.statusRegister & 0x7F
+            scanForKey()
+          //  print("key scan triggered - write")
+            registers.R31 = RegValue
+        default: break
+        }
+    }
+    
+    func readRegister(RegNum: UInt8) -> UInt8
+    {
+        switch RegNum
+        {
+        case 0: return registers.R0
+        case 1: return registers.R1
+        case 2: return registers.R2
+        case 3: return registers.R3
+        case 4: return registers.R4
+        case 5: return registers.R5
+        case 6: return registers.R6
+        case 7: return registers.R7
+        case 8: return registers.R8
+        case 9: return registers.R9
+        case 10: return registers.R10
+        case 11: return registers.R11
+        case 12: return registers.R12
+        case 13: return readStatusRegister()
+        case 14: return registers.R14
+        case 15: return registers.R15
+        case 16:
+            registers.statusRegister = registers.statusRegister & ~0x40
+            lightPenReady = false
+            return registers.R16
+        case 17:
+            registers.statusRegister = registers.statusRegister & ~0x40
+            lightPenReady = false
+            return registers.R17
+        case 18: return registers.R18
+        case 19: return registers.R19
+        case 31:
+            registers.statusRegister = registers.statusRegister & 0x7F
+            return 0
+        default: return 0
+        }
+    }
+    
+    func startNewFrame()
+    {
+        columnCounter = 0
+        rowCounter = 0
+        scanlineCounter = 0
+
+        verticalAdjustCounter = 0
+        inVerticalAdjust = false
+
+        verticalBlank = false
+        frameComplete = true
+    }
+    
+    func endScanline()
+    {
+        if inVerticalAdjust
+        {
+           verticalAdjustCounter = verticalAdjustCounter + 1
+
+           if verticalAdjustCounter >= registers.R5
+           {
+               startNewFrame()
+           }
+
+           return
+        }
+
+        scanlineCounter = scanlineCounter + 1
+
+        if scanlineCounter <= registers.R9
+        {
+           return
+        }
+
+        scanlineCounter = 0
+        
+        rowCounter = rowCounter + 1
+        
+        if rowCounter >= registers.R6
+        {
+            verticalBlank = true
+        }
+        
+        if rowCounter >= registers.R4 + 1
+        {
+            inVerticalAdjust = true
+            verticalAdjustCounter = 0
+        }
+    }
+    
+    func tick(tStates: UInt8)
+    {
+        characterClock = characterClock + tStates
+        
+        while characterClock >= tStatesPerCharacterClock
+        {
+            characterClock = characterClock - 2
+            columnCounter = columnCounter + 1
+            
+            checkKeyboard(position: keyboardScanPosition)
+            
+            keyboardScanPosition = keyboardScanPosition + 1
+
+            if keyboardScanPosition == 64
+            {
+                    keyboardScanPosition = 0
+            }
+        }
+        
+        if columnCounter >= registers.R0
+        {
+            columnCounter = 0
+            endScanline()
+        }
+    }
+    
+    func scanForKey()
+    {
+        // R18:R19 contain the update address.
+
+              let address =
+                  (UInt16(registers.R18) << 8) |
+                   UInt16(registers.R19)
+
+              // The Microbee keyboard uses MA4...MA9.
+              //
+              // Extract those six bits to obtain the
+              // 0...63 keyboard switch number.
+
+              let position =
+                  Int((address >> 4) & 0x3F)
+
+              // --------------------------------------------------------
+              // Test the selected key
+              // --------------------------------------------------------
+
+              let mask =
+                  UInt64(1) << UInt64(position)
+
+             let pressed =
+                 (keyboard.keyMatrix & mask) != 0
+
+              if pressed {
+
+                  // The selected key has effectively generated
+                  // an LPEN event.
+                  //
+                  // Capture the address being tested.
+
+                  registers.R16 =
+                      UInt8((address >> 8) & 0xFF)
+
+                  registers.R17 =
+                      UInt8(address & 0xFF)
+
+                  registers.statusRegister = registers.statusRegister | 0x40
+              }
+
+              // --------------------------------------------------------
+              // Update operation has completed.
+              // --------------------------------------------------------
+
+              registers.statusRegister = registers.statusRegister | 0x80
+    }
+    
+    func checkKeyboard(position: UInt8)
+    {
+        guard !romReadLatch
+        else
+        {
+            return
+        }
+        
+        guard !lightPenReady
+        else
+        {
+            return
+        }
+        
+        let mask = UInt64(1) << UInt64(position)
+        
+        let pressed = (keyboard.keyMatrix & mask) != 0
+        
+        guard pressed
+        else
+        {
+            return
+        }
+        
+        registers.statusRegister = registers.statusRegister | 0x40
+        
+        registers.R16 = position >> 4 & ~0x03   // keypress loaded into bits 0..2 of R16 and bits 4..7 of R17
+        registers.R17 = position << 4
+        
+//            print("position", position)
+//            print("r16",registers.R16)
+//            print("r17",registers.R17)
+        
+        lightPenReady = true
+    }
+}
+
 final class BUS
 {
     var ports = IOPorts()
-    var crtc = CRTC()
+    let keyboard: MicrobeeKeyboard
+    let crtc : CRTC
     var mmu = memoryMapper()
     
-    var underTest = false
+    var underTest : Bool = false
     
     let mainRAM = memoryBlock(size: 0x8000)
     let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
@@ -484,8 +616,11 @@ final class BUS
     
     let testRAM = memoryBlock(size:0x10000)
     
-    init()
+    init(keyboard: MicrobeeKeyboard)
     {
+        self.keyboard = keyboard
+        self.crtc = CRTC(keyboard: keyboard)
+            
         mmu.map(readDevice: mainRAM, writeDevice: mainRAM, memoryLocation: 0x0000)       // 32K System RAM
         mmu.map(readDevice: basicROM, writeDevice: basicROM, memoryLocation: 0x8000)     // 16K BASIC ROM
         mmu.map(readDevice: pakROM, writeDevice: pakROM , memoryLocation: 0xC000)        // 8K Optional ROM
@@ -507,7 +642,6 @@ final class BUS
         let realPort = Int(portNum & 0x00FF)
         if underTest
         {
-            
         }
         else
         {
@@ -549,14 +683,20 @@ final class BUS
             case 0x0B:
                 if portValue & 0x01 == 1
                 {
+                    crtc.romReadLatch = true
                     mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                 }
                 if portValue & 0x01 == 0
                 {
+                    crtc.romReadLatch = false
                     mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                     mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                 }
-            case 0x0D: crtc.writeRegister(RegNum: ports.readPort(portNum: 0x000C), RegValue: portValue)
+            case 0x0C :
+                crtc.writeRegister(RegNum: UInt8(realPort), RegValue: portValue)
+            case 0x0D:
+                let tempPort = ports.readPort(portNum: 0x0C)
+                crtc.writeRegister(RegNum: tempPort, RegValue: portValue)
             default: break // other ports go here
             }
         }
@@ -566,24 +706,25 @@ final class BUS
     @inline(__always)
     func readPort(portNum : UInt16) -> UInt8
     {
-        var tempValue : UInt8 = 0
         let realPort = Int(portNum & 0x00FF)
         
         if underTest
         {
-            tempValue = ports.readPort(portNum : realPort)
+            return ports.readPort(portNum : realPort)
         }
         else
         {
-            
             switch realPort
             {
-            case 0x0C: tempValue = crtc.readStatusRegister()
-            case 0x0D: tempValue = crtc.readRegister(RegNum:ports.readPort(portNum: 0x000C))
-            default: tempValue = ports.readPort(portNum : realPort) // other ports go here
+            case 0x0C:
+                return crtc.readStatusRegister()
+            case 0x0D:
+                let tempPort = ports.readPort(portNum: 0x0C)
+                return crtc.readRegister(RegNum: tempPort)
+            default:
+                return ports.readPort(portNum : realPort) // other ports go here
             }
         }
-        return tempValue
     }
     
     @inline(__always)
@@ -596,18 +737,6 @@ final class BUS
     func readStatusRegister() -> UInt8
     {
         return crtc.readStatusRegister()
-    }
-    
-    @inline(__always)
-    func writeRegister(RegNum : UInt8, RegValue : UInt8)
-    {
-        crtc.writeRegister(RegNum : RegNum , RegValue : RegValue)
-    }
-    
-    @inline(__always)
-    func readRegister(RegNum : UInt8) -> UInt8
-    {
-        return crtc.readRegister(RegNum : RegNum)
     }
     
     @inline(__always)

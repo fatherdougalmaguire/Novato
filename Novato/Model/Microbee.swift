@@ -552,7 +552,8 @@ actor microbee
     
     private var interruptPending = false
 
-    let bus = BUS()
+    let keyboard: MicrobeeKeyboard
+    let bus : BUS
     
     private let baseClockSpeed: Double = 3_375_000
     private let frameRate: Double = 50
@@ -594,6 +595,11 @@ actor microbee
         
         self.frameDuration = .seconds(1.0 / frameRate)
         self.tStatesPerFrame = UInt64(baseClockSpeed * self.clockSpeedMultiplier / frameRate)
+        
+        let keyboardInstance = MicrobeeKeyboard()
+        self.keyboard = keyboardInstance
+
+        self.bus = BUS(keyboard: keyboardInstance)
     }
     
     private var runTask: Task<Void, Never>?
@@ -699,58 +705,42 @@ actor microbee
         pendingClockSpeedMultiplier = multiplier
     }
     
-    struct MicrobeeKeyboard {
-
-        private var pressedKeys:Set<MicrobeeKey> = []
-        
-        var shiftKey: Bool = false
-        var controlKey: Bool = false
-
-        mutating func keyDown(_ key: MicrobeeKey)
-        {
-            pressedKeys.insert(key)
-        }
-
-        mutating func keyUp(_ key: MicrobeeKey)
-        {
-            pressedKeys.remove(key)
-        }
-
-        func isPressed(_ key: MicrobeeKey) -> Bool
-        {
-            pressedKeys.contains(key)
-        }
-        
-        mutating func setShift(_ shift: Bool)
-        {
-            shiftKey = shift
-        }
-        
-        mutating func setControl(_ control: Bool)
-        {
-            controlKey = control
-        }
-    }
-    
-    private var keyboard = MicrobeeKeyboard()
+    private var leftShiftDown = false
+    private var rightShiftDown = false
 
     func keyDown(_ key: MicrobeeKey)
     {
         keyboard.keyDown(key)
+        keyboard.printMatrix("key down  ")
     }
 
     func keyUp(_ key: MicrobeeKey)
     {
         keyboard.keyUp(key)
+        keyboard.printMatrix("key up    ")
     }
     
-    func modifiersChanged(
-        shift: Bool,
-        control: Bool
-    )
+    func modifierChanged(_ modifier: HostModifier, pressed: Bool)
     {
-        keyboard.setShift(shift)
-        keyboard.setControl(control)
+        switch modifier
+        {
+        case .leftShift:
+                leftShiftDown = pressed
+                updateShift()
+        case .rightShift:
+                rightShiftDown = pressed
+                updateShift()
+        case .control: keyboard.set(.ctrlKey, pressed: pressed)
+            keyboard.printMatrix("ctrl key  ")
+        case .capsLock: keyboard.set(.capsLockKey, pressed: pressed)
+            keyboard.printMatrix("caps lock ")
+        }
+    }
+
+    private func updateShift()
+    {
+        keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
+        keyboard.printMatrix("shift key ")
     }
     
     func reset()
@@ -911,12 +901,11 @@ actor microbee
         totalTStates = totalTStates + UInt64(tStates)
         
         #if DEBUG
-        appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
+        //appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
         #endif
         
         bus.crtc.tick(tStates: tStates)
         // sound.tick(tStates: tStates)
-        // keyboard.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
         
         snapshotContinuation.yield(returnSnapshot(stepping: true))
@@ -965,7 +954,7 @@ actor microbee
             }
             
             #if DEBUG
-                let cpuStart = clock.now
+          //      let cpuStart = clock.now
             #endif
             
             let frameTStates = tStatesPerFrame
@@ -988,18 +977,17 @@ actor microbee
                 totalTStates = totalTStates + UInt64(tStates)
                 
                 #if DEBUG
-                   appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
+               //    appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
                 #endif
 
                 bus.crtc.tick(tStates: tStates)
                 // sound.tick(tStates: tStates)
-                // keyboard.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
             }
             
             #if DEBUG
-                let cpuElapsed = cpuStart.duration(to: clock.now)
-                print("CPU frame: \(cpuElapsed)")
+            //    let cpuElapsed = cpuStart.duration(to: clock.now)
+             //   print("CPU frame: \(cpuElapsed)")
             #endif
             
             nextFrame = nextFrame + frameDuration
@@ -1090,8 +1078,8 @@ actor microbee
     func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
         #if DEBUG
-            let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
-            appLog.cpu.debug("\(logString)")
+         //   let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
+         //   appLog.cpu.debug("\(logString)")
         #endif
     }
     

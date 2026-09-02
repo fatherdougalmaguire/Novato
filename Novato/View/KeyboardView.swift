@@ -66,16 +66,6 @@ final class KeyboardNSView: NSView
 
     override func keyDown(with event: NSEvent)
     {
-        
-//        print(
-//                "KEY DOWN:",
-//                "keyCode =", event.keyCode,
-//                "characters =", event.characters ?? "nil",
-//                "charactersIgnoringModifiers =",
-//                event.charactersIgnoringModifiers ?? "nil",
-//                "modifiers =", event.modifierFlags
-//            )
-        
         onKeyDown?(event)
     }
 

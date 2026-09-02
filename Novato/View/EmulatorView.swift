@@ -262,35 +262,37 @@ struct emulatorView: View
                     {
                         CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
                         KeyboardResponderView(
-                            onKeyDown: { event in
-                                guard let key = MicrobeeKeyboardMapper.key(for: event)
-                                else { return }
-                                
-                                Task
-                                {
-                                    await vm.keyDown(key)
-                                }
-                            },
-                            
-                            onKeyUp: { event in
-                                guard let key = MicrobeeKeyboardMapper.key(for: event)
-                                else { return }
-                                
-                                Task
-                                {
-                                    await vm.keyUp(key)
-                                }
-                            },
-                            onFlagsChanged:
+                            onKeyDown:
                                 { event in
-
+                                    guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                    else { return }
+                                
                                     Task
                                     {
-                                        await vm.modifiersChanged(event.modifierFlags)
+                                        await vm.keyDown(key)
+                                    }
+                                },
+                            
+                            onKeyUp:
+                                { event in
+                                    guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                    else { return }
+                                
+                                    Task
+                                    {
+                                        await vm.keyUp(key)
+                                    }
+                                },
+                            onFlagsChanged:
+                                { event in
+                                    guard let change = MicrobeeKeyboardMapper.modifierChange(for: event)
+                                    else { return }
+                                    Task
+                                    {
+                                        await vm.modifierChanged(change.modifier, pressed: change.pressed)
                                     }
                                 }
                         )
-                      //  .opacity(0.001)
                     }
                 }
                 else
