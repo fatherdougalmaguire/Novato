@@ -535,6 +535,9 @@ actor microbee
     
     private var pausedBreakpoint : Bool = false
     
+    private var isStepping = false
+    private var breakpointHit = false
+    
     private let z80Disassembler = Z80Disassembler()
     
     private var z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
@@ -554,6 +557,9 @@ actor microbee
 
     let keyboard: MicrobeeKeyboard
     let bus : BUS
+    
+    private var leftShiftDown = false
+    private var rightShiftDown = false
     
     private let baseClockSpeed: Double = 3_375_000
     private let frameRate: Double = 50
@@ -705,9 +711,6 @@ actor microbee
         pendingClockSpeedMultiplier = multiplier
     }
     
-    private var leftShiftDown = false
-    private var rightShiftDown = false
-
     func keyDown(_ key: MicrobeeKey)
     {
         keyboard.keyDown(key)
@@ -805,7 +808,16 @@ actor microbee
         
         interruptPending = false
         
+        breakpointHit = false
+        
         bus.ports.resetPorts()
+        
+        leftShiftDown = false
+        rightShiftDown = false
+        
+        keyboard.releaseAll()
+        
+        isStepping = false
         
         z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
         z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
@@ -814,32 +826,7 @@ actor microbee
         breakpoints = SIMD16<UInt16>(repeating: 0x0000)
         breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
         
-        bus.crtc.registers.R0 = 0x00
-        bus.crtc.registers.R1 = 0x40
-        bus.crtc.registers.R2 = 0x00
-        bus.crtc.registers.R3 = 0x00
-        bus.crtc.registers.R4 = 0x12
-        bus.crtc.registers.R5 = 0x00
-        bus.crtc.registers.R6 = 0x10
-        bus.crtc.registers.R7 = 0x00
-        bus.crtc.registers.R8 = 0x00
-        bus.crtc.registers.R9 = 0x0F
-        bus.crtc.registers.R10 = 0x20
-        bus.crtc.registers.R11 = 0x00
-        bus.crtc.registers.R12 = 0x00
-        bus.crtc.registers.R13 = 0x00
-        bus.crtc.registers.R14 = 0x00
-        bus.crtc.registers.R15 = 0x00
-        bus.crtc.registers.R16 = 0x00
-        bus.crtc.registers.R17 = 0x00
-        bus.crtc.registers.R18 = 0x00
-        bus.crtc.registers.R19 = 0x00
-        
-        bus.crtc.registers.statusRegister = 0b10000000
-        
-        bus.crtc.registers.redBackgroundIntensity = 0x00
-        bus.crtc.registers.greenBackgroundIntensity = 0x00
-        bus.crtc.registers.blueBackgroundIntensity = 0x00
+        bus.crtc.reset()
         
         bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)       // 32K System RAM
         bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)     // 16K BASIC ROM
@@ -886,17 +873,44 @@ actor microbee
     
     func pause()
     {
+        
+        print("PAUSE: state before =", emulatorState)
+        
         emulatorState = .paused
-        snapshotContinuation.yield(returnSnapshot(stepping: false))
+        
+        print("PAUSE: state after =", emulatorState)
+        
+        let snapshot = returnSnapshot(stepping: false)
+        
+        print(
+              "PAUSE SNAPSHOT STATE =",
+              snapshot.executionSnapshot.emulatorState
+          )
+
+        snapshotContinuation.yield(snapshot)
     }
     
     func step()
     {
+        
+        print("STEP: state =", emulatorState)
+        
         guard emulatorState == .paused else
         {
+            print("STEP REFUSED: state =", emulatorState)
+            
             return
         }
 
+        print("STEP EXECUTING")
+        
+        isStepping = true
+
+        defer
+        {
+            isStepping = false
+        }
+        
         let tStates = nextInstruction()
         totalTStates = totalTStates + UInt64(tStates)
         
@@ -908,7 +922,11 @@ actor microbee
         // sound.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
         
+        emulatorState = .paused
+        
         snapshotContinuation.yield(returnSnapshot(stepping: true))
+        
+        print("STEP COMPLETE: state =", emulatorState)
     }
 
     private func runLoop() async
@@ -972,6 +990,12 @@ actor microbee
                 }
                 
                 let tStates = nextInstruction()
+                
+                if breakpointHit
+                {
+                    pause()
+                        break
+                }
                 
                 executedTStates = executedTStates + UInt64(tStates)
                 totalTStates = totalTStates + UInt64(tStates)
@@ -1092,12 +1116,14 @@ actor microbee
             return 4
         }
         
+        breakpointHit = false
+        
         let currentPCVector = SIMD16<UInt16>(repeating: UInt16(registers.PC))
         let addressMatch = (currentPCVector .== breakpoints)
         
-        if any(addressMatch .& (breakpointMask .!= 0)) && !pausedBreakpoint
+        if any(addressMatch .& (breakpointMask .!= 0)) &&  !isStepping
         {
-            pause()
+            breakpointHit = true
             return 0
             // need to allow a smoother continuation of execution
         }
@@ -13273,17 +13299,17 @@ actor microbee
            registers.Q = 0
            incrementR(opcodeCount:1)
         case 0xCD: // CALL $nn - CD n n - The current PC value plus three is pushed onto the stack, then is loaded with $nn
-           logInstructionDetails(instructionDetails: "CALL $nn",opcode: [0xCD], values: [opcode2,opcode3], programCounter: registers.PC)
-           registers.PC = registers.PC &+ 3
-           registers.SP = registers.SP &- 1
+            logInstructionDetails(instructionDetails: "CALL $nn",opcode: [0xCD], values: [opcode2,opcode3], programCounter: registers.PC)
+            registers.PC = registers.PC &+ 3
+            registers.SP = registers.SP &- 1
             bus.writeByte(address: registers.SP, value: registers.PCH)
-           registers.SP = registers.SP &- 1
+            registers.SP = registers.SP &- 1
             bus.writeByte(address: registers.SP, value: registers.PCL)
-           registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
-           registers.WZ = registers.PC
+            registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
+            registers.WZ = registers.PC
             registers.Q = 0
-           tStates = 17
-           incrementR(opcodeCount:1)
+            tStates = 17
+            incrementR(opcodeCount:1)
         case 0xCE: // ADC A,$n - C3 n - Adds $n and the carry flag to A
            logInstructionDetails(instructionDetails: "ADC A,$n", opcode: [0xCE], values: [opcode2], programCounter: registers.PC)
            let addCarry = (registers.F & z80Flags.Carry.rawValue) != 0

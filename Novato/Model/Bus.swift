@@ -355,11 +355,6 @@ final class CRTC
         {
             tempStatus = tempStatus | verticalBlankingMask
         }
-        
-        if verticalBlank
-        {
-            tempStatus = tempStatus | verticalBlankingMask
-        }
  
         return tempStatus
     }
@@ -391,7 +386,6 @@ final class CRTC
         case 31:
             registers.statusRegister = registers.statusRegister & 0x7F
             scanForKey()
-          //  print("key scan triggered - write")
             registers.R31 = RegValue
         default: break
         }
@@ -494,7 +488,7 @@ final class CRTC
             columnCounter = columnCounter + 1
             
             checkKeyboard(position: keyboardScanPosition)
-            
+
             keyboardScanPosition = keyboardScanPosition + 1
 
             if keyboardScanPosition == 64
@@ -511,52 +505,27 @@ final class CRTC
     }
     
     func scanForKey()
-    {
-        // R18:R19 contain the update address.
+    { 
+        let address = (UInt16(registers.R18) << 8) | UInt16(registers.R19)
 
-              let address =
-                  (UInt16(registers.R18) << 8) |
-                   UInt16(registers.R19)
+        let position = Int((address >> 4) & 0x3F)
 
-              // The Microbee keyboard uses MA4...MA9.
-              //
-              // Extract those six bits to obtain the
-              // 0...63 keyboard switch number.
+        let mask = UInt64(1) << UInt64(position)
 
-              let position =
-                  Int((address >> 4) & 0x3F)
+        let pressed = (keyboard.keyMatrix & mask) != 0
 
-              // --------------------------------------------------------
-              // Test the selected key
-              // --------------------------------------------------------
+        if pressed
+        {
+          registers.R16 = UInt8((address >> 8) & 0xFF)
 
-              let mask =
-                  UInt64(1) << UInt64(position)
+          registers.R17 = UInt8(address & 0xFF)
 
-             let pressed =
-                 (keyboard.keyMatrix & mask) != 0
-
-              if pressed {
-
-                  // The selected key has effectively generated
-                  // an LPEN event.
-                  //
-                  // Capture the address being tested.
-
-                  registers.R16 =
-                      UInt8((address >> 8) & 0xFF)
-
-                  registers.R17 =
-                      UInt8(address & 0xFF)
-
-                  registers.statusRegister = registers.statusRegister | 0x40
-              }
-
-              // --------------------------------------------------------
-              // Update operation has completed.
-              // --------------------------------------------------------
-
-              registers.statusRegister = registers.statusRegister | 0x80
+          registers.statusRegister = registers.statusRegister | 0x40
+          
+          lightPenReady = true
+        }
+        
+        registers.statusRegister = registers.statusRegister | 0x80
     }
     
     func checkKeyboard(position: UInt8)
@@ -584,15 +553,75 @@ final class CRTC
         }
         
         registers.statusRegister = registers.statusRegister | 0x40
+    
+        registers.R16 = (position & 0x30) >> 4   // keypress loaded into bits 0..2 of R16 and bits 4..7 of R17
+        registers.R17 = (position & 0x0F) << 4
         
-        registers.R16 = position >> 4 & ~0x03   // keypress loaded into bits 0..2 of R16 and bits 4..7 of R17
-        registers.R17 = position << 4
-        
-//            print("position", position)
-//            print("r16",registers.R16)
-//            print("r17",registers.R17)
+            print("position", position)
+            print("r16",registers.R16)
+            print("r17",registers.R17)
         
         lightPenReady = true
+    }
+    
+    func reset()
+    {
+        registers.R0 = 0x6B
+        registers.R1 = 0x40
+        registers.R2 = 0x51
+        registers.R3 = 0x37
+        registers.R4 = 0x12
+        registers.R5 = 0x09
+        registers.R6 = 0x10
+        registers.R7 = 0x00
+        registers.R8 = 0x48
+        registers.R9 = 0x0F
+        registers.R10 = 0x20
+        registers.R11 = 0x00
+        registers.R12 = 0x00
+        registers.R13 = 0x00
+        registers.R14 = 0x00
+        registers.R15 = 0x00
+        registers.R16 = 0x00
+        registers.R17 = 0x00
+        registers.R18 = 0x00
+        registers.R19 = 0x00
+        registers.R31 = 0x00
+        
+        registers.statusRegister = 0b10000000
+        
+        registers.redBackgroundIntensity = 0x00
+        registers.greenBackgroundIntensity = 0x00
+        registers.blueBackgroundIntensity = 0x00
+     
+        characterClock = 0
+        
+        columnCounter = 0
+        rowCounter = 0
+        
+        scanlineCounter = 0
+           
+        displayEnable = false
+        
+        verticalAdjustCounter = 0
+        inVerticalAdjust = false
+
+        verticalBlank = false
+        
+        frameComplete = false
+        
+        lightPenReady = false
+        
+        updateReady = false
+        
+        lightPenAddress = 0
+    
+        keyboardScanPosition = 0
+    
+        romReadLatch = false
+    
+        triggerKeyScan = false
+    
     }
 }
 

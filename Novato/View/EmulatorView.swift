@@ -312,7 +312,7 @@ struct emulatorView: View
                         Text("\(speedSelection, specifier: "%.0f")×")
                             .monospacedDigit()
                         
-                        StatusLED(colour: vm.isStepActive ? .orange : vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
+                        StatusLED(colour: vm.isStepActive ? .blue: vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
                         
                     }
                 }
@@ -362,6 +362,15 @@ struct emulatorView: View
                                 }
                             }
                             .labelStyle(.titleAndIcon)
+//                            Button("TEST A") {
+//                                Task {
+//                                    await vm.keyDown(.aKey)
+//
+//                                    try? await Task.sleep(for: .milliseconds(100))
+//
+//                                    await vm.keyUp(.aKey)
+//                                }
+//                            }
                             Button("Quit", systemImage: "xmark.circle")
                             { NSApp.terminate(nil) }
                                 .labelStyle(.titleAndIcon)
