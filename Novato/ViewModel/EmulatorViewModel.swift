@@ -1,4 +1,4 @@
-import Foundation
+    import Foundation
 import AppKit
 
 @Observable
@@ -7,7 +7,6 @@ final class emulatorViewModel
     private let cpu: microbee
     
     var isStepActive = false
-    private var lastUIUpdate = ContinuousClock.now
     
     private(set) var snapshot: microbeeSnapshot?
     private var snapshotTask: Task<Void, Never>?
@@ -15,34 +14,43 @@ final class emulatorViewModel
     func startSnapshots()
     {
         snapshotTask?.cancel()
-        
+
         snapshotTask = Task
         {
             let stream = await cpu.snapshots
-            
-#if arch(arm64)
+
+    #if arch(arm64)
             let minimumUIUpdateInterval = Duration.milliseconds(20)
-#elseif arch(x86_64)
+    #elseif arch(x86_64)
             let minimumUIUpdateInterval = Duration.milliseconds(50)
-#endif
-            
-            var lastUIUpdate = ContinuousClock.now - minimumUIUpdateInterval
-            
+    #endif
+
+            var lastUIUpdate =
+                ContinuousClock.now - minimumUIUpdateInterval
+
+            var lastState: emulatorState?
+
             for await snapshot in stream
             {
-                guard !Task.isCancelled else
-                {
+                guard !Task.isCancelled else {
                     break
                 }
-                
+
+                let state = snapshot.executionSnapshot.emulatorState
+
+                let stateChanged = state != lastState
+
                 let now = ContinuousClock.now
-                
-                guard now - lastUIUpdate >= minimumUIUpdateInterval else {
+
+                if !stateChanged &&
+                   now - lastUIUpdate < minimumUIUpdateInterval
+                {
                     continue
                 }
-                
+
+                lastState = state
                 lastUIUpdate = now
-                
+
                 await MainActor.run
                 {
                     self.snapshot = snapshot
@@ -106,6 +114,11 @@ final class emulatorViewModel
     func pauseEmulation() async
     {
         await cpu.pause()
+        
+        print(
+                "VM AFTER PAUSE:",
+                snapshot?.executionSnapshot.emulatorState as Any
+            )
     }
     
     func resetEmulation() async

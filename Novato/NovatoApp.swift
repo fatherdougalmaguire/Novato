@@ -80,7 +80,7 @@ struct NovatoApp: App
                                 let loadAddress = UInt16(quickLoadAddress, radix: 16) ?? 2304
                                 let executeAddress = UInt16(quickLoadExecuteAddress, radix: 16) ?? 2304
                                 
-                                await vm.pauseEmulation()
+                                //await vm.pauseEmulation()
                                 await vm.quickload(path: url, loadAddress: loadAddress)
                                 await vm.updateProgramCounter(address: executeAddress)
                                 await vm.startEmulation()
