@@ -107,6 +107,12 @@ But not much else.
 * Shader will automatically scale the output resolution to the same display size.
 * Colour support has been added ( green mono, amber mono, blue mono, white mono and alpha model colour )
 
+### Keyboard input
+
+* Keypresses are correctly captured from SWiftUI and passed to the emulator.
+* Keypresses are correctly converted into 6545 register values.
+* BASIC and many games still cannot see the keypresses.
+
 ### Memory
 * Working MMU has been implemented
   
@@ -148,7 +154,6 @@ Some also have some display artefacts.
 * Full emulation of Z80 including undocumented instructions
 * Interrupt processing
 * Sound output
-* Capture keyboard input    
 * Cassette load/save functionality
 
 ## Emulator screenshots
