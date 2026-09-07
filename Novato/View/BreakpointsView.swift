@@ -22,15 +22,43 @@ struct breakpointsView: View {
         let isActive: Bool
         let labelText: String
         let onCommit: (String) -> Void
-        let onToggle: (String) -> Void
+        let onToggle: (String, Bool) -> Void
         
         @State private var localText: String = ""
+        @State private var localIsActive: Bool = false
+
+        private var hasValidAddress: Bool
+        {
+            let scrubbed = localText.filter { $0.isHexDigit }
+            guard !scrubbed.isEmpty, let val = UInt16(scrubbed, radix: 16)
+            else
+            {
+                return false
+            }
+            return val != 0
+        }
 
         var body: some View
         {
             HStack(spacing: 12)
             {
-                Button(action: { onToggle(localText) }) { statusLED(isOn: isActive) }
+                Button(action:
+                    {
+                    if !localIsActive
+                    {
+                        guard hasValidAddress
+                        else
+                        {
+                            return
+                        }
+                    }
+                    localIsActive.toggle()
+                    onToggle(localText, localIsActive)
+                    
+                    })
+                {
+                    statusLED(isOn: localIsActive)
+                }
                 .buttonStyle(.plain)
                 
                 TextField(labelText, text: $localText)
@@ -39,22 +67,37 @@ struct breakpointsView: View {
                     .foregroundColor(.orange)
                     .frame(minWidth: 180)
                     .autocorrectionDisabled()
-                    .onSubmit
-                    {
+                    .onSubmit {
                         onCommit(localText)
                     }
-                    .onChange(of: localText)
-                    { _, newValue in
+                    .onChange(of: localText) { _, newValue in
                         let filtered = newValue.filter { $0.isHexDigit }.uppercased()
-                        localText = String(filtered.prefix(4))
+                        let formatted = String(filtered.prefix(4))
+                        localText = formatted
+                        if !hasValidAddress && localIsActive
+                        {
+                            localIsActive = false
+                            onToggle(formatted, false)
+                        }
                     }
             }
-            .onAppear { localText = text }
+            .onAppear
+            {
+                localText = text
+                localIsActive = isActive
+            }
             .onChange(of: text)
             { _, newValue in
                 if localText != newValue
                 {
                     localText = newValue
+                }
+            }
+            .onChange(of: isActive)
+            { _, newValue in
+                if localIsActive != newValue
+                {
+                    localIsActive = newValue
                 }
             }
         }
@@ -117,12 +160,12 @@ struct breakpointsView: View {
                         text: hexDisplay,
                         isActive: isMasked,
                         labelText: "Breakpoint \(index + 1)",
-                        onCommit: { newValue in updateActor(index: index, hex: newValue, mask: isMasked) },
-                        onToggle:
-                        {
-                            currentText in
+                        onCommit: { newValue in
+                            updateActor(index: index, hex: newValue, mask: isMasked)
+                        },
+                        onToggle: { currentText, newMaskState in
                             let finalHex = currentText.isEmpty ? hexDisplay : currentText
-                            updateActor(index: index, hex: finalHex, mask: !isMasked)
+                            updateActor(index: index, hex: finalHex, mask: newMaskState)
                         }
                     )
                 }
@@ -131,7 +174,6 @@ struct breakpointsView: View {
                     Spacer()
                     Button(action: clearAllBreakpoints) {
                         Label("Clear All Breakpoints", systemImage: "trash")
-            
                             .foregroundColor(.orange)
                             .padding(.vertical, 6)
                             .padding(.horizontal, 16)
