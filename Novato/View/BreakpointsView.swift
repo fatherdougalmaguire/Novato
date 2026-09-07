@@ -73,7 +73,18 @@ struct breakpointsView: View {
             Task { await vm.updateBreakpoints(index: index, value: value, mask: mask) }
         }
     }
-
+    
+    private func clearAllBreakpoints()
+    {
+        guard let snapshot = vm.snapshot else { return }
+        let count = snapshot.executionSnapshot.breakpointQueue.count
+        
+        for index in 0..<count {
+            // Resets address to empty string ("") and mask to disabled (false)
+            updateActor(index: index, hex: "", mask: false)
+        }
+    }
+    
     var body: some View
     {
         if let snapshot = vm.snapshot
@@ -83,7 +94,6 @@ struct breakpointsView: View {
             
             VStack(alignment: .leading, spacing: 10)
             {
-
                 ForEach(breakpoints.indices, id: \.self)
                 { index in
                     let addrRaw = breakpoints[index]
@@ -116,6 +126,23 @@ struct breakpointsView: View {
                         }
                     )
                 }
+                
+                HStack {
+                    Spacer()
+                    Button(action: clearAllBreakpoints) {
+                        Label("Clear All Breakpoints", systemImage: "trash")
+            
+                            .foregroundColor(.orange)
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 16)
+                            .background(Color.white)
+                            .clipShape(Rectangle()) // Square corners
+                            .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1)
+                    }
+                    .buttonStyle(.plain)
+                    Spacer()
+                }
+                .padding(.top, 10)
             }
             .padding(.horizontal, 25)
             .padding(.vertical, 20)
