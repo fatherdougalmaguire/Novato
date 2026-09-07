@@ -14,8 +14,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "994"
-            endingLineNumber = "994"
+            startingLineNumber = "1029"
+            endingLineNumber = "1029"
             landmarkName = "runLoop()"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "995"
-            endingLineNumber = "995"
+            startingLineNumber = "1030"
+            endingLineNumber = "1030"
             landmarkName = "runLoop()"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,68 +46,10 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "996"
-            endingLineNumber = "996"
+            startingLineNumber = "1031"
+            endingLineNumber = "1031"
             landmarkName = "runLoop()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "72D33457-99B4-403E-AD8E-71B27C2C8705 - 506b8936b7aab13a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(1) suspend resume partial function for Novato.microbee.runLoop() async -&gt; ()"
-                  moduleName = "Novato.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tony/Documents/Coding/GitHub/novato/Novato/Model/Microbee.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "996"
-                  endingLineNumber = "996">
-               </Location>
-               <Location
-                  uuid = "72D33457-99B4-403E-AD8E-71B27C2C8705 - 12759f5dc5d95b24"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(3) suspend resume partial function for Novato.microbee.runLoop() async -&gt; ()"
-                  moduleName = "Novato.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tony/Documents/Coding/GitHub/novato/Novato/Model/Microbee.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "996"
-                  endingLineNumber = "996">
-               </Location>
-               <Location
-                  uuid = "72D33457-99B4-403E-AD8E-71B27C2C8705 - 8e106276e0ff3720"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(7) suspend resume partial function for Novato.microbee.runLoop() async -&gt; ()"
-                  moduleName = "Novato.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tony/Documents/Coding/GitHub/novato/Novato/Model/Microbee.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "996"
-                  endingLineNumber = "996">
-               </Location>
-               <Location
-                  uuid = "72D33457-99B4-403E-AD8E-71B27C2C8705 - e91979a3a636ac23"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "(8) suspend resume partial function for Novato.microbee.runLoop() async -&gt; ()"
-                  moduleName = "Novato.debug.dylib"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/tony/Documents/Coding/GitHub/novato/Novato/Model/Microbee.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "996"
-                  endingLineNumber = "996">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -120,8 +62,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1124"
-            endingLineNumber = "1124"
+            startingLineNumber = "1159"
+            endingLineNumber = "1159"
             landmarkName = "nextInstruction()"
             landmarkType = "7">
          </BreakpointContent>
@@ -136,8 +78,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "879"
-            endingLineNumber = "879"
+            startingLineNumber = "914"
+            endingLineNumber = "914"
             landmarkName = "pause()"
             landmarkType = "7">
          </BreakpointContent>
@@ -152,8 +94,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "877"
-            endingLineNumber = "877"
+            startingLineNumber = "912"
+            endingLineNumber = "912"
             landmarkName = "pause()"
             landmarkType = "7">
          </BreakpointContent>

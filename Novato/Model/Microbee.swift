@@ -547,6 +547,9 @@ actor microbee
     private var breakpoints = SIMD16<UInt16>(repeating: 0x0000)
     private var breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
     
+    private static let bpsKey = "SavedBreakpoints"
+    private static let masksKey = "SavedBreakpointMasks"
+    
     var registers = Registers()
     
     var totalTStates : UInt64 = 0
@@ -596,6 +599,26 @@ actor microbee
                 "speedSelection": 1.0
             ]
         )
+        
+        if let savedBps = UserDefaults.standard.array(forKey: Self.bpsKey) as? [UInt16],
+           savedBps.count == 16
+        {
+            self.breakpoints = SIMD16<UInt16>(savedBps)
+        }
+        else
+        {
+            self.breakpoints = SIMD16<UInt16>(repeating: 0x0000)
+        }
+        
+        if let savedMasks = UserDefaults.standard.array(forKey: Self.masksKey) as? [UInt16],
+           savedMasks.count == 16
+        {
+            self.breakpointMask = SIMD16<UInt16>(savedMasks)
+        }
+        else
+        {
+            self.breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
+        }
         
         self.clockSpeedMultiplier = UserDefaults.standard.double(forKey: "speedSelection")
         
@@ -702,8 +725,20 @@ actor microbee
     
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool)
     {
+        guard index >= 0 && index < 16
+        else
+        {
+            return
+        }
+        
         breakpoints[index] = value
         breakpointMask[index] = (mask ? 1 : 0)
+        
+        let bpsArray = (0..<16).map { breakpoints[$0] }
+        let masksArray = (0..<16).map { breakpointMask[$0] }
+                
+        UserDefaults.standard.set(bpsArray, forKey: Self.bpsKey)
+        UserDefaults.standard.set(masksArray, forKey: Self.masksKey)
     }
     
     func setClockSpeedMultiplier(multiplier: Double)
@@ -823,8 +858,8 @@ actor microbee
         z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
         z80QueueHead = 0
         
-        breakpoints = SIMD16<UInt16>(repeating: 0x0000)
-        breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
+//        breakpoints = SIMD16<UInt16>(repeating: 0x0000)
+//        breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
         
         bus.crtc.reset()
         
@@ -874,18 +909,18 @@ actor microbee
     func pause()
     {
         
-        print("PAUSE: state before =", emulatorState)
+//        print("PAUSE: state before =", emulatorState)
         
         emulatorState = .paused
         
-        print("PAUSE: state after =", emulatorState)
+//        print("PAUSE: state after =", emulatorState)
         
         let snapshot = returnSnapshot(stepping: false)
         
-        print(
-              "PAUSE SNAPSHOT STATE =",
-              snapshot.executionSnapshot.emulatorState
-          )
+//        print(
+//              "PAUSE SNAPSHOT STATE =",
+//              snapshot.executionSnapshot.emulatorState
+//          )
 
         snapshotContinuation.yield(snapshot)
     }
@@ -893,16 +928,16 @@ actor microbee
     func step()
     {
         
-        print("STEP: state =", emulatorState)
+//        print("STEP: state =", emulatorState)
         
         guard emulatorState == .paused else
         {
-            print("STEP REFUSED: state =", emulatorState)
+//            print("STEP REFUSED: state =", emulatorState)
             
             return
         }
 
-        print("STEP EXECUTING")
+//        print("STEP EXECUTING")
         
         isStepping = true
 
@@ -926,7 +961,7 @@ actor microbee
         
         snapshotContinuation.yield(returnSnapshot(stepping: true))
         
-        print("STEP COMPLETE: state =", emulatorState)
+   //     print("STEP COMPLETE: state =", emulatorState)
     }
 
     private func runLoop() async

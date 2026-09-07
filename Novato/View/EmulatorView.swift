@@ -312,7 +312,7 @@ struct emulatorView: View
                         Text("\(speedSelection, specifier: "%.0f")×")
                             .monospacedDigit()
                         
-                        StatusLED(colour: vm.isStepActive ? .blue: vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
+                        StatusLED(colour: vm.isStepActive ? .orange: vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
                         
                     }
                 }

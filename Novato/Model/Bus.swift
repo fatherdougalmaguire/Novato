@@ -412,12 +412,41 @@ final class CRTC
         case 14: return registers.R14
         case 15: return registers.R15
         case 16:
+            let value = registers.R16
+            print(
+                    ">>> R16 READ:",
+                    String(format: "%02X", value),
+                    "position =",
+                    ((Int(registers.R16) << 8) | Int(registers.R17)) >> 4
+                )
+
             registers.statusRegister = registers.statusRegister & ~0x40
             lightPenReady = false
+            print(
+                    "    LPEN CLEARED BY R16",
+                    "next scan position =",
+                    keyboardScanPosition
+                )
             return registers.R16
         case 17:
+            
+            let value = registers.R17
+
+              print(
+                  ">>> R17 READ:",
+                  String(format: "%02X", value),
+                  "R16 currently =",
+                  String(format: "%02X", registers.R16)
+              )
+            
             registers.statusRegister = registers.statusRegister & ~0x40
             lightPenReady = false
+
+                print(
+                    "    LPEN CLEARED BY R17",
+                    "next scan position =",
+                    keyboardScanPosition
+                )
             return registers.R17
         case 18: return registers.R18
         case 19: return registers.R19
@@ -491,13 +520,13 @@ final class CRTC
 
             keyboardScanPosition = keyboardScanPosition + 1
 
-            if keyboardScanPosition == 64
+            if keyboardScanPosition >= 64
             {
                     keyboardScanPosition = 0
             }
         }
         
-        if columnCounter >= registers.R0
+        if columnCounter > registers.R0
         {
             columnCounter = 0
             endScanline()
@@ -557,9 +586,12 @@ final class CRTC
         registers.R16 = (position & 0x30) >> 4   // keypress loaded into bits 0..2 of R16 and bits 4..7 of R17
         registers.R17 = (position & 0x0F) << 4
         
-            print("position", position)
-            print("r16",registers.R16)
-            print("r17",registers.R17)
+        print(
+                ">>> KEY CAPTURED:",
+                "position =", position,
+                "R16 =", String(format: "%02X", registers.R16),
+                "R17 =", String(format: "%02X", registers.R17),
+                "status =", String(format: "%02X", registers.statusRegister))
         
         lightPenReady = true
     }
