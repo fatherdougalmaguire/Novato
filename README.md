@@ -47,7 +47,7 @@ And if I get super enthusiastic,  versions for Windows, Linux and WebAssembly.
 This code base has been written entirely by me.
 There have been no coding agents used.
 
-LLM's have been used to answer questions on Swift syntax and to help with debug.
+LLM's have been used to answer questions on Swift syntax, design patterns and to help with debugging.
 
 ## Acknowledgements
 
