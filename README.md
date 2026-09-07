@@ -73,6 +73,8 @@ But not much else.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
 * You can define up to 16 breakpoints
+* Breakpoints are persistent across application run or CPU reset
+* Breakpoints can be cleared in bulk
 * There is now a **Settings** module so you can dynamically set ( and retain ):
   
   - Colour mode
@@ -81,6 +83,8 @@ But not much else.
   - Visible scanline mode
   - Appearance of debug windows
   - CPU speed selection (1x to 8x)
+  - Quickload load address
+  - Quickload start address
   
 ### Instruction decoding
 * All documented instructions are decoded
