@@ -115,10 +115,10 @@ final class emulatorViewModel
     {
         await cpu.pause()
         
-//        print(
-//                "VM AFTER PAUSE:",
-//                snapshot?.executionSnapshot.emulatorState as Any
-//            )
+        print(
+                "VM AFTER PAUSE:",
+                snapshot?.executionSnapshot.emulatorState as Any
+            )
     }
     
     func resetEmulation() async
