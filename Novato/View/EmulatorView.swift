@@ -362,15 +362,32 @@ struct emulatorView: View
                                 }
                             }
                             .labelStyle(.titleAndIcon)
-//                            Button("TEST A") {
-//                                Task {
-//                                    await vm.keyDown(.aKey)
-//
-//                                    try? await Task.sleep(for: .milliseconds(100))
-//
-//                                    await vm.keyUp(.aKey)
-//                                }
-//                            }
+#if DEBUG
+                                Button("warmreset")
+                                {
+                                    Task
+                                    {
+                                        await vm.updateProgramCounter(address: 0x8003)
+                                    }
+                                }
+                                Button("TEST A")
+                                {
+                                    Task {
+                                        await vm.keyDown(.aKey)
+    
+                                        try? await Task.sleep(for: .milliseconds(100))
+    
+                                        await vm.keyUp(.aKey)
+                                    }
+                                }
+                                Button("Logging")
+                                {
+                                    Task
+                                    {
+                                        await vm.toggleLogging()
+                                    }
+                                }
+#endif
                             Button("Quit", systemImage: "xmark.circle")
                             { NSApp.terminate(nil) }
                                 .labelStyle(.titleAndIcon)

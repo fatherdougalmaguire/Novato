@@ -306,6 +306,8 @@ final class CRTC
         
     }
     
+    var logInstructions: Bool = false
+    
     var registers = crtcRegisters()
     
     var characterClock : UInt8 = 0
@@ -347,10 +349,16 @@ final class CRTC
         self.keyboard = keyboard
     }
     
+    func toggleLogging()
+    
+    {
+        logInstructions.toggle( )
+    }
+    
     func readStatusRegister() -> UInt8
     {
         var tempStatus : UInt8 = registers.statusRegister
-        
+                
         if verticalBlank
         {
             tempStatus = tempStatus | verticalBlankingMask
@@ -379,12 +387,42 @@ final class CRTC
         case 13: registers.R13 = RegValue
         case 14: registers.R14 = RegValue
         case 15: registers.R15 = RegValue
-        case 16: registers.R16 = RegValue
-        case 17: registers.R17 = RegValue
-        case 18: registers.R18 = RegValue
-        case 19: registers.R19 = RegValue
+        case 16:
+            registers.statusRegister = registers.statusRegister & ~0x40
+            lightPenReady = false
+            registers.R16 = RegValue
+        case 17:
+            registers.statusRegister = registers.statusRegister & ~0x40
+            lightPenReady = false
+            registers.R17 = RegValue
+        case 18:
+//            print("""
+//                >>> WRITE R18
+//                    value BEFORE = \(String(format: "%02X", registers.R18))
+//                    value NEW    = \(String(format: "%02X", RegValue))
+//                """)
+            registers.R18 = RegValue
+//            print("""
+//                >>> R18 NOW = \(String(format: "%02X", registers.R18))
+//                """)
+        case 19:
+//            print("""
+//                >>> WRITE R19
+//                    value BEFORE = \(String(format: "%02X", registers.R19))
+//                    value NEW    = \(String(format: "%02X", RegValue))
+//                """)
+            registers.R19 = RegValue
+//            print("""
+//                >>> R19 NOW = \(String(format: "%02X", registers.R19))
+//                """)
         case 31:
             registers.statusRegister = registers.statusRegister & 0x7F
+//            print("""
+//                >>> WRITE R31
+//                    value = \(String(format: "%02X", RegValue))
+//                    R18   = \(String(format: "%02X", registers.R18))
+//                    R19   = \(String(format: "%02X", registers.R19))
+//                """)
             scanForKey()
             registers.R31 = RegValue
         default: break
@@ -413,40 +451,51 @@ final class CRTC
         case 15: return registers.R15
         case 16:
             let value = registers.R16
-            print(
-                    ">>> R16 READ:",
-                    String(format: "%02X", value),
-                    "position =",
-                    ((Int(registers.R16) << 8) | Int(registers.R17)) >> 4
-                )
-
+//            if logInstructions
+//            {
+//                print(
+//                    ">>> R16 READ:",
+//                    String(format: "%02X", value),
+//                    "position =",
+//                    ((Int(registers.R16) << 8) | Int(registers.R17)) >> 4
+//                )
+//            }
             registers.statusRegister = registers.statusRegister & ~0x40
             lightPenReady = false
-            print(
-                    "    LPEN CLEARED BY R16",
-                    "next scan position =",
-                    keyboardScanPosition
-                )
+            
+//            if logInstructions
+//            {
+//                print(
+//                    "    LPEN CLEARED BY R16",
+//                    "next scan position =",
+//                    keyboardScanPosition
+//                )
+//            }
             return registers.R16
         case 17:
             
             let value = registers.R17
-
-              print(
-                  ">>> R17 READ:",
-                  String(format: "%02X", value),
-                  "R16 currently =",
-                  String(format: "%02X", registers.R16)
-              )
             
+//            if logInstructions
+//            {
+//                print(
+//                    ">>> R17 READ:",
+//                    String(format: "%02X", value),
+//                    "R16 currently =",
+//                    String(format: "%02X", registers.R16)
+//                )
+//            }
             registers.statusRegister = registers.statusRegister & ~0x40
             lightPenReady = false
 
-                print(
-                    "    LPEN CLEARED BY R17",
-                    "next scan position =",
-                    keyboardScanPosition
-                )
+//            if logInstructions
+//            {
+//                print(
+//                    "    LPEN CLEARED BY R17",
+//                    "next scan position =",
+//                    keyboardScanPosition
+//                )
+//            }
             return registers.R17
         case 18: return registers.R18
         case 19: return registers.R19
@@ -539,19 +588,38 @@ final class CRTC
 
         let position = Int((address >> 4) & 0x3F)
 
-        let mask = UInt64(1) << UInt64(position)
+        let physicallyPressed =
+                keyboard.isPressed(position)
 
-        let pressed = (keyboard.keyMatrix & mask) != 0
+            let pendingPress =
+                keyboard.takePending(position)
+        
+        print("latch key r18=",String(format: "%02X", registers.R18),"r19=",String(format: "%02X", registers.R19),"address=",String(format: "%04X", address),"position=",position,"physicallyPressed=",physicallyPressed, "pendingPress=",pendingPress,"light pen=", lightPenReady,"status=",String(format: "%02X", registers.statusRegister))
 
-        if pressed
+        if (physicallyPressed || pendingPress) && !lightPenReady
         {
-          registers.R16 = UInt8((address >> 8) & 0xFF)
-
-          registers.R17 = UInt8(address & 0xFF)
-
-          registers.statusRegister = registers.statusRegister | 0x40
-          
-          lightPenReady = true
+            registers.R16 = registers.R18
+            registers.R17 = registers.R19
+            
+            registers.statusRegister = registers.statusRegister | 0x40
+     
+            lightPenReady = true
+            
+//            if logInstructions
+//            {
+//            print("""
+//            R31 EXPLICIT SCAN
+//                R18 = \(String(format: "%02X", registers.R18))
+//                R19 = \(String(format: "%02X", registers.R19))
+//                address = \(String(format: "%04X", address))
+//                position = \(position)
+//                matrix = \(String(format: "%016llX", keyboard.keyMatrix))
+//            //    pressed = \(pressed)
+//                LPEN = \(lightPenReady)
+//                status = \(String(format: "%02X", registers.statusRegister))
+//            """)
+ //           keyboard.pendingKeyPresses &= ~mask
+//            }
         }
         
         registers.statusRegister = registers.statusRegister | 0x80
@@ -570,7 +638,7 @@ final class CRTC
         {
             return
         }
-        
+    
         let mask = UInt64(1) << UInt64(position)
         
         let pressed = (keyboard.keyMatrix & mask) != 0
@@ -586,13 +654,18 @@ final class CRTC
         registers.R16 = (position & 0x30) >> 4   // keypress loaded into bits 0..2 of R16 and bits 4..7 of R17
         registers.R17 = (position & 0x0F) << 4
         
-        print(
-                ">>> KEY CAPTURED:",
+//        if logInstructions
+//        {
+            print(
+                ">>> NORMAL KEY CAPTURED:",
+                "rom read latch", romReadLatch,
                 "position =", position,
+                "column = ",columnCounter,
+                "scanline = ",scanlineCounter,
                 "R16 =", String(format: "%02X", registers.R16),
                 "R17 =", String(format: "%02X", registers.R17),
                 "status =", String(format: "%02X", registers.statusRegister))
-        
+//        }
         lightPenReady = true
     }
     

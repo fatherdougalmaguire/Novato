@@ -531,6 +531,8 @@ actor microbee
         var EI : UInt8 = 0          // JSON psuedo-register - track whether previous instruction was EI - 8 bit
     }
     
+    private var logInstructions : Bool = false
+    
     private var preserveEI : UInt8 = 0
     
     private var pausedBreakpoint : Bool = false
@@ -629,6 +631,13 @@ actor microbee
         self.keyboard = keyboardInstance
 
         self.bus = BUS(keyboard: keyboardInstance)
+    }
+    
+    func toggleLogging()
+    
+    {
+        logInstructions.toggle()
+        bus.crtc.toggleLogging()
     }
     
     private var runTask: Task<Void, Never>?
@@ -1036,7 +1045,10 @@ actor microbee
                 totalTStates = totalTStates + UInt64(tStates)
                 
                 #if DEBUG
-               //    appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
+                if  logInstructions
+                {
+                    appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
+                }
                 #endif
 
                 bus.crtc.tick(tStates: tStates)
@@ -1125,20 +1137,23 @@ actor microbee
         return (value & (1 << bitPosition)) != 0
     }
     
-    func returnParity(value: UInt8) -> Bool
-    {
-        var tempValue : UInt8 = value
-        tempValue = tempValue ^ tempValue >> 4
-        tempValue = tempValue ^ tempValue >> 2
-        tempValue = tempValue ^ tempValue >> 1
-        return ((~tempValue) & 1) == 1
-    }
+//    func returnParity(value: UInt8) -> Bool
+//    {
+//        var tempValue : UInt8 = value
+//        tempValue = tempValue ^ tempValue >> 4
+//        tempValue = tempValue ^ tempValue >> 2
+//        tempValue = tempValue ^ tempValue >> 1
+//        return ((~tempValue) & 1) == 1
+//    }
     
     func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
         #if DEBUG
-         //   let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
-         //   appLog.cpu.debug("\(logString)")
+        if  logInstructions
+        {
+            let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
+            appLog.cpu.debug("\(logString)")
+        }
         #endif
     }
     

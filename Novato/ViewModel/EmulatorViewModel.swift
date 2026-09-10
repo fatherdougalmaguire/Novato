@@ -71,6 +71,13 @@ init(cpu: microbee)
     startSnapshots()
 }
 
+func toggleLogging() async
+
+{
+    await cpu.toggleLogging()
+}
+    
+    
 func setClockSpeedMultiplier(multiplier: Double) async
 {
     await cpu.setClockSpeedMultiplier(multiplier: multiplier)

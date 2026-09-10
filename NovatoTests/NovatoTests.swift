@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-let testCycles = 10
+let testCycles = 1000
 let testTiming = 30
 
 var finalPortValue : UInt8 = 0
@@ -156,11 +156,10 @@ extension testHelper
         {
             await cpu.loadPorts(portNum: testCase.ports[0].address, portValue: testCase.ports[0].value)
         }
-        await cpu.nextInstruction()
+        let finalCycles = await cpu.nextInstruction()
         let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
         let finalPortValue = testForPorts ? await cpu.returnPortValue(portNum: testCase.ports[0].address) : 0
-        let finalCycles = await cpu.returnTStates()
-        testError(finalState: finalState, expected: testCase.final, testForPorts: testForPorts, finalPortValue: finalPortValue, ports: testCase.ports, expectedCycles: testCase.cycles.count, finalCycles: finalCycles, context: testCase.name)
+        testError(finalState: finalState, expected: testCase.final, testForPorts: testForPorts, finalPortValue: finalPortValue, ports: testCase.ports, expectedCycles: testCase.cycles.count, finalCycles: Int(finalCycles), context: testCase.name)
     }
 }
 
