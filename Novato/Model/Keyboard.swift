@@ -199,7 +199,8 @@ final class MicrobeeKeyboard
         }
         
         keyMatrix |= mask
-        pendingKeyPresses |= mask
+//        pendingKeyPresses |= mask
+        
     }
 
     @inline(__always)
@@ -217,30 +218,24 @@ final class MicrobeeKeyboard
         return (keyMatrix & mask) != 0
     }
     
-    @inline(__always)
-    func consumePending(_ position: Int) -> Bool
-    {
-        let mask = UInt64(1) << UInt64(position)
-
-        guard (pendingKeyPresses & mask) != 0 else {
-            return false
-        }
-
-        pendingKeyPresses &= ~mask
-        return true
-    }
-    
-    @inline(__always)
-    func takePending(_ position: Int) -> Bool {
-        let mask = UInt64(1) << UInt64(position)
-
-        guard pendingKeyPresses & mask != 0 else {
-            return false
-        }
-
-        pendingKeyPresses &= ~mask
-        return true
-    }
+//    func isPending(_ position: Int) -> Bool
+//    {
+//        let mask = UInt64(1) << UInt64(position)
+//        return (pendingKeyPresses & mask) != 0
+//    }
+//
+//    @inline(__always)
+//    func takePending(_ position: Int) -> Bool
+//    {
+//        let mask = UInt64(1) << UInt64(position)
+//
+//        guard (pendingKeyPresses & mask) != 0 else {
+//            return false
+//        }
+//
+//        pendingKeyPresses &= ~mask
+//        return true
+//    }
     
     @inline(__always)
     func set(_ key: MicrobeeKey, pressed: Bool)
@@ -259,29 +254,53 @@ final class MicrobeeKeyboard
     func releaseAll()
     {
         keyMatrix = 0
+        pendingKeyPresses = 0
     }
     
     @inline(__always)
-    func printMatrix( _ message : String)
+    func clearLatch(position: Int)
     {
-        print(message+" KM @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^d0123456789:;,-./ebtlrlbs c     s")
-        var bob : String = "    "
+        let mask = UInt64(1) << UInt64(position)
+
+        pendingKeyPresses &= ~mask
+    }
+    
+    @inline(__always)
+    func printMatrix( _ message : String, _ matrix: UInt64)
+    {
+        var bob : String = ""
         for matrixpos in 0...63
         {
-            let isPressed =
-                    (keyMatrix & (UInt64(1) << UInt64(matrixpos))) != 0
-
-                bob += isPressed ? "1" : "0"
-        }
-        print(message+bob)
-        bob = "    "
-        print(message+" PK @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^d0123456789:;,-./ebtlrlbs c     s")
-        for matrixpos in 0...63
-        {
-            let isPressed =
-                    (pendingKeyPresses & (UInt64(1) << UInt64(matrixpos))) != 0
-
-                bob += isPressed ? "1" : "0"
+            let mask = UInt64(1) << UInt64(matrixpos)
+            let pressed = (matrix & mask) != 0
+            if pressed{
+                switch matrixpos
+                {
+                case 0 : bob = bob + "@(0) "
+                case 1...26 : if let scalar = UnicodeScalar(matrixpos + 64) { bob = bob+String(scalar)+"("+String(matrixpos)+") " } else { bob = "?" }
+                case 27: bob = bob + "[(27) "
+                case 28: bob = bob + "\\(28) "
+                case 29: bob = bob + "](29) "
+                case 30: bob = bob + "`(30) "
+                case 32...41: if let scalar = UnicodeScalar(matrixpos + 16) { bob = bob + String(scalar)+"("+String(matrixpos)+") " } else { bob = "?" }
+                case 42: bob = bob + "colon(42) "
+                case 43: bob = bob + "+(43) "
+                case 44: bob = bob + ",(44) "
+                case 45: bob = bob + "-(45) "
+                case 46: bob = bob + ".(46) "
+                case 47: bob = bob + "/(47) "
+                case 48: bob = bob + "ESC(48) "
+                case 49: bob = bob + "BACKSPACE(49) "
+                case 50: bob = bob + "TAB(50) "
+                case 51: bob = bob + "LINE FEED(51) "
+                case 52: bob = bob + "RETURN(52) "
+                case 53: bob = bob + "CAPS LOCK(53) "
+                case 54: bob = bob + "BREAK(54) "
+                case 55: bob = bob + "SPACE(55) "
+                case 57: bob = bob + "CTRL(57) "
+                case 63: bob = bob + "SHIFT(63) "
+                default : bob = bob + "No key(255) "
+                }}
         }
         print(message+bob)
     }

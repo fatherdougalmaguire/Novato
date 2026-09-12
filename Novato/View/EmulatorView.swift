@@ -304,7 +304,7 @@ struct emulatorView: View
             {
                 ToolbarItem(placement: .primaryAction)
                 {
-                    HStack(spacing: 32)
+                    HStack(spacing: 12)
                     {
                         
                         LedBar(value: Int(speedSelection))
@@ -318,11 +318,40 @@ struct emulatorView: View
                 }
                 ToolbarItem(placement: .principal)
                 {
-                    HStack(spacing: 40)
+                    HStack(spacing: 12)
                     {
                         HStack(spacing: 12)
                         {
-                            Button(vm.snapshot?.executionSnapshot.emulatorState == .running ? "Pause" : "Resume", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
+                            Button("", systemImage: "power")
+                            {
+                                Task
+                                {
+                                    await vm.stopEmulation()
+                                    try? await Task.sleep(for: .milliseconds(20))
+                                    await vm.resetEmulation()
+                                    await vm.startEmulation()
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
+                            Button("", systemImage: "arrow.counterclockwise")
+                            {
+                                Task
+                                {
+                                    await vm.updateProgramCounter(address: 0x8003)
+                                }
+                            }
+                            Button("", systemImage: "xmark.circle")
+                            {
+                                NSApp.terminate(nil)
+                            }
+                            .labelStyle(.titleAndIcon)
+                        }
+                        Spacer()
+                        Spacer()
+                        Spacer()
+                        HStack(spacing: 12)
+                        {
+                            Button("", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
                             {
                                 Task
                                 {
@@ -337,7 +366,7 @@ struct emulatorView: View
                                 }
                             }
                             .labelStyle(.titleAndIcon)
-                            Button("Step", systemImage: "forward.frame.fill")
+                            Button("", systemImage: "forward.frame.fill")
                             {
                                 Task
                                 {
@@ -348,39 +377,8 @@ struct emulatorView: View
                                 }
                             }
                             .labelStyle(.titleAndIcon)
-                        }
-                        HStack(spacing: 12)
-                        {
-                            Button("Reset", systemImage: "arrow.counterclockwise")
-                            {
-                                Task
-                                {
-                                    await vm.stopEmulation()
-                                    try? await Task.sleep(for: .milliseconds(20))
-                                    await vm.resetEmulation()
-                                    await vm.startEmulation()
-                                }
-                            }
-                            .labelStyle(.titleAndIcon)
 #if DEBUG
-                                Button("warmreset")
-                                {
-                                    Task
-                                    {
-                                        await vm.updateProgramCounter(address: 0x8003)
-                                    }
-                                }
-                                Button("TEST A")
-                                {
-                                    Task {
-                                        await vm.keyDown(.aKey)
-    
-                                        try? await Task.sleep(for: .milliseconds(100))
-    
-                                        await vm.keyUp(.aKey)
-                                    }
-                                }
-                                Button("Logging")
+                                Button("Log",systemImage: "terminal")
                                 {
                                     Task
                                     {
@@ -388,9 +386,7 @@ struct emulatorView: View
                                     }
                                 }
 #endif
-                            Button("Quit", systemImage: "xmark.circle")
-                            { NSApp.terminate(nil) }
-                                .labelStyle(.titleAndIcon)
+                            
                         }
                     }
                     .fixedSize()

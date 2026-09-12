@@ -758,13 +758,15 @@ actor microbee
     func keyDown(_ key: MicrobeeKey)
     {
         keyboard.keyDown(key)
-        keyboard.printMatrix("key down  ")
+        keyboard.printMatrix("matrix key down ",keyboard.keyMatrix)
+      // keyboard.printMatrix("latch key down ",keyboard.pendingKeyPresses)
     }
 
     func keyUp(_ key: MicrobeeKey)
     {
         keyboard.keyUp(key)
-        keyboard.printMatrix("key up    ")
+        keyboard.printMatrix("matrix key up ",keyboard.keyMatrix)
+      //  keyboard.printMatrix("latch key up ",keyboard.pendingKeyPresses)
     }
     
     func modifierChanged(_ modifier: HostModifier, pressed: Bool)
@@ -778,16 +780,19 @@ actor microbee
                 rightShiftDown = pressed
                 updateShift()
         case .control: keyboard.set(.ctrlKey, pressed: pressed)
-            keyboard.printMatrix("ctrl key  ")
+            keyboard.printMatrix("matrix ctrl key  ", keyboard.keyMatrix)
+        //    keyboard.printMatrix("latch ctrl key  ", keyboard.pendingKeyPresses)
         case .capsLock: keyboard.set(.capsLockKey, pressed: pressed)
-            keyboard.printMatrix("caps lock ")
+            keyboard.printMatrix("matrix caps lock ", keyboard.keyMatrix)
+        //    keyboard.printMatrix("latch caps lock ", keyboard.pendingKeyPresses)
         }
     }
 
     private func updateShift()
     {
         keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
-        keyboard.printMatrix("shift key ")
+        keyboard.printMatrix("matrix shift key ", keyboard.keyMatrix)
+     //  keyboard.printMatrix("latch shift key ", keyboard.pendingKeyPresses)
     }
     
     func reset()
