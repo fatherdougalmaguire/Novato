@@ -967,7 +967,7 @@ actor microbee
         //appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
         #endif
         
-        bus.crtc.tick(tStates: tStates)
+        bus.crtc.tick(tStates: tStates, totalTStates : totalTStates)
         // sound.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
         
@@ -1052,11 +1052,11 @@ actor microbee
                 #if DEBUG
                 if  logInstructions
                 {
-                    appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
+               //     appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
                 }
                 #endif
 
-                bus.crtc.tick(tStates: tStates)
+                bus.crtc.tick(tStates: tStates, totalTStates : totalTStates)
                 // sound.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
             }
@@ -1156,7 +1156,9 @@ actor microbee
         #if DEBUG
         if  logInstructions
         {
-            let logString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values)
+            let opcodeString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values).trimmingCharacters(in: .whitespaces)
+            let registerString = " AF:"+String(format: "%04X",registers.AF)+" BC:"+String(format: "%04X",registers.BC)+" DE:"+String(format: "%04X",registers.DE)+" HL:"+String(format: "%04X",registers.HL)+" R16:"+String(format: "%02X",bus.crtc.registers.R16)+" R17:"+String(format: "%02X",bus.crtc.registers.R17)+" R18:"+String(format: "%02X",bus.crtc.registers.R18)+" R19:"+String(format: "%02X",bus.crtc.registers.R19)+" status:"+String(format: "%02X",bus.crtc.registers.statusRegister)+" tstates:"+String(totalTStates)
+            let logString = opcodeString.padding(toLength: 45, withPad: " ", startingAt: 0)+registerString
             appLog.cpu.debug("\(logString)")
         }
         #endif
@@ -1203,7 +1205,6 @@ actor microbee
         switch opcode2
         {
         case 0x00: // RLC B - CB 00 - The contents of B are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-            logInstructionDetails(instructionDetails: "RLC B", opcode: [0xCB,0x00], programCounter: registers.PC)
             let carry = registers.B >> 7
             let tempResult = (registers.B << 1) | carry
             (registers.B,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
@@ -1213,8 +1214,9 @@ actor microbee
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "RLC B", opcode: [0xCB,0x00], programCounter: registers.PC)
         case 0x01: // RLC C - CB 01 - The contents of C are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-            logInstructionDetails(instructionDetails: "RLC C", opcode: [0xCB,0x01], programCounter: registers.PC)
+            
             let carry = registers.C >> 7
             let tempResult = (registers.C << 1) | carry
             (registers.C,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
@@ -1224,8 +1226,8 @@ actor microbee
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "RLC C", opcode: [0xCB,0x01], programCounter: registers.PC)
         case 0x02: // RLC D - CB 02 - The contents of D are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-            logInstructionDetails(instructionDetails: "RLC D", opcode: [0xCB,0x02], programCounter: registers.PC)
             let carry = registers.D >> 7
             let tempResult = (registers.D << 1) | carry
             (registers.D,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
@@ -1235,8 +1237,8 @@ actor microbee
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "RLC D", opcode: [0xCB,0x02], programCounter: registers.PC)
         case 0x03: // RLC E - CB 03 - The contents of E are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-            logInstructionDetails(instructionDetails: "RLC E", opcode: [0xCB,0x03], programCounter: registers.PC)
             let carry = registers.E >> 7
             let tempResult = (registers.E << 1) | carry
             (registers.E,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
@@ -1246,8 +1248,8 @@ actor microbee
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "RLC E", opcode: [0xCB,0x03], programCounter: registers.PC)
         case 0x04: // RLC H - CB 04 - The contents of H are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
-            logInstructionDetails(instructionDetails: "RLC H", opcode: [0xCB,0x04], programCounter: registers.PC)
             let carry = registers.H >> 7
             let tempResult = (registers.H << 1) | carry
             (registers.H,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
@@ -1257,6 +1259,7 @@ actor microbee
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "RLC H", opcode: [0xCB,0x04], programCounter: registers.PC)
         case 0x05: // RLC L - CB 05 - The contents of L are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
             logInstructionDetails(instructionDetails: "RLC L", opcode: [0xCB,0x05], programCounter: registers.PC)
             let carry = registers.L >> 7

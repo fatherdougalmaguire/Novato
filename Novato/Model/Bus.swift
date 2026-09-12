@@ -342,6 +342,8 @@ final class CRTC
     
     var triggerKeyScan : Bool = false
     
+    var lotsoftstates : UInt64 = 0
+    
     private let keyboard: MicrobeeKeyboard
     
     init(keyboard: MicrobeeKeyboard)
@@ -364,6 +366,12 @@ final class CRTC
             tempStatus = tempStatus | verticalBlankingMask
         }
  
+//        print(
+//            "STATUS PORT READ:",
+//            "tstates =", lotsoftstates,
+//            "STATUS =", String(format: "%02X", registers.statusRegister)
+//        )
+        
         return tempStatus
     }
     
@@ -388,12 +396,26 @@ final class CRTC
         case 14: registers.R14 = RegValue
         case 15: registers.R15 = RegValue
         case 16:
-            registers.statusRegister = registers.statusRegister & ~0x40
-            lightPenReady = false
+//            print(
+//                "LPEN REGISTER READ:",
+//                "R16/R17",
+//                "tstates =", lotsoftstates,
+//                "value =", String(format: "%02X", RegValue),
+//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
+//            )
+//            registers.statusRegister = registers.statusRegister & ~0x40
+//            lightPenReady = false
             registers.R16 = RegValue
         case 17:
-            registers.statusRegister = registers.statusRegister & ~0x40
-            lightPenReady = false
+//            print(
+//                "LPEN REGISTER READ:",
+//                "R16/R17",
+//                "tstates =", lotsoftstates,
+//                "value =", String(format: "%02X", RegValue),
+//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
+//            )
+//            registers.statusRegister = registers.statusRegister & ~0x40
+//            lightPenReady = false
             registers.R17 = RegValue
         case 18:
             registers.R18 = RegValue
@@ -428,10 +450,24 @@ final class CRTC
         case 14: return registers.R14
         case 15: return registers.R15
         case 16:
+//            print(
+//                "LPEN REGISTER READ:",
+//                "R16/R17",
+//                "tstates =", lotsoftstates,
+//                "value =", String(format: "%02X", registers.R16),
+//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
+//            )
             registers.statusRegister = registers.statusRegister & ~0x40
             lightPenReady = false
             return registers.R16
         case 17:
+//            print(
+//                "LPEN REGISTER READ:",
+//                "R16/R17",
+//                "tstates =", lotsoftstates,
+//                "value =", String(format: "%02X", registers.R17),
+//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
+//            )
             registers.statusRegister = registers.statusRegister & ~0x40
             lightPenReady = false
             return registers.R17
@@ -494,8 +530,11 @@ final class CRTC
         }
     }
     
-    func tick(tStates: UInt8)
+    func tick(tStates: UInt8, totalTStates: UInt64)
     {
+        
+        lotsoftstates = totalTStates
+        
         characterClock = characterClock + tStates
         
         while characterClock >= tStatesPerCharacterClock
@@ -505,6 +544,9 @@ final class CRTC
             
             checkKeyboard(position: keyboardScanPosition)
 
+//            if lightPenReady
+//            { print(totalTStates)
+//            }
             keyboardScanPosition = keyboardScanPosition + 1
 
             if keyboardScanPosition >= 64
@@ -528,13 +570,13 @@ final class CRTC
 
         let position = Int((address >> 4) & 0x3F)
         
-        print(
-               "R31 scan:",
-               String(format: "%04X", address),
-               "position:", position,
-               "rom read latch:", romReadLatch,
-               "status regsiter:", registers.statusRegister
-           )
+//        print(
+//               "R31 scan:",
+//               String(format: "%04X", address),
+//               "position:", position,
+//               "rom read latch:", romReadLatch,
+//               "status regsiter:", registers.statusRegister
+//           )
 
         if keyboard.isPressed(position)
         {
@@ -556,7 +598,7 @@ final class CRTC
         }
 
         let mask = UInt64(1) << UInt64(position)
-        let pressed = (keyboard.keyMatrix & mask) != 0
+        //let pressed = (keyboard.keyMatrix & mask) != 0
 
         if keyboard.isPressed(Int(position))
             {
@@ -566,14 +608,14 @@ final class CRTC
                 registers.statusRegister |= 0x40
                 lightPenReady = true
             
-            print(
-                "NORMAL SCAN:",
-                "position =", position,
-                "pressed =", pressed,
-                "R16 =", String(format: "%02X", registers.R16),
-                "R17 =", String(format: "%02X", registers.R17),
-                "status =", String(format: "%02X", registers.statusRegister)
-            )
+//            print(
+//                "NORMAL SCAN:",
+//                "position =", position,
+//                "pressed =", pressed,
+//                "R16 =", String(format: "%02X", registers.R16),
+//                "R17 =", String(format: "%02X", registers.R17),
+//                "status =", String(format: "%02X", registers.statusRegister)
+//            )
         }
     }
     
