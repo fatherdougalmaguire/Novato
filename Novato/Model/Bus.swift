@@ -545,13 +545,17 @@ final class CRTC
             checkKeyboard(position: keyboardScanPosition)
 
 //            if lightPenReady
-//            { print(totalTStates)
+//            {
+//                print("tstates",totalTStates)
+//                print("status",registers.statusRegister)
+//                print("R16",registers.R16)
+//                print("R17",registers.R17)
 //            }
             keyboardScanPosition = keyboardScanPosition + 1
 
             if keyboardScanPosition >= 64
             {
-                    keyboardScanPosition = 0
+                keyboardScanPosition = 0
             }
         }
         
@@ -597,7 +601,7 @@ final class CRTC
             return
         }
 
-        let mask = UInt64(1) << UInt64(position)
+        //let mask = UInt64(1) << UInt64(position)
         //let pressed = (keyboard.keyMatrix & mask) != 0
 
         if keyboard.isPressed(Int(position))

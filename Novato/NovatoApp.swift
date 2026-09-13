@@ -44,6 +44,10 @@ struct NovatoApp: App
         {
             breakpointsView().environment(vm)
         }
+        Window("Memory Inspector", id: "memoryInspectorWindow")
+        {
+            memoryInspectorView().environment(vm)
+        }
         Settings
         {
             SettingsView().environment(vm)

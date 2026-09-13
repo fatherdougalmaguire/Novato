@@ -546,8 +546,8 @@ actor microbee
     private var z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
     private var z80QueueHead = 0
     
-    private var breakpoints = SIMD16<UInt16>(repeating: 0x0000)
-    private var breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
+    private var breakpoints = SIMD8<UInt16>(repeating: 0x0000)
+    private var breakpointMask = SIMD8<UInt16>(repeating: 0x0000)
     
     private static let bpsKey = "SavedBreakpoints"
     private static let masksKey = "SavedBreakpointMasks"
@@ -603,23 +603,23 @@ actor microbee
         )
         
         if let savedBps = UserDefaults.standard.array(forKey: Self.bpsKey) as? [UInt16],
-           savedBps.count == 16
+           savedBps.count == 8
         {
-            self.breakpoints = SIMD16<UInt16>(savedBps)
+            self.breakpoints = SIMD8<UInt16>(savedBps)
         }
         else
         {
-            self.breakpoints = SIMD16<UInt16>(repeating: 0x0000)
+            self.breakpoints = SIMD8<UInt16>(repeating: 0x0000)
         }
         
         if let savedMasks = UserDefaults.standard.array(forKey: Self.masksKey) as? [UInt16],
-           savedMasks.count == 16
+           savedMasks.count == 8
         {
-            self.breakpointMask = SIMD16<UInt16>(savedMasks)
+            self.breakpointMask = SIMD8<UInt16>(savedMasks)
         }
         else
         {
-            self.breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
+            self.breakpointMask = SIMD8<UInt16>(repeating: 0x0000)
         }
         
         self.clockSpeedMultiplier = UserDefaults.standard.double(forKey: "speedSelection")
@@ -638,6 +638,11 @@ actor microbee
     {
         logInstructions.toggle()
         bus.crtc.toggleLogging()
+    }
+    
+    func updateMemoryInspector(address: UInt16) -> [UInt8]
+    {
+        return bus.memorySlice(address: address & 0xFF00, size: 0x100)
     }
     
     private var runTask: Task<Void, Never>?
@@ -734,7 +739,7 @@ actor microbee
     
     func updateBreakpoints(index: Int, value: UInt16, mask: Bool)
     {
-        guard index >= 0 && index < 16
+        guard index >= 0 && index < 8
         else
         {
             return
@@ -743,8 +748,8 @@ actor microbee
         breakpoints[index] = value
         breakpointMask[index] = (mask ? 1 : 0)
         
-        let bpsArray = (0..<16).map { breakpoints[$0] }
-        let masksArray = (0..<16).map { breakpointMask[$0] }
+        let bpsArray = (0..<8).map { breakpoints[$0] }
+        let masksArray = (0..<8).map { breakpointMask[$0] }
                 
         UserDefaults.standard.set(bpsArray, forKey: Self.bpsKey)
         UserDefaults.standard.set(masksArray, forKey: Self.masksKey)
@@ -1175,7 +1180,7 @@ actor microbee
         
         breakpointHit = false
         
-        let currentPCVector = SIMD16<UInt16>(repeating: UInt16(registers.PC))
+        let currentPCVector = SIMD8<UInt16>(repeating: UInt16(registers.PC))
         let addressMatch = (currentPCVector .== breakpoints)
         
         if any(addressMatch .& (breakpointMask .!= 0)) &&  !isStepping
@@ -2750,7 +2755,6 @@ actor microbee
             tStates = 12
             incrementR(opcodeCount:2)
         case 0x77: // BIT 6,A - CB 77 - Tests bit 6 of A
-            logInstructionDetails(instructionDetails: "BIT 6,A", opcode: [0xCB,0x77], programCounter: registers.PC)
             let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
             let tempX : UInt8 = registers.A & z80Flags.X.rawValue
             let tempY : UInt8 = registers.A & z80Flags.Y.rawValue
@@ -2764,6 +2768,7 @@ actor microbee
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "BIT 6,A", opcode: [0xCB,0x77], programCounter: registers.PC)
         case 0x78: // BIT 7,B - CB 78 - Tests bit 7 of B
             logInstructionDetails(instructionDetails: "BIT 7,B", opcode: [0xCB,0x78], programCounter: registers.PC)
             let tempCarry : UInt8 = registers.F & z80Flags.Carry.rawValue
@@ -13982,7 +13987,7 @@ actor microbee
     func sortBreakpointQueue() -> [String]
     {
         var tempBreakpointQueue: [String] = []
-        for counter in 0...15
+        for counter in 0...7
         {
             tempBreakpointQueue.append(String(format: "%04X",breakpoints[counter]))
         }
@@ -13993,7 +13998,7 @@ actor microbee
     func sortBreakpointQueueMask() -> [Bool]
     {
         var tempBreakpointQueueMask: [Bool] = []
-        for counter in 0...15
+        for counter in 0...7
         {
             if breakpointMask[counter] == 0
             {

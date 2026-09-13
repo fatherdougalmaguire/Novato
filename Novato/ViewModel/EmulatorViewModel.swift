@@ -10,6 +10,8 @@ var isStepActive = false
 
 private(set) var snapshot: microbeeSnapshot?
 private var snapshotTask: Task<Void, Never>?
+    
+private(set)var memoryInspection: memoryInspector?
 
 func startSnapshots()
 {
@@ -68,9 +70,31 @@ func stopSnapshots()
 init(cpu: microbee)
 {
     self.cpu = cpu
+    
+    UserDefaults.standard.register(
+        defaults:
+        [
+            "memoryInspectionSelection": 0x0000
+        ]
+    )
+    
+    Task
+    {
+        @MainActor in
+                let initialAddress: UInt16 = UInt16(UserDefaults.standard.integer(forKey: "memoryInspectionSelection"))
+                let initialData = await cpu.updateMemoryInspector(address: initialAddress)
+                
+                self.memoryInspection = memoryInspector(memoryInspectorDump: initialData,memoryInspectionAddress: initialAddress)
+    }
+                
     startSnapshots()
 }
 
+//func updateMemoryInspector() async
+//{
+//    memoryInspection = await cpu.updateMemoryInspector(address: 0x0102)
+//}
+    
 func toggleLogging() async
 
 {

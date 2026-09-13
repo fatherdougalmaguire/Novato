@@ -78,6 +78,7 @@ struct emulatorView: View
     @AppStorage("portWindowVisible") private var portWindowVisible: Bool = true
     @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
     @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
+    @AppStorage("memoryInspectorWindowVisible") private var  memoryInspectorWindowVisible: Bool = true
     @AppStorage("speedSelection") private var speedSelection: Double = 1.0
     
     let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
@@ -398,6 +399,7 @@ struct emulatorView: View
                 if portWindowVisible { openWindow(id: "portAndCrtcWindow") }
                 if memoryWindowVisible { openWindow(id: "memoryAndInstructionWindow") }
                 if breakpointWindowVisible { openWindow(id: "breakpointsWindow") }
+                if memoryInspectorWindowVisible { openWindow(id: "memoryInspectorWindow") }
                 focusWindow(withId: "emulatorWindow")
                 Task
                 {

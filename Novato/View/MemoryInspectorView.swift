@@ -1,0 +1,102 @@
+import SwiftUI
+
+struct memoryInspectorView: View
+{
+    @Environment(emulatorViewModel.self) private var vm
+    
+    struct MemoryRowView: View
+    {
+        let row: Int
+        let snapshot: memoryInspector
+        let vm: emulatorViewModel
+        let startAddress: UInt16
+        
+        func mapascii (ascii : UInt8) -> String
+        {
+            switch ascii
+            {
+            case 32...126:
+                return String(UnicodeScalar(Int(ascii))!)
+            default:
+                return "."
+            }
+        }
+        
+        func highlightString(originalString: String, numDigits: Int, offset: Int, activate: Bool) -> AttributedString
+        {
+            var tempResult = AttributedString(originalString)
+            
+            if activate
+            {
+                let beginindex = tempResult.characters.index(tempResult.startIndex, offsetBy: offset)
+                let finalindex = tempResult.characters.index(tempResult.startIndex, offsetBy: offset+numDigits)
+                
+                tempResult[beginindex..<finalindex].backgroundColor = .orange
+                tempResult[beginindex..<finalindex].foregroundColor = .white
+            }
+            
+            return tempResult
+        }
+        
+        var body: some View
+        {
+            let address = row * 16
+            let nextAddress = (row+1)*16
+            let dispAddress = startAddress &+ UInt16(address)
+            let dispNextAddress = startAddress &+ UInt16(nextAddress)
+            let bytes: ArraySlice<UInt8> = snapshot.memoryInspectorDump[address..<(address+16)]
+            let hexBytes: String = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
+            let charBytes: String = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
+            let highlight = (snapshot.memoryInspectionAddress >= dispAddress) && (snapshot.memoryInspectionAddress < dispNextAddress)
+            let alternateRow = (row % 2) == 1
+            let offset = abs(Int(snapshot.memoryInspectionAddress) - Int(dispAddress))
+            let addressString = String(format:"0x%04X", dispAddress)
+            let byteString = highlightString(originalString: hexBytes, numDigits: 2, offset: offset * 3, activate: highlight)
+            let charString = highlightString(originalString: charBytes, numDigits: 1, offset: offset, activate: highlight)
+        
+            HStack(alignment: .firstTextBaseline, spacing: 8)
+            {
+                Text(addressString)
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+                Text("   ")
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+                Text(byteString)
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+                Text(charString)
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+            }
+            .background(alternateRow ? Color(red: 0.95, green: 0.95, blue: 0.97) : Color.clear)
+        }
+    }
+    
+    var body: some View
+    {
+        if let snapshot = vm.memoryInspection
+        {
+            ScrollView
+            {
+                VStack()
+                {                    
+                    let startAddress = snapshot.memoryInspectionAddress & 0xFF00
+                    let limit : Int = snapshot.memoryInspectorDump.count / 16
+                    ForEach(0..<limit, id: \.self)
+                    {
+                        row in MemoryRowView(row: row, snapshot: snapshot, vm: vm, startAddress: startAddress)
+                    }
+                }
+            }
+            .fixedSize()
+            .padding(10)
+            .background(.white)
+        }
+        else
+        {
+            Text("Nothing to see here folks")
+        }
+    }
+}
+

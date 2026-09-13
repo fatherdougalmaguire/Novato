@@ -81,11 +81,17 @@ struct crtcSnapshot: Sendable, Equatable
 
 struct memorySnapshot: Sendable, Equatable
 {
-    let VDU : [Float]
-    let CharRom : [Float]
+    let VDU: [Float]
+    let CharRom: [Float]
     let PcgRam: [Float]
-    let ColourRam : [Float]
-    let memoryDump : [UInt8]
+    let ColourRam: [Float]
+    let memoryDump: [UInt8]
+}
+
+struct memoryInspector : Sendable, Equatable
+{
+    var memoryInspectorDump: [UInt8]
+    var memoryInspectionAddress: UInt16
 }
 
 struct executionSnapshot: Sendable, Equatable

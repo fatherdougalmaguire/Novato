@@ -282,6 +282,7 @@ struct windowsView: View
     @AppStorage("portWindowVisible") private var portWindowVisible: Bool = true
     @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
     @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
+    @AppStorage("memoryInspectorWindowVisible") private var memoryInspectorWindowVisible: Bool = true
     
     var body: some View
     {
@@ -291,6 +292,7 @@ struct windowsView: View
             Toggle("Show port window", isOn: $portWindowVisible)
             Toggle("Show memory window", isOn: $memoryWindowVisible)
             Toggle("Show breakpoint window", isOn: $breakpointWindowVisible)
+            Toggle("Show memory inspector window", isOn: $memoryInspectorWindowVisible)
         }
         .formStyle(.grouped)
     }
