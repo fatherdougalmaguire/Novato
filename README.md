@@ -68,13 +68,14 @@ But not much else.
 * You can instruction step the emulator via button control.
 * You can restart the emulator via button control.
 * You can quit the emulator via button control.
-* You can quick load binary files from disk into location 0x900 and execute them
+* You can quick load binary files from disk into memory and execute them
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
 * You can define up to 16 breakpoints
 * Breakpoints are persistent across application run or CPU reset
 * Breakpoints can be cleared in bulk
+* You can now view arbitrary memory locations via the memory inspector
 * There is now a **Settings** module so you can dynamically set ( and retain ):
   
   - Colour mode
@@ -115,7 +116,7 @@ But not much else.
 
 * Keypresses are correctly captured from SWiftUI and passed to the emulator.
 * Keypresses are correctly converted into 6545 register values.
-* BASIC and many games still cannot see the keypresses.
+* However keypress functionality is still broken as BASIC and many games still cannot see the keypresses.
 
 ### Memory
 * Working MMU has been implemented
@@ -178,8 +179,9 @@ Some also have some display artefacts.
 
 <img width="1734" height="924" alt="image" src="https://github.com/user-attachments/assets/4ee67221-22d3-4699-b9c9-dae6de76b8bf" />
 
+### Memory Inspector View
 
-
+<img width="1474" height="972" alt="image" src="https://github.com/user-attachments/assets/f5ddb1ac-8fe8-47bd-a1b4-fba9d64e7a33" />
 
 
 
