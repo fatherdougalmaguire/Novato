@@ -72,10 +72,11 @@ But not much else.
 * Current register statuses are displayed.
 * The first 256 bytes of memory from the currrent PC value are displayed as hex and ASCII.
 * The last 16 instructions are decoded and displayed
-* You can define up to 16 breakpoints
+* You can define up to 8 breakpoints
 * Breakpoints are persistent across application run or CPU reset
 * Breakpoints can be cleared in bulk
 * You can now view arbitrary memory locations via the memory inspector
+* Memory inspection location is persistent across application run or CPU reset
 * There is now a **Settings** module so you can dynamically set ( and retain ):
   
   - Colour mode
@@ -165,7 +166,7 @@ Some also have some display artefacts.
 
 ### Breakpoint View
 
-<img width="536" height="1232" alt="image" src="https://github.com/user-attachments/assets/df78c080-2505-41b4-b982-9ca47428137f" />
+<img width="736" height="990" alt="image" src="https://github.com/user-attachments/assets/fdd98ff9-bb17-432a-a209-c2e8ff73587a" />
 
 ### Port View
 
