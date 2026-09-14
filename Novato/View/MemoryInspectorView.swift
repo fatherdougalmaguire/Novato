@@ -3,11 +3,12 @@ import SwiftUI
 struct memoryInspectorView: View
 {
     @Environment(emulatorViewModel.self) private var vm
+    @State private var memoryAddressText = "0000"
     
     struct MemoryRowView: View
     {
         let row: Int
-        let snapshot: memoryInspector
+        let snapshot: microbeeSnapshot
         let vm: emulatorViewModel
         let startAddress: UInt16
         
@@ -44,12 +45,12 @@ struct memoryInspectorView: View
             let nextAddress = (row+1)*16
             let dispAddress = startAddress &+ UInt16(address)
             let dispNextAddress = startAddress &+ UInt16(nextAddress)
-            let bytes: ArraySlice<UInt8> = snapshot.memoryInspectorDump[address..<(address+16)]
+            let bytes: ArraySlice<UInt8> = snapshot.memoryInspectorSnapshot.memoryInspectorDump[address..<(address+16)]
             let hexBytes: String = bytes.map { String(format: "%02X", $0) }.joined(separator: " ")
             let charBytes: String = bytes.map { mapascii(ascii:$0) }.joined(separator: "")
-            let highlight = (snapshot.memoryInspectionAddress >= dispAddress) && (snapshot.memoryInspectionAddress < dispNextAddress)
+            let highlight = (snapshot.memoryInspectorSnapshot.memoryInspectorAddress >= dispAddress) && (snapshot.memoryInspectorSnapshot.memoryInspectorAddress < dispNextAddress)
             let alternateRow = (row % 2) == 1
-            let offset = abs(Int(snapshot.memoryInspectionAddress) - Int(dispAddress))
+            let offset = abs(Int(snapshot.memoryInspectorSnapshot.memoryInspectorAddress) - Int(dispAddress))
             let addressString = String(format:"0x%04X", dispAddress)
             let byteString = highlightString(originalString: hexBytes, numDigits: 2, offset: offset * 3, activate: highlight)
             let charString = highlightString(originalString: charBytes, numDigits: 1, offset: offset, activate: highlight)
@@ -75,14 +76,90 @@ struct memoryInspectorView: View
     
     var body: some View
     {
-        if let snapshot = vm.memoryInspection
+        if let snapshot = vm.snapshot
         {
             ScrollView
             {
+                Spacer()
+                HStack(spacing: 8)
+                {
+                    Button
+                    {
+                        Task {
+                            if let base = UInt16(memoryAddressText, radix: 16)
+                            {
+                                let newAddress = base &- 0x100
+
+                                await vm.updateMemoryInspector(address: newAddress)
+
+                                memoryAddressText = String(format: "%04X",newAddress)
+                            }
+                        }
+                    }
+                    label:
+                    {
+                        Image(systemName: "chevron.left")
+                    }
+                    .buttonStyle(.bordered)
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+                    
+                    TextField(
+                        "Address",
+                        text: Binding(
+                            get: { memoryAddressText },
+                            set: { newValue in
+                                let filtered = newValue
+                                    .uppercased()
+                                    .filter { "0123456789ABCDEF".contains($0) }
+
+                                memoryAddressText = String(filtered.prefix(4))
+                            }
+                        ))
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 80)
+                    .multilineTextAlignment(.center)
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+                    .onSubmit
+                    {                        
+                        Task
+                        {
+                            let value = UInt16(memoryAddressText, radix: 16) ?? 0
+                            await vm.updateMemoryInspector(address: value)
+                        }
+                    }
+                    
+                    Button
+                    {
+                        Task
+                        {
+                            if let base = UInt16(memoryAddressText, radix: 16)
+                            {
+                                let newAddress = base &+ 0x100
+
+                                await vm.updateMemoryInspector(address: newAddress)
+
+                                memoryAddressText = String(format: "%04X",newAddress)
+                            }
+                        }
+                    }
+                    label:
+                    {
+                        Image(systemName: "chevron.right")
+                    }
+                    .buttonStyle(.bordered)
+                    .font(.system(.body, design: .monospaced))
+                    .foregroundColor(.orange)
+                }
+                
+                Spacer()
+                Spacer()
+                
                 VStack()
-                {                    
-                    let startAddress = snapshot.memoryInspectionAddress & 0xFF00
-                    let limit : Int = snapshot.memoryInspectorDump.count / 16
+                {
+                    let startAddress = snapshot.memoryInspectorSnapshot.memoryInspectorAddress & 0xFF00
+                    let limit : Int = snapshot.memoryInspectorSnapshot.memoryInspectorDump.count / 16
                     ForEach(0..<limit, id: \.self)
                     {
                         row in MemoryRowView(row: row, snapshot: snapshot, vm: vm, startAddress: startAddress)
@@ -92,6 +169,10 @@ struct memoryInspectorView: View
             .fixedSize()
             .padding(10)
             .background(.white)
+            .onAppear
+            {
+                memoryAddressText = String(format: "%04X", snapshot.memoryInspectorSnapshot.memoryInspectorAddress)
+            }
         }
         else
         {

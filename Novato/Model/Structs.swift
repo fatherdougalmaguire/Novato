@@ -88,10 +88,10 @@ struct memorySnapshot: Sendable, Equatable
     let memoryDump: [UInt8]
 }
 
-struct memoryInspector : Sendable, Equatable
+struct memoryInspectorSnapshot : Sendable, Equatable
 {
     var memoryInspectorDump: [UInt8]
-    var memoryInspectionAddress: UInt16
+    var memoryInspectorAddress: UInt16
 }
 
 struct executionSnapshot: Sendable, Equatable
@@ -121,6 +121,7 @@ struct microbeeSnapshot: Sendable, Equatable, Identifiable
     let crtcSnapshot: crtcSnapshot
     let executionSnapshot: executionSnapshot
     let memorySnapshot: memorySnapshot
+    let memoryInspectorSnapshot : memoryInspectorSnapshot
 }
 
 struct CPUState: Decodable, Sendable, Equatable

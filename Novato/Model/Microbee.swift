@@ -549,6 +549,11 @@ actor microbee
     private var breakpoints = SIMD8<UInt16>(repeating: 0x0000)
     private var breakpointMask = SIMD8<UInt16>(repeating: 0x0000)
     
+    private var memoryInspectorDump = [UInt8](repeating: 0,count: 256)
+    private var memoryInspectorAddress: UInt16
+    private var memoryInspectorPages = [UInt64](repeating: 0,count: 256)
+    private var memoryInspectState: UInt64 = 0
+    
     private static let bpsKey = "SavedBreakpoints"
     private static let masksKey = "SavedBreakpointMasks"
     
@@ -602,6 +607,15 @@ actor microbee
             ]
         )
         
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "memoryInspectorAddress": 0x0000
+            ]
+        )
+        
+        self.memoryInspectorAddress = UInt16(UserDefaults.standard.integer(forKey: "memoryInspectorAddress"))
+        
         if let savedBps = UserDefaults.standard.array(forKey: Self.bpsKey) as? [UInt16],
            savedBps.count == 8
         {
@@ -640,9 +654,10 @@ actor microbee
         bus.crtc.toggleLogging()
     }
     
-    func updateMemoryInspector(address: UInt16) -> [UInt8]
+    func updateMemoryInspector(address: UInt16)
     {
-        return bus.memorySlice(address: address & 0xFF00, size: 0x100)
+        memoryInspectorAddress = address
+        UserDefaults.standard.set(address, forKey: "memoryInspectorAddress")
     }
     
     private var runTask: Task<Void, Never>?
@@ -14097,7 +14112,8 @@ actor microbee
                 PcgRam: bus.pcgRAM.bufferTransform(),
                 ColourRam: bus.colourRAM.bufferTransform(),
                 memoryDump: bus.memorySlice(address: registers.PC & 0xFF00, size: 0x100)
-            )
+            ),
+            memoryInspectorSnapshot: memoryInspectorSnapshot(memoryInspectorDump: bus.memorySlice(address: memoryInspectorAddress & 0xFF00, size: 0x100), memoryInspectorAddress: memoryInspectorAddress)
         )
     }
 }

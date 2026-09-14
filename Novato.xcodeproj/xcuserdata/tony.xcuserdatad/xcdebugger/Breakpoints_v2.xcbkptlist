@@ -14,8 +14,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2771"
-            endingLineNumber = "2771"
+            startingLineNumber = "2786"
+            endingLineNumber = "2786"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
