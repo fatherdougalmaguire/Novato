@@ -76,7 +76,7 @@ struct registerView: View
         
         var result : String = ""
         
-        for i in 0...7
+        for i in (0...7).reversed()
         {
             let bitPosition = i
             let mask = 1 << bitPosition

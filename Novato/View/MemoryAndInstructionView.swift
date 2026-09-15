@@ -1,8 +1,13 @@
 import SwiftUI
+import os
 
 struct memoryAndInstructionView: View
 {
     @Environment(emulatorViewModel.self) private var vm
+    private static let logger = Logger(
+            subsystem: Bundle.main.bundleIdentifier ?? "com.emulator.app",
+            category: "MemoryInspector"
+        )
     
     struct MemoryRowView: View
     {
@@ -104,17 +109,18 @@ struct memoryAndInstructionView: View
                 
                     let queue = snapshot.executionSnapshot.orderedZ80Queue
                     let indices = queue.indices
-
+                    
                     ForEach(indices, id: \.self)
-                    { counter in
+                    { counter in    
                             let isAlternate = counter % 2 == 1
                             let alternateColor = Color(red: 0.95, green: 0.95, blue: 0.97)
-                            
-                            Text(queue[counter])
-                                .font(.system(.body, design: .monospaced))
-                                .foregroundColor(.orange)
-                                .background( isAlternate ? alternateColor : Color.white)
+                        
+                        Text(queue[counter])
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(.orange)
+                            .background( isAlternate ? alternateColor : Color.white)
                     }
+                    //let _ = Self.logger.debug("\(queue.last ?? "")")
                     Text(snapshot.executionSnapshot.currentInstruction)
                         .font(.system(.body, design: .monospaced))
                         .background(Color.orange)

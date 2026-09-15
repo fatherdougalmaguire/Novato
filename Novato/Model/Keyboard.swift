@@ -181,7 +181,7 @@ struct MicrobeeModifierChange
 final class MicrobeeKeyboard
 {
     var keyMatrix: UInt64 = 0
-    var pendingKeyPresses: UInt64 = 0
+//    var pendingKeyPresses: UInt64 = 0
     
     var shiftKey: Bool = false
     var controlKey: Bool = false
@@ -206,8 +206,13 @@ final class MicrobeeKeyboard
     @inline(__always)
     func keyUp(_ key: MicrobeeKey)
     {
+//        Task { [weak self] in
+//            // Delay 250ms without blocking the caller
+//            try? await Task.sleep(for: .milliseconds(250))
+//            let mask = UInt64(1) << UInt64(key.rawValue)
+//            self?.keyMatrix &= ~mask
+//        }
         let mask = UInt64(1) << UInt64(key.rawValue)
-        
         keyMatrix &= ~mask
     }
 
@@ -254,16 +259,16 @@ final class MicrobeeKeyboard
     func releaseAll()
     {
         keyMatrix = 0
-        pendingKeyPresses = 0
+     //   pendingKeyPresses = 0
     }
     
-    @inline(__always)
-    func clearLatch(position: Int)
-    {
-        let mask = UInt64(1) << UInt64(position)
-
-        pendingKeyPresses &= ~mask
-    }
+//    @inline(__always)
+//    func clearLatch(position: Int)
+//    {
+//        let mask = UInt64(1) << UInt64(position)
+//
+//    //    pendingKeyPresses &= ~mask
+//    }
     
     @inline(__always)
     func printMatrix( _ message : String, _ matrix: UInt64)

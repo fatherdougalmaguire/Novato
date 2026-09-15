@@ -535,7 +535,9 @@ actor microbee
     
     private var preserveEI : UInt8 = 0
     
-    private var pausedBreakpoint : Bool = false
+    //private var lastPC : UInt16 = 0x0000
+    
+    //private var pausedBreakpoint : Bool = false
     
     private var isStepping = false
     private var breakpointHit = false
@@ -551,8 +553,8 @@ actor microbee
     
     private var memoryInspectorDump = [UInt8](repeating: 0,count: 256)
     private var memoryInspectorAddress: UInt16
-    private var memoryInspectorPages = [UInt64](repeating: 0,count: 256)
-    private var memoryInspectState: UInt64 = 0
+//    private var memoryInspectorPages = [UInt64](repeating: 0,count: 256)
+//    private var memoryInspectState: UInt64 = 0
     
     private static let bpsKey = "SavedBreakpoints"
     private static let masksKey = "SavedBreakpointMasks"
@@ -658,6 +660,10 @@ actor microbee
     {
         memoryInspectorAddress = address
         UserDefaults.standard.set(address, forKey: "memoryInspectorAddress")
+        
+        let snapshot = returnSnapshot(stepping: false)
+
+        snapshotContinuation.yield(snapshot)
     }
     
     private var runTask: Task<Void, Never>?
@@ -873,7 +879,7 @@ actor microbee
         
         emulatorState = .stopped
         
-        pausedBreakpoint = false
+        //pausedBreakpoint = false
         
         interruptPending = false
         
@@ -943,18 +949,32 @@ actor microbee
     func pause()
     {
         
-//        print("PAUSE: state before =", emulatorState)
+//        print(
+//                "PAUSE LIVE PC:",
+//                String(format: "%04X", registers.PC)
+//            )
+//        
+//        print("PAUSE: PC =", String(format: "%04X", registers.PC))
+//            print("PAUSE: F  =", String(format: "%02X", registers.F))
+//            print("PAUSE: C  =", (registers.F & 0x01) != 0)
         
         emulatorState = .paused
-        
-//        print("PAUSE: state after =", emulatorState)
-        
+    
         let snapshot = returnSnapshot(stepping: false)
         
+//        print("SNAPSHOT: F =", String(format: "%02X", snapshot.z80Snapshot.F))
+//            print("SNAPSHOT: C =", (snapshot.z80Snapshot.F & 0x01) != 0)
+//        
 //        print(
-//              "PAUSE SNAPSHOT STATE =",
-//              snapshot.executionSnapshot.emulatorState
-//          )
+//                "PAUSE SNAPSHOT PC:",
+//                String(format: "%04X", snapshot.z80Snapshot.PC)
+//            )
+//        
+//        print(
+//                "PAUSE SNAPSHOT STATE:",
+//                snapshot.executionSnapshot.emulatorState
+//            )
+
 
         snapshotContinuation.yield(snapshot)
     }
@@ -1058,14 +1078,15 @@ actor microbee
                     break
                 }
                 
-                let tStates = nextInstruction()
-                
                 if breakpointHit
                 {
-                    pause()
+                    breakpointHit = false
+                        pause()
                         break
                 }
                 
+                let tStates = nextInstruction()
+            
                 executedTStates = executedTStates + UInt64(tStates)
                 totalTStates = totalTStates + UInt64(tStates)
                 
@@ -1201,11 +1222,11 @@ actor microbee
         if any(addressMatch .& (breakpointMask .!= 0)) &&  !isStepping
         {
             breakpointHit = true
+            //print(String(format: "%04X",registers.PC),registers.F)
             return 0
-            // need to allow a smoother continuation of execution
         }
 
-        pausedBreakpoint = false
+        //pausedBreakpoint = false
         pollInterrupt()
         return executeInstructions()
     }
@@ -13557,24 +13578,25 @@ actor microbee
             tStates = 11
             incrementR(opcodeCount:1)
        case 0xDC: // CALL C,$nn - DC n n - If the carry flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
-           logInstructionDetails(instructionDetails: "CALL C,$nn",opcode: [0xDC], values: [opcode2,opcode3], programCounter: registers.PC)
-           registers.PC = registers.PC &+ 3
-           registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
-           if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
-           {
-               registers.SP = registers.SP &- 1
-               bus.writeByte(address: registers.SP, value: registers.PCH)
-               registers.SP = registers.SP &- 1
-               bus.writeByte(address: registers.SP, value: registers.PCL)
-               registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
-               tStates = 17
-           }
-           else
-           {
-               tStates = 10
-           }
-           registers.Q = 0
-           incrementR(opcodeCount:1)
+            logInstructionDetails(instructionDetails: "CALL C,$nn",opcode: [0xDC], values: [opcode2,opcode3], programCounter: registers.PC)
+            //print(String(format: "%04X",registers.PC), registers.F)
+            registers.PC = registers.PC &+ 3
+            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
+            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
+            {
+                registers.SP = registers.SP &- 1
+                bus.writeByte(address: registers.SP, value: registers.PCH)
+                registers.SP = registers.SP &- 1
+                bus.writeByte(address: registers.SP, value: registers.PCL)
+                registers.PC = UInt16(opcode3) << 8 | UInt16(opcode2)
+                tStates = 17
+            }
+            else
+            {
+                tStates = 10
+            }
+            registers.Q = 0
+            incrementR(opcodeCount:1)
         case 0xDD : tStates = executeDDInstructions(opcode2: opcode2, opcode3: opcode3, opcode4: opcode4)
         case 0xDE: // SBC A,$n - DE n - Subtracts $n and the carry flag from A
            logInstructionDetails(instructionDetails: "SBC A,$n", opcode: [0xDE], values: [opcode2], programCounter: registers.PC)
@@ -14104,7 +14126,7 @@ actor microbee
                 orderedZ80Queue: sortZ80Queue(),
                 breakpointQueue: sortBreakpointQueue(),
                 breakpointQueueMask : sortBreakpointQueueMask(),
-                currentInstruction : z80Disassembler.decodeInstructions(address: registers.PC, bytes: [bus.readByte(address: registers.PC),bus.readByte(address: registers.PC &+ 1),bus.readByte(address: registers.PC &+ 2),bus.readByte(address: registers.PC &+ 3)])
+                currentInstruction :  z80Disassembler.decodeInstructions(address: registers.PC, bytes: [bus.readByte(address: registers.PC),bus.readByte(address: registers.PC &+ 1),bus.readByte(address: registers.PC &+ 2),bus.readByte(address: registers.PC &+ 3)])
             ),
             memorySnapshot: memorySnapshot(
                 VDU: bus.videoRAM.bufferTransform(),
