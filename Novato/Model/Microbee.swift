@@ -1007,13 +1007,15 @@ actor microbee
         //appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
         #endif
         
-        bus.crtc.tick(tStates: tStates, totalTStates : totalTStates)
+        bus.crtc.tick(tStates: tStates, totalTStates : totalTStates, thepc: registers.PC)
         // sound.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
         
         emulatorState = .paused
         
-        snapshotContinuation.yield(returnSnapshot(stepping: true))
+        let snapshot = returnSnapshot(stepping: true)
+        
+        snapshotContinuation.yield(snapshot)
         
    //     print("STEP COMPLETE: state =", emulatorState)
     }
@@ -1097,7 +1099,7 @@ actor microbee
                 }
                 #endif
 
-                bus.crtc.tick(tStates: tStates, totalTStates : totalTStates)
+                bus.crtc.tick(tStates: tStates, totalTStates : totalTStates, thepc: registers.PC)
                 // sound.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
             }
@@ -14114,7 +14116,7 @@ actor microbee
                 R18: bus.crtc.registers.R18,
                 R19: bus.crtc.registers.R19,
                 R31: bus.crtc.registers.R31,
-                statusRegister: bus.crtc.registers.statusRegister,
+                statusRegister: bus.crtc.readStatusRegister(), 
                 redBackgroundIntensity: bus.crtc.registers.redBackgroundIntensity,
                 greenBackgroundIntensity: bus.crtc.registers.greenBackgroundIntensity,
                 blueBackgroundIntensity: bus.crtc.registers.blueBackgroundIntensity

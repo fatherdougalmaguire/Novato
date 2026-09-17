@@ -346,6 +346,8 @@ final class CRTC
     
     var lotsoftstates : UInt64 = 0
     
+    var PCPC : UInt16 = 0
+    
     private let keyboard: MicrobeeKeyboard
     
     init(keyboard: MicrobeeKeyboard)
@@ -378,13 +380,14 @@ final class CRTC
             tempStatus = tempStatus | updateReadyMask
         }
  
-        //print(lightPenReady)
-//        print(
-//            "STATUS PORT READ:",
-//            "tstates =", lotsoftstates,
-//            "STATUS =", String(format: "%02X", tempStatus)
-//        )
-        
+//if lightPenReady
+//        {
+//            print(
+//                "STATUS PORT READ:",
+//                "pc =", String(format: "%04X", PCPC),
+//                "STATUS =", String(format: "%02X", tempStatus)
+//            )
+//}
         return tempStatus
     }
     
@@ -459,7 +462,7 @@ final class CRTC
         case 10: return registers.R10
         case 11: return registers.R11
         case 12: return registers.R12
-        case 13: return readStatusRegister()
+        case 13: return registers.R13
         case 14: return registers.R14
         case 15: return registers.R15
         case 16:
@@ -544,10 +547,11 @@ final class CRTC
         }
     }
     
-    func tick(tStates: UInt8, totalTStates: UInt64)
+    func tick(tStates: UInt8, totalTStates: UInt64, thepc : UInt16)
     {
         
         lotsoftstates = totalTStates
+        PCPC = thepc
         
         characterClock = characterClock + tStates
         
@@ -558,13 +562,14 @@ final class CRTC
             
             checkKeyboard(position: keyboardScanPosition)
 
-            if lightPenReady
-            {
-                print("tstates",totalTStates)
-                print("status",readStatusRegister())
-                print("R16",registers.R16)
-                print("R17",registers.R17)
-            }
+//            if lightPenReady
+//            {
+//                print("tstates",totalTStates)
+//                print("status",readStatusRegister())
+//                print("R16",registers.R16)
+//                print("R17",registers.R17)
+//            }
+            
             keyboardScanPosition = keyboardScanPosition + 1
 
             if keyboardScanPosition >= 64
@@ -799,8 +804,8 @@ final class BUS
                     mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                     mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                 }
-            case 0x0C :
-                crtc.writeRegister(RegNum: UInt8(realPort), RegValue: portValue)
+//            case 0x0C :
+//                crtc.writeRegister(RegNum: UInt8(realPort), RegValue: portValue)
             case 0x0D:
                 let tempPort = ports.readPort(portNum: 0x0C)
                 crtc.writeRegister(RegNum: tempPort, RegValue: portValue)
