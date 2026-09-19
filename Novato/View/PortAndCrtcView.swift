@@ -76,6 +76,7 @@ struct portAndCrtcView: View
                 displayPort(portLabel: "0x11",portDescription: "Light Pen Register - Low      ",portValue: snapshot.crtcSnapshot.R17, alternateRow: false)
                 displayPort(portLabel: "0x12",portDescription: "Update Address Register - High",portValue: snapshot.crtcSnapshot.R18, alternateRow: true)
                 displayPort(portLabel: "0x13",portDescription: "Update Address Register - Low ",portValue: snapshot.crtcSnapshot.R19, alternateRow: false)
+                displayPort(portLabel: "0x1F",portDescription: "Dummy Register                 ",portValue: snapshot.crtcSnapshot.R31, alternateRow: true)
                 
                 Spacer()
                 

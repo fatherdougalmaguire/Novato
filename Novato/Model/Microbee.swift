@@ -782,44 +782,44 @@ actor microbee
     }
     
     func keyDown(_ key: MicrobeeKey)
-    {
-        keyboard.keyDown(key)
-        keyboard.printMatrix("matrix key down ",keyboard.keyMatrix)
-      // keyboard.printMatrix("latch key down ",keyboard.pendingKeyPresses)
-    }
-
-    func keyUp(_ key: MicrobeeKey)
-    {
-        keyboard.keyUp(key)
-        keyboard.printMatrix("matrix key up ",keyboard.keyMatrix)
-      //  keyboard.printMatrix("latch key up ",keyboard.pendingKeyPresses)
-    }
-    
-    func modifierChanged(_ modifier: HostModifier, pressed: Bool)
-    {
-        switch modifier
         {
-        case .leftShift:
-                leftShiftDown = pressed
-                updateShift()
-        case .rightShift:
-                rightShiftDown = pressed
-                updateShift()
-        case .control: keyboard.set(.ctrlKey, pressed: pressed)
-            keyboard.printMatrix("matrix ctrl key  ", keyboard.keyMatrix)
-        //    keyboard.printMatrix("latch ctrl key  ", keyboard.pendingKeyPresses)
-        case .capsLock: keyboard.set(.capsLockKey, pressed: pressed)
-            keyboard.printMatrix("matrix caps lock ", keyboard.keyMatrix)
-        //    keyboard.printMatrix("latch caps lock ", keyboard.pendingKeyPresses)
+            keyboard.keyDown(key)
+            keyboard.printMatrix("matrix key down ",keyboard.keyMatrix)
+          // keyboard.printMatrix("latch key down ",keyboard.pendingKeyPresses)
         }
-    }
 
-    private func updateShift()
-    {
-        keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
-        keyboard.printMatrix("matrix shift key ", keyboard.keyMatrix)
-     //  keyboard.printMatrix("latch shift key ", keyboard.pendingKeyPresses)
-    }
+        func keyUp(_ key: MicrobeeKey)
+        {
+            keyboard.keyUp(key)
+            keyboard.printMatrix("matrix key up ",keyboard.keyMatrix)
+          //  keyboard.printMatrix("latch key up ",keyboard.pendingKeyPresses)
+        }
+        
+        func modifierChanged(_ modifier: HostModifier, pressed: Bool)
+        {
+            switch modifier
+            {
+            case .leftShift:
+                    leftShiftDown = pressed
+                    updateShift()
+            case .rightShift:
+                    rightShiftDown = pressed
+                    updateShift()
+            case .control: keyboard.set(.ctrlKey, pressed: pressed)
+                keyboard.printMatrix("matrix ctrl key  ", keyboard.keyMatrix)
+            //    keyboard.printMatrix("latch ctrl key  ", keyboard.pendingKeyPresses)
+            case .capsLock: keyboard.set(.capsLockKey, pressed: pressed)
+                keyboard.printMatrix("matrix caps lock ", keyboard.keyMatrix)
+            //    keyboard.printMatrix("latch caps lock ", keyboard.pendingKeyPresses)
+            }
+        }
+
+        private func updateShift()
+        {
+            keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
+            keyboard.printMatrix("matrix shift key ", keyboard.keyMatrix)
+         //  keyboard.printMatrix("latch shift key ", keyboard.pendingKeyPresses)
+        }
     
     func reset()
     {
@@ -886,10 +886,7 @@ actor microbee
         breakpointHit = false
         
         bus.ports.resetPorts()
-        
-        leftShiftDown = false
-        rightShiftDown = false
-        
+                
         keyboard.releaseAll()
         
         isStepping = false
@@ -1007,7 +1004,7 @@ actor microbee
         //appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
         #endif
         
-        bus.crtc.tick(tStates: tStates, totalTStates : totalTStates, thepc: registers.PC)
+        bus.crtc.tick(tStates: tStates)
         // sound.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
         
@@ -1099,7 +1096,7 @@ actor microbee
                 }
                 #endif
 
-                bus.crtc.tick(tStates: tStates, totalTStates : totalTStates, thepc: registers.PC)
+                bus.crtc.tick(tStates: tStates)
                 // sound.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
             }

@@ -4,152 +4,146 @@ import AppKit
 @Observable
 final class emulatorViewModel
 {
-private let cpu: microbee
+    private let cpu: microbee
 
-var isStepActive = false
+    var isStepActive = false
 
-private(set) var snapshot: microbeeSnapshot?
-private var snapshotTask: Task<Void, Never>?
-    
-func startSnapshots()
-{
-    snapshotTask?.cancel()
-
-    snapshotTask = Task
+    private(set) var snapshot: microbeeSnapshot?
+    private var snapshotTask: Task<Void, Never>?
+        
+    func startSnapshots()
     {
-        let stream = await cpu.snapshots
+        snapshotTask?.cancel()
 
-#if arch(arm64)
-        let minimumUIUpdateInterval = Duration.milliseconds(20)
-#elseif arch(x86_64)
-        let minimumUIUpdateInterval = Duration.milliseconds(50)
-#endif
-
-        var lastUIUpdate =
-            ContinuousClock.now - minimumUIUpdateInterval
-
-        var lastState: emulatorState?
-
-        for await snapshot in stream
+        snapshotTask = Task
         {
-            guard !Task.isCancelled else {
-                break
-            }
+            let stream = await cpu.snapshots
 
-            let state = snapshot.executionSnapshot.emulatorState
+            #if arch(arm64)
+            let minimumUIUpdateInterval = Duration.milliseconds(20)
+            #elseif arch(x86_64)
+            let minimumUIUpdateInterval = Duration.milliseconds(50)
+            #endif
 
-            let stateChanged = state != lastState
+            var lastUIUpdate =
+                ContinuousClock.now - minimumUIUpdateInterval
 
-            let now = ContinuousClock.now
+            var lastState: emulatorState?
 
-            if !stateChanged &&
-               now - lastUIUpdate < minimumUIUpdateInterval
+            for await snapshot in stream
             {
-                continue
-            }
+                guard !Task.isCancelled else {
+                    break
+                }
 
-            lastState = state
-            lastUIUpdate = now
+                let state = snapshot.executionSnapshot.emulatorState
 
-            await MainActor.run
-            {
-                self.snapshot = snapshot
+                let stateChanged = state != lastState
+
+                let now = ContinuousClock.now
+
+                if !stateChanged &&
+                   now - lastUIUpdate < minimumUIUpdateInterval
+                {
+                    continue
+                }
+
+                lastState = state
+                lastUIUpdate = now
+
+                await MainActor.run
+                {
+                    self.snapshot = snapshot
+                }
             }
         }
     }
-}
 
-func stopSnapshots()
-{
-    snapshotTask?.cancel()
-    snapshotTask = nil
-}
+    func stopSnapshots()
+    {
+        snapshotTask?.cancel()
+        snapshotTask = nil
+    }
 
-init(cpu: microbee)
-{
-    self.cpu = cpu
-    startSnapshots()
-}
+    init(cpu: microbee)
+    {
+        self.cpu = cpu
+        startSnapshots()
+    }
 
-func updateMemoryInspector(address: UInt16) async
-{
-   await cpu.updateMemoryInspector(address: address)
-}
-    
-func toggleLogging() async
+    func updateMemoryInspector(address: UInt16) async
+    {
+       await cpu.updateMemoryInspector(address: address)
+    }
+        
+    func toggleLogging() async
 
-{
-    await cpu.toggleLogging()
-}
-    
-    
-func setClockSpeedMultiplier(multiplier: Double) async
-{
-    await cpu.setClockSpeedMultiplier(multiplier: multiplier)
-}
+    {
+        await cpu.toggleLogging()
+    }
+        
+    func setClockSpeedMultiplier(multiplier: Double) async
+    {
+        await cpu.setClockSpeedMultiplier(multiplier: multiplier)
+    }
 
-func quickload(path: URL, loadAddress: UInt16) async
-{
-    await cpu.bus.quickLoad(path: path, loadAddress: loadAddress)
-}
+    func quickload(path: URL, loadAddress: UInt16) async
+    {
+        await cpu.bus.quickLoad(path: path, loadAddress: loadAddress)
+    }
 
-func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
-{
-    await cpu.updateBreakpoints(index: index, value: value, mask: mask)
-}
+    func updateBreakpoints(index: Int, value: UInt16, mask: Bool) async
+    {
+        await cpu.updateBreakpoints(index: index, value: value, mask: mask)
+    }
 
-func writeToMemory(address : UInt16, value : UInt8) async
-{
-    await cpu.writeToMemory(address : address, value : value)
-}
+    func writeToMemory(address : UInt16, value : UInt8) async
+    {
+        await cpu.writeToMemory(address : address, value : value)
+    }
 
-func updateProgramCounter(address: UInt16) async
-{
-    await cpu.updatePC(address : address)
-}
+    func updateProgramCounter(address: UInt16) async
+    {
+        await cpu.updatePC(address : address)
+    }
 
-func startEmulation() async
-{
-    await cpu.start()
-}
+    func startEmulation() async
+    {
+        await cpu.start()
+    }
 
-func stepEmulation() async
-{
-    await cpu.step()
-}
+    func stepEmulation() async
+    {
+        await cpu.step()
+    }
 
-func stopEmulation() async
-{
-    await cpu.stop()
-}
+    func stopEmulation() async
+    {
+        await cpu.stop()
+    }
 
-func pauseEmulation() async
-{
-    await cpu.pause()
-    
-//        print(
-//                "VM AFTER PAUSE:",
-//                snapshot?.executionSnapshot.emulatorState as Any
-//            )
-}
+    func pauseEmulation() async
+    {
+        await cpu.pause()
+    }
 
-func resetEmulation() async
-{
-    await cpu.reset()
-}
+    func resetEmulation() async
+    {
+        await cpu.reset()
+    }
 
-func keyDown(_ key: MicrobeeKey) async
-{
-    await cpu.keyDown(key)
-}
+    func keyDown(_ key: MicrobeeKey) async
+    {
+        await cpu.keyDown(key)
+    }
 
-func keyUp(_ key: MicrobeeKey) async
-{
-    await cpu.keyUp(key)
-}
+    func keyUp(_ key: MicrobeeKey) async
+    {
+        await cpu.keyUp(key)
+    }
 
-func modifierChanged(_ modifier: HostModifier, pressed: Bool) async
-{
-    await cpu.modifierChanged(modifier, pressed: pressed)
-}
+    func modifierChanged(_ modifier: HostModifier, pressed: Bool) async
+    {
+        await cpu.modifierChanged(modifier, pressed: pressed)
+    }
 }

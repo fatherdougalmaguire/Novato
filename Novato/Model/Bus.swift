@@ -298,12 +298,40 @@ final class CRTC
         var R19 : UInt8 = 0x00                              // Update Address Register ( low byte ) : 8 bits
         var R31 : UInt8 = 0x00                              // Dummy Location Register : when read or written to,  will
         
-        var statusRegister : UInt8 =  0b10000000            // Status register.  Bit 7 is update strobe.  Goes low during R31 read. initially set high.  Bit 6 is light pen strobe.  Goes high if key is pressed.  bit 5 is vblank.  Goes high if in vertical blank
+        var statusRegister : UInt8            // Status register.  Bit 7 is update strobe.  Goes low during R31 read. initially set high.  Bit 6 is light pen strobe.  Goes high if key is pressed.  bit 5 is vblank.  Goes high if in vertical blank
+        {
+            var status: UInt8 = 0
+
+            if verticalBlank {
+                status |= verticalBlankingMask
+            }
+
+            if lightPenReady {
+                status |= lightPenReadyMask
+            }
+
+            if updateReady {
+                status |= updateReadyMask
+            }
+
+            return status
+        }
+        
+        let verticalBlankingMask : UInt8 = 0x20
+        let lightPenReadyMask : UInt8 = 0x40
+        let updateReadyMask : UInt8 = 0x80
         
         var redBackgroundIntensity : UInt8 = 0x00           // red background intensity 0 = half 1 = full
         var greenBackgroundIntensity : UInt8 = 0x00         // green background intensity 0 = half 1 = full
         var blueBackgroundIntensity : UInt8 = 0x00          // blue background intensity 0 = half 1 = full
         
+        var verticalBlank : Bool = false
+        
+        var frameComplete : Bool = false
+        
+        var lightPenReady : Bool = false
+        
+        var updateReady : Bool = true
     }
     
     var logInstructions: Bool = false
@@ -323,20 +351,10 @@ final class CRTC
     
     var verticalAdjustCounter : UInt8 = 0
     var inVerticalAdjust : Bool = false
-
-    var verticalBlank : Bool = false
     
     var frameComplete : Bool = false
     
-    var lightPenReady : Bool = false
-    
-    var updateReady : Bool = true
-    
     var lightPenAddress : UInt64 = 0
-    
-    let verticalBlankingMask : UInt8 = 0x20
-    let lightPenReadyMask : UInt8 = 0x40
-    let updateReadyMask : UInt8 = 0x80
     
     var keyboardScanPosition : UInt8 = 0
     
@@ -363,32 +381,7 @@ final class CRTC
     
     func readStatusRegister() -> UInt8
     {
-        var tempStatus : UInt8 = 0
-                
-        if verticalBlank
-        {
-            tempStatus = tempStatus | verticalBlankingMask
-        }
-        
-        if lightPenReady
-        {
-            tempStatus = tempStatus | lightPenReadyMask
-        }
-        
-        if updateReady
-        {
-            tempStatus = tempStatus | updateReadyMask
-        }
- 
-//if lightPenReady
-//        {
-//            print(
-//                "STATUS PORT READ:",
-//                "pc =", String(format: "%04X", PCPC),
-//                "STATUS =", String(format: "%02X", tempStatus)
-//            )
-//}
-        return tempStatus
+        return registers.statusRegister
     }
     
     func writeRegister(RegNum: UInt8, RegValue: UInt8)
@@ -438,7 +431,6 @@ final class CRTC
         case 19:
             registers.R19 = RegValue
         case 31:
-            updateReady = false
             scanForKey()
             registers.R31 = RegValue
         default: break
@@ -474,7 +466,7 @@ final class CRTC
 //                "status BEFORE =", String(format: "%02X", registers.statusRegister)
 //            )
 //            registers.statusRegister = registers.statusRegister & ~0x40
-            lightPenReady = false
+            registers.lightPenReady = false
             return registers.R16
         case 17:
 //            print(
@@ -485,13 +477,12 @@ final class CRTC
 //                "status BEFORE =", String(format: "%02X", registers.statusRegister)
 //            )
 //            registers.statusRegister = registers.statusRegister & ~0x40
-            lightPenReady = false
+            registers.lightPenReady = false
             return registers.R17
         case 18: return registers.R18
         case 19: return registers.R19
-        case 31:
-            updateReady = false
-            scanForKey()
+        case 31:  // never called as far as I can tell
+            registers.updateReady = false
             return 0
         default: return 0
         }
@@ -506,7 +497,7 @@ final class CRTC
         verticalAdjustCounter = 0
         inVerticalAdjust = false
 
-        verticalBlank = false
+        registers.verticalBlank = false
         frameComplete = true
     }
     
@@ -537,7 +528,7 @@ final class CRTC
         
         if rowCounter >= registers.R6
         {
-            verticalBlank = true
+            registers.verticalBlank = true
         }
         
         if rowCounter >= registers.R4 + 1
@@ -547,12 +538,8 @@ final class CRTC
         }
     }
     
-    func tick(tStates: UInt8, totalTStates: UInt64, thepc : UInt16)
-    {
-        
-        lotsoftstates = totalTStates
-        PCPC = thepc
-        
+    func tick(tStates: UInt8)
+    {        
         characterClock = characterClock + tStates
         
         while characterClock >= tStatesPerCharacterClock
@@ -587,6 +574,11 @@ final class CRTC
     
     func scanForKey()
     {
+        if !romReadLatch
+        {
+            return
+        }
+        
         let address =
             (UInt16(registers.R18) << 8) |
             UInt16(registers.R19)
@@ -598,19 +590,19 @@ final class CRTC
             registers.R16 = registers.R18
             registers.R17 = registers.R19
 
-            lightPenReady = true
+            registers.lightPenReady = true
             
                     print(
                            "R31 scan:",
                            String(format: "%04X", address),
                            "position:", position,
                            "rom read latch:", romReadLatch,
-                           "light pen ready:", lightPenReady,
-                           "update status =", String(format: "%02X", updateReady)
+                           "light pen ready:", registers.lightPenReady,
+                           "update status =", String(format: "%02X", registers.updateReady)
                        )
         }
 
-        updateReady = true
+        registers.updateReady = true
         
        // print("update status =", String(format: "%02X", updateReady))
     }
@@ -622,7 +614,7 @@ final class CRTC
             return
         }
         
-        if lightPenReady
+        if registers.lightPenReady
         {
             return
         }
@@ -632,15 +624,15 @@ final class CRTC
                 
                 registers.R16 = (position & 0x30) >> 4
                 registers.R17 = (position & 0x0F) << 4
-                lightPenReady = true
+                registers.lightPenReady = true
             
                          print(
                              "NORMAL SCAN:",
                              "position =", position,
                              "pressed=",keyboard.isPressed(Int(position)),
                              "rom read latch:", romReadLatch,
-                             "light pen status =", String(format: "%02X", lightPenReady),
-                             "update status =", String(format: "%02X", updateReady)
+                             "light pen status =", String(format: "%02X", registers.lightPenReady),
+                             "update status =", String(format: "%02X", registers.updateReady)
                          )
         }
     }
@@ -668,9 +660,7 @@ final class CRTC
         registers.R18 = 0x00
         registers.R19 = 0x00
         registers.R31 = 0x00
-        
-        registers.statusRegister = 0b10000000
-        
+
         registers.redBackgroundIntensity = 0x00
         registers.greenBackgroundIntensity = 0x00
         registers.blueBackgroundIntensity = 0x00
@@ -687,13 +677,13 @@ final class CRTC
         verticalAdjustCounter = 0
         inVerticalAdjust = false
 
-        verticalBlank = false
+        registers.verticalBlank = false
         
         frameComplete = false
         
-        lightPenReady = false
+        registers.lightPenReady = false
         
-        updateReady = true
+        registers.updateReady = true
         
         //lightPenAddress = 0
     

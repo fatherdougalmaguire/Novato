@@ -258,43 +258,41 @@ struct emulatorView: View
             {
                 if let snapshot = vm.snapshot
                 {
-                    
                     ZStack
                     {
                         CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
                         KeyboardResponderView(
-                            onKeyDown:
-                                { event in
-                                    guard let key = MicrobeeKeyboardMapper.key(for: event)
-                                    else { return }
-                                
-                                    Task
-                                    {
-                                        await vm.keyDown(key)
-                                    }
-                                },
-                            
-                            onKeyUp:
-                                { event in
-                                    guard let key = MicrobeeKeyboardMapper.key(for: event)
-                                    else { return }
-                                
-                                    Task
-                                    {
-                                        await vm.keyUp(key)
-                                    }
-                                },
-                            onFlagsChanged:
-                                { event in
-                                    guard let change = MicrobeeKeyboardMapper.modifierChange(for: event)
-                                    else { return }
-                                    Task
-                                    {
-                                        await vm.modifierChanged(change.modifier, pressed: change.pressed)
-                                    }
-                                }
-                        )
-                    }
+                                                    onKeyDown:
+                                                        { event in
+                                                            guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                                            else { return }
+                                                        
+                                                            Task
+                                                            {
+                                                                await vm.keyDown(key)
+                                                            }
+                                                        },
+                                                    
+                                                    onKeyUp:
+                                                        { event in
+                                                            guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                                            else { return }
+                                                        
+                                                            Task
+                                                            {
+                                                                await vm.keyUp(key)
+                                                            }
+                                                        },
+                                                    onFlagsChanged:
+                                                        { event in
+                                                            guard let change = MicrobeeKeyboardMapper.modifierChange(for: event)
+                                                            else { return }
+                                                            Task
+                                                            {
+                                                                await vm.modifierChanged(change.modifier, pressed: change.pressed)
+                                                            }
+                                                        }
+                                                )                    }
                 }
                 else
                 {
