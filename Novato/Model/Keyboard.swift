@@ -32,10 +32,10 @@ enum MicrobeeKey: UInt8, CaseIterable, Hashable
     case zKey
     
     case leftSquareBracketKey
-    case backslashKey
+    case backSlashKey
     case rightSquareBracketKey
     case caretKey
-    case delKey
+    case deleteKey
     
     case zeroKey
     case oneKey
@@ -55,40 +55,36 @@ enum MicrobeeKey: UInt8, CaseIterable, Hashable
     case dashKey
     case periodKey
     
-    case forwardslashKey
+    case forwardSlashKey
     case escapeKey
-    case backspaceKey
+    case backSpaceKey
     case tabKey
     
-    case linefeedKey
+    case lineFeedKey
     case returnKey
     
     case capsLockKey
     case breakKey
     case spaceKey
     
-    case dummy1Key
+    case upArrowKey
     case ctrlKey
     
-    case dummy2Key
-    case dummy3Key
-    case dummy4Key
+    case downArrowKey
+    case leftArrowKey
+    case resetKey
     case dummy5Key
-    case dummy6Key
+    case rightArrowKey
     
     case shiftKey
-    
-    case equalsKey
 }
 
 struct MicrobeeKeyboardMapper
 {
-    
     static func key(for event: NSEvent) -> MicrobeeKey?
     {
         switch event.keyCode
         {
-            
         case 0x12: return .oneKey
         case 0x13: return .twoKey
         case 0x14: return .threeKey
@@ -129,22 +125,30 @@ struct MicrobeeKeyboardMapper
             
         case 0x31: return .spaceKey
         case 0x24: return .returnKey
-        case 0x33: return .backspaceKey
+        case 0x33: return .backSpaceKey
         case 0x35: return .escapeKey
             
         case 0x30: return .tabKey
             
         case 0x1B: return .dashKey
-        case 0x21: return .rightSquareBracketKey
-        case 0x1E: return .leftSquareBracketKey
-        case 0x2A: return .backslashKey
+        case 0x21: return .leftSquareBracketKey
+        case 0x1E: return .rightSquareBracketKey
+        case 0x2A: return .backSlashKey
         case 0x29: return .semicolonKey
         case 0x27: return .ampersandKey
         case 0x2B: return .commaKey
         case 0x2F: return .periodKey
-        case 0x2C: return .forwardslashKey
+        case 0x2C: return .forwardSlashKey
             
-        case 0x18 : return .equalsKey
+        case 0x73 : return .lineFeedKey     //  Home maps to Line Feed
+        case 0x77 : return .deleteKey       //  End maps to Delete
+        case 0x74 : return .breakKey        //  Page up maps to Break
+        case 0x79 : return .resetKey        //  Page down maps to Reset
+            
+        case 0x7E : return .upArrowKey
+        case 0x7D : return .downArrowKey
+        case 0x7B : return .leftArrowKey
+        case 0x7C : return .rightArrowKey
             
         default: return nil
         }
@@ -152,13 +156,12 @@ struct MicrobeeKeyboardMapper
     
     static func modifierChange(for event: NSEvent) -> MicrobeeModifierChange?
     {
-        
         switch event.keyCode
         {
-        case 56: return MicrobeeModifierChange(modifier: .leftShift, pressed: event.modifierFlags.contains(.shift))
-        case 60: return MicrobeeModifierChange(modifier: .rightShift, pressed: event.modifierFlags.contains(.shift))
-        case 59: return MicrobeeModifierChange(modifier: .control, pressed: event.modifierFlags.contains(.control))
-        case 57: return MicrobeeModifierChange(modifier: .capsLock, pressed: event.modifierFlags.contains(.capsLock))
+        case 0x38: return MicrobeeModifierChange(modifier: .leftShift, pressed: event.modifierFlags.contains(.shift))
+        case 0x3C: return MicrobeeModifierChange(modifier: .rightShift, pressed: event.modifierFlags.contains(.shift))
+        case 0x3B,0x3E: return MicrobeeModifierChange(modifier: .control, pressed: event.modifierFlags.contains(.control))
+        case 0x39: return MicrobeeModifierChange(modifier: .capsLock, pressed: event.modifierFlags.contains(.capsLock))
         default: return nil
         }
     }
@@ -180,68 +183,70 @@ struct MicrobeeModifierChange
 
 final class MicrobeeKeyboard
 {
-    var keyMatrix: UInt64 = 0
-//    var pendingKeyPresses: UInt64 = 0
+    
+    func highResTimestamp() -> UInt64 {
+        var timebase = mach_timebase_info_data_t()
+        mach_timebase_info(&timebase)
+
+        let t = mach_absolute_time()
+        return t &* UInt64(timebase.numer) / UInt64(timebase.denom)
+    }
+    
+    private(set) var keyMatrix: [Bool] = Array(repeating: false, count: 64)
+
+    private var keyMatrixCounter: [Int] = Array(repeating: 0, count: 64)
+
+    private var keyMatrixHostDown: [Bool] = Array(repeating: false, count: 64)
+    
+    //var keyMatrix: UInt64 = 0
     
     var shiftKey: Bool = false
     var controlKey: Bool = false
     var capsLockKey: Bool = false
+    
+    private let stickyFrames: Int = 5
 
     @inline(__always)
     func keyDown(_ key: MicrobeeKey)
     {
-        let mask = UInt64(1) << UInt64(key.rawValue)
+        let position = Int(key.rawValue)
+
+        guard position >= 0 && position < 64
+        else { return }
         
-        guard (keyMatrix & mask) == 0
-        else
-        {
-            return
-        }
+        keyMatrix[position] = true
+        keyMatrixCounter[position] = stickyFrames
+        keyMatrixHostDown[position] = true
         
-        keyMatrix |= mask
-//        pendingKeyPresses |= mask
-        
+        print("down",position,key,keyMatrix[position],
+              keyMatrixCounter[position],keyMatrixHostDown[position])
+       
     }
 
     @inline(__always)
     func keyUp(_ key: MicrobeeKey)
     {
-//        Task { [weak self] in
-//            // Delay 250ms without blocking the caller
-//            try? await Task.sleep(for: .milliseconds(250))
-//            let mask = UInt64(1) << UInt64(key.rawValue)
-//            self?.keyMatrix &= ~mask
-//        }
-        let mask = UInt64(1) << UInt64(key.rawValue)
-        keyMatrix &= ~mask
+        let position = Int(key.rawValue)
+
+        
+        guard position >= 0 && position < 64
+        else { return }
+
+        keyMatrixHostDown[position] = false
+        
+        print("up",position,key,keyMatrix[position],
+              keyMatrixCounter[position],keyMatrixHostDown[position])
     }
 
     @inline(__always)
     func isPressed(_ position: Int) -> Bool
     {
-        let mask = UInt64(1) << UInt64(position)
-        return (keyMatrix & mask) != 0
+        guard position >= 0 && position < 64
+        else { return false }
+        
+        return keyMatrix[position]
     }
-    
-//    func isPending(_ position: Int) -> Bool
-//    {
-//        let mask = UInt64(1) << UInt64(position)
-//        return (pendingKeyPresses & mask) != 0
-//    }
-//
-//    @inline(__always)
-//    func takePending(_ position: Int) -> Bool
-//    {
-//        let mask = UInt64(1) << UInt64(position)
-//
-//        guard (pendingKeyPresses & mask) != 0 else {
-//            return false
-//        }
-//
-//        pendingKeyPresses &= ~mask
-//        return true
-//    }
-    
+        
     @inline(__always)
     func set(_ key: MicrobeeKey, pressed: Bool)
     {
@@ -258,56 +263,67 @@ final class MicrobeeKeyboard
     @inline(__always)
     func releaseAll()
     {
-        keyMatrix = 0
-     //   pendingKeyPresses = 0
+        keyMatrix = Array(repeating: false, count: 64)
+        keyMatrixCounter = Array(repeating: 0, count: 64)
+        keyMatrixHostDown = Array(repeating: false, count: 64)
     }
     
-//    @inline(__always)
-//    func clearLatch(position: Int)
-//    {
-//        let mask = UInt64(1) << UInt64(position)
-//
-//    //    pendingKeyPresses &= ~mask
-//    }
+    func tickFrame()
+    {
+        for i in 0..<64
+        {
+            if keyMatrixCounter[i] > 0
+            {
+                keyMatrixCounter[i] = keyMatrixCounter[i] - 1
+            }
+
+            // Only release the key once the hold period has expired
+            // AND the host has already released it
+            if keyMatrixCounter[i] == 0 && !keyMatrixHostDown[i] && keyMatrix[i]
+            {
+                keyMatrix[i] = false
+                print("MATRIX released  key \(i)")
+            }
+        }
+    }
     
     @inline(__always)
     func printMatrix( _ message : String, _ matrix: UInt64)
     {
-        var bob : String = ""
-        for matrixpos in 0...63
-        {
-            let mask = UInt64(1) << UInt64(matrixpos)
-            let pressed = (matrix & mask) != 0
-            if pressed{
-                switch matrixpos
-                {
-                case 0 : bob = bob + "@(0) "
-                case 1...26 : if let scalar = UnicodeScalar(matrixpos + 64) { bob = bob+String(scalar)+"("+String(matrixpos)+") " } else { bob = "?" }
-                case 27: bob = bob + "[(27) "
-                case 28: bob = bob + "\\(28) "
-                case 29: bob = bob + "](29) "
-                case 30: bob = bob + "`(30) "
-                case 32...41: if let scalar = UnicodeScalar(matrixpos + 16) { bob = bob + String(scalar)+"("+String(matrixpos)+") " } else { bob = "?" }
-                case 42: bob = bob + "colon(42) "
-                case 43: bob = bob + "+(43) "
-                case 44: bob = bob + ",(44) "
-                case 45: bob = bob + "-(45) "
-                case 46: bob = bob + ".(46) "
-                case 47: bob = bob + "/(47) "
-                case 48: bob = bob + "ESC(48) "
-                case 49: bob = bob + "BACKSPACE(49) "
-                case 50: bob = bob + "TAB(50) "
-                case 51: bob = bob + "LINE FEED(51) "
-                case 52: bob = bob + "RETURN(52) "
-                case 53: bob = bob + "CAPS LOCK(53) "
-                case 54: bob = bob + "BREAK(54) "
-                case 55: bob = bob + "SPACE(55) "
-                case 57: bob = bob + "CTRL(57) "
-                case 63: bob = bob + "SHIFT(63) "
-                default : bob = bob + "No key(255) "
-                }}
-        }
-        print(message+bob)
+//        var bob : String = ""
+//        for matrixpos in 0...63
+//        {
+//            let mask = UInt64(1) << UInt64(matrixpos)
+//            let pressed = (matrix & mask) != 0
+//            if pressed{
+//                switch matrixpos
+//                {
+//                case 0 : bob = bob + "@(0) "
+//                case 1...26 : if let scalar = UnicodeScalar(matrixpos + 64) { bob = bob+String(scalar)+"("+String(matrixpos)+") " } else { bob = "?" }
+//                case 27: bob = bob + "[(27) "
+//                case 28: bob = bob + "\\(28) "
+//                case 29: bob = bob + "](29) "
+//                case 30: bob = bob + "`(30) "
+//                case 32...41: if let scalar = UnicodeScalar(matrixpos + 16) { bob = bob + String(scalar)+"("+String(matrixpos)+") " } else { bob = "?" }
+//                case 42: bob = bob + "colon(42) "
+//                case 43: bob = bob + "+(43) "
+//                case 44: bob = bob + ",(44) "
+//                case 45: bob = bob + "-(45) "
+//                case 46: bob = bob + ".(46) "
+//                case 47: bob = bob + "/(47) "
+//                case 48: bob = bob + "ESC(48) "
+//                case 49: bob = bob + "BACKSPACE(49) "
+//                case 50: bob = bob + "TAB(50) "
+//                case 51: bob = bob + "LINE FEED(51) "
+//                case 52: bob = bob + "RETURN(52) "
+//                case 53: bob = bob + "CAPS LOCK(53) "
+//                case 54: bob = bob + "BREAK(54) "
+//                case 55: bob = bob + "SPACE(55) "
+//                case 57: bob = bob + "CTRL(57) "
+//                case 63: bob = bob + "SHIFT(63) "
+//                default : bob = bob + "No key(255) "
+//                }}
+//        }
+//        print(message+bob)
     }
-    
 }

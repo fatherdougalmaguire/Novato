@@ -784,14 +784,14 @@ actor microbee
     func keyDown(_ key: MicrobeeKey)
         {
             keyboard.keyDown(key)
-            keyboard.printMatrix("matrix key down ",keyboard.keyMatrix)
+            //keyboard.printMatrix("matrix key down ",keyboard.keyMatrix)
           // keyboard.printMatrix("latch key down ",keyboard.pendingKeyPresses)
         }
 
         func keyUp(_ key: MicrobeeKey)
         {
             keyboard.keyUp(key)
-            keyboard.printMatrix("matrix key up ",keyboard.keyMatrix)
+          //  keyboard.printMatrix("matrix key up ",keyboard.keyMatrix)
           //  keyboard.printMatrix("latch key up ",keyboard.pendingKeyPresses)
         }
         
@@ -806,10 +806,10 @@ actor microbee
                     rightShiftDown = pressed
                     updateShift()
             case .control: keyboard.set(.ctrlKey, pressed: pressed)
-                keyboard.printMatrix("matrix ctrl key  ", keyboard.keyMatrix)
+                //keyboard.printMatrix("matrix ctrl key  ", keyboard.keyMatrix)
             //    keyboard.printMatrix("latch ctrl key  ", keyboard.pendingKeyPresses)
             case .capsLock: keyboard.set(.capsLockKey, pressed: pressed)
-                keyboard.printMatrix("matrix caps lock ", keyboard.keyMatrix)
+              //  keyboard.printMatrix("matrix caps lock ", keyboard.keyMatrix)
             //    keyboard.printMatrix("latch caps lock ", keyboard.pendingKeyPresses)
             }
         }
@@ -817,7 +817,7 @@ actor microbee
         private func updateShift()
         {
             keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
-            keyboard.printMatrix("matrix shift key ", keyboard.keyMatrix)
+         //   keyboard.printMatrix("matrix shift key ", keyboard.keyMatrix)
          //  keyboard.printMatrix("latch shift key ", keyboard.pendingKeyPresses)
         }
     
@@ -1000,10 +1000,6 @@ actor microbee
         let tStates = nextInstruction()
         totalTStates = totalTStates + UInt64(tStates)
         
-        #if DEBUG
-        //appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
-        #endif
-        
         bus.crtc.tick(tStates: tStates)
         // sound.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
@@ -1088,14 +1084,7 @@ actor microbee
             
                 executedTStates = executedTStates + UInt64(tStates)
                 totalTStates = totalTStates + UInt64(tStates)
-                
-                #if DEBUG
-                if  logInstructions
-                {
-               //     appLog.cpu.debug("Cumulative T-states: \(String(self.totalTStates))")
-                }
-                #endif
-
+            
                 bus.crtc.tick(tStates: tStates)
                 // sound.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
@@ -1197,7 +1186,7 @@ actor microbee
         if  logInstructions
         {
             let opcodeString = z80Disassembler.decodeInstructions(address: programCounter, bytes: opcode+values).trimmingCharacters(in: .whitespaces)
-            let registerString = " AF:"+String(format: "%04X",registers.AF)+" BC:"+String(format: "%04X",registers.BC)+" DE:"+String(format: "%04X",registers.DE)+" HL:"+String(format: "%04X",registers.HL)+" R16:"+String(format: "%02X",bus.crtc.registers.R16)+" R17:"+String(format: "%02X",bus.crtc.registers.R17)+" R18:"+String(format: "%02X",bus.crtc.registers.R18)+" R19:"+String(format: "%02X",bus.crtc.registers.R19)+" status:"+String(format: "%02X",bus.crtc.registers.statusRegister)+" tstates:"+String(totalTStates)
+            let registerString = " AF:"+String(format: "%04X",registers.AF)+" BC:"+String(format: "%04X",registers.BC)+" DE:"+String(format: "%04X",registers.DE)+" HL:"+String(format: "%04X",registers.HL)+" R16:"+String(format: "%02X",bus.crtc.registers.R16)+" R17:"+String(format: "%02X",bus.crtc.registers.R17)+" R18:"+String(format: "%02X",bus.crtc.registers.R18)+" R19:"+String(format: "%02X",bus.crtc.registers.R19)+" R31:"+String(format: "%02X",bus.crtc.registers.R31)+" status:"+String(format: "%02X",bus.crtc.registers.statusRegister)+" tstates:"+String(totalTStates)
             let logString = opcodeString.padding(toLength: 45, withPad: " ", startingAt: 0)+registerString
             appLog.cpu.debug("\(logString)")
         }
@@ -7378,14 +7367,14 @@ actor microbee
            tStates = 12
            incrementR(opcodeCount:2)
         case 0x51: // OUT (C),D - ED 51 - The value of D is written to port C
-           logInstructionDetails(instructionDetails: "OUT (C),D", opcode: [0xED,0x51], programCounter: registers.PC)
-           let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
-           registers.D = bus.readPort(portNum: tempResult)
-           registers.WZ = registers.BC &+ 1
-           registers.Q = 0
-           registers.PC = registers.PC &+ 2
-           tStates = 12
-           incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "OUT (C),D", opcode: [0xED,0x51], programCounter: registers.PC)
+            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+            bus.writePort(portNum: tempResult, portValue: registers.D)
+            registers.WZ = registers.BC &+ 1
+            registers.Q = 0
+            registers.PC = registers.PC &+ 2
+            tStates = 12
+            incrementR(opcodeCount:2)
         case 0x52: // SBC HL,DE - ED 52 - Subtracts DE and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,DE", opcode: [0xED,0x52], programCounter: registers.PC)
            registers.WZ = registers.HL &+ 1

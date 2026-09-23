@@ -382,6 +382,9 @@ struct emulatorView: View
                                     Task
                                     {
                                         await vm.toggleLogging()
+                                        await vm.keyDown(.spaceKey)
+                                        try await Task.sleep(nanoseconds: 50_000_000)
+                                        await vm.keyUp(.spaceKey)
                                     }
                                 }
 #endif

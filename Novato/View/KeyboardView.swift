@@ -49,7 +49,9 @@ final class KeyboardNSView: NSView
     {
         super.viewDidMoveToWindow()
 
-        Task { @MainActor [weak self] in
+        Task
+        {
+            @MainActor [weak self] in
             await Task.yield()
             guard let self,
                   let window = self.window
@@ -67,14 +69,19 @@ final class KeyboardNSView: NSView
 
     override func keyDown(with event: NSEvent)
     {
-        Task { @MainActor [weak self] in
-            self?.onKeyDown?(event)}
+        Task
+        {
+            @MainActor [weak self] in self?.onKeyDown?(event)
+            //print(event)
+        }
     }
 
     override func keyUp(with event: NSEvent)
     {
-        Task { @MainActor [weak self] in
-            self?.onKeyUp?(event)}
+        Task
+        {
+            @MainActor [weak self] in self?.onKeyUp?(event)
+        }
     }
 
     override func flagsChanged(with event: NSEvent)

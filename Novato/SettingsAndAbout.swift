@@ -77,6 +77,9 @@ struct SettingsView: View
             modelSettingsView()
                 .tabItem { Label("Model", systemImage: "gear") }
                 .tag("general")
+            keyboardSettingsView()
+                .tabItem { Label("Keyboard", systemImage: "gear") }
+                .tag("general")
         }
         .frame(width: 450, height: 250)
     }
@@ -219,6 +222,20 @@ struct modelSettingsView: View
         }
         .padding(30)
         .frame(width: 400, height: 150)
+    }
+}
+
+struct keyboardSettingsView: View
+{
+    @AppStorage("EmulatedKeyboard") private var emulatedKeyboard: Bool = true
+    
+    var body: some View
+    {
+        Form
+        {
+            Toggle("Use emulated keyboard", isOn: $emulatedKeyboard)
+        }
+        .formStyle(.grouped)
     }
 }
 

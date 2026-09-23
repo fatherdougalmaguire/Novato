@@ -326,11 +326,7 @@ final class CRTC
         var blueBackgroundIntensity : UInt8 = 0x00          // blue background intensity 0 = half 1 = full
         
         var verticalBlank : Bool = false
-        
-        var frameComplete : Bool = false
-        
         var lightPenReady : Bool = false
-        
         var updateReady : Bool = true
     }
     
@@ -359,12 +355,6 @@ final class CRTC
     var keyboardScanPosition : UInt8 = 0
     
     var romReadLatch : Bool = false
-    
-    //var triggerKeyScan : Bool = false
-    
-    var lotsoftstates : UInt64 = 0
-    
-    var PCPC : UInt16 = 0
     
     private let keyboard: MicrobeeKeyboard
     
@@ -405,32 +395,16 @@ final class CRTC
         case 14: registers.R14 = RegValue
         case 15: registers.R15 = RegValue
         case 16:
-//            print(
-//                "LPEN REGISTER READ:",
-//                "R16/R17",
-//                "tstates =", lotsoftstates,
-//                "value =", String(format: "%02X", RegValue),
-//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
-//            )
-//            registers.statusRegister = registers.statusRegister & ~0x40
-//            lightPenReady = false
             registers.R16 = RegValue
         case 17:
-//            print(
-//                "LPEN REGISTER READ:",
-//                "R16/R17",
-//                "tstates =", lotsoftstates,
-//                "value =", String(format: "%02X", RegValue),
-//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
-//            )
-//            registers.statusRegister = registers.statusRegister & ~0x40
-//            lightPenReady = false
             registers.R17 = RegValue
         case 18:
             registers.R18 = RegValue
         case 19:
             registers.R19 = RegValue
         case 31:
+            //print("R31 write")
+            registers.updateReady = false
             scanForKey()
             registers.R31 = RegValue
         default: break
@@ -458,38 +432,26 @@ final class CRTC
         case 14: return registers.R14
         case 15: return registers.R15
         case 16:
-//            print(
-//                "LPEN REGISTER READ:",
-//                "R16/R17",
-//                "tstates =", lotsoftstates,
-//                "value =", String(format: "%02X", registers.R16),
-//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
-//            )
-//            registers.statusRegister = registers.statusRegister & ~0x40
             registers.lightPenReady = false
             return registers.R16
         case 17:
-//            print(
-//                "LPEN REGISTER READ:",
-//                "R16/R17",
-//                "tstates =", lotsoftstates,
-//                "value =", String(format: "%02X", registers.R17),
-//                "status BEFORE =", String(format: "%02X", registers.statusRegister)
-//            )
-//            registers.statusRegister = registers.statusRegister & ~0x40
             registers.lightPenReady = false
             return registers.R17
         case 18: return registers.R18
         case 19: return registers.R19
         case 31:  // never called as far as I can tell
+           // print("R31 read")
             registers.updateReady = false
-            return 0
+            scanForKey()
+            return registers.R31
         default: return 0
         }
     }
     
     func startNewFrame()
     {
+        keyboard.tickFrame()
+        
         columnCounter = 0
         rowCounter = 0
         scanlineCounter = 0
@@ -549,17 +511,9 @@ final class CRTC
             
             checkKeyboard(position: keyboardScanPosition)
 
-//            if lightPenReady
-//            {
-//                print("tstates",totalTStates)
-//                print("status",readStatusRegister())
-//                print("R16",registers.R16)
-//                print("R17",registers.R17)
-//            }
-            
             keyboardScanPosition = keyboardScanPosition + 1
 
-            if keyboardScanPosition >= 64
+            if keyboardScanPosition > 63
             {
                 keyboardScanPosition = 0
             }
@@ -579,32 +533,30 @@ final class CRTC
             return
         }
         
-        let address =
-            (UInt16(registers.R18) << 8) |
-            UInt16(registers.R19)
+        let address = (UInt16(registers.R18) << 8) | UInt16(registers.R19)
 
         let position = Int((address >> 4) & 0x3F)
+        
+      //  print(position)
         
         if keyboard.isPressed(position)
         {
             registers.R16 = registers.R18
             registers.R17 = registers.R19
-
+            
             registers.lightPenReady = true
             
-                    print(
-                           "R31 scan:",
-                           String(format: "%04X", address),
-                           "position:", position,
-                           "rom read latch:", romReadLatch,
-                           "light pen ready:", registers.lightPenReady,
-                           "update status =", String(format: "%02X", registers.updateReady)
-                       )
+//            print(
+//                "latch SCAN:",
+//                "position =", position,
+//                "pressed=",keyboard.isPressed(position),
+//                "rom read latch:", romReadLatch,
+//                "light pen status =", String(format: "%02X", registers.lightPenReady),
+//                "update status =", String(format: "%02X", 1==1)
+//            )
         }
 
         registers.updateReady = true
-        
-       // print("update status =", String(format: "%02X", updateReady))
     }
     
     func checkKeyboard(position: UInt8)
@@ -618,22 +570,17 @@ final class CRTC
         {
             return
         }
-
+            
         if keyboard.isPressed(Int(position))
             {
-                
                 registers.R16 = (position & 0x30) >> 4
                 registers.R17 = (position & 0x0F) << 4
+            
                 registers.lightPenReady = true
             
-                         print(
-                             "NORMAL SCAN:",
-                             "position =", position,
-                             "pressed=",keyboard.isPressed(Int(position)),
-                             "rom read latch:", romReadLatch,
-                             "light pen status =", String(format: "%02X", registers.lightPenReady),
-                             "update status =", String(format: "%02X", registers.updateReady)
-                         )
+         //       print("R16 -",String(format: "%02X", registers.R16),"R17 -",String(format: "%02X", registers.R17))
+                
+          //      print("normal scan : position =", position)
         }
     }
     
@@ -676,23 +623,18 @@ final class CRTC
         
         verticalAdjustCounter = 0
         inVerticalAdjust = false
-
-        registers.verticalBlank = false
-        
         frameComplete = false
         
+        registers.verticalBlank = false
         registers.lightPenReady = false
-        
         registers.updateReady = true
         
-        //lightPenAddress = 0
-    
         keyboardScanPosition = 0
     
         romReadLatch = false
-    
-       // triggerKeyScan = false
-    
+        
+        keyboard.releaseAll()
+
     }
 }
 
@@ -784,13 +726,13 @@ final class BUS
                 if portValue & 0x01 == 1
                 {
                     crtc.romReadLatch = true
-                    //print("ROM LATCH = ON")
+        //            print("ROM LATCH = ON")
                     mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                 }
                 if portValue & 0x01 == 0
                 {
                     crtc.romReadLatch = false
-                    //print("ROM LATCH = OFF")
+       //             print("ROM LATCH = OFF")
                     mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                     mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                 }
