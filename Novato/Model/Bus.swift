@@ -403,7 +403,6 @@ final class CRTC
         case 19:
             registers.R19 = RegValue
         case 31:
-            //print("R31 write")
             registers.updateReady = false
             scanForKey()
             registers.R31 = RegValue
@@ -440,7 +439,6 @@ final class CRTC
         case 18: return registers.R18
         case 19: return registers.R19
         case 31:  // never called as far as I can tell
-           // print("R31 read")
             registers.updateReady = false
             scanForKey()
             return registers.R31
@@ -450,8 +448,6 @@ final class CRTC
     
     func startNewFrame()
     {
-        keyboard.tickFrame()
-        
         columnCounter = 0
         rowCounter = 0
         scanlineCounter = 0
@@ -545,15 +541,6 @@ final class CRTC
             registers.R17 = registers.R19
             
             registers.lightPenReady = true
-            
-//            print(
-//                "latch SCAN:",
-//                "position =", position,
-//                "pressed=",keyboard.isPressed(position),
-//                "rom read latch:", romReadLatch,
-//                "light pen status =", String(format: "%02X", registers.lightPenReady),
-//                "update status =", String(format: "%02X", 1==1)
-//            )
         }
 
         registers.updateReady = true
@@ -572,15 +559,11 @@ final class CRTC
         }
             
         if keyboard.isPressed(Int(position))
-            {
-                registers.R16 = (position & 0x30) >> 4
-                registers.R17 = (position & 0x0F) << 4
-            
-                registers.lightPenReady = true
-            
-         //       print("R16 -",String(format: "%02X", registers.R16),"R17 -",String(format: "%02X", registers.R17))
-                
-          //      print("normal scan : position =", position)
+        {
+            registers.R16 = (position & 0x30) >> 4
+            registers.R17 = (position & 0x0F) << 4
+        
+            registers.lightPenReady = true
         }
     }
     
@@ -726,18 +709,14 @@ final class BUS
                 if portValue & 0x01 == 1
                 {
                     crtc.romReadLatch = true
-        //            print("ROM LATCH = ON")
                     mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                 }
                 if portValue & 0x01 == 0
                 {
                     crtc.romReadLatch = false
-       //             print("ROM LATCH = OFF")
                     mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
                     mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and wrtie
                 }
-//            case 0x0C :
-//                crtc.writeRegister(RegNum: UInt8(realPort), RegValue: portValue)
             case 0x0D:
                 let tempPort = ports.readPort(portNum: 0x0C)
                 crtc.writeRegister(RegNum: tempPort, RegValue: portValue)

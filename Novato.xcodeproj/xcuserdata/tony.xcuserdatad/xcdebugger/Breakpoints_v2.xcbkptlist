@@ -14,8 +14,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "2795"
-            endingLineNumber = "2795"
+            startingLineNumber = "2739"
+            endingLineNumber = "2739"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "13569"
-            endingLineNumber = "13569"
+            startingLineNumber = "13513"
+            endingLineNumber = "13513"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "764"
-            endingLineNumber = "764"
+            startingLineNumber = "743"
+            endingLineNumber = "743"
             landmarkName = "readPort(portNum:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "445"
-            endingLineNumber = "445"
+            startingLineNumber = "443"
+            endingLineNumber = "443"
             landmarkName = "readRegister(RegNum:)"
             landmarkType = "7">
          </BreakpointContent>

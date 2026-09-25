@@ -535,10 +535,6 @@ actor microbee
     
     private var preserveEI : UInt8 = 0
     
-    //private var lastPC : UInt16 = 0x0000
-    
-    //private var pausedBreakpoint : Bool = false
-    
     private var isStepping = false
     private var breakpointHit = false
     
@@ -553,8 +549,6 @@ actor microbee
     
     private var memoryInspectorDump = [UInt8](repeating: 0,count: 256)
     private var memoryInspectorAddress: UInt16
-//    private var memoryInspectorPages = [UInt64](repeating: 0,count: 256)
-//    private var memoryInspectState: UInt64 = 0
     
     private static let bpsKey = "SavedBreakpoints"
     private static let masksKey = "SavedBreakpointMasks"
@@ -572,6 +566,7 @@ actor microbee
     
     private var leftShiftDown = false
     private var rightShiftDown = false
+    private var capsLockActive = false
     
     private let baseClockSpeed: Double = 3_375_000
     private let frameRate: Double = 50
@@ -783,43 +778,53 @@ actor microbee
     
     func keyDown(_ key: MicrobeeKey)
         {
-            keyboard.keyDown(key)
-            //keyboard.printMatrix("matrix key down ",keyboard.keyMatrix)
-          // keyboard.printMatrix("latch key down ",keyboard.pendingKeyPresses)
-        }
-
-        func keyUp(_ key: MicrobeeKey)
-        {
-            keyboard.keyUp(key)
-          //  keyboard.printMatrix("matrix key up ",keyboard.keyMatrix)
-          //  keyboard.printMatrix("latch key up ",keyboard.pendingKeyPresses)
-        }
-        
-        func modifierChanged(_ modifier: HostModifier, pressed: Bool)
-        {
-            switch modifier
+            if capsLockActive
             {
-            case .leftShift:
-                    leftShiftDown = pressed
-                    updateShift()
-            case .rightShift:
-                    rightShiftDown = pressed
-                    updateShift()
-            case .control: keyboard.set(.ctrlKey, pressed: pressed)
-                //keyboard.printMatrix("matrix ctrl key  ", keyboard.keyMatrix)
-            //    keyboard.printMatrix("latch ctrl key  ", keyboard.pendingKeyPresses)
-            case .capsLock: keyboard.set(.capsLockKey, pressed: pressed)
-              //  keyboard.printMatrix("matrix caps lock ", keyboard.keyMatrix)
-            //    keyboard.printMatrix("latch caps lock ", keyboard.pendingKeyPresses)
+                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+                keyboard.keyUp(.capsLockKey)
+                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+                capsLockActive.toggle()
+                print("CAPSLOCK active ",capsLockActive)
             }
+            keyboard.keyDown(key)
+            keyboard.printMatrix("down ", keyboard.keyMatrix)
         }
 
-        private func updateShift()
+    func keyUp(_ key: MicrobeeKey)
+    {
+        keyboard.keyUp(key)
+        keyboard.printMatrix("up ", keyboard.keyMatrix)
+    }
+    
+    func modifierChanged(_ modifier: HostModifier, pressed: Bool)
+    {
+        switch modifier
         {
-            keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
-         //   keyboard.printMatrix("matrix shift key ", keyboard.keyMatrix)
-         //  keyboard.printMatrix("latch shift key ", keyboard.pendingKeyPresses)
+        case .leftShift:
+                        leftShiftDown = pressed
+                        updateShift()
+                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+        case .rightShift:
+                        rightShiftDown = pressed
+                        updateShift()
+                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+        case .control:
+                        keyboard.set(.ctrlKey, pressed: pressed)
+                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+        case .capsLock:
+                        keyboard.set(.capsLockKey, pressed: true)
+                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+                        capsLockActive = true
+                        print("presssed", pressed)
+                        print("CAPSLOCK active ",capsLockActive)
+                       
         }
+    }
+
+    private func updateShift()
+    {
+        keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
+    }
     
     func reset()
     {
@@ -879,13 +884,15 @@ actor microbee
         
         emulatorState = .stopped
         
-        //pausedBreakpoint = false
-        
         interruptPending = false
         
         breakpointHit = false
         
         bus.ports.resetPorts()
+        
+        rightShiftDown = false
+        leftShiftDown = false
+        capsLockActive = false
                 
         keyboard.releaseAll()
         
@@ -894,9 +901,6 @@ actor microbee
         z80Queue = ContiguousArray<UInt16>(repeating: 0, count: 16)
         z80QueueFilled = ContiguousArray<Bool>(repeating: false, count: 16)
         z80QueueHead = 0
-        
-//        breakpoints = SIMD16<UInt16>(repeating: 0x0000)
-//        breakpointMask = SIMD16<UInt16>(repeating: 0x0000)
         
         bus.crtc.reset()
         
@@ -945,46 +949,17 @@ actor microbee
     
     func pause()
     {
-        
-//        print(
-//                "PAUSE LIVE PC:",
-//                String(format: "%04X", registers.PC)
-//            )
-//        
-//        print("PAUSE: PC =", String(format: "%04X", registers.PC))
-//            print("PAUSE: F  =", String(format: "%02X", registers.F))
-//            print("PAUSE: C  =", (registers.F & 0x01) != 0)
-        
         emulatorState = .paused
     
         let snapshot = returnSnapshot(stepping: false)
         
-//        print("SNAPSHOT: F =", String(format: "%02X", snapshot.z80Snapshot.F))
-//            print("SNAPSHOT: C =", (snapshot.z80Snapshot.F & 0x01) != 0)
-//        
-//        print(
-//                "PAUSE SNAPSHOT PC:",
-//                String(format: "%04X", snapshot.z80Snapshot.PC)
-//            )
-//        
-//        print(
-//                "PAUSE SNAPSHOT STATE:",
-//                snapshot.executionSnapshot.emulatorState
-//            )
-
-
         snapshotContinuation.yield(snapshot)
     }
     
     func step()
     {
-        
-//        print("STEP: state =", emulatorState)
-        
         guard emulatorState == .paused else
         {
-//            print("STEP REFUSED: state =", emulatorState)
-            
             return
         }
 
@@ -1009,8 +984,7 @@ actor microbee
         let snapshot = returnSnapshot(stepping: true)
         
         snapshotContinuation.yield(snapshot)
-        
-   //     print("STEP COMPLETE: state =", emulatorState)
+    
     }
 
     private func runLoop() async
@@ -1036,10 +1010,6 @@ actor microbee
 
                 tStatesPerFrame = UInt64(clockSpeed / frameRate)
 
-//                print("Applied multiplier:", clockSpeedMultiplier)
-//                print("Clock speed:", clockSpeed)
-//                print("T-states/frame:", tStatesPerFrame)
-
                 pendingClockSpeedMultiplier = nil
             }
             
@@ -1054,10 +1024,6 @@ actor microbee
             case .running, .halted:
                 break
             }
-            
-            #if DEBUG
-          //      let cpuStart = clock.now
-            #endif
             
             let frameTStates = tStatesPerFrame
             
@@ -1089,12 +1055,7 @@ actor microbee
                 // sound.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
             }
-            
-            #if DEBUG
-            //    let cpuElapsed = cpuStart.duration(to: clock.now)
-             //   print("CPU frame: \(cpuElapsed)")
-            #endif
-            
+    
             nextFrame = nextFrame + frameDuration
             
             if clock.now < nextFrame
@@ -1108,12 +1069,6 @@ actor microbee
                     nextFrame = clock.now
                 }
             }
-        
-//            if (executedTStates & 0x0FFF) == 0
-//            {
-//                print("yiedld")
-//                await Task.yield()
-//            }
             
             let snapshot = returnSnapshot(stepping: false)
             snapshotContinuation.yield(snapshot)
@@ -1171,15 +1126,6 @@ actor microbee
         return (value & (1 << bitPosition)) != 0
     }
     
-//    func returnParity(value: UInt8) -> Bool
-//    {
-//        var tempValue : UInt8 = value
-//        tempValue = tempValue ^ tempValue >> 4
-//        tempValue = tempValue ^ tempValue >> 2
-//        tempValue = tempValue ^ tempValue >> 1
-//        return ((~tempValue) & 1) == 1
-//    }
-    
     func logInstructionDetails(instructionDetails: String = "Unknown opcode", opcode: [UInt8], values: [UInt8] = [], programCounter: UInt16)
     {
         #if DEBUG
@@ -1210,11 +1156,9 @@ actor microbee
         if any(addressMatch .& (breakpointMask .!= 0)) &&  !isStepping
         {
             breakpointHit = true
-            //print(String(format: "%04X",registers.PC),registers.F)
             return 0
         }
 
-        //pausedBreakpoint = false
         pollInterrupt()
         return executeInstructions()
     }

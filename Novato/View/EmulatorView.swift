@@ -262,37 +262,47 @@ struct emulatorView: View
                     {
                         CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
                         KeyboardResponderView(
-                                                    onKeyDown:
-                                                        { event in
-                                                            guard let key = MicrobeeKeyboardMapper.key(for: event)
-                                                            else { return }
-                                                        
-                                                            Task
-                                                            {
-                                                                await vm.keyDown(key)
-                                                            }
-                                                        },
-                                                    
-                                                    onKeyUp:
-                                                        { event in
-                                                            guard let key = MicrobeeKeyboardMapper.key(for: event)
-                                                            else { return }
-                                                        
-                                                            Task
-                                                            {
-                                                                await vm.keyUp(key)
-                                                            }
-                                                        },
-                                                    onFlagsChanged:
-                                                        { event in
-                                                            guard let change = MicrobeeKeyboardMapper.modifierChange(for: event)
-                                                            else { return }
-                                                            Task
-                                                            {
-                                                                await vm.modifierChanged(change.modifier, pressed: change.pressed)
-                                                            }
-                                                        }
-                                                )                    }
+                                onKeyDown:
+                                    { event in
+                                        guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                        else { return }
+                                    
+                                        _ = Task
+                                        {
+                                            if key == .resetKey
+                                            {
+                                                await vm.updateProgramCounter(address: 0x8003)
+                                            }
+                                            else
+                                            {
+                                                await vm.keyDown(key)
+                                            }
+                                        }
+                                    },
+                                
+                                onKeyUp:
+                                    { event in
+                                        guard let key = MicrobeeKeyboardMapper.key(for: event)
+                                        else { return }
+                                    
+                                        _ = Task
+                                        {
+                                            await vm.keyUp(key)
+                                        }
+                                    },
+                                onFlagsChanged:
+                                    { event in
+                                        guard let change = MicrobeeKeyboardMapper.modifierChange(for: event)
+                                        else { return }
+                                        
+                                        _ = Task
+                                        {
+                                            await vm.modifierChanged(change.modifier, pressed: change.pressed)
+                                        }
+                                    }
+                                                
+                        )
+                    }
                 }
                 else
                 {
@@ -323,7 +333,7 @@ struct emulatorView: View
                         {
                             Button("", systemImage: "power")
                             {
-                                Task
+                                _ = Task
                                 {
                                     await vm.stopEmulation()
                                     try? await Task.sleep(for: .milliseconds(20))
@@ -334,7 +344,7 @@ struct emulatorView: View
                             .labelStyle(.titleAndIcon)
                             Button("", systemImage: "arrow.counterclockwise")
                             {
-                                Task
+                                _ = Task
                                 {
                                     await vm.updateProgramCounter(address: 0x8003)
                                 }
@@ -352,7 +362,7 @@ struct emulatorView: View
                         {
                             Button("", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
                             {
-                                Task
+                                _ = Task
                                 {
                                     if vm.snapshot?.executionSnapshot.emulatorState == .running
                                     {
@@ -367,7 +377,7 @@ struct emulatorView: View
                             .labelStyle(.titleAndIcon)
                             Button("", systemImage: "forward.frame.fill")
                             {
-                                Task
+                                _ = Task
                                 {
                                     vm.isStepActive = true
                                     try? await Task.sleep(for: .milliseconds(200))
@@ -379,11 +389,11 @@ struct emulatorView: View
 #if DEBUG
                                 Button("Log",systemImage: "terminal")
                                 {
-                                    Task
+                                    _ = Task
                                     {
                                         await vm.toggleLogging()
                                         await vm.keyDown(.spaceKey)
-                                        try await Task.sleep(nanoseconds: 50_000_000)
+                                        try? await Task.sleep(nanoseconds: 50_000_000)
                                         await vm.keyUp(.spaceKey)
                                     }
                                 }
@@ -402,7 +412,7 @@ struct emulatorView: View
                 if breakpointWindowVisible { openWindow(id: "breakpointsWindow") }
                 if memoryInspectorWindowVisible { openWindow(id: "memoryInspectorWindow") }
                 focusWindow(withId: "emulatorWindow")
-                Task
+                _ = Task
                 {
                     await vm.updateProgramCounter(address: 0x8000)
                     await vm.startEmulation()
@@ -411,3 +421,4 @@ struct emulatorView: View
             }
     } //body
 } // emulatorView
+
