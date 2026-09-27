@@ -132,18 +132,18 @@ final class emulatorViewModel
         await cpu.reset()
     }
 
-    func keyDown(_ key: MicrobeeKey) async
+    func keyDown(_ key: MicrobeeKey, _ keyCode: UInt16) async
     {
-        await cpu.keyDown(key)
+        await cpu.keyDown(key, keyCode)
     }
 
-    func keyUp(_ key: MicrobeeKey) async
+    func keyUp(_ key: MicrobeeKey, _ keyCode: UInt16) async
     {
-        await cpu.keyUp(key)
+        await cpu.keyUp(key, keyCode)
     }
 
-    func modifierChanged(_ modifier: HostModifier, pressed: Bool) async
+    func modifierChanged(_ modifier: HostModifier, pressed: Bool, _ keyCode: UInt16) async
     {
-        await cpu.modifierChanged(modifier, pressed: pressed)
+        await cpu.modifierChanged(modifier, pressed: pressed, keyCode)
     }
 }

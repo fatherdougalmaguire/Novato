@@ -1,6 +1,6 @@
 import SwiftUI
 import AppKit
-
+import Carbon.HIToolbox
 
 func focusWindow(withId id: String)
 {
@@ -275,7 +275,7 @@ struct emulatorView: View
                                             }
                                             else
                                             {
-                                                await vm.keyDown(key)
+                                                await vm.keyDown(key, event.keyCode)
                                             }
                                         }
                                     },
@@ -287,7 +287,7 @@ struct emulatorView: View
                                     
                                         _ = Task
                                         {
-                                            await vm.keyUp(key)
+                                            await vm.keyUp(key, event.keyCode)
                                         }
                                     },
                                 onFlagsChanged:
@@ -297,7 +297,7 @@ struct emulatorView: View
                                         
                                         _ = Task
                                         {
-                                            await vm.modifierChanged(change.modifier, pressed: change.pressed)
+                                            await vm.modifierChanged(change.modifier, pressed: change.pressed, event.keyCode)
                                         }
                                     }
                                                 
@@ -392,9 +392,11 @@ struct emulatorView: View
                                     _ = Task
                                     {
                                         await vm.toggleLogging()
-                                        await vm.keyDown(.spaceKey)
+                                        await vm.keyDown(.ctrlKey, 0x0C)
+                                        await vm.keyDown(.eKey, 0x0C)
                                         try? await Task.sleep(nanoseconds: 50_000_000)
-                                        await vm.keyUp(.spaceKey)
+                                        await vm.keyUp(.eKey, 0x0C)
+                                        await vm.keyUp(.ctrlKey, 0x0C)
                                     }
                                 }
 #endif

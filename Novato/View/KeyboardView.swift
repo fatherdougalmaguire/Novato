@@ -69,28 +69,18 @@ final class KeyboardNSView: NSView
 
     override func keyDown(with event: NSEvent)
     {
-
-            print("KEY DOWN", event.keyCode, event.characters ?? "")
-            onKeyDown?(event)
+        onKeyDown?(event)
+        //print(event.keyCode)
     }
 
     override func keyUp(with event: NSEvent)
     {
-
-            print("KEY UP", event.keyCode, event.characters ?? "")
-                onKeyUp?(event)
+        onKeyUp?(event)
+       // print(event.keyCode)
     }
 
     override func flagsChanged(with event: NSEvent)
     {
-
-            print(
-                    "FLAGS",
-                    event.keyCode,
-                    event.modifierFlags,
-                    event.modifierFlags.contains(.capsLock)
-                )
-
-                onFlagsChanged?(event)
+        onFlagsChanged?(event)
     }
 }

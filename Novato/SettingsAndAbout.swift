@@ -227,7 +227,7 @@ struct modelSettingsView: View
 
 struct keyboardSettingsView: View
 {
-    @AppStorage("EmulatedKeyboard") private var emulatedKeyboard: Bool = true
+    @AppStorage("emulatedKeyboard") private var emulatedKeyboard: Bool = true
     
     var body: some View
     {

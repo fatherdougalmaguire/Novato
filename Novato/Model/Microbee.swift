@@ -1,4 +1,5 @@
 import Foundation
+import Carbon.HIToolbox
 
 actor microbee
 {
@@ -550,6 +551,8 @@ actor microbee
     private var memoryInspectorDump = [UInt8](repeating: 0,count: 256)
     private var memoryInspectorAddress: UInt16
     
+    private var keyboardType : MicrobeeKeyboardType
+    
     private static let bpsKey = "SavedBreakpoints"
     private static let masksKey = "SavedBreakpointMasks"
     
@@ -567,6 +570,8 @@ actor microbee
     private var leftShiftDown = false
     private var rightShiftDown = false
     private var capsLockActive = false
+    
+    private var keyboardMappingRule : Int = 0
     
     private let baseClockSpeed: Double = 3_375_000
     private let frameRate: Double = 50
@@ -610,6 +615,15 @@ actor microbee
                 "memoryInspectorAddress": 0x0000
             ]
         )
+        
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "emulatedKeyboard": true
+            ]
+        )
+        
+        self.keyboardType = UserDefaults.standard.bool(forKey: "emulatedKeyboard") ? .emulated : .natural
         
         self.memoryInspectorAddress = UInt16(UserDefaults.standard.integer(forKey: "memoryInspectorAddress"))
         
@@ -776,48 +790,261 @@ actor microbee
         pendingClockSpeedMultiplier = multiplier
     }
     
-    func keyDown(_ key: MicrobeeKey)
-        {
-            if capsLockActive
-            {
-                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
-                keyboard.keyUp(.capsLockKey)
-                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
-                capsLockActive.toggle()
-                print("CAPSLOCK active ",capsLockActive)
-            }
-            keyboard.keyDown(key)
-            keyboard.printMatrix("down ", keyboard.keyMatrix)
-        }
-
-    func keyUp(_ key: MicrobeeKey)
+    func keyDown(_ key: MicrobeeKey, _ keyCode: UInt16)
     {
-        keyboard.keyUp(key)
-        keyboard.printMatrix("up ", keyboard.keyMatrix)
+        var mappedKey : MicrobeeKey = key
+        
+        keyboardMappingRule = 0
+        
+        if capsLockActive
+        {
+            keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+            keyboard.keyUp(.capsLockKey)
+            keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+            capsLockActive.toggle()
+            print("CAPSLOCK active ",capsLockActive)
+        }
+        
+        if keyboardType == .emulated
+        {
+            if keyCode == kVK_ANSI_Quote && !leftShiftDown && !rightShiftDown
+            {
+//                print("e1")
+                keyboardMappingRule = 1
+                mappedKey = .sevenKey
+                keyboard.keyDown(.shiftKey)
+//                keyboard.printMatrix("down ", keyboard.keyMatrix)
+            }
+            else if keyCode == kVK_ANSI_Equal && !leftShiftDown && !rightShiftDown
+            {
+//                print("e2")
+                keyboardMappingRule = 2
+                mappedKey = .minusKey
+                keyboard.keyDown(.shiftKey)
+//                keyboard.printMatrix("down ", keyboard.keyMatrix)
+            }
+            else if keyCode == kVK_ANSI_Grave && !leftShiftDown && !rightShiftDown
+            {
+//                print("e3")
+                keyboardMappingRule = 3
+                mappedKey = .atKey
+                keyboard.keyDown(.shiftKey)
+//                keyboard.printMatrix("down ", keyboard.keyMatrix)
+            }
+            else if keyCode == kVK_ANSI_Semicolon && (leftShiftDown || rightShiftDown)
+            {
+//                print("e4")
+                keyboardMappingRule = 4
+                mappedKey = .colonKey
+                keyboard.keyUp(.shiftKey)
+//                leftShiftDown = false
+//                rightShiftDown = false
+//                keyboard.printMatrix("down ", keyboard.keyMatrix)
+            }
+            else if keyCode == kVK_ANSI_Semicolon
+            {
+//                print("e15")
+                keyboardMappingRule = 15
+                mappedKey = .semicolonKey
+//                keyboard.keyUp(.shiftKey)
+//                leftShiftDown = false
+//                rightShiftDown = false
+//                keyboard.printMatrix("down ", keyboard.keyMatrix)
+            }
+            else if keyCode == kVK_ANSI_2 && (leftShiftDown || rightShiftDown)
+            {
+//                print("e5")
+                keyboardMappingRule = 5
+                mappedKey = .atKey
+                keyboard.keyUp(.shiftKey)
+//                leftShiftDown = false
+//                rightShiftDown = false
+            }
+            else if keyCode == kVK_ANSI_6 && (leftShiftDown || rightShiftDown)
+            {
+//                print("e6")
+                keyboardMappingRule = 6
+                mappedKey = .caretKey
+                keyboard.keyUp(.shiftKey)
+//                leftShiftDown = false
+//                rightShiftDown = false
+            }
+            else if keyCode == kVK_ANSI_Minus && (leftShiftDown || rightShiftDown)
+            {
+//                print("e7")
+                keyboardMappingRule = 7
+                mappedKey = .dummyKey
+            }
+            else if keyCode == kVK_ANSI_Grave && (leftShiftDown || rightShiftDown)
+            {
+//                print("e8")
+                keyboardMappingRule = 8
+                mappedKey = .caretKey
+            }
+            else if keyCode == kVK_ANSI_Equal && (leftShiftDown || rightShiftDown)
+            {
+//                print("e9")
+                keyboardMappingRule = 9
+                mappedKey = .semicolonKey
+            }
+            else if keyCode == kVK_ANSI_Quote && (leftShiftDown || rightShiftDown)
+            {
+//                print("e10")
+                keyboardMappingRule = 10
+                mappedKey = .twoKey
+            }
+            else if keyCode == kVK_ANSI_0 && (leftShiftDown || rightShiftDown)
+            {
+//                print("e11")
+                keyboardMappingRule = 11
+                mappedKey = .nineKey
+            }
+            else if keyCode == kVK_ANSI_9 && (leftShiftDown || rightShiftDown)
+            {
+//                print("e12")
+                keyboardMappingRule = 12
+                mappedKey = .eightKey
+            }
+            else if keyCode == kVK_ANSI_8 && (leftShiftDown || rightShiftDown)
+            {
+//                print("e13")
+                keyboardMappingRule = 13
+                mappedKey = .colonKey
+            }
+            else if keyCode == kVK_ANSI_7 && (leftShiftDown || rightShiftDown)
+            {
+//                print("e14")
+                keyboardMappingRule = 14
+                mappedKey = .sixKey
+            }
+        }
+        keyboard.keyDown(mappedKey)
+     //   keyboard.printMatrix("fin down ", keyboard.keyMatrix)
+    }
+
+    func keyUp(_ key: MicrobeeKey, _ keyCode: UInt16)
+    {
+        var mappedKey : MicrobeeKey = key
+        
+        if keyboardType == .emulated
+        {
+            switch keyboardMappingRule
+            {
+                case 1:
+//                    print("x1")
+                    mappedKey = .sevenKey
+                    keyboard.keyUp(.shiftKey)
+//                    keyboard.printMatrix("up ", keyboard.keyMatrix)
+                case 2:
+//                    print("x2")
+                    mappedKey = .minusKey
+                    keyboard.keyUp(.shiftKey)
+//                    keyboard.printMatrix("up ", keyboard.keyMatrix)
+                case 3:
+//                    print("x3")
+                    keyboard.printMatrix("rup ", keyboard.keyMatrix)
+                    print(leftShiftDown,rightShiftDown)
+                    mappedKey = .atKey
+                    keyboard.keyUp(.shiftKey)
+//                    keyboard.printMatrix("up ", keyboard.keyMatrix)
+                case 4:
+//                    print("x4")
+                    mappedKey = .colonKey
+                    keyboard.keyUp(.shiftKey)
+//                    keyboard.printMatrix("up ", keyboard.keyMatrix)
+                case 5:
+//                    print("x5")
+                    mappedKey = .atKey
+                    //keyboard.keyUp(.shiftKey)
+//                    keyboard.printMatrix("up ", keyboard.keyMatrix)
+                case 6:
+                  //  print("x6")
+                    mappedKey = .caretKey
+                    keyboard.keyUp(.shiftKey)
+//                    keyboard.printMatrix("up ", keyboard.keyMatrix)
+                case 7:
+                  //  print("x7")
+                    mappedKey = .dummyKey
+                case 8:
+                  //  print("x8")
+                    mappedKey = .caretKey
+                case 9:
+                  //  print("x9")
+                    mappedKey = .semicolonKey
+                case 10:
+                  //  print("x10")
+                    mappedKey = .twoKey
+                case 11:
+                  //  print("x11")
+                    mappedKey = .nineKey
+                case 12:
+                  //  print("x12")
+                    mappedKey = .eightKey
+                case 13:
+                  //  print("x13")
+                    mappedKey = .colonKey
+                case 14:
+                  //  print("x14`1")
+                    mappedKey = .sixKey
+                case 15:
+                   // print("x15")
+                    mappedKey = .semicolonKey
+                default: break
+            }
+        }
+        
+        keyboard.keyUp(mappedKey)
+     //   print(keyboardType)
+     //   keyboard.printMatrix("Fin up ", keyboard.keyMatrix)
     }
     
-    func modifierChanged(_ modifier: HostModifier, pressed: Bool)
+    func modifierChanged(_ modifier: HostModifier, pressed: Bool, _ keyCode: UInt16)
     {
-        switch modifier
+        if keyboardType == .natural
         {
-        case .leftShift:
-                        leftShiftDown = pressed
-                        updateShift()
-                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
-        case .rightShift:
-                        rightShiftDown = pressed
-                        updateShift()
-                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
-        case .control:
-                        keyboard.set(.ctrlKey, pressed: pressed)
-                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
-        case .capsLock:
-                        keyboard.set(.capsLockKey, pressed: true)
-                        keyboard.printMatrix("modifier ", keyboard.keyMatrix)
-                        capsLockActive = true
-                        print("presssed", pressed)
-                        print("CAPSLOCK active ",capsLockActive)
-                       
+            switch modifier
+            {
+            case .leftShift:
+                leftShiftDown = pressed
+                updateShift()
+         //       keyboard.printMatrix("fin modifier ", keyboard.keyMatrix)
+            case .rightShift:
+                rightShiftDown = pressed
+                updateShift()
+        //        keyboard.printMatrix("fin modifier ", keyboard.keyMatrix)
+            case .control:
+                keyboard.set(.ctrlKey, pressed: pressed)
+        //        keyboard.printMatrix("fin modifier ", keyboard.keyMatrix)
+            case .capsLock:
+                keyboard.set(.capsLockKey, pressed: true)
+       //         keyboard.printMatrix("Fin modifier ", keyboard.keyMatrix)
+                capsLockActive = true
+//                print("presssed", pressed)
+//                print("CAPSLOCK active ",capsLockActive)
+            }
+        }
+        else
+        {
+            switch modifier
+            {
+            case .leftShift:
+                leftShiftDown = pressed
+                updateShift()
+                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+            case .rightShift:
+                rightShiftDown = pressed
+                updateShift()
+                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+            case .control:
+                keyboard.set(.ctrlKey, pressed: pressed)
+                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+            case .capsLock:
+                keyboard.set(.capsLockKey, pressed: true)
+                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+                capsLockActive = true
+                print("presssed", pressed)
+                print("CAPSLOCK active ",capsLockActive)
+            }
         }
     }
 
@@ -893,6 +1120,8 @@ actor microbee
         rightShiftDown = false
         leftShiftDown = false
         capsLockActive = false
+        
+        keyboardType = UserDefaults.standard.bool(forKey: "emulatedKeyboard") ? .emulated : .natural
                 
         keyboard.releaseAll()
         
@@ -913,10 +1142,10 @@ actor microbee
         
         bus.basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
         bus.pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-        bus.netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        bus.netROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
         bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         
-        bus.mainRAM.fillMemory(memValue: 0x00) // needs hard reset to boot basic again.   Can you warm reboot a microbee ?
+        bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
         bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
         
         snapshotContinuation.yield(returnSnapshot(stepping: false))

@@ -655,7 +655,8 @@ final class BUS
         
         basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
         pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-        netROM.fillMemoryFromFile(fileName: "telcom_1.0", fileExtension: "rom")
+        //pakROM.fillMemoryFromFile(fileName: "mytek_wordprocessor", fileExtension: "rom")
+        netROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
         fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
 
         mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram

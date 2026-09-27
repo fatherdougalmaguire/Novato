@@ -1,5 +1,6 @@
 import Foundation
 import AppKit
+import Carbon.HIToolbox
 
 enum MicrobeeKey: UInt8, CaseIterable, Hashable
 {
@@ -52,7 +53,7 @@ enum MicrobeeKey: UInt8, CaseIterable, Hashable
     case semicolonKey
   
     case commaKey
-    case dashKey
+    case minusKey
     case periodKey
     
     case forwardSlashKey
@@ -73,7 +74,7 @@ enum MicrobeeKey: UInt8, CaseIterable, Hashable
     case downArrowKey
     case leftArrowKey
     case resetKey
-    case dummy5Key
+    case dummyKey
     case rightArrowKey
     
     case shiftKey
@@ -83,72 +84,74 @@ struct MicrobeeKeyboardMapper
 {
     static func key(for event: NSEvent) -> MicrobeeKey?
     {
-        switch event.keyCode
+        switch Int(event.keyCode)
         {
-        case 0x12: return .oneKey
-        case 0x13: return .twoKey
-        case 0x14: return .threeKey
-        case 0x15: return .fourKey
-        case 0x16: return .sixKey
-        case 0x17: return .fiveKey
-        case 0x19: return .nineKey
-        case 0x1A: return .sevenKey
-        case 0x1C: return .eightKey
-        case 0x1D: return .zeroKey
+        case kVK_ANSI_1: return .oneKey
+        case kVK_ANSI_2: return .twoKey
+        case kVK_ANSI_3: return .threeKey
+        case kVK_ANSI_4: return .fourKey
+        case kVK_ANSI_5: return .fiveKey
+        case kVK_ANSI_6: return .sixKey
+        case kVK_ANSI_7: return .sevenKey
+        case kVK_ANSI_8: return .eightKey
+        case kVK_ANSI_9: return .nineKey
+        case kVK_ANSI_0: return .zeroKey
             
-        case 0x00: return .aKey
-        case 0x01: return .sKey
-        case 0x0B: return .bKey
-        case 0x08: return .cKey
-        case 0x02: return .dKey
-        case 0x0E: return .eKey
-        case 0x03: return .fKey
-        case 0x05: return .gKey
-        case 0x04: return .hKey
-        case 0x22: return .iKey
-        case 0x26: return .jKey
-        case 0x28: return .kKey
-        case 0x25: return .lKey
-        case 0x2E: return .mKey
-        case 0x2D: return .nKey
-        case 0x1F: return .oKey
-        case 0x23: return .pKey
-        case 0x0C: return .qKey
-        case 0x0F: return .rKey
-        case 0x11: return .tKey
-        case 0x20: return .uKey
-        case 0x09: return .vKey
-        case 0x0D: return .wKey
-        case 0x07: return .xKey
-        case 0x10: return .yKey
-        case 0x06: return .zKey
+        case kVK_ANSI_A: return .aKey
+        case kVK_ANSI_B: return .bKey
+        case kVK_ANSI_C: return .cKey
+        case kVK_ANSI_D: return .dKey
+        case kVK_ANSI_E: return .eKey
+        case kVK_ANSI_F: return .fKey
+        case kVK_ANSI_G: return .gKey
+        case kVK_ANSI_H: return .hKey
+        case kVK_ANSI_I: return .iKey
+        case kVK_ANSI_J: return .jKey
+        case kVK_ANSI_K: return .kKey
+        case kVK_ANSI_L: return .lKey
+        case kVK_ANSI_M: return .mKey
+        case kVK_ANSI_N: return .nKey
+        case kVK_ANSI_O: return .oKey
+        case kVK_ANSI_P: return .pKey
+        case kVK_ANSI_Q: return .qKey
+        case kVK_ANSI_R: return .rKey
+        case kVK_ANSI_S: return .sKey
+        case kVK_ANSI_T: return .tKey
+        case kVK_ANSI_U: return .uKey
+        case kVK_ANSI_V: return .vKey
+        case kVK_ANSI_W: return .wKey
+        case kVK_ANSI_X: return .xKey
+        case kVK_ANSI_Y: return .yKey
+        case kVK_ANSI_Z: return .zKey
             
-        case 0x31: return .spaceKey
-        case 0x24: return .returnKey
-        case 0x33: return .backSpaceKey
-        case 0x35: return .escapeKey
+        case kVK_Space: return .spaceKey
+        case kVK_Return: return .returnKey
+        case kVK_Delete: return .backSpaceKey
+        case kVK_Escape: return .escapeKey
             
-        case 0x30: return .tabKey
+        case kVK_Tab: return .tabKey
             
-        case 0x1B: return .dashKey
-        case 0x21: return .leftSquareBracketKey
-        case 0x1E: return .rightSquareBracketKey
-        case 0x2A: return .backSlashKey
-        case 0x29: return .semicolonKey
-        case 0x27: return .atKey
-        case 0x2B: return .commaKey
-        case 0x2F: return .periodKey
-        case 0x2C: return .forwardSlashKey
+        case kVK_ANSI_Minus: return .minusKey
+        case kVK_ANSI_LeftBracket: return .leftSquareBracketKey
+        case kVK_ANSI_RightBracket: return .rightSquareBracketKey
+        case kVK_ANSI_Backslash: return .backSlashKey
+        case kVK_ANSI_Quote: return .atKey
+        case kVK_ANSI_Comma: return .commaKey
+        case kVK_ANSI_Semicolon: return .colonKey
+        case kVK_ANSI_Period: return .periodKey
+        case kVK_ANSI_Slash: return .forwardSlashKey
+        case kVK_ANSI_Grave: return .caretKey
+        case kVK_ANSI_Equal : return .semicolonKey
             
-        case 0x73 : return .lineFeedKey     //  Home maps to Line Feed
-        case 0x77 : return .deleteKey       //  End maps to Delete
-        case 0x74 : return .breakKey        //  Page up maps to Break
-        case 0x79 : return .resetKey        //  Page down maps to Reset
+        case kVK_Home: return .lineFeedKey     //  Home maps to Line Feed
+        case kVK_End: return .deleteKey       //  End maps to Delete
+        case kVK_PageUp: return .breakKey        //  Page up maps to Break
+        case kVK_PageDown: return .resetKey        //  Page down maps to Reset
             
-        case 0x7E : return .upArrowKey
-        case 0x7D : return .downArrowKey
-        case 0x7B : return .leftArrowKey
-        case 0x7C : return .rightArrowKey
+        case kVK_UpArrow: return .upArrowKey
+        case kVK_DownArrow: return .downArrowKey
+        case kVK_LeftArrow: return .leftArrowKey
+        case kVK_RightArrow: return .rightArrowKey
             
         default: return nil
         }
@@ -156,15 +159,21 @@ struct MicrobeeKeyboardMapper
     
     static func modifierChange(for event: NSEvent) -> MicrobeeModifierChange?
     {
-        switch event.keyCode
+        switch Int(event.keyCode)
         {
-            case 0x38: return MicrobeeModifierChange(modifier: .leftShift, pressed: event.modifierFlags.contains(.shift))
-            case 0x3C: return MicrobeeModifierChange(modifier: .rightShift, pressed: event.modifierFlags.contains(.shift))
-            case 0x3B,0x3E: return MicrobeeModifierChange(modifier: .control, pressed: event.modifierFlags.contains(.control))
-            case 0x39: return MicrobeeModifierChange(modifier: .capsLock, pressed: event.modifierFlags.contains(.capsLock))
+            case kVK_Shift: return MicrobeeModifierChange(modifier: .leftShift, pressed: event.modifierFlags.contains(.shift))
+            case kVK_RightShift: return MicrobeeModifierChange(modifier: .rightShift, pressed: event.modifierFlags.contains(.shift))
+            case kVK_Control,kVK_RightControl: return MicrobeeModifierChange(modifier: .control, pressed: event.modifierFlags.contains(.control))
+            case kVK_CapsLock: return MicrobeeModifierChange(modifier: .capsLock, pressed: event.modifierFlags.contains(.capsLock))
             default: return nil
         }
     }
+}
+
+enum MicrobeeKeyboardType
+{
+    case emulated
+    case natural
 }
 
 enum HostModifier
