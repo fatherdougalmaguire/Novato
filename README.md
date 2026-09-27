@@ -146,7 +146,7 @@ It has a functional z80 core, mmu, 6545 emulation, keyboard input and video outp
 
 A animated .gif of a selection games that currently boot.
 
-<img width="2272" height="1864" alt="animated" src="https://github.com/user-attachments/assets/be6a8142-17f8-4b10-9725-f35a39b47145" />
+<img alt="animated" src="https://github.com/user-attachments/assets/56eaee8e-8fcc-4ce1-a300-484a82411b06" />
 
 ## On the to-do list
 
