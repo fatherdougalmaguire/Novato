@@ -144,12 +144,9 @@ It has a functional z80 core, mmu, 6545 emulation, keyboard input and video outp
 
 ### Miscellaneous Games
 
-A animated .gif of games that currently boot.
+A animated .gif of a selection games that currently boot.
 
-Some file due to reliance on missing ROM's and/or specific ROM versions.
-Some also have some display artefacts.
-
-<img alt="output" src="https://github.com/user-attachments/assets/4c506711-b345-4072-86f9-a6b040fee3ad" />
+<img width="2272" height="1864" alt="animated" src="https://github.com/user-attachments/assets/be6a8142-17f8-4b10-9725-f35a39b47145" />
 
 ## On the to-do list
 
