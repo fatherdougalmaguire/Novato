@@ -57,11 +57,9 @@ The MicroWorld Basic v5.22e ROM and the MicroBee Font ROM have been bundled with
 
 Initially I am looking to emulate the [Microbee 32IC](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee+Series+1+Models#Microbee_16K_32K_IC) model.
 
-This emulator is still in what could charitably called *alpha* status.
+This emulator has now edged into *beta* territory.
 
-It has a functional z80 core,  mmu and video output.
-
-But not much else.
+It has a functional z80 core, mmu, 6545 emulation, keyboard input and video output.
 
 ### UI controls
 * You can pause and resume the emulator via button control.
@@ -87,6 +85,7 @@ But not much else.
   - CPU speed selection (1x to 8x)
   - Quickload load address
   - Quickload start address
+  - Keyboard mapping (natural/emulated)
   
 ### Instruction decoding
 * All documented instructions are decoded
@@ -116,8 +115,9 @@ But not much else.
 ### Keyboard input
 
 * Keypresses are correctly captured from SWiftUI and passed to the emulator.
-* Keypresses are correctly converted into 6545 register values.
-* However keypress functionality is still broken as BASIC and many games still cannot see the keypresses.
+* Emulator supports NanoWasp-style natural/emulated keyboard mapping ( defaults to emulated )
+  - Under natural mapping,  macOS keystrokes are sent directly to the microbee key matrix.  As a result,  keys pressed may result in different characters returned
+  - Under emulated mapping,  macOS keystrokes are mapped to equivalents in the microbee key matrix.  This may result in some applications not working as expected ( but I haven't seen any affected applications thus far )
 
 ### Memory
 * Working MMU has been implemented
