@@ -158,6 +158,7 @@ A animated .gif of a selection games that currently boot.
 * Interrupt processing
 * Sound output
 * Cassette load/save functionality
+* PIO functionality for serial/parallel data transfer
 
 ## Emulator screenshots
 
