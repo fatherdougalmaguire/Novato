@@ -1030,20 +1030,20 @@ actor microbee
             case .leftShift:
                 leftShiftDown = pressed
                 updateShift()
-                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+  //              keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             case .rightShift:
                 rightShiftDown = pressed
                 updateShift()
-                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+ //               keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             case .control:
                 keyboard.set(.ctrlKey, pressed: pressed)
-                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+  //              keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             case .capsLock:
                 keyboard.set(.capsLockKey, pressed: true)
-                keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+    //            keyboard.printMatrix("modifier ", keyboard.keyMatrix)
                 capsLockActive = true
-                print("presssed", pressed)
-                print("CAPSLOCK active ",capsLockActive)
+      //          print("presssed", pressed)
+        //        print("CAPSLOCK active ",capsLockActive)
             }
         }
     }
@@ -1052,7 +1052,7 @@ actor microbee
     {
         keyboard.set(.shiftKey,pressed: leftShiftDown || rightShiftDown)
     }
-    
+
     func reset()
     {
         //confirm Z80 and 6545 reset behaviour

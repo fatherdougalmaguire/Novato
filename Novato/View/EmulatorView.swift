@@ -399,8 +399,49 @@ struct emulatorView: View
                                         await vm.keyUp(.ctrlKey, 0x0C)
                                     }
                                 }
+                                .labelStyle(.titleAndIcon)
+                            Button("Paste",systemImage: "sparkle.text.clipboard")
+                            {
+                                _ = Task
+                                {
+                                    let clipBoard = NSPasteboard.general
+                                    if clipBoard.canReadObject(forClasses: [NSString.self], options: nil),
+                                       let strings = clipBoard.readObjects(forClasses: [NSString.self], options: nil) as? [String],
+                                       let text = strings.first
+                                        {
+                                            let strippedText = text.replacingOccurrences(of: "\r\n", with: "\r").replacingOccurrences(of: "\n", with: "\r")
+                                            for char in strippedText
+                                            {
+                                                guard let code = char.asciiValue else { continue }
+                                
+                                                guard code < symbolMap.count else { continue }
+
+                                                let fakeKeypress = symbolMap[Int(code)]
+                                                
+//                                                print(char,code,fakeKeypress.matrixValue)
+
+                                                guard fakeKeypress.matrixValue != .dummyKey else { continue }
+                                        
+                                                if fakeKeypress.shiftStatus
+                                                {
+                                                    await vm.keyDown(.shiftKey, 0x0C)
+                                                    await vm.keyDown(fakeKeypress.matrixValue, 0x0C)
+                                                    try? await Task.sleep(nanoseconds: 50_000_000)
+                                                    await vm.keyUp(fakeKeypress.matrixValue, 0x0C)
+                                                    await vm.keyUp(.shiftKey, 0x0C)
+                                                }
+                                                else
+                                                {
+                                                    await vm.keyDown(fakeKeypress.matrixValue, 0x0C)
+                                                    try? await Task.sleep(nanoseconds: 50_000_000)
+                                                    await vm.keyUp(fakeKeypress.matrixValue, 0x0C)
+                                                }
+                                            }
+                                        }
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
 #endif
-                            
                         }
                     }
                     .fixedSize()
