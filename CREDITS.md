@@ -9,6 +9,10 @@ These test files provide comprehensive coverage for both documented and undocume
 Repository: [SingleStepTests](https://github.com/SingleStepTests/z80)
 Licence : [MIT License](https://github.com/fatherdougalmaguire/Novato/blob/main/NovatoTests/JSON%20tests/LICENCE.md)
 
+## About Panel
+
+Adapted from example code contained within [Customizing the macOS About Panel in SwiftUI](https://danielsaidi.com/blog/2023/11/28/customizing-the-macos-about-panel-in-swiftui)
+
 ## MicroWorld Basic 5.22e and Microbee Font ROM
 
 These ROM files are bundled with the application and associated source code repositories with the kind permission of Ewan J. Wordsworth of Microbee Technology Pty Ltd.
