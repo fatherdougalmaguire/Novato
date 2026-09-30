@@ -15,6 +15,8 @@ enum memoryConstant
     static let pageMask = pageSize - 1
 }
 
+
+
 final class memoryBlock
 {
     var addressBlock: ContiguousArray<UInt8>

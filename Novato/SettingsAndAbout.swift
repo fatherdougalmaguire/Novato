@@ -1,5 +1,3 @@
-//  Adapted from code listed at https://danielsaidi.com/blog/2023/11/28/how-to-customize-the-macos-about-panel-in-swiftui
-
 import Foundation
 import SwiftUI
 

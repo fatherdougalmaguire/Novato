@@ -87,134 +87,134 @@ struct pastedKeyStroke
 }
 
 let symbolMap: [pastedKeyStroke] = [
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .returnKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .spaceKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .oneKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .twoKey , shiftStatus: true),
-    pastedKeyStroke(matrixValue: .threeKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .fourKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .fiveKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .sixKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .sevenKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .eightKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .nineKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .colonKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .semicolonKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .commaKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .minusKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .periodKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .forwardSlashKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .zeroKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .oneKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .twoKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .threeKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .fourKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .fiveKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .sixKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .sevenKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .eightKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .nineKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .colonKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .semicolonKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .commaKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .minusKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .periodKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .backSlashKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .atKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .aKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .bKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .cKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .dKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .eKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .fKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .gKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .hKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .iKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .jKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .kKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .lKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .mKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .nKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .oKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .pKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .qKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .rKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .sKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .tKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .uKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .vKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .wKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .xKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .yKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .zKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .leftSquareBracketKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .backSlashKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .rightSquareBracketKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .caretKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .atKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .aKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .bKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .cKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .dKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .eKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .fKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .gKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .hKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .iKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .jKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .kKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .lKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .mKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .nKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .oKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .pKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .qKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .rKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .sKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .tKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .uKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .vKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .wKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .xKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .yKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .zKey, shiftStatus: false),
-    pastedKeyStroke(matrixValue: .leftSquareBracketKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .backSlashKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .rightSquareBracketKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .caretKey, shiftStatus: true),
-    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false)]
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  0
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  1
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  2
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  3
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  4
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  5
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  6
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  7
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  8
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  9
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  10
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  11
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  12
+    pastedKeyStroke(matrixValue: .returnKey, shiftStatus: false),               //  13  carriage return
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  14
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  15
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  16
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  17
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  18
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  19
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  20
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  21
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  22
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  23
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  24
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  25
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  26
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  27
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  28
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  29
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  30
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  31
+    pastedKeyStroke(matrixValue: .spaceKey, shiftStatus: false),                //  32  space
+    pastedKeyStroke(matrixValue: .oneKey, shiftStatus: true),                   //  33  !
+    pastedKeyStroke(matrixValue: .twoKey , shiftStatus: true),                  //  34  "
+    pastedKeyStroke(matrixValue: .threeKey, shiftStatus: true),                 //  35  #
+    pastedKeyStroke(matrixValue: .fourKey, shiftStatus: true),                  //  36  $
+    pastedKeyStroke(matrixValue: .fiveKey, shiftStatus: true),                  //  37  %
+    pastedKeyStroke(matrixValue: .sixKey, shiftStatus: true),                   //  38  &
+    pastedKeyStroke(matrixValue: .sevenKey, shiftStatus: true),                 //  39  '
+    pastedKeyStroke(matrixValue: .eightKey, shiftStatus: true),                 //  40  (
+    pastedKeyStroke(matrixValue: .nineKey, shiftStatus: true),                  //  41  )
+    pastedKeyStroke(matrixValue: .colonKey, shiftStatus: true),                 //  42  *
+    pastedKeyStroke(matrixValue: .semicolonKey, shiftStatus: true),             //  43  +
+    pastedKeyStroke(matrixValue: .commaKey, shiftStatus: false),                //  44  ,
+    pastedKeyStroke(matrixValue: .minusKey, shiftStatus: false),                //  45  -
+    pastedKeyStroke(matrixValue: .periodKey, shiftStatus: false),               //  46  .
+    pastedKeyStroke(matrixValue: .forwardSlashKey, shiftStatus: false),         //  47  /
+    pastedKeyStroke(matrixValue: .zeroKey, shiftStatus: false),                 //  48  0
+    pastedKeyStroke(matrixValue: .oneKey, shiftStatus: false),                  //  49  1
+    pastedKeyStroke(matrixValue: .twoKey, shiftStatus: false),                  //  50  2
+    pastedKeyStroke(matrixValue: .threeKey, shiftStatus: false),                //  51  3
+    pastedKeyStroke(matrixValue: .fourKey, shiftStatus: false),                 //  52  4
+    pastedKeyStroke(matrixValue: .fiveKey, shiftStatus: false),                 //  53  5
+    pastedKeyStroke(matrixValue: .sixKey, shiftStatus: false),                  //  54  6
+    pastedKeyStroke(matrixValue: .sevenKey, shiftStatus: false),                //  55  7
+    pastedKeyStroke(matrixValue: .eightKey, shiftStatus: false),                //  56  8
+    pastedKeyStroke(matrixValue: .nineKey, shiftStatus: false),                 //  57  9
+    pastedKeyStroke(matrixValue: .colonKey, shiftStatus: false),                //  58  :
+    pastedKeyStroke(matrixValue: .semicolonKey, shiftStatus: false),            //  59  ;
+    pastedKeyStroke(matrixValue: .commaKey, shiftStatus: true),                 //  60  <
+    pastedKeyStroke(matrixValue: .minusKey, shiftStatus: true),                 //  61  =
+    pastedKeyStroke(matrixValue: .periodKey, shiftStatus: true),                //  62  >
+    pastedKeyStroke(matrixValue: .forwardSlashKey, shiftStatus: true),          //  63  ?
+    pastedKeyStroke(matrixValue: .atKey, shiftStatus: false),                   //  64  @
+    pastedKeyStroke(matrixValue: .aKey, shiftStatus: true),                     //  65  A
+    pastedKeyStroke(matrixValue: .bKey, shiftStatus: true),                     //  66  B
+    pastedKeyStroke(matrixValue: .cKey, shiftStatus: true),                     //  67  C
+    pastedKeyStroke(matrixValue: .dKey, shiftStatus: true),                     //  68  D
+    pastedKeyStroke(matrixValue: .eKey, shiftStatus: true),                     //  69  E
+    pastedKeyStroke(matrixValue: .fKey, shiftStatus: true),                     //  70  F
+    pastedKeyStroke(matrixValue: .gKey, shiftStatus: true),                     //  71  G
+    pastedKeyStroke(matrixValue: .hKey, shiftStatus: true),                     //  72  H
+    pastedKeyStroke(matrixValue: .iKey, shiftStatus: true),                     //  73  I
+    pastedKeyStroke(matrixValue: .jKey, shiftStatus: true),                     //  74  J
+    pastedKeyStroke(matrixValue: .kKey, shiftStatus: true),                     //  75  K
+    pastedKeyStroke(matrixValue: .lKey, shiftStatus: true),                     //  76  L
+    pastedKeyStroke(matrixValue: .mKey, shiftStatus: true),                     //  77  M
+    pastedKeyStroke(matrixValue: .nKey, shiftStatus: true),                     //  78  N
+    pastedKeyStroke(matrixValue: .oKey, shiftStatus: true),                     //  79  O
+    pastedKeyStroke(matrixValue: .pKey, shiftStatus: true),                     //  80  P
+    pastedKeyStroke(matrixValue: .qKey, shiftStatus: true),                     //  81  Q
+    pastedKeyStroke(matrixValue: .rKey, shiftStatus: true),                     //  82  R
+    pastedKeyStroke(matrixValue: .sKey, shiftStatus: true),                     //  83  S
+    pastedKeyStroke(matrixValue: .tKey, shiftStatus: true),                     //  84  T
+    pastedKeyStroke(matrixValue: .uKey, shiftStatus: true),                     //  85  U
+    pastedKeyStroke(matrixValue: .vKey, shiftStatus: true),                     //  86  V
+    pastedKeyStroke(matrixValue: .wKey, shiftStatus: true),                     //  87  W
+    pastedKeyStroke(matrixValue: .xKey, shiftStatus: true),                     //  88  X
+    pastedKeyStroke(matrixValue: .yKey, shiftStatus: true),                     //  89  Y
+    pastedKeyStroke(matrixValue: .zKey, shiftStatus: true),                     //  90  Z
+    pastedKeyStroke(matrixValue: .leftSquareBracketKey, shiftStatus: false),    //  91  [
+    pastedKeyStroke(matrixValue: .backSlashKey, shiftStatus: false),            //  92  \
+    pastedKeyStroke(matrixValue: .rightSquareBracketKey, shiftStatus: false),   //  93  ]
+    pastedKeyStroke(matrixValue: .caretKey, shiftStatus: false),                //  94  ^
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false),                //  95
+    pastedKeyStroke(matrixValue: .atKey, shiftStatus: true),                    //  96  `
+    pastedKeyStroke(matrixValue: .aKey, shiftStatus: false),                    //  97  a
+    pastedKeyStroke(matrixValue: .bKey, shiftStatus: false),                    //  98  b
+    pastedKeyStroke(matrixValue: .cKey, shiftStatus: false),                    //  99  c
+    pastedKeyStroke(matrixValue: .dKey, shiftStatus: false),                    //  100 d
+    pastedKeyStroke(matrixValue: .eKey, shiftStatus: false),                    //  101 e
+    pastedKeyStroke(matrixValue: .fKey, shiftStatus: false),                    //  102 f
+    pastedKeyStroke(matrixValue: .gKey, shiftStatus: false),                    //  103 g
+    pastedKeyStroke(matrixValue: .hKey, shiftStatus: false),                    //  104 h
+    pastedKeyStroke(matrixValue: .iKey, shiftStatus: false),                    //  105 i
+    pastedKeyStroke(matrixValue: .jKey, shiftStatus: false),                    //  106 j
+    pastedKeyStroke(matrixValue: .kKey, shiftStatus: false),                    //  107 k
+    pastedKeyStroke(matrixValue: .lKey, shiftStatus: false),                    //  108 l
+    pastedKeyStroke(matrixValue: .mKey, shiftStatus: false),                    //  109 m
+    pastedKeyStroke(matrixValue: .nKey, shiftStatus: false),                    //  110 n
+    pastedKeyStroke(matrixValue: .oKey, shiftStatus: false),                    //  111 o
+    pastedKeyStroke(matrixValue: .pKey, shiftStatus: false),                    //  112 p
+    pastedKeyStroke(matrixValue: .qKey, shiftStatus: false),                    //  113 q
+    pastedKeyStroke(matrixValue: .rKey, shiftStatus: false),                    //  114 r
+    pastedKeyStroke(matrixValue: .sKey, shiftStatus: false),                    //  115 s
+    pastedKeyStroke(matrixValue: .tKey, shiftStatus: false),                    //  116 t
+    pastedKeyStroke(matrixValue: .uKey, shiftStatus: false),                    //  117 u
+    pastedKeyStroke(matrixValue: .vKey, shiftStatus: false),                    //  118 v
+    pastedKeyStroke(matrixValue: .wKey, shiftStatus: false),                    //  119 w
+    pastedKeyStroke(matrixValue: .xKey, shiftStatus: false),                    //  120 x
+    pastedKeyStroke(matrixValue: .yKey, shiftStatus: false),                    //  121 y
+    pastedKeyStroke(matrixValue: .zKey, shiftStatus: false),                    //  122 z
+    pastedKeyStroke(matrixValue: .leftSquareBracketKey, shiftStatus: true),     //  123 {
+    pastedKeyStroke(matrixValue: .backSlashKey, shiftStatus: true),             //  124 |
+    pastedKeyStroke(matrixValue: .rightSquareBracketKey, shiftStatus: true),    //  125 }
+    pastedKeyStroke(matrixValue: .caretKey, shiftStatus: true),                 //  126 ~
+    pastedKeyStroke(matrixValue: .dummyKey, shiftStatus: false)]                //  127
 
 struct MicrobeeKeyboardMapper
 {

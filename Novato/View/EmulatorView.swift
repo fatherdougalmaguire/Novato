@@ -86,6 +86,8 @@ struct emulatorView: View
     
     let startDate = Date()
     
+    @State private var pasteTask: Task<Void, Never>?
+    
     struct CRTCDisplayView: View
     {
         let snapshot: microbeeSnapshot
@@ -335,6 +337,8 @@ struct emulatorView: View
                             {
                                 _ = Task
                                 {
+                                    pasteTask?.cancel()
+                                    pasteTask = nil
                                     await vm.stopEmulation()
                                     try? await Task.sleep(for: .milliseconds(20))
                                     await vm.resetEmulation()
@@ -346,6 +350,8 @@ struct emulatorView: View
                             {
                                 _ = Task
                                 {
+                                    pasteTask?.cancel()
+                                    pasteTask = nil
                                     await vm.updateProgramCounter(address: 0x8003)
                                 }
                             }
@@ -400,28 +406,53 @@ struct emulatorView: View
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
+#endif
                             Button("Paste",systemImage: "sparkle.text.clipboard")
                             {
                                 _ = Task
                                 {
+                                    pasteTask?.cancel()
                                     let clipBoard = NSPasteboard.general
                                     if clipBoard.canReadObject(forClasses: [NSString.self], options: nil),
                                        let strings = clipBoard.readObjects(forClasses: [NSString.self], options: nil) as? [String],
                                        let text = strings.first
                                         {
-                                            let strippedText = text.replacingOccurrences(of: "\r\n", with: "\r").replacingOccurrences(of: "\n", with: "\r")
+                                            let strippedText = text
+                                                                .replacingOccurrences(of: "\r\n", with: "\r")
+                                                                .replacingOccurrences(of: "\n", with: "\r")
+                                                                .replacingOccurrences(of: "\u{2018}", with: "'")
+                                                                .replacingOccurrences(of: "\u{2019}", with: "'")
+                                                                .replacingOccurrences(of: "\u{201A}", with: "'")
+                                                                .replacingOccurrences(of: "\u{2039}", with: "'")
+                                                                .replacingOccurrences(of: "\u{203A}", with: "'")
+                                                                .replacingOccurrences(of: "\u{201C}", with: "\"")
+                                                                .replacingOccurrences(of: "\u{201D}", with: "\"")
+                                                                .replacingOccurrences(of: "\u{201E}", with: "\"")
+                                                                .replacingOccurrences(of: "\u{00AB}", with: "\"")
+                                                                .replacingOccurrences(of: "\u{00BB}", with: "\"")
+                                                                .replacingOccurrences(of: "\u{2010}", with: "-")
+                                                                .replacingOccurrences(of: "\u{2013}", with: "-")
+                                                                .replacingOccurrences(of: "\u{2014}", with: "-")
+                                                                .replacingOccurrences(of: "\u{2212}", with: "-")
+                                                                .replacingOccurrences(of: "\u{00A0}", with: " ")
+                                                                .replacingOccurrences(of: "\u{2002}", with: " ")
+                                                                .replacingOccurrences(of: "\u{2003}", with: " ")
+                                                                .replacingOccurrences(of: "\u{2009}", with: " ")
+                                                                .replacingOccurrences(of: "\u{200A}", with: " ")
+                                                                .replacingOccurrences(of: "\u{202F}", with: " ")
+                                                                .replacingOccurrences(of: "\u{3000}", with: " ")
+                                        pasteTask = Task {
                                             for char in strippedText
                                             {
                                                 guard let code = char.asciiValue else { continue }
-                                
                                                 guard code < symbolMap.count else { continue }
-
+                                                
+                                                if Task.isCancelled { break }
+                                                
                                                 let fakeKeypress = symbolMap[Int(code)]
                                                 
-//                                                print(char,code,fakeKeypress.matrixValue)
-
                                                 guard fakeKeypress.matrixValue != .dummyKey else { continue }
-                                        
+                                                
                                                 if fakeKeypress.shiftStatus
                                                 {
                                                     await vm.keyDown(.shiftKey, 0x0C)
@@ -438,10 +469,10 @@ struct emulatorView: View
                                                 }
                                             }
                                         }
+                                    }
                                 }
                             }
                             .labelStyle(.titleAndIcon)
-#endif
                         }
                     }
                     .fixedSize()

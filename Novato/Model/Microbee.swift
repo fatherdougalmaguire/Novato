@@ -795,14 +795,14 @@ actor microbee
         var mappedKey : MicrobeeKey = key
         
         keyboardMappingRule = 0
-        
+
         if capsLockActive
         {
             keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             keyboard.keyUp(.capsLockKey)
             keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             capsLockActive.toggle()
-            print("CAPSLOCK active ",capsLockActive)
+ //           print("CAPSLOCK active ",capsLockActive)
         }
         
         if keyboardType == .emulated
