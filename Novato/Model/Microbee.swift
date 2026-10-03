@@ -1975,18 +1975,21 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x30: // Undocumented - SLL B - CB 30 - The contents of B are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL B", opcode: [0xCB,0x30], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x31: // Undocumented - SLL C - CB 31 - The contents of C are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL C", opcode: [0xCB,0x31], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x32: // Undocumented - SLL D - CB 32 - The contents of D are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL D", opcode: [0xCB,0x32], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -1994,30 +1997,35 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x33: // Undocumented - SLL E - CB 33 - The contents of E are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL E", opcode: [0xCB,0x33], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x34: // Undocumented - SLL H - CB 34 - The contents of H are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL H", opcode: [0xCB,0x34], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x35: // Undocumented - SLL L - CB 35 - The contents of L are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL L", opcode: [0xCB,0x35], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x36: // Undocumented - SLL (HL) - CB 36 - The contents of (HL) are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
-            // Stub
+            // Stub)
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL (HL)", opcode: [0xCB,0x36], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 15
             incrementR(opcodeCount:2)
         case 0x37: // Undocumented - SLL A - CB 37 - The contents of A are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("CB",opcode2)
             logInstructionDetails(instructionDetails: "SLL A", opcode: [0xCB,0x37], programCounter: registers.PC)
             registers.Q = registers.F
             tStates = 8
@@ -3891,6 +3899,7 @@ actor microbee
         {
         case 0x04: // Undocumented - INC B - DD 04 - Adds one to B
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC B", opcode: [0xDD,0x04], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -3898,14 +3907,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x05: // Undocumented - DEC B - DD 05 - Subtracts one from B - DD 05
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC B", opcode: [0xDD,0x05], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x06: // Undocumented - LD B,$n - DD 06 n - Loads $n into B - DD 6 $n
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,$n", opcode: [0xDD,0x06], values: [opcode3], programCounter: registers.PC)
+            registers.B = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -3929,6 +3939,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0C: // Undocumented - INC C - DD 0C - Adds one to C
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC C", opcode: [0xDD,0x0C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -3936,20 +3947,22 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0D: // Undocumented - DEC C - DD 0D - Subtracts one from C
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC C", opcode: [0xDD,0x0D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
-        case 0x0E: // Undocumented - LD C,$n - DD 0E n - Loads n into C
-            // Stub
+        case 0x0E: // Undocumented - LD C,$n - DD 0E n - Loads $n into C
             logInstructionDetails(instructionDetails: "LD C,$n", opcode: [0xDD,0x0E], values: [opcode3], programCounter: registers.PC)
+            registers.C = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
             incrementR(opcodeCount:2)
         case 0x14: // Undocumented - INC D - DD 14 - Adds one to D
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC D", opcode: [0xDD,0x14], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -3957,14 +3970,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x15: // Undocumented - DEC D - DD 15 - Subtracts one from D
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC D", opcode: [0xDD,0x15], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x16: // Undocumented - LD D,$n - DD 16 n - Loads $n into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,$n", opcode: [0xDD,0x16], values: [opcode3], programCounter: registers.PC)
+            registers.D = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -3988,6 +4002,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1C: // Undocumented - INC E - DD 1C - Adds one to E
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC E", opcode: [0xDD,0x1C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -3995,14 +4010,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1D: // Undocumented - DEC E - DD 1D - Subtracts one from E
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC E", opcode: [0xDD,0x1D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
-        case 0x1E: // Undocumented - LD E,$n - DD 1E n - Loads n into E
-            // Stub
+        case 0x1E: // Undocumented - LD E,$n - DD 1E n - Loads $n into E
             logInstructionDetails(instructionDetails: "LD E,$n", opcode: [0xDD,0x1E], values: [opcode3], programCounter: registers.PC)
+            registers.E = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -4033,6 +4049,7 @@ actor microbee
            incrementR(opcodeCount:2)
         case 0x24: // Undocumented - INC IXH - DD 24 - Adds one to IXH
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC IXH", opcode: [0xDD,0x24], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4040,14 +4057,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x25: // Undocumented - DEC IXH - DD 25 - Subtracts one from IXH
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC IXH", opcode: [0xDD,0x25], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x26: // Undocumented - LD IHX,$n - DD 26 n - Loads $n into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IHX,$n", opcode: [0xDD,0x26], values: [opcode3], programCounter: registers.PC)
+            registers.IXH = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -4088,6 +4106,7 @@ actor microbee
            incrementR(opcodeCount:2)
         case 0x2C: // Undocumented - INC IXL - DD 2C - Adds one to IXL
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC IXL", opcode: [0xDD,0x2C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4095,14 +4114,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2D: // Undocumented - DEC IXL - DD 2D - Subtracts one from IXL
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC IXL", opcode: [0xDD,0x2D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
-        case 0x2E: // Undocumented - LD IXL,$n - DD 2E n - Loads n into IXL
-            // Stub
+        case 0x2E: // Undocumented - LD IXL,$n - DD 2E n - Loads $n into IXL
             logInstructionDetails(instructionDetails: "LD IXL,$n", opcode: [0xDD,0x2E], values: [opcode3], programCounter: registers.PC)
+            registers.IXL = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -4157,6 +4177,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3C: // Undocumented - INC A - DD 3C - Adds one to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "INC A", opcode: [0xDD,0x3C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4164,56 +4185,56 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3D: // Undocumented - DEC A - DD 3D - Subtracts one from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "DEC A", opcode: [0xDD,0x3D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
-        case 0x3E: // Undocumented - LD A,$n - DD 3E n - Loads n into A.
-            // Stub
+        case 0x3E: // Undocumented - LD A,$n - DD 3E n - Loads $n into A
             logInstructionDetails(instructionDetails: "LD A,$n", opcode: [0xDD,0x3E], values: [opcode3], programCounter: registers.PC)
+            registers.A = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
             incrementR(opcodeCount:2)
         case 0x40: // Undocumented - LD B,B - DD 40 - The contents of B are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,B", opcode: [0xDD,0x40], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x41: // Undocumented - LD B,C - DD 41 - The contents of C are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,C", opcode: [0xDD,0x41], programCounter: registers.PC)
+            registers.B = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x42: // Undocumented - LD B,D - DD 42 - The contents of D are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,D", opcode: [0xDD,0x42], programCounter: registers.PC)
+            registers.B = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x43: // Undocumented - LD B,E - DD 43 - The contents of E are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,E", opcode: [0xDD,0x43], programCounter: registers.PC)
+            registers.B = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x44: // Undocumented - LD B,IXH - DD 44 - The contents of IXH are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,IXH", opcode: [0xDD,0x44], programCounter: registers.PC)
+            registers.B = registers.IXH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x45: // Undocumented - LD B,IXL - DD 45 - The contents of IXL are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,IXL", opcode: [0xDD,0x45], programCounter: registers.PC)
+            registers.B = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -4228,320 +4249,316 @@ actor microbee
            tStates = 19
            incrementR(opcodeCount:2)
         case 0x47: // Undocumented - LD B,A - DD 47 - The contents of A are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,A", opcode: [0xDD,0x47], programCounter: registers.PC)
+            registers.B = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x48: // Undocumented - LD C,B - DD 48 - The contents of B are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,B", opcode: [0xDD,0x48], programCounter: registers.PC)
+            registers.C = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x49: // Undocumented - LD C,C - DD 49 - The contents of C are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,C", opcode: [0xDD,0x49], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4A: // Undocumented - LD C,D - DD 4A - The contents of D are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,D", opcode: [0xDD,0x4A], programCounter: registers.PC)
+            registers.C = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4B: // Undocumented - LD C,E - DD 4B - The contents of E are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,E", opcode: [0xDD,0x4B], programCounter: registers.PC)
+            registers.C = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4C: // Undocumented - LD C,IXH - DD 4C - The contents of IXH are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,IXH", opcode: [0xDD,0x4C], programCounter: registers.PC)
+            registers.C = registers.IXH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4D: // Undocumented - LD C,IXL - DD 4D - The contents of IXL are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,IXL", opcode: [0xDD,0x4D], programCounter: registers.PC)
+            registers.C = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4E: // LD C,(IX+$d) - DD 4E d - Loads the value pointed to by IX plus $d into C
-           logInstructionDetails(instructionDetails: "LD C,(IX+$d)", opcode: [0xDD,0x4E], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+            logInstructionDetails(instructionDetails: "LD C,(IX+$d)", opcode: [0xDD,0x4E], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             registers.C = bus.readByte(address: tempResult)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x4F: // Undocumented - LD C,A - DD 4F - The contents of A are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,A", opcode: [0xDD,0x4F], programCounter: registers.PC)
+            registers.C = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x50: // Undocumented - LD D,B - DD 50 - The contents of B are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,B", opcode: [0xDD,0x50], programCounter: registers.PC)
+            registers.D = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x51: // Undocumented - LD D,C - DD 51 - The contents of C are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,C", opcode: [0xDD,0x51], programCounter: registers.PC)
+            registers.D = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x52: // Undocumented - LD D,D - DD 52 - The contents of D are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,D", opcode: [0xDD,0x52], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x53: // Undocumented - LD D,E - DD 53 - The contents of E are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,E", opcode: [0xDD,0x53], programCounter: registers.PC)
+            registers.D = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x54: // Undocumented - LD D,IXH - DD 54 - The contents of IXH are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,IXH", opcode: [0xDD,0x54], programCounter: registers.PC)
+            registers.D = registers.IXH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x55: // Undocumented - LD D,IXL - DD 55 - The contents of IXL are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,IXL", opcode: [0xDD,0x55], programCounter: registers.PC)
+            registers.D = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x56: // LD D,(IX+$d) - DD 56 d - Loads the value pointed to by IX plus $d into D
-           logInstructionDetails(instructionDetails: "LD D,(IX+$d)", opcode: [0xDD,0x46], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+            logInstructionDetails(instructionDetails: "LD D,(IX+$d)", opcode: [0xDD,0x46], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             registers.D = bus.readByte(address: tempResult)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x57: // Undocumented - LD D,A - DD 57 - The contents of A are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,A", opcode: [0xDD,0x57], programCounter: registers.PC)
+            registers.D = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x58: // Undocumented - LD E,B - DD 58 - The contents of B are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,B", opcode: [0xDD,0x58], programCounter: registers.PC)
+            registers.E = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x59: // Undocumented - LD E,C - DD 59 - The contents of C are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,C", opcode: [0xDD,0x59], programCounter: registers.PC)
+            registers.E = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5A: // Undocumented - LD E,D - DD 5A - The contents of D are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,D", opcode: [0xDD,0x5A], programCounter: registers.PC)
+            registers.E = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5B: // Undocumented - LD E,E - DD 5B - The contents of E are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,E", opcode: [0xDD,0x5B], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5C: // Undocumented - LD E,IXH - DD 5C - The contents of IXH are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,IXH", opcode: [0xDD,0x5C], programCounter: registers.PC)
+            registers.E = registers.IXH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5D: // Undocumented - LD E,IXL - DD 5D - The contents of IXL are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,IXL", opcode: [0xDD,0x5D], programCounter: registers.PC)
+            registers.E = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
-       case 0x5E: // LD E,(IX+$d) - DD 5E d - Loads the value pointed to by IX plus $d into E
-           logInstructionDetails(instructionDetails: "LD E,(IX+$d)", opcode: [0xDD,0x5E], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+        case 0x5E: // LD E,(IX+$d) - DD 5E d - Loads the value pointed to by IX plus $d into E
+            logInstructionDetails(instructionDetails: "LD E,(IX+$d)", opcode: [0xDD,0x5E], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             registers.E = bus.readByte(address: tempResult)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x5F: // Undocumented - LD E,A - DD 5F - The contents of A are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,A", opcode: [0xDD,0x5F], programCounter: registers.PC)
+            registers.E = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x60: // Undocumented - LD IXH,B - DD 60 - The contents of B are loaded into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,B", opcode: [0xDD,0x60], programCounter: registers.PC)
+            registers.IXH = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x61: // Undocumented - LD IXH,C - DD 61 - The contents of C are loaded into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,C", opcode: [0xDD,0x61], programCounter: registers.PC)
+            registers.IXH = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x62: // Undocumented - LD IXH,D - DD 62 - The contents of D are loaded into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,D", opcode: [0xDD,0x62], programCounter: registers.PC)
+            registers.IXH = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x63: // Undocumented - LD IXH,E - DD 63 - The contents of E are loaded into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,E", opcode: [0xDD,0x63], programCounter: registers.PC)
+            registers.IXH = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x64: // Undocumented - LD IXH,IXH - DD 64 - The contents of IXH are loaded into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,IXH", opcode: [0xDD,0x64], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x65: // Undocumented - LD IXH,IXL - DD 65 - The contents of IXH are loaded into IXH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,IXL", opcode: [0xDD,0x65], programCounter: registers.PC)
+            registers.IXH = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
-       case 0x66: // LD H,(IX+$d) - DD 66 d - Loads the value pointed to by IX plus $d into H
-           logInstructionDetails(instructionDetails: "LD H,(IX+$d)", opcode: [0xDD,0x66], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+        case 0x66: // LD H,(IX+$d) - DD 66 d - Loads the value pointed to by IX plus $d into H
+            logInstructionDetails(instructionDetails: "LD H,(IX+$d)", opcode: [0xDD,0x66], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             registers.H = bus.readByte(address: tempResult)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x67: // Undocumented - LD IXH,A - DD 67 - The contents of A are loaded into IX
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXH,A", opcode: [0xDD,0x67], programCounter: registers.PC)
+            registers.IXH = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x68: // Undocumented - LD IXL,B - DD 68 - The contents of B are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,B", opcode: [0xDD,0x68], programCounter: registers.PC)
+            registers.IXL = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x69: // Undocumented - LD IXL,C - DD 69 - The contents of C are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,C", opcode: [0xDD,0x69], programCounter: registers.PC)
+            registers.IXL = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6A: // Undocumented - LD IXL,D - DD 6A - The contents of D are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,D", opcode: [0xDD,0x6A], programCounter: registers.PC)
+            registers.IXL = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6B: // Undocumented - LD IXL,E - DD 6B - The contents of E are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,E", opcode: [0xDD,0x6B], programCounter: registers.PC)
+            registers.IXL = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6C: // Undocumented - LD IXL,IXH - DD 6C - The contents of IXH are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,IXH", opcode: [0xDD,0x6C], programCounter: registers.PC)
+            registers.IXL = registers.IXH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6D: // Undocumented - LD IXL,IXL - DD 6D - The contents of IXL are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,IXL", opcode: [0xDD,0x6D], programCounter: registers.PC)
+            registers.IXL = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
-       case 0x6E: // LD L,(IX+$d) - DD 6E d - Loads the value pointed to by IX plus $d into L
-           logInstructionDetails(instructionDetails: "LD L,(IX+$d)", opcode: [0xDD,0x6E], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+        case 0x6E: // LD L,(IX+$d) - DD 6E d - Loads the value pointed to by IX plus $d into L
+            logInstructionDetails(instructionDetails: "LD L,(IX+$d)", opcode: [0xDD,0x6E], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             registers.L = bus.readByte(address: tempResult)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x6F: // Undocumented - LD IXL,A - DD 6F - The contents of A are loaded into IXL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IXL,A", opcode: [0xDD,0x6F], programCounter: registers.PC)
+            registers.IXL = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
-       case 0x70: // LD (IX+$d),B - DD 70 d - Stores B to the memory location pointed to by IX plus $d
-           logInstructionDetails(instructionDetails: "LD (IX+$d),B", opcode: [0xDD,0x70], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+        case 0x70: // LD (IX+$d),B - DD 70 d - Stores B to the memory location pointed to by IX plus $d
+            logInstructionDetails(instructionDetails: "LD (IX+$d),B", opcode: [0xDD,0x70], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             bus.writeByte(address: tempResult, value: registers.B)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
-       case 0x71: // LD (IX+$d),C - DD 71 d - Stores C to the memory location pointed to by IX plus $d
-           logInstructionDetails(instructionDetails: "LD (IX+$d),C", opcode: [0xDD,0x71], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
+        case 0x71: // LD (IX+$d),C - DD 71 d - Stores C to the memory location pointed to by IX plus $d
+            logInstructionDetails(instructionDetails: "LD (IX+$d),C", opcode: [0xDD,0x71], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             bus.writeByte(address: tempResult, value: registers.C)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x72: // LD (IX+$d),D - DD 72 d - Stores D to the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "LD (IX+$d),D", opcode: [0xDD,0x72], values: [opcode3], programCounter: registers.PC)
             let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -4560,14 +4577,14 @@ actor microbee
            registers.Q = 0
            tStates = 19
            incrementR(opcodeCount:2)
-       case 0x74: // LD (IX+$d),H - DD 74 d - Stores H to the memory location pointed to by IX plus $d
-           logInstructionDetails(instructionDetails: "LD (IX+$d),H", opcode: [0xDD,0x74], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+        case 0x74: // LD (IX+$d),H - DD 74 d - Stores H to the memory location pointed to by IX plus $d
+            logInstructionDetails(instructionDetails: "LD (IX+$d),H", opcode: [0xDD,0x74], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             bus.writeByte(address: tempResult, value: registers.H)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
            incrementR(opcodeCount:2)
         case 0x75: // LD (IX+$d),L - DD 75 d - Stores L to the memory location pointed to by IX plus $d
             logInstructionDetails(instructionDetails: "LD (IX+$d),L", opcode: [0xDD,0x75], values: [opcode3], programCounter: registers.PC)
@@ -4578,68 +4595,67 @@ actor microbee
             registers.Q = 0
             tStates = 19
             incrementR(opcodeCount:2)
-       case 0x77: // LD (IX+$d),A - DD 77 d - Stores A to the memory location pointed to by IX plus $d
-           logInstructionDetails(instructionDetails: "LD (IX+$d),A", opcode: [0xDD,0x77], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
-        bus.writeByte(address: tempResult, value: registers.A)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+        case 0x77: // LD (IX+$d),A - DD 77 d - Stores A to the memory location pointed to by IX plus $d
+            logInstructionDetails(instructionDetails: "LD (IX+$d),A", opcode: [0xDD,0x77], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
+            bus.writeByte(address: tempResult, value: registers.A)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x78: // Undocumented - LD A,B - DD 78 - The contents of B are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,B", opcode: [0xDD,0x78], programCounter: registers.PC)
+            registers.A = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x79: // Undocumented - LD A,C - DD 79 - The contents of C are loaded into A. - DD 79
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,C", opcode: [0xDD,0x79], programCounter: registers.PC)
+            registers.A = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7A: // Undocumented - LD A,D - DD 7A - The contents of D are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,D", opcode: [0xDD,0x7A], programCounter: registers.PC)
+            registers.A = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7B: // Undocumented - LD A,E - DD 7B - The contents of E are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,E", opcode: [0xDD,0x7B], programCounter: registers.PC)
+            registers.A = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7C: // Undocumented - LD A,IXH - DD 7C - The contents of IXH are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,IXH", opcode: [0xDD,0x7C], programCounter: registers.PC)
+            registers.A = registers.IXH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7D: // Undocumented - LD A,IXL - DD 7D - The contents of IXL are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,IXL", opcode: [0xDD,0x7D], programCounter: registers.PC)
+            registers.A = registers.IXL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
-       case 0x7E: // LD A,(IX+$d) - DD 7E d - Loads the value pointed to by IX plus $d into A
-           logInstructionDetails(instructionDetails: "LD A,(IX+$d)", opcode: [0xDD,0x7E], values: [opcode3], programCounter: registers.PC)
-           let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
-           registers.WZ = tempResult
+        case 0x7E: // LD A,(IX+$d) - DD 7E d - Loads the value pointed to by IX plus $d into A
+            logInstructionDetails(instructionDetails: "LD A,(IX+$d)", opcode: [0xDD,0x7E], values: [opcode3], programCounter: registers.PC)
+            let tempResult = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResult
             registers.A = bus.readByte(address: tempResult)
-           registers.PC = registers.PC &+ 3
-           registers.Q = 0
-           tStates = 19
-           incrementR(opcodeCount:2)
+            registers.PC = registers.PC &+ 3
+            registers.Q = 0
+            tStates = 19
+            incrementR(opcodeCount:2)
         case 0x7F: // Undocumented - LD A,A - DD 7F - The contents of A are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,A", opcode: [0xDD,0x7F], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
@@ -4647,6 +4663,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x80: // Undocumented - ADD A,B - DD 80 - Adds B to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,B", opcode: [0xDD,0x80], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4654,6 +4671,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x81: // Undocumented - ADD A,C - DD 81 - Adds C to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,C", opcode: [0xDD,0x81], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4661,6 +4679,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x82: // Undocumented - ADD A,D - DD 82 - Adds D to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,D", opcode: [0xDD,0x82], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4668,6 +4687,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x83: // Undocumented - ADD A,E - DD 83 - Adds E to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,E", opcode: [0xDD,0x83], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4675,6 +4695,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x84: // Undocumented - ADD A,IXH - DD 84 - Adds IXH to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,IXH", opcode: [0xDD,0x84], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4682,6 +4703,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x85: // Undocumented - ADD A,IXL - DD 85 - Adds IXL to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,IXL", opcode: [0xDD,0x85], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4698,6 +4720,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x87: // Undocumented - ADD A,A - DD 87 - Adds A to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,A", opcode: [0xDD,0x87], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4705,6 +4728,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x88: // Undocumented - ADC A,B - DD 88 - Adds B and the carry flag to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,B", opcode: [0xDD,0x88], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4712,6 +4736,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x89: // Undocumented - ADC A,C - DD 89 - Adds C and the carry flag to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,C", opcode: [0xDD,0x89], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4719,6 +4744,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8A: // Undocumented - ADC A,D - DD 8A - Adds D and the carry flag to
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,D", opcode: [0xDD,0x8A], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4726,6 +4752,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8B: // Undocumented - ADC A,E - DD 8B - Adds E and the carry flag to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,E", opcode: [0xDD,0x8B], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4733,6 +4760,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8C: // Undocumented - ADC A,IXH - DD 8C - Adds IXH and the carry flag to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,IXH", opcode: [0xDD,0x8C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4740,6 +4768,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8D: // Undocumented - ADC A,IXL - DD 8D - Adds IXL and the carry flag to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,IXL", opcode: [0xDD,0x8D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4757,6 +4786,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8F: // Undocumented - ADC A,A - DD 8F - Adds A and the carry flag to A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,A", opcode: [0xDD,0x8F], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4764,6 +4794,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x90: // Undocumented - SUB B - DD 90 - Subtracts B from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB B", opcode: [0xDD,0x90], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4771,6 +4802,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x91: // Undocumented - SUB C - DD 91 - Subtracts C from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB C", opcode: [0xDD,0x90], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4778,6 +4810,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x92: // Undocumented - SUB D - DD 92 - Subtracts D from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB D", opcode: [0xDD,0x92], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4785,6 +4818,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x93: // Undocumented - SUB E - DD 93 - Subtracts E from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB E", opcode: [0xDD,0x93], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4792,6 +4826,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x94: // Undocumented - SUB IXH - DD 94 - Subtracts IXH from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB IXH", opcode: [0xDD,0x94], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4799,6 +4834,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x95: // Undocumented - SUB IXL - DD 95 - Subtracts IXL from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB IXL", opcode: [0xDD,0x95], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4815,6 +4851,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x97: // Undocumented - SUB A - DD 97 - Subtracts A from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SUB A", opcode: [0xDD,0x97], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4822,6 +4859,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x98: // Undocumented - SBC A,B - DD 98 - Subtracts B and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,B", opcode: [0xDD,0x98], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4829,6 +4867,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x99: // Undocumented - SBC A,C - DD 99 - Subtracts C and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,C", opcode: [0xDD,0x99], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4836,6 +4875,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9A: // Undocumented - SBC A,D - DD 9A - Subtracts D and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,D", opcode: [0xDD,0x9A], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4843,6 +4883,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9B: // Undocumented - SBC A,E - DD 9B - Subtracts E and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,E", opcode: [0xDD,0x9B], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4850,6 +4891,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9C: // Undocumented - SBC A,IXH - DD 9C - Subtracts IXH and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,IXH", opcode: [0xDD,0x9C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4857,6 +4899,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9D: // Undocumented - SBC A,IXL - DD 9D - Subtracts IXL and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,IXL", opcode: [0xDD,0x9D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4875,6 +4918,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9F: // Undocumented - SBC A,A - DD 9F - Subtracts A and the carry flag from A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,A", opcode: [0xDD,0x9F], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4882,6 +4926,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA0: // Undocumented - AND B - DD A0 - Bitwise AND on A with B
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND B", opcode: [0xDD,0xA0], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4889,6 +4934,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA1: // Undocumented - AND C - DD A1 - Bitwise AND on A with C
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND C", opcode: [0xDD,0xA1], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4896,6 +4942,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA2: // Undocumented - AND D - DD A2 - Bitwise AND on A with D
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND D", opcode: [0xDD,0xA2], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4903,6 +4950,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA3: // Undocumented - AND E - DD A3 - Bitwise AND on A with E
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND E", opcode: [0xDD,0xA3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4910,6 +4958,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA4: // Undocumented - AND IXH - DD A4 - Bitwise AND on A with IXH
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND IXH", opcode: [0xDD,0xA4], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4917,6 +4966,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA5: // Undocumented - AND IXL - DD A5 - Bitwise AND on A with IXL
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND IXL", opcode: [0xDD,0xA5], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4933,6 +4983,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA7: // Undocumented - AND A - DD A7 - Bitwise AND on A with A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "AND A", opcode: [0xDD,0xA7], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4940,6 +4991,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA8: // Undocumented - XOR B - DD A8 - Bitwise XOR on A with B - DD A8
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR B", opcode: [0xDD,0xA8], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4947,6 +4999,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA9: // Undocumented - XOR C - DD A9 - Bitwise XOR on A with C
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR C", opcode: [0xDD,0xA9], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4954,6 +5007,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAA: // Undocumented - XOR D - DD AA - Bitwise XOR on A with D
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR D", opcode: [0xDD,0xAA], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4961,6 +5015,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAB: // Undocumented - XOR E - DD AB - Bitwise XOR on A with E
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR E", opcode: [0xDD,0xAB], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4968,6 +5023,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAC: // Undocumented - XOR IXH - DD AC - Bitwise XOR on A with IXH
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR IXH", opcode: [0xDD,0xAC], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4975,6 +5031,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAD: // Undocumented - XOR IXL - DD AD - Bitwise XOR on A with IXL
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR IXL", opcode: [0xDD,0xAD], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4991,6 +5048,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAF: // Undocumented - XOR A - DD AF - Bitwise XOR on A with A.
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "XOR A", opcode: [0xDD,0xAF], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -4998,6 +5056,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB0: // Undocumented - OR B - DD B0 - Bitwise OR on A with B
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR B", opcode: [0xDD,0xB0], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5005,6 +5064,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB1: // Undocumented - OR C - DD B1 - Bitwise OR on A with C
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR C", opcode: [0xDD,0xB1], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5012,6 +5072,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB2: // Undocumented - OR D - DD B2 - Bitwise OR on A with D
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR D", opcode: [0xDD,0xB2], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5019,6 +5080,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB3: // Undocumented - OR E - DD B3 - Bitwise OR on A with E
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR E", opcode: [0xDD,0xB3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5026,6 +5088,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB4: // Undocumented - OR IXH - DD B4 - Bitwise OR on A with IXH
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR IXH", opcode: [0xDD,0xB4], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5033,6 +5096,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB5: // Undocumented - OR IXL - DD B5 - Bitwise OR on A with IXL
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR IXL", opcode: [0xDD,0xB5], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5049,6 +5113,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB7: // Undocumented - OR A - DD B7 - Bitwise OR on A with A
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "OR A", opcode: [0xDD,0xB7], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5056,6 +5121,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB8: // Undocumented - CP B - DD B8 - Subtracts B from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP B", opcode: [0xDD,0xB8], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5063,6 +5129,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB9: // Undocumented - CP C - DD B9 - Subtracts C from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP C", opcode: [0xDD,0xB9], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5070,6 +5137,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBA: // Undocumented - CP D - DD BA - Subtracts D from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP D", opcode: [0xDD,0xBA], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5077,6 +5145,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBB: // Undocumented - CP E - DD BB - Subtracts E from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP E", opcode: [0xDD,0xBB], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5084,6 +5153,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBC: // Undocumented - CP IXH - DD BC - Subtracts IXH from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP IXH", opcode: [0xDD,0xBC], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5091,6 +5161,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBD: // Undocumented - CP IXL - DD BD - Subtracts IXL from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP IXL", opcode: [0xDD,0xBD], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5111,6 +5182,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBF: // Undocumented - CP A - DD BF - Subtracts A from A and affects flags according to the result. A is not modified
             // Stub
+            print("DD",opcode2)
             logInstructionDetails(instructionDetails: "CP A", opcode: [0xDD,0xBF], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -5180,44 +5252,128 @@ actor microbee
         {
         case 0x00: // Undocumented - RLC (IX+$d),B - DD CB d 00 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in B
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x00], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x01: // Undocumented - RLC (IX+$d),C - DD CB d 01 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in C
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x01], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x02: // Undocumented - RLC (IX+$d),D - DD CB d 02 -The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in C
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x02], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x03: // Undocumented - RLC (IX+$d),E - DD CB d 03 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in E
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x03], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x04: // Undocumented - RLC (IX+$d),H - DD CB d 04 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in H
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x04], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x05: // Undocumented - RLC (IX+$d),L - DD CB d 05 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in L
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x05], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x06: // RLC (IX+$d) - DD CB d 06 - The contents of (IX+$d) are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0
@@ -5240,51 +5396,149 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x07: // Undocumented - RLC (IX+$d),A - DD CB d 07 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in A
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RLC (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x07], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let tempResult = (tempOldValue << 1) | (tempOldValue >> 7)
+            let carry = (tempOldValue  & 0x80) >> 7
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x08: // Undocumented - RRC (IX+$d),B - DD CB d 08 - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in B
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x08], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x09: // Undocumented - RRC (IX+$d),C - DD CB d 09 - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in C
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x09], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x0A: // Undocumented - RRC (IX+$d),D - DD CB d 0A - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in D
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x0A], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x0B: // Undocumented - RRC (IX+$d),E - DD CB d 0B - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in E
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x0B], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x0C: // Undocumented - RRC (IX+$d),H - DD CB d 0C - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in H
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x0C], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x0D: // Undocumented - RRC (IX+$d),L - DD CB d 0D - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in L
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x0D], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x0E: // RRC (IX+$d) - DD CB d 0E - The contents of (IX+$d) are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7
@@ -5307,13 +5561,28 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0F: // Undocumented - RRC (IX+$d),A - DD CB d 0F - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in A
             // Stub
+            print("+DDCB",opcode4)
             logInstructionDetails(instructionDetails: "RRC (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x0F], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            registers.WZ = tempResultAddress
+            let tempOldValue = bus.readByte(address: tempResultAddress)
+            let carry = tempOldValue & 0x01
+            let tempResult = (tempOldValue << 7) | (tempOldValue >> 1)
+            (_,registers.F) = z80FastFlags.logicHelper(tempResult: tempResult)
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = (registers.F & ~z80Flags.X.rawValue) | (tempResult & z80Flags.X.rawValue)   // Preserve bit 3 (X) flags from result
+            registers.F = (registers.F & ~z80Flags.Y.rawValue) | (tempResult & z80Flags.Y.rawValue)   // Preserve bit 5 (Y) flags from result
+            registers.F = registers.F | carry
             registers.PC = registers.PC &+ 4
-            registers.Q = 0 //  change for flag opcodes
+            registers.Q = registers.F
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x10: // Undocumented - RL (IX+$d),B - DD CB d 10 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in B
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x10], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5321,6 +5590,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x11: // Undocumented - RL (IX+$d),C - DD CB d 11 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in C
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x11], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5328,6 +5598,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x12: // Undocumented - RL (IX+$d),D - DD CB d 12 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in D
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x12], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5335,6 +5606,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x13: // Undocumented - RL (IX+$d),E - DD CB d 13 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in E
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x13], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5342,6 +5614,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x14: // Undocumented - RL (IX+$d),H - DD CB d 14 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in H
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x14], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5349,6 +5622,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x15: // Undocumented - RL (IX+$d),L - DD CB d 15 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in L
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x15], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5375,6 +5649,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x17: // Undocumented - RL (IX+$d),A - DD CB d 17 - The contents of the memory location pointed to by IX plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in A
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RL (IX+$d),A",opcode: [0xDD,0xCB,opcode3,0x17], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5382,6 +5657,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x18: // Undocumented - RR (IX+$d),B - DD CB d 18 - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in B
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x18], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5389,6 +5665,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x19: // Undocumented - RR (IX+$d),C - DD CB d 19 - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in C
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x19], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5396,6 +5673,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1A: // Undocumented - RR (IX+$d),D - DD CB d 1A - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in D
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x1A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5403,6 +5681,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1B: // Undocumented - RR (IX+$d),E - DD CB d 1B - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in E
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x1B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5410,6 +5689,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1C: // Undocumented - RR (IX+$d),H - DD CB d 1C - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in H
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x1C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5417,6 +5697,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1D: // Undocumented - RR (IX+$d),L - DD CB d 1D - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in L
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x1D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5443,6 +5724,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1F: // Undocumented - RR (IX+$d),A - DD CB d 1F - The contents of the memory location pointed to by IX plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in A
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "RR (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x1F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5450,6 +5732,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x20: // Undocumented - SLA (IX+$d),B - DD CB d 20 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in B
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x20], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5457,6 +5740,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x21: // Undocumented - SLA (IX+$d),C - DD CB d 21 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in C
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x21], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5464,6 +5748,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x22: // Undocumented - SLA (IX+$d),D  - DD CB d 22 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in D
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x22], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5471,6 +5756,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x23: // Undocumented - SLA (IX+$d),E - DD CB d 23 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in E
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x23], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5478,6 +5764,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x24: // Undocumented - SLA (IX+$d),H - DD CB d 24 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in H
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x24], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5485,6 +5772,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x25: // Undocumented - SLA (IX+$d),L - DD CB d 25 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in L
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x25], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5510,6 +5798,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x27: // Undocumented - SLA (IX+$d),A - DD CB d 27 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in A
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLA (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x27], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5517,6 +5806,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x28: // Undocumented - SRA (IX+$d),B - DD CB d 28 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in B
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x28], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5524,6 +5814,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x29: // Undocumented - SRA (IX+$d),C - DD CB d 29 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in C
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x29], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5531,6 +5822,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2A: // Undocumented - SRA (IX+$d),D - DD CB d 2A - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in D
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x2A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5538,6 +5830,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2B: // Undocumented - SRA (IX+$d),E - DD CB d 2B - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in E
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x2B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5545,6 +5838,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2C: // Undocumented - SRA (IX+$d),H - DD CB d 2C - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in H
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x2C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5552,6 +5846,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2D: // Undocumented - SRA (IX+$d),L - DD CB d 2D - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in L
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x2D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5578,6 +5873,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2F: // Undocumented - SRA (IX+$d),A - DD CB d 2F - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in A
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRA (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x2F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5585,6 +5881,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x30: // Undocumented - SLL (IX+$d),B - DD CB d 30 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in B
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x30], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5592,6 +5889,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x31: // Undocumented - SLL (IX+$d),C - DD CB d 31 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in C
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x31], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5599,6 +5897,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x32: // Undocumented - SLL (IX+$d),D - DD CB d 32 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in D
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x32], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5606,6 +5905,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x33: // Undocumented - SLL (IX+$d),E - DD CB d 33 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in E
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x33], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5613,6 +5913,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x34: // Undocumented - SLL (IX+$d),H - DD CB d 34 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in H
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x34], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5620,6 +5921,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x35: // Undocumented - SLL (IX+$d),L - DD CB d 35 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in L
             // Stub
+            print("DDCB------",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x35], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5627,6 +5929,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x36: // Undocumented - SLL (IX+$d) - DD CB d 36 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d)", opcode: [0xDD,0xCB,opcode3,0x36], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5634,6 +5937,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x37: // Undocumented - SLL (IX+$d),A - DD CB d 37 - The contents of the memory location pointed to by IX plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in A
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SLL (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x37], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5641,6 +5945,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x38: // Undocumented - SRL (IX+$d),B - DD CB d 38 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in B
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x38], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5648,6 +5953,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x39: // Undocumented - SRL (IX+$d),C - DD CB d 39 - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in C
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x39], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5655,6 +5961,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3A: // Undocumented - SRL (IX+$d),D - DD CB d 3A - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in D
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x3A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5662,6 +5969,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3B: // Undocumented - SRL (IX+$d),E - DD CB d 3B - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in E
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x3B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5669,6 +5977,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3C: // Undocumented - SRL (IX+$d),H - DD CB d 3C - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in H
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x3C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5676,6 +5985,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3D: // Undocumented - SRL (IX+$d),L - DD CB d 3D - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in L
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x3D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -5701,12 +6011,14 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3F: // Undocumented - SRL (IX+$d),A - DD CB d 3F - The contents of the memory location pointed to by IX plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in A
             // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "SRL (IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x3F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x40: // Undocumented - BIT 0,(IX+$d) - DD CB d 40 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x40], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5718,6 +6030,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x41: // Undocumented - BIT 0,(IX+$d) - DD CB d 41 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x41], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5729,6 +6042,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x42: // Undocumented - BIT 0,(IX+$d) - DD CB d 42 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x42], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5740,6 +6054,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x43: // Undocumented - BIT 0,(IX+$d) - DD CB d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x43], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5751,6 +6066,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x44: // Undocumented - BIT 0,(IX+$d) - DD CB d 44 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x44], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5762,6 +6078,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x45: // Undocumented - BIT 0,(IX+$d) - DD CB d 45 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x45], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5793,6 +6110,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x47: // Undocumented - BIT 0,(IX+$d) - DD CB d 47 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 0,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x47], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -5804,6 +6122,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x48: // Undocumented - BIT 1,(IX+$d) - DD CB d 48 - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x48], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5815,6 +6134,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x49: // Undocumented - BIT 1,(IX+$d) - DD CB d 49 - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x49], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5826,6 +6146,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4A: // Undocumented - BIT 1,(IX+$d) - DD CB d 4A - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5837,6 +6158,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4B: // Undocumented - BIT 1,(IX+$d) - DD CB d 4B - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5848,6 +6170,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4C: // Undocumented - BIT 1,(IX+$d) - DD CB d 4C - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5859,6 +6182,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4D: // Undocumented - BIT 1,(IX+$d) - DD CB d 4D - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5890,6 +6214,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4F: // Undocumented - BIT 1,(IX+$d) - DD CB d 4F - Tests bit 1 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 1,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x4F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -5901,6 +6226,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x50: // Undocumented - BIT 2,(IX+$d) - DD CB d 50 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x50], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5911,6 +6237,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x51: // Undocumented - BIT 2,(IX+$d) - DD CB d 51 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x51], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5921,6 +6248,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x52: // Undocumented - BIT 2,(IX+$d) - DD CB d 52 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x52], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5931,6 +6259,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x53: // Undocumented - BIT 2,(IX+$d) - DD CB d 53 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x53], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5941,6 +6270,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x54: // Undocumented - BIT 2,(IX+$d) - DD CB d 54 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x54], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5951,6 +6281,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x55: // Undocumented - BIT 2,(IX+$d) - DD CB d 55 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x55], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5981,6 +6312,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x57: // Undocumented - BIT 2,(IX+$d) - DD CB d 57 - Tests bit 2 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 2,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x57], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -5991,6 +6323,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x58: // Undocumented - BIT 3,(IX+$d) - DD CB d 58 - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x58], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6001,6 +6334,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x59: // Undocumented - BIT 3,(IX+$d) - DD CB d 59 - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x59], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6011,6 +6345,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5A: // Undocumented - BIT 3,(IX+$d) - DD CB d 5A - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6021,6 +6356,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5B: // Undocumented - BIT 3,(IX+$d) - DD CB d 5B - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6031,6 +6367,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5C: // Undocumented - BIT 3,(IX+$d) - DD CB d 5C - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6041,6 +6378,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5D: // Undocumented - BIT 3,(IX+$d) - DD CB d 5D - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6051,6 +6389,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5E: // BIT 3,(IX+$d) - DD CB d 5E - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -6071,6 +6410,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5F: // Undocumented - BIT 3,(IX+$d) - DD CB d 5F - Tests bit 3 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 3,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x5F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -6081,6 +6421,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x60: // Undocumented - BIT 4,(IX+$d) - DD CB d 60 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x60], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6091,6 +6432,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x61: // Undocumented - BIT 4,(IX+$d) - DD CB d 61 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x61], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6101,6 +6443,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x62: // Undocumented - BIT 4,(IX+$d) - DD CB d 62 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x62], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6111,6 +6454,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x63: // Undocumented - BIT 4,(IX+$d) - DD CB d 63 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x63], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6121,6 +6465,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x64: // Undocumented - BIT 4,(IX+$d) - DD CB d 64 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x64], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6131,6 +6476,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x65: // Undocumented - BIT 4,(IX+$d) - DD CB d 65 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x65], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6141,6 +6487,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x66: // BIT 4,(IX+$d) - DD CB d 66 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x66], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -6161,6 +6508,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x67: // Undocumented - BIT 4,(IX+$d) - DD CB d 67 - Tests bit 4 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 4,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x67], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -6171,6 +6519,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x68: // Undocumented - BIT 5,(IX+$d) - DD CB d 68 - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x68], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6181,6 +6530,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x69: // Undocumented - BIT 5,(IX+$d) - DD CB d 69 - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x69], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6191,6 +6541,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6A: // Undocumented - BIT 5,(IX+$d) - DD CB d 6A - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6201,6 +6552,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6B: // Undocumented - BIT 5,(IX+$d) - DD CB d 6B - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6211,6 +6563,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6C: // Undocumented - BIT 5,(IX+$d) - DD CB d 6C - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6221,6 +6574,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6D: // Undocumented - BIT 5,(IX+$d) - DD CB d 6D - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6231,6 +6585,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6E: // BIT 5,(IX+$d) - DD CB d 6E - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -6251,6 +6606,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6F: // Undocumented - BIT 5,(IX+$d) - DD CB d 6F - Tests bit 5 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 5,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x6F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -6261,6 +6617,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x70: // Undocumented - BIT 6,(IX+$d) - DD CB d 70 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x70], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6271,6 +6628,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x71: // Undocumented - BIT 6,(IX+$d) - DD CB d 71 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x71], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6281,6 +6639,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x72: // Undocumented - BIT 6,(IX+$d) - DD CB d 72 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x72], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6291,6 +6650,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x73: // Undocumented - BIT 6,(IX+$d) - DD CB d 73 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x73], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6301,6 +6661,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x74: // Undocumented - BIT 6,(IX+$d) - DD CB d 74 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x74], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6311,6 +6672,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x75: // Undocumented - BIT 6,(IX+$d) - DD CB d 75 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x75], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6321,6 +6683,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x76: // BIT 6,(IX+$d) - DD CB d 76 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x76], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -6341,6 +6704,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x77: // Undocumented - BIT 6,(IX+$d) - DD CB d 77 - Tests bit 6 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 6,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x77], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -6351,6 +6715,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:3)
         case 0x78: // Undocumented - BIT 7,(IX+$d) - DD CB d 78 - Tests bit 7 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x78], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6361,6 +6726,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x79: // Undocumented - BIT 7,(IX+$d) - DD CB d 79 - Tests bit 7 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x79], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6371,6 +6737,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7A: // Undocumented - BIT 7,(IX+$d) - DD CB d 7A - Tests bit 7 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6381,6 +6748,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7B: // Undocumented - BIT 7,(IX+$d) - DD CB d 7B - Tests bit 7 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6391,6 +6759,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7C: // Undocumented - BIT 7,(IX+$d) - DD CB d 7C - Tests bit 7 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6401,6 +6770,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7D: // Undocumented - BIT 7,(IX+$d) - DD CB d 7D - Tests bit 7 of the memory location pointed to by IX plus $d L
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6411,6 +6781,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7E: // BIT 7,(IX+$d) - DD CB d 7E - Tests bit 7 of the memory location pointed to by IX plus $d
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -6431,6 +6802,8 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7F: // Undocumented - BIT 7,(IX+$d) - DD CB d 7F - Tests bit 7 of the memory location pointed to by IX plus $d
+            // Stub
+            print("DDCB",String(format: "%02X",opcode4))
             logInstructionDetails(instructionDetails: "BIT 7,(IX+$d)", opcode: [0xDD,0xCB,opcode3,0x7F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -6441,43 +6814,67 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x80: // Undocumented - RES 0,(IX+$d),B - DD CB d 80 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x80], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x81: // Undocumented - RES 0,(IX+$d),C - DD CB d 81 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x81], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x82: // Undocumented - RES 0,(IX+$d),D - DD CB d 82 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x82], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x83: // Undocumented - RES 0,(IX+$d),E - DD CB d 83 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x83], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x84: // Undocumented - RES 0,(IX+$d),H - DD CB d 84 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x84], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x85: // Undocumented - RES 0,(IX+$d),L - DD CB d 85 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x85], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6493,50 +6890,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x87: // Undocumented - RES 0,(IX+$d),A - DD CB d 87 - Resets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x87], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x88: // Undocumented - RES 1,(IX+$d),B - DD CB d 88 - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x88], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x89: // Undocumented - RES 1,(IX+$d),C - DD CB d 89 - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x89], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8A: // Undocumented - RES 1,(IX+$d),D - DD CB d 8A - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x8A], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8B: // Undocumented - RES 1,(IX+$d),E - DD CB d 8B - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x8B], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8C: // Undocumented - RES 1,(IX+$d),H - DD CB d 8C - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x8C], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8D: // Undocumented - RES 1,(IX+$d),L - DD CB d 8D - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x8D], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6552,50 +6977,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8F: // Undocumented - RES 1,(IX+$d),A - DD CB d 8F - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x8F], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x90: // Undocumented - RES 2,(IX+$d),B - DD CB d 90 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x90], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x91: // Undocumented - RES 2,(IX+$d),C - DD CB d 91 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x91], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x92: // Undocumented - RES 2,(IX+$d),D - DD CB d 92 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x92], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x93: // Undocumented - RES 2,(IX+$d),E - DD CB d 93 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x93], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x94: // Undocumented - RES 2,(IX+$d),H - DD CB d 94 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x94], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x95: // Undocumented - RES 2,(IX+$d),L - DD CB d 95 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x95], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6611,50 +7064,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x97: // Undocumented - RES 2,(IX+$d),A - DD CB d 97 - Resets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x97], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x98: // Undocumented - RES 3,(IX+$d),B - DD CB d 98 - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0x98], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x99: // Undocumented - RES 3,(IX+$d),C - DD CB d 99 - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0x99], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9A: // Undocumented - RES 3,(IX+$d),D - DD CB d 9A - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0x9A], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9B: // Undocumented - RES 3,(IX+$d),E - DD CB d 9B - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0x9B], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9C: // Undocumented - RES 3,(IX+$d),H - DD CB d 9C - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0x9C], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9D: // Undocumented - RES 3,(IX+$d),L - DD CB d 9D - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0x9D], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6670,50 +7151,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9F: // Undocumented - RES 3,(IX+$d),A - DD CB d 9F - Resets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0x9F], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA0: // Undocumented - RES 4,(IX+$d),B - DD CB d A0 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xA0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA1: // Undocumented - RES 4,(IX+$d),C - DD CB d A1 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xA1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA2: // Undocumented - RES 4,(IX+$d),D - DD CB d A2 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xA2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA3: // Undocumented - RES 4,(IX+$d),E - DD CB d A3 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xA3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA4: // Undocumented - RES 4,(IX+$d),H - DD CB d A4 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xA4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA5: // Undocumented - RES 4,(IX+$d),L - DD CB d A5 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xA5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6729,50 +7238,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA7: // Undocumented - RES 4,(IX+$d),A - DD CB d A7 - Resets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xA7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA8: // Undocumented - RES 5,(IX+$d),B - DD CB d A8 - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xA8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA9: // Undocumented - RES 5,(IX+$d),C - DD CB d A9 - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xA9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAA: // Undocumented - RES 5,(IX+$d),D - DD CB d AA - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xAA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAB: // Undocumented - RES 5,(IX+$d),E - DD CB d AB - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xAB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAC: // Undocumented - RES 5,(IX+$d),H - DD CB d AC - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xAC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAD: // Undocumented - RES 5,(IX+$d),L - DD CB d AD - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xAD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6788,50 +7325,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAF: // Undocumented - RES 5,(IX+$d),A - DD CB d AF - Resets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xAF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB0: // Undocumented - RES 6,(IX+$d),B - DD CB d B0 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xB0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB1: // Undocumented - RES 6,(IX+$d),C - DD CB d B1 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xB1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB2: // Undocumented - RES 6,(IX+$d),D - DD CB d B2 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xB2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB3: // Undocumented - RES 6,(IX+$d),E - DD CB d B3 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xB3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB4: // Undocumented - RES 6,(IX+$d),H - DD CB d B4 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xB4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB5: // Undocumented - RES 6,(IX+$d),L - DD CB d B5 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xB5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6847,50 +7412,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB7: // Undocumented - RES 6,(IX+$d),A - DD CB d B7 - Resets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xB7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB8: // Undocumented - RES 7,(IX+$d),B - DD CB d B8 - Resets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xB8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB9: // Undocumented - RES 7,(IX+$d),C - DD CB d B9 - Resets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xB9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBA: // Undocumented - RES 7,(IX+$d),D - DD CB d BA - Resets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xBA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBB: // Undocumented - RES 7,(IX+$d),E - DD CB d BB - Resets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xBB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBC: // Undocumented - RES 7,(IX+$d),H - DD CB d BC - Resets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xBC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBD: // Undocumented - RES 7,(IX+$d),L - DD CB d BD - Resets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xBD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6906,50 +7499,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBF: // Undocumented - RES 7,(IX+$d),A - DD CB d BF - Resets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xBF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC0: // Undocumented - SET 0,(IX+$d),B - DD CB d C0 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xC0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC1: // Undocumented - SET 0,(IX+$d),C - DD CB d C1 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xC1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC2: // Undocumented - SET 0,(IX+$d),D - DD CB d C2 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xC2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC3: // Undocumented - SET 0,(IX+$d),E - DD CB d C3 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xC3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC4: // Undocumented - SET 0,(IX+$d),H - DD CB d C4 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xC4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC5: // Undocumented - SET 0,(IX+$d),L - DD CB d C5 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xC5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -6965,50 +7586,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC7: // Undocumented - SET 0,(IX+$d),A - DD CB d C7 - Sets bit 0 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xC7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC8: // Undocumented - SET 1,(IX+$d),B - DD CB d C8 - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xC8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC9: // Undocumented - SET 1,(IX+$d),C - DD CB d C9 - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xC9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCA: // Undocumented - SET 1,(IX+$d),D - DD CB d CA - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xCA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCB: // Undocumented - SET 1,(IX+$d),E - DD CB d CB - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xCB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCC: // Undocumented - SET 1,(IX+$d),H - DD CB d CC - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xCC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
-        case 0xCD: // Undocumented - SET 1,(IX+$d),L - DD CB d CD - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
+        case 0xCD: // Undocumented - SET 1,(IX+$d),L - DD CB d CD - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in L)
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xCD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7024,50 +7673,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCF: // Undocumented - SET 1,(IX+$d),A - DD CB d CF - Sets bit 1 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xCF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD0: // Undocumented - SET 2,(IX+$d),B - DD CB d D0 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xD0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD1: // Undocumented - SET 2,(IX+$d),C - DD CB d D1 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xD1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD2: // Undocumented - SET 2,(IX+$d),D - DD CB d D2 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xD2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD3: // Undocumented - SET 2,(IX+$d),E - DD CB d D3 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xD3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD4: // Undocumented - SET 2,(IX+$d),H - DD CB d D4 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xD4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD5: // Undocumented - SET 2,(IX+$d),L - DD CB d D5 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xD5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7083,50 +7760,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD7: // Undocumented - SET 2,(IX+$d),A - DD CB d D7 - Sets bit 2 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xD7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD8: // Undocumented - SET 3,(IX+$d),B - DD CB d D8 - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xD8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD9: // Undocumented - SET 3,(IX+$d),C - DD CB d D9 - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xD9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDA: // Undocumented - SET 3,(IX+$d),D - DD CB d DA - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xDA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDB: // Undocumented - SET 3,(IX+$d),E - DD CB d DB - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xDB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
-        case 0xDC: // Undocumented - SET 3,(IX+$d),H - DD CB d DC - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
+        case 0xDC: // Undocumented - SET 3,(IX+$d),H - DD CB d DC - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in H)
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xDC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDD: // Undocumented - SET 3,(IX+$d),L - DD CB d DD - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xDD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7142,50 +7847,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDF: // Undocumented - SET 3,(IX+$d),A - DD CB d DF - Sets bit 3 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xDF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE0: // Undocumented - SET 4,(IX+$d),B - DD CB d E0 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xE0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE1: // Undocumented - SET 4,(IX+$d),C - DD CB d E1 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xE1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE2: // Undocumented - SET 4,(IX+$d),D - DD CB d E2 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xE2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE3: // Undocumented - SET 4,(IX+$d),E - DD CB d E3 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xE3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE4: // Undocumented - SET 4,(IX+$d),H - DD CB d E4 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xE4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE5: // Undocumented - SET 4,(IX+$d),L - DD CB d E5 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xE5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7201,50 +7934,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE7: // Undocumented - SET 4,(IX+$d),A - DD CB d E7 - Sets bit 4 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xE7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE8: // Undocumented - SET 5,(IX+$d),B - DD CB d E8 - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xE8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE9: // Undocumented - SET 5,(IX+$d),C - DD CB d E9 - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xE9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEA: // Undocumented - SET 5,(IX+$d),D - DD CB d EA - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xEA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEB: // Undocumented - SET 5,(IX+$d),E - DD CB d EB - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xEB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEC: // Undocumented - SET 5,(IX+$d),H - DD CB d EC - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xEC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xED: // Undocumented - SET 5,(IX+$d),L - DD CB d ED - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xED], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7260,50 +8021,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEF: // Undocumented - SET 5,(IX+$d),A - DD CB d EF - Sets bit 5 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xEF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF0: // Undocumented - SET 6,(IX+$d),B - DD CB d F0 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xF0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF1: // Undocumented - SET 6,(IX+$d),C - DD CB d F1 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xF1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF2: // Undocumented - SET 6,(IX+$d),D - DD CB d F2 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xF2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF3: // Undocumented - SET 6,(IX+$d),E - DD CB d F3 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xF3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF4: // Undocumented - SET 6,(IX+$d),H - DD CB d F4 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xF4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF5: // Undocumented - SET 6,(IX+$d),L - DD CB d F5 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xF5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7319,50 +8108,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF7: // Undocumented - SET 6,(IX+$d),A - DD CB d F7 - Sets bit 6 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xF7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF8: // Undocumented - SET 7,(IX+$d),B - DD CB d F8 - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),B", opcode: [0xDD,0xCB,opcode3,0xF8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF9: // Undocumented - SET 7,(IX+$d),C - DD CB d F9 - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),C", opcode: [0xDD,0xCB,opcode3,0xF9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFA: // Undocumented - SET 7,(IX+$d),D - DD CB d FA - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),D", opcode: [0xDD,0xCB,opcode3,0xFA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFB: // Undocumented - SET 7,(IX+$d),E - DD CB d FB - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),E", opcode: [0xDD,0xCB,opcode3,0xFB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFC: // Undocumented - SET 7,(IX+$d),H - DD CB d FC - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),H", opcode: [0xDD,0xCB,opcode3,0xFC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFD: // Undocumented - SET 7,(IX+$d),L - DD CB d FD - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),L", opcode: [0xDD,0xCB,opcode3,0xFD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7378,8 +8195,12 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFF: // Undocumented - SET 7,(IX+$d),A - DD CB d FF - Sets bit 7 of the memory location pointed to by IX plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IX+$d),A", opcode: [0xDD,0xCB,opcode3,0xFF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IX &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -7696,12 +8517,15 @@ actor microbee
            tStates = 15
            incrementR(opcodeCount:2)
         case 0x63: // Undocumented - LD ($nn),HL - ED 63 n n - Stores HL into the memory location pointed to by $nn
-           // Stub
-           logInstructionDetails(instructionDetails: "LD ($nn),HL", opcode: [0xED,0x63], values: [opcode3,opcode4], programCounter: registers.PC)
-           registers.PC = registers.PC &+ 4
-           registers.Q = 0
-           tStates = 20
-           incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "LD ($nn),HL", opcode: [0xED,0x63], values: [opcode3,opcode4], programCounter: registers.PC)
+            let tempAddress = UInt16(opcode4) << 8 | UInt16(opcode3)
+            bus.writeByte(address: tempAddress, value: registers.L)
+            bus.writeByte(address: tempAddress &+ 1, value: registers.H)
+            registers.WZ = tempAddress &+ 1
+            registers.PC = registers.PC &+ 4
+            registers.Q = 0
+            tStates = 20
+            incrementR(opcodeCount:2)
         case 0x67: // RRD - ED 67 - The contents of the low-order nibble of (HL) are copied to the low-order nibble of A. The previous contents are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of (HL)
            logInstructionDetails(instructionDetails: "RRD", opcode: [0xED,0x67], programCounter: registers.PC)
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -7751,12 +8575,15 @@ actor microbee
            tStates = 15
            incrementR(opcodeCount:2)
         case 0x6B: // Undocumented - LD HL,($nn) - ED 6B n n - Loads the value pointed to by $nn into HL
-           // Stub
-           logInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0xED,0x6B], values: [opcode3,opcode4], programCounter: registers.PC)
-           registers.PC = registers.PC &+ 4
-           registers.Q = 0
-           tStates = 20
-           incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "LD HL,($nn)", opcode: [0xED,0x6B], values: [opcode3,opcode4], programCounter: registers.PC)
+            let tempAddress = UInt16(opcode4) << 8 | UInt16(opcode3)
+            registers.L = bus.readByte(address: tempAddress)
+            registers.H = bus.readByte(address: tempAddress &+ 1)
+            registers.WZ = tempAddress &+ 1
+            registers.PC = registers.PC &+ 4
+            registers.Q = 0
+            tStates = 20
+            incrementR(opcodeCount:2)
         case 0x6F: // RLD - ED 6F - The contents of the low-order nibble of (HL) are copied to the high-order nibble of (HL). The previous contents are copied to the low-order nibble of A. The previous contents are copied to the low-order nibble of (HL)
            logInstructionDetails(instructionDetails: "RLD", opcode: [0xED,0x6F], programCounter: registers.PC)
            let carry = registers.F & z80Flags.Carry.rawValue
@@ -7778,18 +8605,21 @@ actor microbee
            incrementR(opcodeCount:2)
         case 0x70: // Undocumented - IN (C) - ED 70 - Inputs a byte from port C and affects flags only
            // Stub
+            print("ED",opcode2)
            logInstructionDetails(instructionDetails: "IN (C)", opcode: [0xED,0x70], programCounter: registers.PC)
            registers.PC = registers.PC &+ 2
            registers.Q = 0 //  change for flag opcodes
            tStates = 12
            incrementR(opcodeCount:2)
         case 0x71: // Undocumented - OUT (C),0 - ED 71 - Outputs a zero (on NMOS Z80s) or 255 (on CMOS Z80s) to port C
-           // Stub
-           logInstructionDetails(instructionDetails: "OUT (C),0", opcode: [0xED,0x71], programCounter: registers.PC)
-           registers.PC = registers.PC &+ 2
-           registers.Q = 0
-           tStates = 12
-           incrementR(opcodeCount:2)
+            logInstructionDetails(instructionDetails: "OUT (C),0", opcode: [0xED,0x71], programCounter: registers.PC)
+            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
+            bus.writePort(portNum: tempResult, portValue: 0)
+            registers.WZ = registers.BC &+ 1
+            registers.PC = registers.PC &+ 2
+            registers.Q = 0
+            tStates = 12
+            incrementR(opcodeCount:2)
         case 0x72: // SBC HL,SP - ED 72 - Subtracts SP and the carry flag from HL
            logInstructionDetails(instructionDetails: "SBC HL,SP", opcode: [0xED,0x72], programCounter: registers.PC)
            registers.WZ = registers.HL &+ 1
@@ -8270,6 +9100,7 @@ actor microbee
         {
         case 0x00: // Undocumented - RLC (IY+$d),B - FD CB d 00 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x00], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8277,6 +9108,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x01: // Undocumented - RLC (IY+$d),C - FD CB d 01 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x01], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8284,6 +9116,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x02: // Undocumented - RLC (IY+$d),D - FD CB d 02 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x02], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8291,6 +9124,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x03: // Undocumented - RLC (IY+$d),E - FD CB d 03 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x03], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8298,6 +9132,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x04: // Undocumented - RLC (IY+$d),H - FD CB d 04 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x04], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8305,6 +9140,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x05: // Undocumented - RLC (IY+$d),L - FD CB d 05 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x05], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8330,6 +9166,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x07: // Undocumented - RLC (IY+$d),A - FD CB d 07 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and bit 0. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RLC (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x07], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8337,6 +9174,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x08: // Undocumented - RRC (IY+$d),B - FD CB d 08 - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x08], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8344,6 +9182,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x09: // Undocumented - RRC (IY+$d),C - FD CB d 09 - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x09], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8351,6 +9190,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0A: // Undocumented - RRC (IY+$d),D - FD CB d 0A - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x0A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8358,6 +9198,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0B: // Undocumented - RRC (IY+$d),E - FD CB d 0B - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x0B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8365,6 +9206,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0C: // Undocumented - RRC (IY+$d),H - FD CB d 0C - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x0C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8372,6 +9214,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0D: // Undocumented - RRC (IY+$d),L - FD CB d 0D - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x0D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8397,6 +9240,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0F: // Undocumented - RRC (IY+$d),A - FD CB d 0F - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and bit 7. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RRC (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x0F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8404,6 +9248,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x10: // Undocumented - RL (IY+$d),B  - FD CB d 10 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x10], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8411,6 +9256,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x11: // Undocumented - RL (IY+$d),C  - FD CB d 11  - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x11], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8418,6 +9264,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x12: // Undocumented - RL (IY+$d),D - FD CB d 12 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x12], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8425,6 +9272,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x13: // Undocumented - RL (IY+$d),E - FD CB d 13 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x13], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8432,6 +9280,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x14: // Undocumented - RL (IY+$d),H - FD CB d 14 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x14], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8439,6 +9288,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x15: // Undocumented - RL (IY+$d),L - FD CB d 15 - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x15], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8465,6 +9315,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x17: // Undocumented - RL (IY+$d),A - FD CB d 17  - The contents of the memory location pointed to by IY plus $d are rotated left one bit position. The contents of bit 7 are copied to the carry flag and the previous contents of the carry flag are copied to bit 0. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RL (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x17], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8472,6 +9323,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x18: // Undocumented - RR (IY+$d),B - FD CB d 18 - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x18], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8479,6 +9331,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x19: // Undocumented - RR (IY+$d),C - FD CB d 19  - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x19], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8486,6 +9339,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1A: // Undocumented - RR (IY+$d),D - FD CB d 1A - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x1A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8493,6 +9347,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1B: // Undocumented - RR (IY+$d),E - FD CB d 1B - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x1B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8500,6 +9355,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1C: // Undocumented - RR (IY+$d),H - FD CB d 1C - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x1C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8507,6 +9363,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1D: // Undocumented - RR (IY+$d),L - FD CB d 1D - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x1D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8533,6 +9390,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1F: // Undocumented - RR (IY+$d),A - FD CB d 1F - The contents of the memory location pointed to by IY plus $d are rotated right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of the carry flag are copied to bit 7. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RR (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x1F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8540,6 +9398,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x20: // Undocumented - SLA (IY+$d),B - FD CB d 20 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x20], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8547,6 +9406,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x21: // Undocumented - SLA (IY+$d),C - FD CB d 21 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x21], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8554,6 +9414,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x22: // Undocumented - SLA (IY+$d),D - FD CB d 22 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x22], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8561,6 +9422,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x23: // Undocumented - SLA (IY+$d),E - FD CB d 23 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x23], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8568,6 +9430,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x24: // Undocumented - SLA (IY+$d),H - FD CB d 24 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x24], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8575,6 +9438,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x25: // Undocumented - SLA (IY+$d),L - FD CB d 25 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x25], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8600,6 +9464,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x27: // Undocumented - SLA (IY+$d),A - FD CB d 27 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are copied to the carry flag and a zero is put into bit 0. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLA (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x27], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8607,6 +9472,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x28: // Undocumented - SRA (IY+$d),B - FD CB d 28 - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x28], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8614,6 +9480,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x29: // Undocumented - SRA (IY+$d),C - FD CB d 29 - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x29], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8621,6 +9488,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2A: // Undocumented - SRA (IY+$d),D - FD CB d 2A - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x2A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8628,6 +9496,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2B: // Undocumented - SRA (IY+$d),E - FD CB d 2B - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x2B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8635,6 +9504,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2C: // Undocumented - SRA (IY+$d),H - FD CB d 2C - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x2C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8642,6 +9512,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2D: // Undocumented - SRA (IY+$d),L - FD CB d 2D - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x2D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8668,6 +9539,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2F: // Undocumented - SRA (IY+$d),A - FD CB d 2F - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and the previous contents of bit 7 are unchanged. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRA (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x2F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8675,6 +9547,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x30: // Undocumented - SLL (IY+$d),B - FD CB d 30 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x30], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8682,6 +9555,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x31: // Undocumented - SLL (IY+$d),C - FD CB d 31 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x31], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8689,6 +9563,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x32: // Undocumented - SLL (IY+$d),D - FD CB d 32 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x32], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8696,6 +9571,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x33: // Undocumented - SLL (IY+$d),E - FD CB d 33 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x33], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8703,6 +9579,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x34: // Undocumented - SLL (IY+$d),H - FD CB d 34 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x34], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8710,6 +9587,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x35: // Undocumented - SLL (IY+$d),L - FD CB d 35 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x35], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8717,6 +9595,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x36: // Undocumented - SLL (IY+$d) - FD CB d 36 - The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d)", opcode: [0xFD,0xCB,opcode3,0x36], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8724,6 +9603,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x37: // Undocumented - SLL (IY+$d),A - FD CB d 37- The contents of the memory location pointed to by IY plus $d are shifted left one bit position. The contents of bit 7 are put into the carry flag and a one is put into bit 0. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SLL (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x37], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8731,6 +9611,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x38: // Undocumented - SRL (IY+$d),B - FD CB d 38 - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in B
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x38], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8738,6 +9619,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x39: // Undocumented - SRL (IY+$d),C - FD CB d 39 - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in C
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x39], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8745,6 +9627,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3A: // Undocumented - SRL (IY+$d),D - FD CB d 3A - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in D
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x3A], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8752,6 +9635,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3B: // Undocumented - SRL (IY+$d),E - FD CB d 3B - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in E
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x3B], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8759,6 +9643,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3C: // Undocumented - SRL (IY+$d),H - FD CB d 3C - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in H
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x3C], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8766,6 +9651,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3D: // Undocumented - SRL (IY+$d),L - FD CB d 3D - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x3D], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
@@ -8791,12 +9677,14 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3F: // Undocumented - SRL (IY+$d),A - FD CB d 3F - The contents of the memory location pointed to by IY plus $d are shifted right one bit position. The contents of bit 0 are copied to the carry flag and a zero is put into bit 7. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "SRL (IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x3F], values: [opcode3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 4
             registers.Q = 0 //  change for flag opcodes
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x40: // Undocumented - BIT 0,(IY+$d) - FD CB d 40 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x40], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8808,6 +9696,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x41: // Undocumented - BIT 0,(IY+$d) - FD CB d 41 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x41], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8819,6 +9708,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x42: // Undocumented - BIT 0,(IY+$d) - FD CB d 42 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x42], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8830,6 +9720,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x43: // Undocumented - BIT 0,(IY+$d) - FD CB d 43 - Tests bit 0 of the memory location pointed to by IX plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x43], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8841,6 +9732,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x44: // Undocumented - BIT 0,(IY+$d) - FD CB d 44 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x44], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8852,6 +9744,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x45: // Undocumented - BIT 0,(IY+$d) - FD CB d 45 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x45], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8863,6 +9756,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x46: // BIT 0,(IY+$d) - FD CB d 46 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x46], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -8883,6 +9777,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x47: // Undocumented - BIT 0,(IY+$d) - FD CB d 47 - Tests bit 0 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 0,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x47], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 1
@@ -8894,6 +9789,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x48: // Undocumented - BIT 1,(IY+$d) - FD CB d 48 - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x48], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8905,6 +9801,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x49: // Undocumented - BIT 1,(IY+$d) - FD CB d 49 - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x49], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8916,6 +9813,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4A: // Undocumented - BIT 1,(IY+$d) - FD CB d 4A - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8927,6 +9825,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4B: // Undocumented - BIT 1,(IY+$d) - FD CB d 4B - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8938,6 +9837,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4C: // Undocumented - BIT 1,(IY+$d) - FD CB d 4C - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8949,6 +9849,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4D: // Undocumented - BIT 1,(IY+$d) - FD CB d 4D - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8960,6 +9861,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4E: // BIT 1,(IY+$d) - FD CB d 4E - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -8980,6 +9882,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x4F: // Undocumented - BIT 1,(IY+$d) - FD CB d 4F - Tests bit 1 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 1,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x4F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 2
@@ -8991,6 +9894,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x50: // Undocumented - BIT 2,(IY+$d) - FD CB d 50 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x50], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9002,6 +9906,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x51: // Undocumented - BIT 2,(IY+$d) - FD CB d 51 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x51], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9013,6 +9918,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x52: // Undocumented - BIT 2,(IY+$d) - FD CB d 52 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x52], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9024,6 +9930,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x53: // Undocumented - BIT 2,(IY+$d) - FD CB d 53 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x53], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9035,6 +9942,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x54: // Undocumented - BIT 2,(IY+$d) - FD CB d 54 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x54], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9046,6 +9954,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x55: // Undocumented - BIT 2,(IY+$d) - FD CB d 55 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x55], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9057,6 +9966,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x56: // BIT 2,(IY+$d) - FD CB d 56 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x56], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -9077,6 +9987,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x57: // Undocumented - BIT 2,(IY+$d) - FD CB d 57 - Tests bit 2 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 2,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x57], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 4
@@ -9088,6 +9999,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x58: // Undocumented - BIT 3,(IY+$d) - FD CB d 58 - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x58], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9099,6 +10011,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x59: // Undocumented - BIT 3,(IY+$d) - FD CB d 59 - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x59], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9109,6 +10022,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5A: // Undocumented - BIT 3,(IY+$d) - FD CB d 5A - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9120,6 +10034,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5B: // Undocumented - BIT 3,(IY+$d) - FD CB d 5B - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9131,6 +10046,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5C: // Undocumented - BIT 3,(IY+$d) - FD CB d 5C - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9142,6 +10058,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5D: // Undocumented - BIT 3,(IY+$d) - FD CB d 5D - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9153,6 +10070,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5E: // BIT 3,(IY+$d) - FD CB d 5E - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -9173,6 +10091,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x5F: // Undocumented - BIT 3,(IY+$d) - FD CB d 5F - Tests bit 3 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 3,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x5F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 8
@@ -9184,6 +10103,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x60: // Undocumented - BIT 4,(IY+$d) - FD CB d 60 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x60], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9195,6 +10115,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x61: // Undocumented - BIT 4,(IY+$d) - FD CB d 61 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x61], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9206,6 +10127,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x62: // Undocumented - BIT 4,(IY+$d) - FD CB d 62 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x62], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9217,6 +10139,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x63: // Undocumented - BIT 4,(IY+$d) - FD CB d 63 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x63], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9228,6 +10151,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x64: // Undocumented - BIT 4,(IY+$d) - FD CB d 64 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x64], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9239,6 +10163,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x65: // Undocumented - BIT 4,(IY+$d) - FD CB d 65 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x65], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9250,6 +10175,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x66: // BIT 4,(IY+$d) - FD CB d 66 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x66], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -9270,6 +10196,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x67: // Undocumented - BIT 4,(IY+$d) - FD CB d 67 - Tests bit 4 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 4,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x67], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 16
@@ -9281,6 +10208,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x68: // Undocumented - BIT 5,(IY+$d) - FD CB d 68 - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x68], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9292,6 +10220,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x69: // Undocumented - BIT 5,(IY+$d) - FD CB d 69 - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x69], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9303,6 +10232,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6A: // Undocumented - BIT 5,(IY+$d) - FD CB d 6A - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9314,6 +10244,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6B: // Undocumented - BIT 5,(IY+$d) - FD CB d 6B - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9325,6 +10256,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6C: // Undocumented - BIT 5,(IY+$d) - FD CB d 6C - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9336,6 +10268,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6D: // Undocumented - BIT 5,(IY+$d) - FD CB d 6D - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9347,6 +10280,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6E: // BIT 5,(IY+$d) - FD CB d 6E - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -9367,6 +10301,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x6F: // Undocumented - BIT 5,(IY+$d) - FD CB d 6F - Tests bit 5 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 5,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x6F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 32
@@ -9378,6 +10313,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x70: // Undocumented - BIT 6,(IY+$d) - FD CB d 70 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x70], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9389,6 +10325,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x71: // Undocumented - BIT 6,(IY+$d) - FD CB d 71 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x71], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9400,6 +10337,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x72: // Undocumented - BIT 6,(IY+$d) - FD CB d 72 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x72], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9411,6 +10349,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x73: // Undocumented - BIT 6,(IY+$d) - FD CB d 73 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x73], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9422,6 +10361,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x74: // Undocumented - BIT 6,(IY+$d) - FD CB d 74 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x74], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9433,6 +10373,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x75: // Undocumented - BIT 6,(IY+$d) - FD CB d 75 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x75], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9444,6 +10385,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x76: // BIT 6,(IY+$d) - FD CB d 76 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x76], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -9464,6 +10406,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x77: // Undocumented - BIT 6,(IY+$d) - FD CB d 77 - Tests bit 6 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x77], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 64
@@ -9475,6 +10418,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x78: // Undocumented - BIT 7,(IY+$d) - FD CB d 78 - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x78], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9486,6 +10430,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x79: // Undocumented - BIT 7,(IY+$d) - FD CB d 79 - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x79], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9497,6 +10442,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7A: // Undocumented - BIT 7,(IY+$d) - FD CB d 7A - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7A], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9508,6 +10454,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7B: // Undocumented - BIT 7,(IY+$d) - FD CB d 7B - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7B], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9519,6 +10466,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7C: // Undocumented - BIT 7,(IY+$d) - FD CB d 7C - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7C], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9530,6 +10478,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7D: // Undocumented - BIT 7,(IY+$d) - FD CB d 7D - Tests bit 7 of the memory location pointed to by IY plus $d L
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7D], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9541,6 +10490,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7E: // BIT 7,(IY+$d) - FD CB d 7E - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7E], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress)
@@ -9561,6 +10511,7 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x7F: // Undocumented - BIT 7,(IY+$d) - FD CB d 7F - Tests bit 7 of the memory location pointed to by IY plus $d
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "BIT 7,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0x7F], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
             let tempResult = bus.readByte(address: tempResultAddress) & 128
@@ -9572,43 +10523,67 @@ actor microbee
             tStates = 20
             incrementR(opcodeCount:2)
         case 0x80: // Undocumented - RES 0,(IY+$d),B - FD CB d 80 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x80], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x81: // Undocumented - RES 0,(IY+$d),C - FD CB d 81 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x81], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x82: // Undocumented - RES 0,(IY+$d),D - FD CB d 82 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x82], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x83: // Undocumented - RES 0,(IY+$d),E - FD CB d 83 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x83], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x84: // Undocumented - RES 0,(IY+$d),H - FD CB d 84 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x84], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x85: // Undocumented - RES 0,(IY+$d),L - FD CB d 85 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x85], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -9624,50 +10599,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x87: // Undocumented - RES 0,(IY+$d),A - FD CB d 87 - Resets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 0,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x87], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111110
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x88: // Undocumented - RES 1,(IY+$d),B - FD CB d 88 - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x88], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x89: // Undocumented - RES 1,(IY+$d),C - FD CB d 89 - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x89], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8A: // Undocumented - RES 1,(IY+$d),D - FD CB d 8A - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x8A], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8B: // Undocumented - RES 1,(IY+$d),E - FD CB d 8B - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x8B], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8C: // Undocumented - RES 1,(IY+$d),H - FD CB d 8C - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x8C], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8D: // Undocumented - RES 1,(IY+$d),L - FD CB d 8D - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x8D], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -9683,50 +10686,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x8F: // Undocumented - RES 1,(IY+$d),A - FD CB d 8F - Resets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 1,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x8F], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111101
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x90: // Undocumented - RES 2,(IY+$d),B - FD CB d 90 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x90], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x91: // Undocumented - RES 2,(IY+$d),C - FD CB d 91 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x91], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
-        incrementR(opcodeCount:2)
+            incrementR(opcodeCount:2)
         case 0x92: // Undocumented - RES 2,(IY+$d),D - FD CB d 92 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x92], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x93: // Undocumented - RES 2,(IY+$d),E - FD CB d 93 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x93], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x94: // Undocumented - RES 2,(IY+$d),H - FD CB d 94 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x94], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x95: // Undocumented - RES 2,(IY+$d),L - FD CB d 95 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x95], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -9742,50 +10773,80 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x97: // Undocumented - RES 2,(IY+$d),A - FD CB d 97 - Resets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 2,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x97], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11111011
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x98: // Undocumented - RES 3,(IY+$d),B - FD CB d 98 - Resets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0x98], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x99: // Undocumented - RES 3,(IY+$d),C - FD CB d 99 - Resets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0x99], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9A: // Undocumented - RES 3,(IY+$d),D - FD CB d 9A - Resets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0x9A], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9B: // Undocumented - RES 3,(IY+$d),E - FD CB d 9B - Resets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0x9B], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9C: // Undocumented - RES 3,(IY+$d),H - FD CB d 9C - Resets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0x9C], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9D: // Undocumented - RES 3,(IY+$d),L - FD CB d 9D - Resets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in L
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0x9D], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -9801,50 +10862,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0x9F: // Undocumented - RES 3,(IY+$d),A - FD CB d 9F - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 3,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0x9F], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11110111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA0: // Undocumented - RES 4,(IY+$d),B - FD CB d A0 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xA0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA1: // Undocumented - RES 4,(IY+$d),C - FD CB d A1 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xA1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA2: // Undocumented - RES 4,(IY+$d),D - FD CB d A2 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xA2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA3: // Undocumented - RES 4,(IY+$d),E - FD CB d A3 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xA3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA4: // Undocumented - RES 4,(IY+$d),H - FD CB d A4 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xA4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA5: // Undocumented - RES 4,(IY+$d),L - FD CB d 24 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xA5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -9860,50 +10949,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA7: // Undocumented - RES 4,(IY+$d),A - FD CB d A7 - Resets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 4,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xA7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11101111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA8: // Undocumented - RES 5,(IY+$d),B - FD CB d A8 - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xA8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xA9: // Undocumented - RES 5,(IY+$d),C - FD CB d A9 - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xA9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAA: // Undocumented - RES 5,(IY+$d),D - FD CB d AA - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xAA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAB: // Undocumented - RES 5,(IY+$d),E - FD CB d AB - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xAB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAC: // Undocumented - RES 5,(IY+$d),H - FD CB d AC - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xAC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAD: // Undocumented - RES 5,(IY+$d),L - FD CB d AD - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xAD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -9919,53 +11036,82 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xAF: // Undocumented - RES 5,(IY+$d),A - FD CB d AF - Resets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 5,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xAF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b11011111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB0: // Undocumented - RES 6,(IY+$d),B - FD CB d B0 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xB0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB1: // Undocumented - RES 6,(IY+$d),C - FD CB d B1 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xB1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB2: // Undocumented - RES 6,(IY+$d),D - FD CB d B2 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xB2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB3: // Undocumented - RES 6,(IY+$d),E - FD CB d B3 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xB3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB4: // Undocumented - RES 6,(IY+$d),H - FD CB d B4 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xB4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB5: // Undocumented - RES 6,(IY+$d),L - FD CB d B5 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xB5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
+            incrementR(opcodeCount:2)
         case 0xB6: // RES 6,(IY+$d) - FD CB d B6 - Resets bit 6 of the memory location pointed to by IY plus $d
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d)", opcode: [0xFD,0xCB,opcode3,0xB6], values: [opcode3], programCounter: registers.PC)
             let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
@@ -9978,49 +11124,79 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB7: // Undocumented - RES 6,(IY+$d),A - FD CB d B7 - Resets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in A
             // Stub
+            print("FDCB",opcode3)
             logInstructionDetails(instructionDetails: "RES 6,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xB7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b10111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB8: // Undocumented - RES 7,(IY+$d),B - FD CB d B8 - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xB8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xB9: // Undocumented - RES 7,(IY+$d),C - FD CB d B9 - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xB9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBA: // Undocumented - RES 7,(IY+$d),D - FD CB d BA - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xBA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBB: // Undocumented - RES 7,(IY+$d),E - FD CB d BB - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xBB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBC: // Undocumented - RES 7,(IY+$d),H - FD CB d BC - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xBC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBD: // Undocumented - RES 7,(IY+$d),L - FD CB d BD - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xBD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10036,50 +11212,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xBF: // Undocumented - RES 7,(IY+$d),A - FD CB d BF - Resets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "RES 7,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xBF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) & 0b01111111
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC0: // Undocumented - SET 0,(IY+$d),B - FD CB d C0 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xC0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC1: // Undocumented - SET 0,(IY+$d),C - FD CB d C1 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xC1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC2: // Undocumented - SET 0,(IY+$d),D - FD CB d C2 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xC2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC3: // Undocumented - SET 0,(IY+$d),E - FD CB d C3 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xC3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC4: // Undocumented - SET 0,(IY+$d),H - FD CB d C4 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xC4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC5: // Undocumented - SET 0,(IY+$d),L  - FD CB d C5 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xC5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10095,50 +11299,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC7: // Undocumented - SET 0,(IY+$d),A - FD CB d C7 - Sets bit 0 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 0,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xC7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000001
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC8: // Undocumented - SET 1,(IY+$d),B - FD CB d C8 - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xC8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xC9: // Undocumented - SET 1,(IY+$d),C - FD CB d C9 - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xC9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCA: // Undocumented - SET 1,(IY+$d),D - FD CB d CA - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xCA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCB: // Undocumented - SET 1,(IY+$d),E - FD CB d CB - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xCB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCC: // Undocumented - SET 1,(IY+$d),H - FD CB d CC - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xCC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCD: // Undocumented - SET 1,(IY+$d),L - FD CB d CD - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xCD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10154,50 +11386,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xCF: // Undocumented - SET 1,(IY+$d),A - FD CB d CF - Sets bit 1 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 1,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xCF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000010
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD0: // Undocumented - SET 2,(IY+$d),B - FD CB d D0 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xD0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD1: // Undocumented - SET 2,(IY+$d),C - FD CB d D1 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xD1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD2: // Undocumented - SET 2,(IY+$d),D - FD CB d D2 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xD2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD3: // Undocumented - SET 2,(IY+$d),E - FD CB d D3 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xD3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD4: // Undocumented - SET 2,(IY+$d),H - FD CB d D4 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xD4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
-        case 0xD5: // Undocumented - SET 2,(IY+$d),L - FD CB d D5 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
+        case 0xD5: // Undocumented - SET 2,(IY+$d),L - FD CB d D5 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in
             logInstructionDetails(instructionDetails: "SET 2,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xD5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10212,44 +11472,79 @@ actor microbee
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
-        case 0xD7: // Undocumented - SET 3,(IY+$d),B - FD CB d D8 - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
-            logInstructionDetails(instructionDetails: "SET 3,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xD8], values: [opcode3], programCounter: registers.PC)
+        case 0xD7: // Undocumented - SET 2,(IY+$d),A - FD CB d D7 - Sets bit 2 of the memory location pointed to by IY plus $d. The result is then stored in A
+            logInstructionDetails(instructionDetails: "SET 2,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xD7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00000100
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
+            registers.PC = registers.PC &+ 4
+            registers.Q = 0
+            tStates = 23
+            incrementR(opcodeCount:2)
+        case 0xD8: // Undocumented - SET 3,(IY+$d),B - FD CB d D9 - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in C
+            logInstructionDetails(instructionDetails: "SET 3,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xD9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xD9: // Undocumented - SET 3,(IY+$d),C - FD CB d D9 - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xD9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDA: // Undocumented - SET 3,(IY+$d),D - FD CB d DA - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xDA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDB: // Undocumented - SET 3,(IY+$d),E - FD CB d DB - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xDB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDC: // Undocumented - SET 3,(IY+$d),H - FD CB d DC - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xDC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDD: // Undocumented - SET 3,(IY+$d),L - FD CB d DD - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xDD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10265,50 +11560,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xDF: // Undocumented - SET 3,(IY+$d),A - FD CB d DF - Sets bit 3 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 3,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xDF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00001000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE0: // Undocumented - SET 4,(IY+$d),B - FD CB d E0 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xE0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE1: // Undocumented - SET 4,(IY+$d),C - FD CB d E1 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xE1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE2: // Undocumented - SET 4,(IY+$d),D - FD CB d E2 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xE2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE3: // Undocumented - SET 4,(IY+$d),E - FD CB d E3 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xE3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE4: // Undocumented - SET 4,(IY+$d),H - FD CB d E4 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xE4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE5: // Undocumented - SET 4,(IY+$d),L - FD CB d E5 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xE5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10324,50 +11647,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE7: // Undocumented - SET 4,(IY+$d),A - FD CB d E7 - Sets bit 4 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 4,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xE7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00010000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE8: // Undocumented - SET 5,(IY+$d),B - FD CB d E8 - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xE8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xE9: // Undocumented - SET 5,(IY+$d),C - FD CB d E9 - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xE9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEA: // Undocumented - SET 5,(IY+$d),D - FD CB d EA - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xEA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEB: // Undocumented - SET 5,(IY+$d),E - FD CB d EB - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xEB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEC: // Undocumented - SET 5,(IY+$d),H - FD CB d EC - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xEC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xED: // Undocumented - SET 5,(IY+$d),L - FD CB d ED - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xED], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10383,50 +11734,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xEF: // Undocumented - SET 5,(IY+$d),A - FD CB d EF - Sets bit 5 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 5,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xEF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b00100000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF0: // Undocumented - SET 6,(IY+$d),B - FD CB d F0 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xF0], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF1: // Undocumented - SET 6,(IY+$d),C - FD CB d F1 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xF1], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF2: // Undocumented - SET 6,(IY+$d),D - FD CB d F2 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xF2], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF3: // Undocumented - SET 6,(IY+$d),E - FD CB d F3 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xF3], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF4: // Undocumented - SET 6,(IY+$d),H - FD CB d F4 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xF4], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF5: // Undocumented - SET 6,(IY+$d),L - FD CB d F5 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xF5], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10442,50 +11821,78 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF7: // Undocumented - SET 6,(IY+$d),A - FD CB d F7 - Sets bit 6 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 6,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xF7], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b01000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF8: // Undocumented - SET 7,(IY+$d),B - FD CB d F8 - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in B
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),B", opcode: [0xFD,0xCB,opcode3,0xF8], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.B = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xF9: // Undocumented - SET 7,(IY+$d),C - FD CB d F9 - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in C
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),C", opcode: [0xFD,0xCB,opcode3,0xF9], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.C = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFA: // Undocumented - SET 7,(IY+$d),D - FD CB d FA - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in D
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),D", opcode: [0xFD,0xCB,opcode3,0xFA], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.D = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFB: // Undocumented - SET 7,(IY+$d),E - FD CB d FB - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in E
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),E", opcode: [0xFD,0xCB,opcode3,0xFB], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.E = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFC: // Undocumented - SET 7,(IY+$d),H - FD CB d FC - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in H
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),H", opcode: [0xFD,0xCB,opcode3,0xFC], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.H = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFD: // Undocumented - SET 7,(IY+$d),L - FD CB d FD - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in L
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),L", opcode: [0xFD,0xCB,opcode3,0xFD], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.L = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10501,8 +11908,12 @@ actor microbee
             tStates = 23
             incrementR(opcodeCount:2)
         case 0xFF: // Undocumented - SET 7,(IY+$d),A - FD CB d FF - Sets bit 7 of the memory location pointed to by IY plus $d. The result is then stored in A
-            // Stub
             logInstructionDetails(instructionDetails: "SET 7,(IY+$d),A", opcode: [0xFD,0xCB,opcode3,0xFF], values: [opcode3], programCounter: registers.PC)
+            let tempResultAddress = registers.IY &+ UInt16(bitPattern: Int16(Int8(bitPattern: opcode3)))
+            let tempResult = bus.readByte(address: tempResultAddress) | 0b10000000
+            bus.writeByte(address: tempResultAddress, value: tempResult)
+            registers.A = tempResult
+            registers.WZ = tempResultAddress
             registers.PC = registers.PC &+ 4
             registers.Q = 0
             tStates = 23
@@ -10525,6 +11936,7 @@ actor microbee
         {
         case 0x04: // Undocumented - INC B - FD 04 - Adds one to B
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC B", opcode: [0xFD,0x04], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10532,14 +11944,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x05: // Undocumented - DEC B - FD 05 - Subtracts one from B
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC B", opcode: [0xFD,0x05], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x06: // Undocumented - LD B,$n - FD 06 n - Loads $n into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,$n", opcode: [0xFD,0x06], values: [opcode3], programCounter: registers.PC)
+            registers.B = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -10563,6 +11976,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0C: // Undocumented - INC C - FD 0C - Adds one to C
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC C", opcode: [0xFD,0x0C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10570,20 +11984,22 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x0D: // Undocumented - DEC C - FD 0D - Subtracts one from C
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC C", opcode: [0xFD,0x0D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x0E: // Undocumented - LD C,$n - FD 0E n - Loads n into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,$n", opcode: [0xFD,0x0E], values: [opcode3], programCounter: registers.PC)
+            registers.C = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
             incrementR(opcodeCount:2)
         case 0x14: // Undocumented - INC D - FD 14 - Adds one to D
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC D", opcode: [0xFD,0x14], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10591,14 +12007,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x15: // Undocumented - DEC D - FD 15 - Subtracts one from D
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC D", opcode: [0xFD,0x15], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x16: // Undocumented - LD D,$n - FD 16 n - Loads $n into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,$n", opcode: [0xFD,0x16], values: [opcode3,opcode4], programCounter: registers.PC)
+            registers.D = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -10622,6 +12039,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1C: // Undocumented - INC E - FD 1C - Adds one to E
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC E", opcode: [0xFD,0x1C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10629,14 +12047,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x1D: // Undocumented - DEC E - FD 1D - Subtracts one from E
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC E", opcode: [0xFD,0x1D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x1E: // Undocumented - LD E,$n - FD 1E n - Loads n into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,$n", opcode: [0xFD,0x1E], values: [opcode3], programCounter: registers.PC)
+            registers.E = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -10667,6 +12086,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x24: // Undocumented - INC IYH - FD 24 - Adds one to IYH
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC IYH", opcode: [0xFD,0x24], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10674,14 +12094,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x25: // Undocumented - DEC IYH - FD 25 - Subtracts one from IYH
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC IYH", opcode: [0xFD,0x25], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x26: // Undocumented - LD IYH,$n - FD 26 n - Loads $n into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,$n", opcode: [0xFD,0x26], values: [opcode3], programCounter: registers.PC)
+            registers.IYH = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -10722,6 +12143,8 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2C: // Undocumented - INC IYL - FD 2C - Adds one to IYL
             // Stub
+            print("FD",opcode2)
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC IYL", opcode: [0xFD,0x2C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10729,14 +12152,15 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x2D: // Undocumented - DEC IYL - FD 2D - Subtracts one from IYL
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC IYL", opcode: [0xFD,0x2D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x2E: // Undocumented - LD IYL,$n - FD 2E n - Loads n into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,$n", opcode: [0xFD,0x2E], values: [opcode3], programCounter: registers.PC)
+            registers.IYL = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
@@ -10791,6 +12215,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3C: // Undocumented - INC A - FD 3C - Adds one to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "INC A", opcode: [0xFD,0x3C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -10798,56 +12223,56 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x3D: // Undocumented - DEC A - FD 3D - Subtracts one from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "DEC A", opcode: [0xFD,0x3D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x3E: // Undocumented - LD A,$n - FD 3E n - Loads n into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,$n", opcode: [0xFD,0x3E], values: [opcode3], programCounter: registers.PC)
+            registers.A = opcode3
             registers.PC = registers.PC &+ 3
             registers.Q = 0
             tStates = 11
             incrementR(opcodeCount:2)
         case 0x40: // Undocumented - LD B,B - FD 40 - The contents of B are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,B", opcode: [0xFD,0x40], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x41: // Undocumented - LD B,C - FD 41 - The contents of C are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,C", opcode: [0xFD,0x41], programCounter: registers.PC)
+            registers.B = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x42: // Undocumented - LD B,D - FD 42 - The contents of D are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,D", opcode: [0xFD,0x42], programCounter: registers.PC)
+            registers.B = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x43: // Undocumented - LD B,E - FD 43 - The contents of E are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,E", opcode: [0xFD,0x43], programCounter: registers.PC)
+            registers.B = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x44: // Undocumented - LD B,IYH - FD 44 - The contents of IYH are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,IYH", opcode: [0xFD,0x44], programCounter: registers.PC)
+            registers.B = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x45: // Undocumented - LD B,IYL - FD 45 - The contents of IYL are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,IYL", opcode: [0xFD,0x45], programCounter: registers.PC)
+            registers.B = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -10862,50 +12287,49 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x47: // Undocumented - LD B,A - FD 47 - The contents of A are loaded into B
-            // Stub
             logInstructionDetails(instructionDetails: "LD B,A", opcode: [0xFD,0x47], programCounter: registers.PC)
+            registers.B = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x48: // Undocumented - LD C,B - FD 48 - The contents of B are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,B", opcode: [0xFD,0x48], programCounter: registers.PC)
+            registers.C = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x49: // Undocumented - LD C,C - FD 49 - The contents of C are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,C", opcode: [0xFD,0x49], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4A: // Undocumented - LD C,D - FD 4A - The contents of D are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,D", opcode: [0xFD,0x4A], programCounter: registers.PC)
+            registers.C = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4B: // Undocumented - LD C,E - FD 4B - The contents of E are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,E", opcode: [0xFD,0x4B], programCounter: registers.PC)
+            registers.C = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4C: // Undocumented - LD C,IYH - FD 4C - The contents of IYH are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,IYH", opcode: [0xFD,0x4C], programCounter: registers.PC)
+            registers.C = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x4D: // Undocumented - LD C,IYL - FD 4D - The contents of IYL are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,IYL", opcode: [0xFD,0x4D], programCounter: registers.PC)
+            registers.C = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -10920,50 +12344,49 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x4F: // Undocumented - LD C,A - FD 4F - The contents of A are loaded into C
-            // Stub
             logInstructionDetails(instructionDetails: "LD C,A", opcode: [0xFD,0x4F], programCounter: registers.PC)
+            registers.C = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x50: // Undocumented - LD D,B - FD 50 - The contents of B are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,B", opcode: [0xFD,0x50], programCounter: registers.PC)
+            registers.D = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x51: // Undocumented - LD D,C - FD 51 - The contents of C are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,C", opcode: [0xFD,0x51], programCounter: registers.PC)
+            registers.D = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x52: // Undocumented - LD D,D - FD 52 - The contents of D are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,D", opcode: [0xFD,0x52], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x53: // Undocumented - LD D,E - FD 53 - The contents of E are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,E", opcode: [0xFD,0x53], programCounter: registers.PC)
+            registers.D = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x54: // Undocumented - LD D,IYH - FD 54 - The contents of IYH are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,IYH", opcode: [0xFD,0x54], programCounter: registers.PC)
+            registers.D = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x55: // Undocumented - LD D,IYL - FD 55 - The contents of IYL are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,IYL", opcode: [0xFD,0x55], programCounter: registers.PC)
+            registers.D = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -10978,50 +12401,49 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x57: // Undocumented - LD D,A - FD 57 - The contents of A are loaded into D
-            // Stub
             logInstructionDetails(instructionDetails: "LD D,A", opcode: [0xFD,0x57], programCounter: registers.PC)
+            registers.D = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x58: // Undocumented - LD E,B - FD 58 - The contents of B are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,B", opcode: [0xFD,0x58], programCounter: registers.PC)
+            registers.E = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x59: // Undocumented - LD E,C - FD 59 - The contents of C are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,C", opcode: [0xFD,0x59], programCounter: registers.PC)
+            registers.E = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5A: // Undocumented - LD E,D - FD 5A - The contents of D are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,D", opcode: [0xFD,0x5A], programCounter: registers.PC)
+            registers.E = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5B: // Undocumented - LD E,E - FD 5B - The contents of E are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,E", opcode: [0xFD,0x5B], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5C: // Undocumented - LD E,IYH - FD 5C - The contents of IYH are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,IYH", opcode: [0xFD,0x5C], programCounter: registers.PC)
+            registers.E = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x5D: // Undocumented - LD E,IYL - FD 5D - The contents of IYL are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,IYL", opcode: [0xFD,0x5D], programCounter: registers.PC)
+            registers.E = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -11036,50 +12458,50 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x5F: // Undocumented - LD E,A - FD 5F - The contents of A are loaded into E
-            // Stub
             logInstructionDetails(instructionDetails: "LD E,A", opcode: [0xFD,0x5F], programCounter: registers.PC)
+            registers.E = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x60: // Undocumented - LD IYH,B - FD 60 - The contents of B are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,B", opcode: [0xFD,0x60], programCounter: registers.PC)
+            registers.IYH = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x61: // Undocumented - LD IYH,C - FD 61 - The contents of C are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,C", opcode: [0xFD,0x61], programCounter: registers.PC)
+            registers.IYH = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x62: // Undocumented - LD IYH,D - FD 62 - The contents of D are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,D", opcode: [0xFD,0x62], programCounter: registers.PC)
+            registers.IYH = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x63: // Undocumented - LD IYH,E - FD 63 - The contents of E are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,E", opcode: [0xFD,0x63], programCounter: registers.PC)
+            registers.IYH = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x64: // Undocumented - LD IYH,IYH - FD 64 - The contents of IYH are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,IYH", opcode: [0xFD,0x64], programCounter: registers.PC)
+            registers.IYH = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x65: // Undocumented - LD IYH,IYL - FD 65 - The contents of IYL are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,IYL", opcode: [0xFD,0x65], programCounter: registers.PC)
+            registers.IYH = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -11094,50 +12516,50 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x67: // Undocumented - LD IYH,A - FD 67 - The contents of A are loaded into IYH
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYH,A", opcode: [0xFD,0x67], programCounter: registers.PC)
+            registers.IYH = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x68: // Undocumented - LD IYL,B - FD 68 - The contents of B are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,B", opcode: [0xFD,0x68], programCounter: registers.PC)
+            registers.IYL = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x69: // Undocumented - LD IYL,C - FD 69 - The contents of C are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,C", opcode: [0xFD,0x69], programCounter: registers.PC)
+            registers.IYL = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6A: // Undocumented - LD IYL,D - FD 6A - The contents of D are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,D", opcode: [0xFD,0x6A], programCounter: registers.PC)
+            registers.IYL = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6B: // Undocumented - LD IYL,E - FD 6B - The contents of E are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,E", opcode: [0xFD,0x6B], programCounter: registers.PC)
+            registers.IYL = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6C: // Undocumented - LD IYL,IYH - FD 6C - The contents of IYH are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,IYH", opcode: [0xFD,0x6C], programCounter: registers.PC)
+            registers.IYL = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x6D: // Undocumented - LD IYL,IYL - FD 6D - The contents of IYL are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,IYL", opcode: [0xFD,0x6D], programCounter: registers.PC)
+            registers.IYL = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -11152,8 +12574,8 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x6F: // Undocumented - LD IYL,A - FD 6F - The contents of A are loaded into IYL
-            // Stub
             logInstructionDetails(instructionDetails: "LD IYL,A", opcode: [0xFD,0x6F], programCounter: registers.PC)
+            registers.IYL = registers.A
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -11222,43 +12644,43 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x78: // Undocumented - LD A,B - FD 78 - The contents of B are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,B", opcode: [0xFD,0x78], programCounter: registers.PC)
+            registers.A = registers.B
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x79: // Undocumented - LD A,C - FD 79 - The contents of C are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,C", opcode: [0xFD,0x79], programCounter: registers.PC)
+            registers.A = registers.C
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7A: // Undocumented - LD A,D - FD 7A - The contents of D are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,D", opcode: [0xFD,0x7A], programCounter: registers.PC)
+            registers.A = registers.D
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7B: // Undocumented - LD A,E - FD 7B - The contents of E are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,E", opcode: [0xFD,0x7B], programCounter: registers.PC)
+            registers.A = registers.E
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7C: // Undocumented - LD A,IYH - FD 7C - The contents of IYH are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,IYH", opcode: [0xFD,0x7C], programCounter: registers.PC)
+            registers.A = registers.IYH
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
             incrementR(opcodeCount:2)
         case 0x7D: // Undocumented - LD A,IYL - FD 7D - The contents of IYL are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,IYL", opcode: [0xFD,0x7D], programCounter: registers.PC)
+            registers.A = registers.IYL
             registers.PC = registers.PC &+ 2
             registers.Q = 0
             tStates = 8
@@ -11273,7 +12695,6 @@ actor microbee
             tStates = 19
             incrementR(opcodeCount:2)
         case 0x7F: // Undocumented - LD A,A - FD 7F - The contents of A are loaded into A
-            // Stub
             logInstructionDetails(instructionDetails: "LD A,A", opcode: [0xFD,0x7F], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0
@@ -11281,6 +12702,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x80: // Undocumented - ADD A,B - FD 80 - Adds B to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,B", opcode: [0xFD,0x80], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11288,6 +12710,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x81: // Undocumented - ADD A,C - FD 81 - Adds C to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,C", opcode: [0xFD,0x81], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11295,6 +12718,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x82: // Undocumented - ADD A,D - FD 82 - Adds D to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,D", opcode: [0xFD,0x82], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11302,6 +12726,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x83: // Undocumented - ADD A,E - FD 83 - Adds E to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,E", opcode: [0xFD,0x83], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11309,6 +12734,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x84: // Undocumented - ADD A,IYH - FD 84 - Adds IYH to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,IYH", opcode: [0xFD,0x84], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11316,6 +12742,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x85: // Undocumented - ADD A,IYL - FD 85 - Adds IYL to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,IYL", opcode: [0xFD,0x85], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11332,6 +12759,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x87: // Undocumented - ADD A,A - FD 87 - Adds A to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADD A,A", opcode: [0xFD,0x87], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11339,6 +12767,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x88: // Undocumented - ADC A,B - FD 88 - Adds B and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,B", opcode: [0xFD,0x88], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11346,6 +12775,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x89: // Undocumented - ADC A,C - FD 89 - Adds C and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,C", opcode: [0xFD,0x89], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11353,6 +12783,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8A: // Undocumented - ADC A,D - FD 8A - Adds D and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,D", opcode: [0xFD,0x8A], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11360,6 +12791,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8B: // Undocumented - ADC A,E - FD 8B - Adds E and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,E", opcode: [0xFD,0x8B], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11367,6 +12799,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8C: // Undocumented - ADC A,IYH - FD 8C - Adds IYH and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,IYH", opcode: [0xFD,0x8C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11374,6 +12807,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8D: // Undocumented - ADC A,IYL - FD 8D - Adds IYL and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,IYL", opcode: [0xFD,0x8D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11391,6 +12825,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x8F: // Undocumented - ADC A,A - FD 8F - Adds A and the carry flag to A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "ADC A,A", opcode: [0xFD,0x8F], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11398,6 +12833,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x90: // Undocumented - SUB B - FD 90 - Subtracts B from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB B", opcode: [0xFD,0x90], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11405,6 +12841,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x91: // Undocumented - SUB C - FD 91 - Subtracts B from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB C", opcode: [0xFD,0x91], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11412,6 +12849,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x92: // Undocumented - SUB D - FD 92 - Subtracts D from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB D", opcode: [0xFD,0x92], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11419,6 +12857,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x93: // Undocumented - SUB E - FD 93 - Subtracts E from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB E", opcode: [0xFD,0x93], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11426,6 +12865,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x94: // Undocumented - SUB IYH - FD 94 - Subtracts IYH from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB IYH", opcode: [0xFD,0x94], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11433,6 +12873,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x95: // Undocumented - SUB IYL - FD 95 - SubtractsIYLfrom A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB IYL", opcode: [0xFD,0x95], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11449,6 +12890,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x97: // Undocumented - SUB A - FD 97 - Subtracts A from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SUB A", opcode: [0xFD,0x97], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11456,6 +12898,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x98: // Undocumented - SBC A,B - FD 98 - Subtracts B and the carry flag from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,B", opcode: [0xFD,0x98], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11463,6 +12906,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x99: // Undocumented - SBC A,C - FD 99 - Subtracts C and the carry flag from A. - FD 99
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,C", opcode: [0xFD,0x0C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11470,6 +12914,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9A: // Undocumented - SBC A,D - FD 9A - Subtracts D and the carry flag from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,D", opcode: [0xFD,0x9A], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11477,6 +12922,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9B: // Undocumented - SBC A,E - FD 9B - Subtracts E and the carry flag from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,E", opcode: [0xFD,0x9B], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11484,6 +12930,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9C: // Undocumented - SBC A,IYH - FD 9C - Subtracts IYH and the carry flag from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,IYH", opcode: [0xFD,0x9C], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11491,6 +12938,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9D: // Undocumented - SBC A,IYL - FD 9D - Subtracts IYL and the carry flag from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,IYL", opcode: [0xFD,0x9D], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11509,6 +12957,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0x9F: // Undocumented - SBC A,A - FD 9F - Subtracts A and the carry flag from A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "SBC A,A", opcode: [0xFD,0x9F], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11516,6 +12965,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA0: // Undocumented - AND B - FD A0 - Bitwise AND on A with B
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND B", opcode: [0xFD,0xA0], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11523,6 +12973,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA1: // Undocumented - AND C - FD A1 - Bitwise AND on A with C
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND C", opcode: [0xFD,0xA1], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11530,6 +12981,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA2: // Undocumented - AND D - FD A2 - Bitwise AND on A with D
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND D", opcode: [0xFD,0xA2], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11537,6 +12989,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA3: // Undocumented - AND E - FD A3 - Bitwise AND on A with E
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND E", opcode: [0xFD,0xA3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11544,6 +12997,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA4: // Undocumented - AND IYH - FD A4 - Bitwise AND on A with IYH
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND IYH", opcode: [0xFD,0xA4], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11551,6 +13005,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA5: // Undocumented - AND IYL - FD A5 - Bitwise AND on A with IYL
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND IYL", opcode: [0xFD,0xA5], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11567,6 +13022,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA7: // Undocumented - AND A - FD A7 - Bitwise AND on A with A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "AND A", opcode: [0xFD,0xA7], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11574,6 +13030,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA8: // Undocumented - XOR B - FD A8 - Bitwise XOR on A with B
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR B", opcode: [0xFD,0xA8], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11581,6 +13038,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xA9: // Undocumented - XOR C - FD A9 - Bitwise XOR on A with C
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR C", opcode: [0xFD,0xA9], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11588,6 +13046,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAA: // Undocumented - XOR D - FD AA - Bitwise XOR on A with D
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR D", opcode: [0xFD,0xAA], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11595,6 +13054,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAB: // Undocumented - XOR E - FD AB - Bitwise XOR on A with E
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR E", opcode: [0xFD,0xAB], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11602,6 +13062,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAC: // Undocumented - XOR IYH - FD AC - Bitwise XOR on A with IYH
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR IYH", opcode: [0xFD,0xAC], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11609,6 +13070,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAD: // Undocumented - XOR IYL - FD AD - Bitwise XOR on A with IYL
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR IYL", opcode: [0xFD,0xAD], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11625,6 +13087,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xAF: // Undocumented - XOR A - FD AF - Bitwise XOR on A with A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "XOR A", opcode: [0xFD,0xAF], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11632,6 +13095,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB0: // Undocumented - OR B - FD B0 - Bitwise OR on A with B
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR B", opcode: [0xFD,0xB0], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11639,6 +13103,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB1: // Undocumented - OR C - FD B1 - Bitwise OR on A with C
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR C", opcode: [0xFD,0xB1], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11646,6 +13111,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB2: // Undocumented - OR D - FD B2 - Bitwise OR on A with D
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR D", opcode: [0xFD,0xB2], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11653,6 +13119,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB3: // Undocumented - OR E - FD B3 - Bitwise OR on A with E
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR E", opcode: [0xFD,0xB3], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11660,6 +13127,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB4: // Undocumented - OR IYH - FD B4 - Bitwise OR on A with IYH
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR IYH", opcode: [0xFD,0xB4], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11667,6 +13135,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB5: // Undocumented - OR IYL - FD B5 - Bitwise OR on A with IYL
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR IYL", opcode: [0xFD,0xB5], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11683,6 +13152,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB7: // Undocumented - OR A - FD B7 - Bitwise OR on A with A
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "OR A", opcode: [0xFD,0xB7], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11690,6 +13160,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB8: // Undocumented - CP B - FD B8 - Subtracts B from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP B", opcode: [0xFD,0xB8], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11697,6 +13168,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xB9: // Undocumented - CP C - FD B9 - Subtracts C from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP C", opcode: [0xFD,0xB9], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11704,6 +13176,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBA: // Undocumented - CP D - FD BA - Subtracts D from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP D", opcode: [0xFD,0xBA], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11711,6 +13184,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBB: // Undocumented - CP E - FD BB - Subtracts E from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP E", opcode: [0xFD,0xBB], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11718,6 +13192,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBC: // Undocumented - CP IYH - FD BC - Subtracts IYH from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP IYH", opcode: [0xFD,0xBC], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11725,6 +13200,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBD: // Undocumented - CP IYL - FD BD - Subtracts IYL from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP IYL", opcode: [0xFD,0xBD], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -11745,6 +13221,7 @@ actor microbee
             incrementR(opcodeCount:2)
         case 0xBF: // Undocumented - CP A - FD BF - Subtracts A from A and affects flags according to the result. A is not modified
             // Stub
+            print("FD",opcode2)
             logInstructionDetails(instructionDetails: "CP A", opcode: [0xFD,0xBF], programCounter: registers.PC)
             registers.PC = registers.PC &+ 2
             registers.Q = 0 //  change for flag opcodes
@@ -13522,8 +14999,6 @@ actor microbee
             registers.Q = 0
             tStates = 10
             incrementR(opcodeCount:1)
-//            benchmarkStartClock = clock.now
-//            benchmarkStartTStates = totalTStates
         case 0xCA: // JP Z,nn - CA n n - If the zero flag is set, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP Z,$nn", opcode: [0xCA], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
