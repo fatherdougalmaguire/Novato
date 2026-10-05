@@ -338,7 +338,7 @@ final class CRTC
     
     var characterClock : UInt8 = 0
     
-    let tStatesPerCharacterClock = 2                        // 3.375Mhz divide by 1.6875 Mhz.  Make this speed independent later
+    var tStatesPerCharacterClock : UInt8 = 2                        // 3.375Mhz divide by 1.6875 Mhz - Default value but can be changed if CPU multiplier changes
     
     var columnCounter : UInt8 = 0
     var rowCounter : UInt8 = 0
@@ -363,6 +363,11 @@ final class CRTC
     init(keyboard: MicrobeeKeyboard)
     {
         self.keyboard = keyboard
+    }
+    
+    func setCharacterClock(clockSpeedMultiplier: Double )
+    {
+        tStatesPerCharacterClock = UInt8((3.375*clockSpeedMultiplier)/1.6875)
     }
     
     func toggleLogging()
