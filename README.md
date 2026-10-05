@@ -89,7 +89,8 @@ It has a functional z80 core, mmu, 6545 emulation, keyboard input and video outp
   
 ### Instruction decoding
 * All documented instructions are decoded
-* All non-documented instructions are stubs at this point
+* All non-documented instructions are decoded
+* Need to work out how to cope with DD,FD prefixes ( as they are part of the single step tests )
 * T-states are captured
 
 ### Emulator core
