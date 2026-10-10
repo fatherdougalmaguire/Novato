@@ -1135,6 +1135,8 @@ actor microbee
         
         bus.crtc.reset()
         
+        bus.pio.reset()
+        
         bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)       // 32K System RAM
         bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)     // 16K BASIC ROM
         bus.mmu.map(readDevice: bus.pakROM, writeDevice: bus.pakROM , memoryLocation: 0xC000)        // 8K Optional ROM
@@ -17094,7 +17096,7 @@ actor microbee
            }
            registers.Q = 0
            incrementR(opcodeCount:1)
-       case 0xD1: // POP DE - D1 - The memory location pointed to by SP is stored into E and SP is incremented. The memory location pointed to by SP is stored into D and SP is incremented again.
+        case 0xD1: // POP DE - D1 - The memory location pointed to by SP is stored into E and SP is incremented. The memory location pointed to by SP is stored into D and SP is incremented again.
             logInstructionDetails(instructionDetails: "POP DE", opcode: [0xD1], programCounter: registers.PC)
             registers.E = bus.readByte(address: registers.SP)
             registers.D = bus.readByte(address: registers.SP &+ 1)
@@ -17103,7 +17105,7 @@ actor microbee
             registers.Q = 0
             tStates = 10
             incrementR(opcodeCount:1)
-       case 0xD2: // JP NC,$nn - D2 n n - If the carry flag is unset, $nn is copied to PC
+        case 0xD2: // JP NC,$nn - D2 n n - If the carry flag is unset, $nn is copied to PC
             logInstructionDetails(instructionDetails: "JP NC,$nn", opcode: [0xD2], values: [opcode2,opcode3], programCounter: registers.PC)
             registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
             if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
@@ -17117,7 +17119,7 @@ actor microbee
             registers.Q = 0
             tStates = 10
             incrementR(opcodeCount:1)
-       case 0xD3: // OUT ($n),A - D3 n - The value of A is written to port $n
+        case 0xD3: // OUT ($n),A - D3 n - The value of A is written to port $n
             logInstructionDetails(instructionDetails: "OUT ($n),A", opcode: [0xD3], values: [opcode2], programCounter: registers.PC)
             let tempResult = UInt16(registers.A) << 8 | UInt16(opcode2)
             bus.writePort(portNum: tempResult, portValue: registers.A)
@@ -17126,7 +17128,7 @@ actor microbee
             registers.WZ = UInt16(registers.A) << 8 | (UInt16(opcode2) &+ 1) & 0xFF
             tStates = 11
             incrementR(opcodeCount:1)
-       case 0xD4: // CALL NC,$nn - D4 n n - If the carry flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
+        case 0xD4: // CALL NC,$nn - D4 n n - If the carry flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn
            logInstructionDetails(instructionDetails: "CALL NC,$nn",opcode: [0xD4], values: [opcode2,opcode3], programCounter: registers.PC)
            registers.PC = registers.PC &+ 3
            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
@@ -17145,7 +17147,7 @@ actor microbee
            }
            registers.Q = 0
            incrementR(opcodeCount:1)
-       case 0xD5: // PUSH DE - D5 - SP is decremented and D is stored into the memory location pointed to by SP. SP is decremented again and E is stored into the memory location pointed to by SP
+         case 0xD5: // PUSH DE - D5 - SP is decremented and D is stored into the memory location pointed to by SP. SP is decremented again and E is stored into the memory location pointed to by SP
            logInstructionDetails(instructionDetails: "PUSH DE", opcode: [0xD5], programCounter: registers.PC)
            registers.SP = registers.SP &- 1
             bus.writeByte(address: registers.SP, value: registers.D)
@@ -17155,14 +17157,14 @@ actor microbee
            registers.Q = 0
            tStates = 11
            incrementR(opcodeCount:1)
-       case 0xD6: // SUB $n - D6 n - Subtracts $n from A
+        case 0xD6: // SUB $n - D6 n - Subtracts $n from A
            logInstructionDetails(instructionDetails: "SUB $n", opcode: [0xD6], values: [opcode2], programCounter: registers.PC)
            (registers.A,registers.F) = z80FastFlags.subHelper(operand1: registers.A, operand2: opcode2)
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
            tStates = 7
            incrementR(opcodeCount:1)
-       case 0xD7: // RST 0x10 - The current PC value plus one is pushed onto the stack, then is loaded with 0x10
+        case 0xD7: // RST 0x10 - The current PC value plus one is pushed onto the stack, then is loaded with 0x10
            logInstructionDetails(instructionDetails: "RST 0x10", opcode: [0xD7], programCounter: registers.PC)
            registers.PC = registers.PC &+ 1
            registers.SP = registers.SP &- 1
@@ -17174,7 +17176,7 @@ actor microbee
            registers.Q = 0
            tStates = 11
            incrementR(opcodeCount:1)
-       case 0xD8: // RET C - D8 - If the carry flag is set, the top stack entry is popped into PC
+        case 0xD8: // RET C - D8 - If the carry flag is set, the top stack entry is popped into PC
            logInstructionDetails(instructionDetails: "RET NC", opcode: [0xD0], programCounter: registers.PC)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
            {
@@ -17192,7 +17194,7 @@ actor microbee
            }
            registers.Q = 0
            incrementR(opcodeCount:1)
-       case 0xD9: // EXX - D9 - Exchanges the 16-bit contents of BC, DE, and HL with BC', DE', and HL'
+        case 0xD9: // EXX - D9 - Exchanges the 16-bit contents of BC, DE, and HL with BC', DE', and HL'
            logInstructionDetails(instructionDetails: "EXX", opcode: [0xD9], programCounter: registers.PC)
            (registers.BC,registers.altBC) = (registers.altBC,registers.BC)
            (registers.DE,registers.altDE) = (registers.altDE,registers.DE)
@@ -17201,7 +17203,7 @@ actor microbee
            registers.Q = 0
            tStates = 4
            incrementR(opcodeCount:1)
-       case 0xDA: // JP C,$nn - DA n n - If the carry flag is set, $nn is copied to PC
+        case 0xDA: // JP C,$nn - DA n n - If the carry flag is set, $nn is copied to PC
            logInstructionDetails(instructionDetails: "JP C,$nn", opcode: [0xDA], values: [opcode2,opcode3], programCounter: registers.PC)
            registers.WZ = UInt16(opcode3) << 8 | UInt16(opcode2)
            if (TestFlags(FlagRegister:registers.F,Flag:z80Flags.Carry))
@@ -17215,7 +17217,7 @@ actor microbee
            registers.Q = 0
            tStates = 10
            incrementR(opcodeCount:1)
-       case 0xDB: // IN A,($n) - DB n - A byte from port $n is written to A
+        case 0xDB: // IN A,($n) - DB n - A byte from port $n is written to A
             logInstructionDetails(instructionDetails: "IN A,($n)", opcode: [0xDB], values: [opcode2], programCounter: registers.PC)
             registers.WZ = UInt16(registers.A) << 8 | UInt16(opcode2) &+ 1
             let tempResult = UInt16(registers.A) << 8 | UInt16(opcode2)
@@ -17224,7 +17226,7 @@ actor microbee
             registers.Q = 0
             tStates = 11
             incrementR(opcodeCount:1)
-       case 0xDC: // CALL C,$nn - DC n n - If the carry flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
+        case 0xDC: // CALL C,$nn - DC n n - If the carry flag is set, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
             logInstructionDetails(instructionDetails: "CALL C,$nn",opcode: [0xDC], values: [opcode2,opcode3], programCounter: registers.PC)
             //print(String(format: "%04X",registers.PC), registers.F)
             registers.PC = registers.PC &+ 3

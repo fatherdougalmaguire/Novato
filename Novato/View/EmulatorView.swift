@@ -398,14 +398,28 @@ struct emulatorView: View
                                     _ = Task
                                     {
                                         await vm.toggleLogging()
-                                        await vm.keyDown(.ctrlKey, 0x0C)
-                                        await vm.keyDown(.eKey, 0x0C)
+                                        await vm.keyDown(.qKey, 0x0C)
                                         try? await Task.sleep(nanoseconds: 50_000_000)
-                                        await vm.keyUp(.eKey, 0x0C)
-                                        await vm.keyUp(.ctrlKey, 0x0C)
+                                        await vm.keyUp(.qKey, 0x0C)
                                     }
                                 }
                                 .labelStyle(.titleAndIcon)
+                            Button("Inject",systemImage: "terminal")
+                            {
+                                _ = Task
+                                {
+                                    await vm.keyDown(.qKey, 0x0C)
+                                    try? await Task.sleep(nanoseconds: 50_000_000)
+                                    await vm.keyUp(.qKey, 0x0C)
+                                    await vm.keyDown(.qKey, 0x0C)
+                                    try? await Task.sleep(nanoseconds: 50_000_000)
+                                    await vm.keyUp(.qKey, 0x0C)
+                                    await vm.keyDown(.qKey, 0x0C)
+                                    try? await Task.sleep(nanoseconds: 50_000_000)
+                                    await vm.keyUp(.qKey, 0x0C)
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
 #endif
                             Button("Paste",systemImage: "sparkle.text.clipboard")
                             {
