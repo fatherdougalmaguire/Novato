@@ -652,9 +652,23 @@ final class CRTC
     
     private let keyboard: MicrobeeKeyboard
     
+    let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
+    // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
+    
+    var colourType : Int = 0
+    
     init(keyboard: MicrobeeKeyboard)
     {
         self.keyboard = keyboard
+        
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "colorSelection": "Green"
+            ]
+        )
+        
+        self.colourType = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
     }
     
     func setCharacterClock(clockSpeedMultiplier: Double )
@@ -919,7 +933,18 @@ final class CRTC
         romReadLatch = false
         
         keyboard.releaseAll()
-
+        
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "colorSelection": "Green"
+            ]
+        )
+        
+        let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
+        // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
+        
+        self.colourType = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
     }
 }
 
@@ -932,6 +957,8 @@ final class BUS
     let pio = z80PIO()
     
     var underTest : Bool = false
+    
+    var colourEnabled : Bool = false
     
     let mainRAM = memoryBlock(size: 0x8000)
     let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
@@ -961,8 +988,20 @@ final class BUS
         //pakROM.fillMemoryFromFile(fileName: "mytek_wordprocessor", fileExtension: "rom")
         netROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
         fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "colorSelection": "Green"
+            ]
+        )
 
-        mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
+        self.colourEnabled = UserDefaults.standard.string(forKey: "colorSelection") == "Colour" ? true : false
+        
+        if self.colourEnabled
+        {
+            mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
+        }
     }
     
     @inline(__always)
@@ -978,6 +1017,8 @@ final class BUS
             {
             case 0x00,0x02: pio.writeData(portNum: UInt8(realPort), portValue: portValue)
             case 0x01,0x03: pio.writeControl(portNum: UInt8(realPort), portValue: portValue)
+            case 0x04: break // RTC address port
+            case 0x06: break // RTC write port
             case 0x08:
                 if portValue & 0x01 == 0x01
                 {
@@ -1003,16 +1044,18 @@ final class BUS
                 {
                     crtc.registers.blueBackgroundIntensity = 0 // set global background blue intensity to 0 = half
                 }
-                if portValue & 0x40 == 0x40
+                if portValue & 0x40 == 0x40 && colourEnabled
                 {
-                    mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram
+                   mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
                    // print("Switch in Colour RAM. Setting port 8 to",ports.readPort(portNum : realPort))
                 }
-                if portValue & 0x40 == 0x00
+                if portValue & 0x40 == 0x00 && colourEnabled
                 {
-                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)        // swap in pcg ram
+                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)      // swap in pcg ram if colour capability is set
                    // print("Switch in PCG RAM. Setting port 8 to",ports.readPort(portNum : realPort))
                 }
+            case 0x09: break // Colour "Wait off" OUTPUT to port - no idea what this does
+            case 0x0A: break // PAK selection
             case 0x0B:
                 if portValue & 0x01 == 1
                 {
@@ -1044,6 +1087,13 @@ final class BUS
                 // To select the normal screen ram use
                 // LD A,10100000
                 // OUT (0x1C),A
+            case 0x48: break
+                // Disk controller select/side/DD latch bit assignments (write only)
+                // bit 0 LSB of drive address
+                // bit 1 MSB of drive address
+                // bit 2 Side select (0=side 0, 1=side 1)
+                // bit 3 DD select (0 = single density)
+                // bit 7 Controller TRANSFER status bit - gives INTRQ or DRQ.
             case 0x50: break
                 // 128k bank switching.  All bits are set to zero upon power up or RESET.
                 // Bit 5 ROM Select.
@@ -1087,9 +1137,13 @@ final class BUS
             {
             case 0x00,0x02: return pio.readData(portNum: UInt8(realPort))
             case 0x01,0x03: return 0xff // PIO control reads apparently aren't defined
+            case 0x04: return 0xff // RTC address port
+            case 0x07: return 0xff // RTC read port
             case 0x08:
                 //print("Port 8 is set to",ports.readPort(portNum : realPort))
                 return ports.readPort(portNum : realPort)
+            case 0x09: return 0xff // Viatel Video mode INPUT from port
+            case 0x0A: return 0xff // NET selection INPUT from port
             case 0x0C:
                 return crtc.readStatusRegister()
             case 0x0D:

@@ -71,7 +71,7 @@ struct emulatorView: View
     
     @AppStorage("scalingSelection") private var charScale: Double = 2.0 // Scale for visibility on 27" screen ( 2560 x 1440 )
     @AppStorage("aspectSelection") private var charAspect: Double = 4/3  // Correction for CRT aspect ratio
-    @AppStorage("colorSelection") private var colourSelection = "Colour"
+    //@AppStorage("colorSelection") private var colourSelection = "Green"
     @AppStorage("bootModeSelection") private var bootModeSelection = "MicroWorld Basic 5.22e"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
     @AppStorage("registerWindowVisible") private var registerWindowVisible: Bool = true
@@ -81,7 +81,7 @@ struct emulatorView: View
     @AppStorage("memoryInspectorWindowVisible") private var  memoryInspectorWindowVisible: Bool = true
     @AppStorage("speedSelection") private var speedSelection: Double = 1.0
     
-    let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
+    //let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
     // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
     
     let startDate = Date()
@@ -93,8 +93,8 @@ struct emulatorView: View
         let snapshot: microbeeSnapshot
         let vm: emulatorViewModel
         let startDate: Date
-        let colourSelection: String
-        let colourOptions: [String: Int]
+        //let colourSelection: String
+        //let colourOptions: [String: Int]
         let charScale: CGFloat
         let charAspect: CGFloat
         
@@ -191,7 +191,8 @@ struct emulatorView: View
             let alternateFontROM: Float = Float(Int(snapshot.crtcSnapshot.R12) >> 5) // Is MA13 set to 1 ?  If so, select alternate font ROM
             let cursorPosition: Float = Float(Int(snapshot.crtcSnapshot.R14) << 8 | Int(snapshot.crtcSnapshot.R15))
 
-            let colourMode: Float = Float(colourOptions[colourSelection] ?? 0)
+            //let colourMode: Float = Float(colourOptions[colourSelection] ?? 0)
+            let colourMode: Float = Float(snapshot.crtcSnapshot.colourType)
 
             // Base and scaled sizes (broken into smaller sub-expressions for type-checker)
             let baseWidthInt: Int = max(frameWidth, 1)
@@ -262,7 +263,7 @@ struct emulatorView: View
                 {
                     ZStack
                     {
-                        CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, colourSelection: colourSelection, colourOptions: colourOptions, charScale: charScale, charAspect: charAspect)
+                        CRTCDisplayView( snapshot: snapshot, vm: vm, startDate: startDate, charScale: charScale, charAspect: charAspect)
                         KeyboardResponderView(
                                 onKeyDown:
                                     { event in

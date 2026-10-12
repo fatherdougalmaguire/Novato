@@ -203,7 +203,7 @@ struct modelSettingsView: View
     
     var body: some View
     {
-        let themes = ["Microbee 32IC","64K Computer in a Book (CIAB)","128K Small Business Computer Premium (SBC Premium)","FreeBee Freemium"]
+        let themes = ["Microbee 32IC","64K Computer in a Book (CIAB)","PC85 Premium","128K Small Business Computer Premium","FreeBee Freemium"]
         Form
         {
             Picker("Model:", selection: $modelSelection)
@@ -268,7 +268,7 @@ struct screenSettingsView: View
     @AppStorage("scalingSelection") private var scalingSelection: Double = 2.0
     @AppStorage("aspectSelection") private var aspectSelection: Double = 4/3
     @AppStorage("interlaceEnabled") private var interlaceEnabled: Bool = false
-    @AppStorage("colorSelection") private var colourSelection = "Colour"
+    @AppStorage("colorSelection") private var colourSelection = "Green"
     
     var body: some View
     {

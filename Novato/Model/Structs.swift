@@ -77,6 +77,8 @@ struct crtcSnapshot: Sendable, Equatable
     let redBackgroundIntensity : UInt8
     let greenBackgroundIntensity : UInt8
     let blueBackgroundIntensity : UInt8
+    
+    let colourType : Int
 }
 
 struct memorySnapshot: Sendable, Equatable

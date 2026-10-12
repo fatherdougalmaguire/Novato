@@ -1150,9 +1150,22 @@ actor microbee
         bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         
         bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
-        bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
-        
+    
         snapshotContinuation.yield(returnSnapshot(stepping: false))
+        
+        UserDefaults.standard.register(
+            defaults:
+            [
+                "colorSelection": "Green"
+            ]
+        )
+
+        bus.colourEnabled = UserDefaults.standard.string(forKey: "colorSelection") == "Colour" ? true : false
+        
+        if bus.colourEnabled
+        {
+            bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
+        }
     }
     
     func start()
@@ -17766,7 +17779,8 @@ actor microbee
                 statusRegister: bus.crtc.readStatusRegister(), 
                 redBackgroundIntensity: bus.crtc.registers.redBackgroundIntensity,
                 greenBackgroundIntensity: bus.crtc.registers.greenBackgroundIntensity,
-                blueBackgroundIntensity: bus.crtc.registers.blueBackgroundIntensity
+                blueBackgroundIntensity: bus.crtc.registers.blueBackgroundIntensity,
+                colourType: bus.crtc.colourType
             ),
             executionSnapshot: executionSnapshot(
                 totalTStates: totalTStates,
