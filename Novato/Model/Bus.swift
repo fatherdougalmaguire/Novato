@@ -21,12 +21,15 @@ final class memoryBlock
     let size: Int
     let deviceType : memoryDeviceType
     
-    init(size: UInt, deviceType: memoryDeviceType = .RAM, fillValue: UInt8 = 0)
+    let name : String
+    
+    init(size: Int, deviceType: memoryDeviceType = .RAM, fillValue: UInt8 = 0, name: String = "")
     {
         let clampedSize = min((Int(size) + memoryConstant.pageMask) & ~memoryConstant.pageMask,memoryConstant.memorySize)
         self.size = Int(clampedSize)
         self.deviceType  = deviceType
         self.addressBlock = ContiguousArray(repeating: fillValue, count: clampedSize)
+        self.name = name
     }
     
     func fillMemory(memValue: UInt8)
@@ -84,7 +87,7 @@ final class memoryMapper
     
     init()
     {
-        let emptyBlock = memoryBlock(size: UInt(memoryConstant.pageSize), deviceType: .ROM, fillValue: 0xFF)
+        let emptyBlock = memoryBlock(size: Int(memoryConstant.pageSize), deviceType: .ROM, fillValue: 0xFF)
         self.readPages = ContiguousArray(repeating: emptyBlock,count: memoryConstant.pageCount)
         self.writePages = ContiguousArray(repeating: emptyBlock, count: memoryConstant.pageCount)
         self.readOffset = ContiguousArray(repeating: 0, count: memoryConstant.pageCount)
@@ -102,6 +105,16 @@ final class memoryMapper
         
         if let unwrapReadDevice = readDevice
         {
+//            if unwrapReadDevice.name == "pcg"
+//            {
+//                print("MMU:PCG switched in for read")
+//            }
+//            
+//            if unwrapReadDevice.name == "color"
+//            {
+//                print("MMU:Colour switched in for read")
+//            }
+            
             let endReadPage = (Int(memoryLocation)+unwrapReadDevice.size-1) >> memoryConstant.pageShift
             
             for counter in pageIndex...endReadPage
@@ -114,6 +127,17 @@ final class memoryMapper
         
         if let unwrapWriteDevice = writeDevice
         {
+            
+//            if unwrapWriteDevice.name == "pcg"
+//            {
+//                print("MMU:PCG switched in for write")
+//            }
+//            
+//            if unwrapWriteDevice.name == "color"
+//            {
+//                print("MMU:Colour switched in for write")
+//            }
+            
             let endWritePage = (Int(memoryLocation)+unwrapWriteDevice.size-1) >> memoryConstant.pageShift
             
             for counter in pageIndex...endWritePage
@@ -959,14 +983,15 @@ final class BUS
     var underTest : Bool = false
     
     var colourEnabled : Bool = false
+    var colourLatch : Bool = false
     
     let mainRAM = memoryBlock(size: 0x8000)
     let basicROM = memoryBlock(size: 0x4000, deviceType : .ROM)
     let pakROM = memoryBlock(size: 0x2000, deviceType : .ROM)
     let netROM = memoryBlock(size: 0x1000, deviceType : .ROM)
     let videoRAM = memoryBlock(size: 0x800, fillValue: 0x20)
-    let pcgRAM = memoryBlock(size: 0x800)
-    let colourRAM = memoryBlock(size: 0x800, fillValue: 0x02)
+    let pcgRAM = memoryBlock(size: 0x800, name: "pcg")
+    let colourRAM = memoryBlock(size: 0x800, fillValue: 0x02, name: "color")
     let fontROM = memoryBlock(size: 0x1000, deviceType : .ROM)
     
     let testRAM = memoryBlock(size:0x10000)
@@ -1046,13 +1071,16 @@ final class BUS
                 }
                 if portValue & 0x40 == 0x40 && colourEnabled
                 {
-                   mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
-                   // print("Switch in Colour RAM. Setting port 8 to",ports.readPort(portNum : realPort))
+//                    print("BUS:switching in colour ram")
+                    colourLatch = true
+                    mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
                 }
                 if portValue & 0x40 == 0x00 && colourEnabled
                 {
+//                    print("BUS:switching in pcg ram")
+                    colourLatch = false
                     mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)      // swap in pcg ram if colour capability is set
-                   // print("Switch in PCG RAM. Setting port 8 to",ports.readPort(portNum : realPort))
+                    
                 }
             case 0x09: break // Colour "Wait off" OUTPUT to port - no idea what this does
             case 0x0A: break // PAK selection
@@ -1066,7 +1094,14 @@ final class BUS
                 {
                     crtc.romReadLatch = false
                     mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram and pcg ram
-                    mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap video ram and pcg ram back into memory at 0xf000 for read and write
+                    if colourLatch
+                    {
+                        mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if color ram latched is on
+                    }
+                    else
+                    {
+                        mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)  // swap in pcg ram if color ram latch is off
+                    }
                 }
             case 0x0D:
                 let tempPort = ports.readPort(portNum: 0x0C)
@@ -1120,6 +1155,10 @@ final class BUS
             }
         }
         ports.writePort(portNum : realPort, portValue : portValue)
+        if realPort == 0x08
+        {
+            print("Port 8 is set to ",portValue,ports.readPort(portNum: 8))
+        }
     }
     
     @inline(__always)
