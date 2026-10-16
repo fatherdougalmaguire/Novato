@@ -112,6 +112,7 @@ It has a functional z80 core, mmu, 6545 emulation, keyboard input and video outp
 
 * Shader will automatically scale the output resolution to the same display size.
 * Colour support has been added ( green mono, amber mono, blue mono, white mono and alpha model colour )
+   - Changes to displayed colour only take effect after emulator reboot.
 
 ### Keyboard input
 
