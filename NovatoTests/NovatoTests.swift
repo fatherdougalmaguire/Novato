@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-let testCycles = 25
+let testCycles = 1000
 let testTiming = 30
 
 var finalPortValue : UInt8 = 0
@@ -111,7 +111,7 @@ extension testHelper
         }
     }
     
-    func testError(finalState: CPUState, expected: CPUState, testForPorts: Bool, finalPortValue: UInt8, ports: [PortActivity], expectedCycles: Int, finalCycles : Int, context: String)
+    func testError(finalState: CPUState, expected: CPUState, testForPorts: Bool, finalPortValue: UInt8, ports: [PortActivity], expectedCycles: Int, finalCycles : Int, context: String, isEI: Bool, preserveEI: UInt8, preserveR: UInt8, preservePC: UInt16)
     {
        #expect(finalState.A == expected.A, "Register A fail in \(context)")
        #expect(finalState.F == expected.F, "Register F fail in \(context)")
@@ -122,13 +122,23 @@ extension testHelper
        #expect(finalState.H == expected.H, "Register H fail in \(context)")
        #expect(finalState.L == expected.L, "Register L fail in \(context)")
        #expect(finalState.I == expected.I, "Register I fail in \(context)")
-       #expect(finalState.R == expected.R, "Register R fail in \(context)")
+        if isEI
+        {
+            #expect(preserveR == expected.R, "Register R fail in \(context)")
+            #expect(preservePC == expected.PC, "Register PC fail in \(context)")
+            #expect(preserveEI == expected.EI,"Register EI fail in \(context)")
+        }
+        else
+        {
+            #expect(finalState.R == expected.R, "Register R fail in \(context)")
+            #expect(finalState.PC == expected.PC, "Register PC fail in \(context)")
+            #expect(finalState.EI == expected.EI,"Register EI fail in \(context)")
+        }
        #expect(finalState.altAF == expected.altAF, "Register altAF fail in \(context)")
        #expect(finalState.altBC == expected.altBC, "Register altBC fail in \(context)")
        #expect(finalState.altDE == expected.altDE, "Register altDE fail in \(context)")
        #expect(finalState.altHL == expected.altHL, "Register altHL fail in \(context)")
        #expect(finalState.IM == expected.IM, "Register IM fail in \(context)")
-       #expect(finalState.PC == expected.PC, "Register PC fail in \(context)")
        #expect(finalState.SP == expected.SP, "Register SP fail in \(context)")
        #expect(finalState.IX == expected.IX, "Register IX fail in \(context)")
        #expect(finalState.IY == expected.IY, "Register IY fail in \(context)")
@@ -136,17 +146,16 @@ extension testHelper
        #expect(finalState.ram == expected.ram, "RAM fail in \(context)")
        #expect(finalState.Q == expected.Q,"Register Q fail in \(context)")
        #expect(finalState.P == expected.P,"Register P fail in \(context)")
-       #expect(finalState.EI == expected.EI,"Register EI fail in \(context)")
        #expect(finalState.IFF1 == expected.IFF1, "Register IFF1 fail in \(context)")
        #expect(finalState.IFF2 == expected.IFF2, "Register IFF2 fail in \(context)")
        if testForPorts
        {
            #expect( finalPortValue == ports[0].value, "Ports fail in \(context)")
        }
-       #expect(expectedCycles == finalCycles,"T-States fail in \(context)")
+        #expect(expectedCycles == finalCycles,"T-States fail in \(context)")
     }
     
-    func runTest(_ testCase: Z80Test) async throws
+    func runTest(_ testCase: Z80Test, isEI: Bool = false) async throws
     {
         let testForPorts : Bool = !testCase.ports.isEmpty
         let cpu = microbee()
@@ -157,9 +166,16 @@ extension testHelper
             await cpu.loadPorts(portNum: testCase.ports[0].address, portValue: testCase.ports[0].value)
         }
         let finalCycles = await cpu.nextInstruction()
+        let interimState = await cpu.returnCPUState(cpuState: testCase.initial)
+        await cpu.eiDelay()
+        if isEI
+        {
+            let _ = await cpu.nextInstruction()
+            await cpu.eiDelay()
+        }
         let finalState = await cpu.returnCPUState(cpuState: testCase.initial)
         let finalPortValue = testForPorts ? await cpu.returnPortValue(portNum: testCase.ports[0].address) : 0
-        testError(finalState: finalState, expected: testCase.final, testForPorts: testForPorts, finalPortValue: finalPortValue, ports: testCase.ports, expectedCycles: testCase.cycles.count, finalCycles: Int(finalCycles), context: testCase.name)
+        testError(finalState: finalState, expected: testCase.final, testForPorts: testForPorts, finalPortValue: finalPortValue, ports: testCase.ports, expectedCycles: testCase.cycles.count, finalCycles: Int(finalCycles), context: testCase.name, isEI : isEI, preserveEI: interimState.EI, preserveR: interimState.R, preservePC: interimState.PC)
     }
 }
 
@@ -1070,7 +1086,7 @@ struct Z80Opcodes: testHelper
         @Test("Validate EI (0xFB)",  arguments: loadJsonTests(named: "fb", range: 0...testCycles-1))
         func test_EI(testCase: Z80Test) async throws
         {
-            try await parent.runTest(testCase)
+            try await parent.runTest(testCase, isEI: true)
         }
         
         @Test("Validate CALL M,$nn (0xFC)",  arguments: loadJsonTests(named: "fc", range: 0...testCycles-1))

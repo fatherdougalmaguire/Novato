@@ -367,8 +367,8 @@ final class PIO
 //    The two follow-up bytes (I/O mask and interrupt mask) have no marker of their own. A stray byte in the wrong place gets misread, so always send the mask immediately after the word that requests it.
 //    The polarity of the two masks is opposite. In the I/O mask, 1 means input. In the interrupt mask, 1 means ignore this bit.
     
-    var input: UInt8 = 0
-    var output: UInt8 = 0
+    var inputPins: UInt8 = 0
+    var outputLatch: UInt8 = 0xff
     var ioMask: UInt8 = 0
     var interruptMask: UInt8 = 0
     
@@ -376,10 +376,11 @@ final class PIO
     var maskControl: pioMaskState = .anyUnmasked
     var signalControl: pioSignal =  .activeLow
      
-    var ready: Bool = false
+    var ready: Bool = true
     var strobe: Bool = false
     
     var interruptsEnabled: Bool = false
+    var interruptsUnderService: Bool = false
     
     var interruptVector: UInt8 = 0
 
@@ -398,18 +399,19 @@ final class PIO
     
     func reset()
     {
-        input = 0
-        output = 0
+        inputPins = 0xff
+        outputLatch = 0
         ioMask = 0
 
         modeControl = .byteInput
         maskControl = .anyUnmasked
         signalControl =  .activeLow
         
-        ready = false
+        ready = true
         strobe = false
         
         interruptsEnabled = false
+        interruptsUnderService = false
         
         interruptVector = 0
         interruptMask = 0
@@ -419,10 +421,10 @@ final class PIO
         
         isPortA = false
     }
-    
+
     func writeData(portValue: UInt8)
     {
-        output = portValue
+        outputLatch = portValue
         if modeControl == .byteOutput || modeControl == .bidirectonal
         {
             ready = true
@@ -508,11 +510,11 @@ final class PIO
         {
         case .byteInput, .bidirectonal:
             ready = true
-            return input
+            return inputPins
         case .byteOutput:
-           return output
+           return outputLatch
         case .bitControl:
-            return 0xff  // not correct.  implement (pins & ioMask) | (output & ~ioMask)
+            return 0xff  // not correct
         }
     }
 }
@@ -1071,16 +1073,13 @@ final class BUS
                 }
                 if portValue & 0x40 == 0x40 && colourEnabled
                 {
-//                    print("BUS:switching in colour ram")
                     colourLatch = true
                     mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
                 }
                 if portValue & 0x40 == 0x00 && colourEnabled
                 {
-//                    print("BUS:switching in pcg ram")
                     colourLatch = false
                     mmu.map(readDevice: pcgRAM, writeDevice: pcgRAM, memoryLocation: 0xF800)      // swap in pcg ram if colour capability is set
-                    
                 }
             case 0x09: break // Colour "Wait off" OUTPUT to port - no idea what this does
             case 0x0A: break // PAK selection
@@ -1155,10 +1154,6 @@ final class BUS
             }
         }
         ports.writePort(portNum : realPort, portValue : portValue)
-        if realPort == 0x08
-        {
-            print("Port 8 is set to ",portValue,ports.readPort(portNum: 8))
-        }
     }
     
     @inline(__always)
@@ -1178,9 +1173,7 @@ final class BUS
             case 0x01,0x03: return 0xff // PIO control reads apparently aren't defined
             case 0x04: return 0xff // RTC address port
             case 0x07: return 0xff // RTC read port
-            case 0x08:
-                //print("Port 8 is set to",ports.readPort(portNum : realPort))
-                return ports.readPort(portNum : realPort)
+            case 0x08: return ports.readPort(portNum : realPort)
             case 0x09: return 0xff // Viatel Video mode INPUT from port
             case 0x0A: return 0xff // NET selection INPUT from port
             case 0x0C:

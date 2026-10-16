@@ -534,7 +534,7 @@ actor microbee
     
     private var logInstructions : Bool = false
     
-    private var preserveEI : UInt8 = 0
+    //private var preserveEI : UInt8 = 0
     
     private var isStepping = false
     private var breakpointHit = false
@@ -563,6 +563,9 @@ actor microbee
     private(set) var emulatorState : emulatorState = .stopped
     
     private var interruptPending = false
+    private var nmiInterruptPending = false
+    
+    private var interruptVector: UInt8 = 0
 
     let keyboard: MicrobeeKeyboard
     let bus : BUS
@@ -572,6 +575,8 @@ actor microbee
     private var capsLockActive = false
     
     private var keyboardMappingRule : Int = 0
+    
+    private var eiDelayCounter: UInt8 = 0
     
     private let baseClockSpeed: Double = 3_375_000
     private let frameRate: Double = 50
@@ -1107,13 +1112,18 @@ actor microbee
         
         registers.EI = 0
         
-        preserveEI = 0
+        eiDelayCounter = 0
+        
+        // preserveEI = 0
         
         totalTStates = 0
         
         emulatorState = .stopped
         
         interruptPending = false
+        nmiInterruptPending = false
+        
+        interruptVector = 0
         
         breakpointHit = false
         
@@ -1152,6 +1162,8 @@ actor microbee
         bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
     
         snapshotContinuation.yield(returnSnapshot(stepping: false))
+        
+        bus.colourLatch = false
         
         UserDefaults.standard.register(
             defaults:
@@ -1208,8 +1220,6 @@ actor microbee
         {
             return
         }
-
-//        print("STEP EXECUTING")
         
         isStepping = true
 
@@ -1219,6 +1229,8 @@ actor microbee
         }
         
         let tStates = nextInstruction()
+        eiDelay()
+        
         totalTStates = totalTStates + UInt64(tStates)
         
         bus.crtc.tick(tStates: tStates)
@@ -1293,6 +1305,7 @@ actor microbee
                 }
                 
                 let tStates = nextInstruction()
+                eiDelay()
             
                 executedTStates = executedTStates + UInt64(tStates)
                 totalTStates = totalTStates + UInt64(tStates)
@@ -1320,7 +1333,6 @@ actor microbee
             snapshotContinuation.yield(snapshot)
             await Task.yield()
         }
-        
     }
     
     func requestInterrupt()
@@ -1328,15 +1340,29 @@ actor microbee
         interruptPending = true
     }
     
-    private func pollInterrupt()
+    func requestNMIInterrupt()
     {
-        guard interruptPending, registers.IFF1 else { return }
-        serviceInterrupt()
+        nmiInterruptPending = true
     }
     
-    private func serviceInterrupt()
+    private func pollInterrupt() -> UInt8
     {
-        guard registers.IFF1 else { return }
+        if nmiInterruptPending
+        {
+            return serviceNMIInterrupt()
+        }
+        
+        if interruptPending
+        {
+            return serviceInterrupt()
+        }
+        
+        return 0
+    }
+    
+    private func serviceInterrupt() -> UInt8
+    {
+        guard interruptPending, registers.IFF1, eiDelayCounter == 0 else { return 0 }
         
         interruptPending = false
         emulatorState = .running
@@ -1344,11 +1370,71 @@ actor microbee
         registers.IFF1 = false
         registers.IFF2 = false
         
-        // check this
         registers.SP = registers.SP &- 2
         bus.writeByte(address: registers.SP, value: registers.PCH)
         bus.writeByte(address: registers.SP + 1, value: registers.PCL)
-        registers.PC = 0x0038
+    
+        switch registers.IM
+        {
+        case 0:
+            registers.PC = 0x0038
+            registers.WZ = 0x0038
+            registers.Q = 0
+            incrementR(opcodeCount:2)
+            return 13
+        case 1:
+            registers.PC = 0x0038
+            registers.WZ = 0x0038
+            registers.Q = 0
+            incrementR(opcodeCount: 1)
+            return 13
+        case 2:
+            let vectorAddress = (UInt16(registers.I) << 8) | UInt16(interruptVector)
+            registers.PCH = bus.readByte(address: vectorAddress)
+            registers.PCL = bus.readByte(address: vectorAddress &+ 1)
+            registers.WZ = registers.PC
+            registers.Q = 0
+            incrementR(opcodeCount: 1)
+            return 19
+        default: return 0
+        }
+    }
+    
+    private func serviceNMIInterrupt() -> UInt8
+    {
+        guard nmiInterruptPending else { return 0 }
+        
+        nmiInterruptPending = false
+        emulatorState = .running
+        
+        registers.IFF2 = registers.IFF1
+        registers.IFF1 = false
+        
+        registers.SP = registers.SP &- 2
+        bus.writeByte(address: registers.SP, value: registers.PCH)
+        bus.writeByte(address: registers.SP + 1, value: registers.PCL)
+        
+        registers.PC = 0x0066
+        registers.WZ = 0x0066
+        
+        registers.Q = 0
+        
+        incrementR(opcodeCount: 1)
+        
+        return 11
+    }
+    
+    func eiDelay()
+    {
+        if eiDelayCounter > 0
+        {
+            eiDelayCounter = eiDelayCounter - 1
+            if eiDelayCounter == 0
+            {
+                registers.IFF1 = true
+                registers.IFF2 = true
+            }
+        }
     }
     
     func writeToMemory(address: UInt16, value: UInt8)
@@ -1390,8 +1476,7 @@ actor microbee
     {
         if emulatorState == .halted
         {
-            pollInterrupt()
-            return 4
+            return pollInterrupt()+4
         }
         
         breakpointHit = false
@@ -1405,8 +1490,7 @@ actor microbee
             return 0
         }
 
-        pollInterrupt()
-        return executeInstructions()
+        return pollInterrupt()+executeInstructions()
     }
 
     @inline(__always)
@@ -9361,29 +9445,29 @@ actor microbee
            registers.PC = registers.PC &+ 2
            tStates = 8
            incrementR(opcodeCount:2)
-        case 0x57: // LD A,I - ED 57 - Stores the value of register I into A
-           // If an interrupt occurs during execution of this instruction, the parity flag contains a 0
-           logInstructionDetails(instructionDetails: "LD A,I", opcode: [0xED,0x57], programCounter: registers.PC)
-           registers.A = registers.I
-           let carry = registers.F & z80Flags.Carry.rawValue
-           registers.F = z80FastFlags.basicHelper(tempResult: registers.I) | carry
-           registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           registers.F = registers.F & ~z80Flags.Negative.rawValue
-           if registers.IFF2
-           {
-               registers.F = registers.F | z80Flags.ParityOverflow.rawValue
-           }
-           else
-           {
-               registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
-           }
-           registers.P = 1
-           registers.EI = preserveEI == 1 ? 0 : registers.EI
-           registers.PC = registers.PC &+ 2
-           registers.Q = registers.F
-           tStates = 9
-           incrementR(opcodeCount:2)
+        case 0x57: // LD A,I - ED 57 - Stores the value of register I into A. If an interrupt occurs during execution of this instruction, the parity flag contains a 0
+            logInstructionDetails(instructionDetails: "LD A,I", opcode: [0xED,0x57], programCounter: registers.PC)
+            registers.A = registers.I
+            let carry = registers.F & z80Flags.Carry.rawValue
+            registers.F = z80FastFlags.basicHelper(tempResult: registers.I) | carry
+            registers.F = registers.F & ~z80Flags.HalfCarry.rawValue
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            registers.F = registers.F & ~z80Flags.Negative.rawValue
+            if registers.IFF2
+            {
+                registers.F = registers.F | z80Flags.ParityOverflow.rawValue
+            }
+            else
+            {
+                registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
+            }
+            registers.P = 1
+            //registers.EI = preserveEI == 1 ? 0 : registers.EI
+            registers.EI = eiDelayCounter != 0 ? 0 : registers.EI
+            registers.PC = registers.PC &+ 2
+            registers.Q = registers.F
+            tStates = 9
+            incrementR(opcodeCount:2)
         case 0x58: // IN E,(C) - ED 50 - A byte from port C is written to E
            logInstructionDetails(instructionDetails: "IN E,(C)", opcode: [0xED,0x58], programCounter: registers.PC)
            let tempResult = UInt16(registers.B) << 8 | UInt16(registers.C)
@@ -9430,8 +9514,7 @@ actor microbee
            registers.PC = registers.PC &+ 2
            tStates = 8
            incrementR(opcodeCount:2)
-        case 0x5F: // LD A,R - ED 5F - Stores the value of register R into A
-           // If an interrupt occurs during execution of this instruction, the parity flag contains a 0
+        case 0x5F: // LD A,R - ED 5F - Stores the value of register R into A.  If an interrupt occurs during execution of this instruction, the parity flag contains a 0
            logInstructionDetails(instructionDetails: "LD A,R", opcode: [0xED,0x5F], programCounter: registers.PC)
            incrementR(opcodeCount:2)
            registers.A = registers.R
@@ -9449,7 +9532,8 @@ actor microbee
                registers.F = registers.F & ~z80Flags.ParityOverflow.rawValue
            }
            registers.P = 1
-           registers.EI = preserveEI == 1 ? 0 : registers.EI
+           //registers.EI = preserveEI == 1 ? 0 : registers.EI
+           registers.EI = eiDelayCounter != 0 ? 0 : registers.EI
            registers.PC = registers.PC &+ 2
            registers.Q = registers.F
            tStates = 9
@@ -15319,7 +15403,7 @@ actor microbee
         z80QueueFilled[z80QueueHead] = true
         z80QueueHead = (z80QueueHead + 1) % 16
         registers.P = 0 // default value for all instructions except LD A,I and LD A,R
-        preserveEI = registers.EI
+       // preserveEI = registers.EI
         registers.EI = 0 // default value for all instructions except LD A,I and LD A,R
         switch opcode1
         {
@@ -16335,18 +16419,6 @@ actor microbee
             registers.PC = registers.PC &+ 1
             registers.Q = 0
             tStates = 4
-//            if let start = benchmarkStartClock
-//            {
-//                let elapsed = start.duration(to: clock.now)
-//
-//                let executedTStates = totalTStates - benchmarkStartTStates
-//
-//                print("Wall clock      : \(elapsed)")
-//                print("T-states        : \(executedTStates)")
-//                print("Emulated time   : \(Double(executedTStates) / baseClockSpeed / clockSpeedMultiplier) seconds")
-//
-//                benchmarkStartClock = nil
-//            }
             incrementR(opcodeCount:1)
         case 0x77: // LD (HL),A - 77 - The contents of A are loaded into (HL)
             logInstructionDetails(instructionDetails: "LD (HL),A", opcode: [0x77], programCounter: registers.PC)
@@ -17515,6 +17587,7 @@ actor microbee
             registers.PC = registers.PC &+ 1
             registers.Q = 0
             tStates = 4
+            eiDelayCounter = 0
             incrementR(opcodeCount:1)
         case 0xF4: // CALL P,$nn - F4 n n - If the sign flag is unset, the current PC value plus three is pushed onto the stack, then is loaded with $nn.
             logInstructionDetails(instructionDetails: "CALL P,$nn",opcode: [0xF4], values: [opcode2,opcode3], programCounter: registers.PC)
@@ -17605,8 +17678,7 @@ actor microbee
             incrementR(opcodeCount:1)
         case 0xFB: // EI - FB - Sets both interrupt flip-flops, thus allowing maskable interrupts to occur. An interrupt will not occur until after the immediately following instruction
             logInstructionDetails(instructionDetails: "EI", opcode: [0xFB], programCounter: registers.PC)
-            registers.IFF1 = true
-            registers.IFF2 = true
+            eiDelayCounter = 2
             registers.EI = 1
             registers.PC = registers.PC &+ 1
             registers.Q = 0
