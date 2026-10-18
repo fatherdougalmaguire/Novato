@@ -96,7 +96,18 @@ It has a functional z80 core, mmu, 6545 emulation, keyboard input and video outp
 ### Emulator core
 * A calibrated run loop executes the emulator at an equivalent speed to a 3.375Mhz microbee
 * You can overclock the CPU at up to 8x ( equivalent of 27Mhz ) on Apple Silicon
-* There are currently issues on Intel based machines where the UI is unresponsive.  This is likely due to the SwiftUI view being starved of updates and will take some thinking to work around
+* There are currently issues on Intel based machines where the UI is unresponsive.  This is likely due to the SwiftUI view being starved of updates and will take some thinking to work around.
+* Interrupt processing
+
+### Input/Output
+* Z80 PIO framework has been built out to provide
+  - Model A and B ports
+  - Control and data registers
+* Interrupt lines, vectors and data input/output still pending
+* Still needs to be tied into the PIO
+ - Sound output
+ - Cassette load/save functionality
+ - Serial/parallel data transfer
 
 ### Display output
 * The screen buffer is output to the display using a SwiftUI Shader library .ColorEffect shader
@@ -132,7 +143,7 @@ It has a functional z80 core, mmu, 6545 emulation, keyboard input and video outp
 ### Test Harness
 
 * Implemented testing harness using the Swift Testing framework and the [SingleStepTests jSMoo-based Z80 single step tests](https://github.com/SingleStepTests/z80)
-  - Supports ports, ram, t-states, real registers ( including WZ ) and P,Q and EI psuedo-register
+  - Supports ports, ram, t-states, real registers ( including WZ ) and P,Q and EI psuedo-registers
   - Test harnesses in place for all documented and non-documented instructions
   - Opcodes that have passed testing
     - all documented non-flag affecting instructions
@@ -156,11 +167,7 @@ A animated .gif of a selection games that currently boot.
 * Display PCG characters in the memory dump window
 * ROM selection and load
 * Machine state saving
-* Full emulation of Z80 including undocumented instructions
-* Interrupt processing
-* Sound output
-* Cassette load/save functionality
-* PIO functionality for serial/parallel data transfer
+
 
 ## Emulator screenshots
 
