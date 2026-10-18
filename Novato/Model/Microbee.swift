@@ -562,10 +562,10 @@ actor microbee
     
     private(set) var emulatorState : emulatorState = .stopped
     
-    private var interruptPending = false
+    private var interruptPending = false    //  probably need to this to an interrupt level check and get devices to clear the interrupt
     private var nmiInterruptPending = false
     
-    private var interruptVector: UInt8 = 0
+    private var interruptVector: UInt8 = 0  //  set from device.  which is PIO in this case
 
     let keyboard: MicrobeeKeyboard
     let bus : BUS
@@ -1335,13 +1335,16 @@ actor microbee
         }
     }
     
-    func requestInterrupt()
+    func requestInterrupt(im2InterruptVector: UInt8 = 0)
     {
+        // helper function.   raised in emulated hardware ( which is TBA )
         interruptPending = true
+        interruptVector = im2InterruptVector
     }
     
     func requestNMIInterrupt()
     {
+        //helper function.  raised in emulated hardware ( which is TBA )
         nmiInterruptPending = true
     }
     
@@ -1370,17 +1373,18 @@ actor microbee
         registers.IFF1 = false
         registers.IFF2 = false
         
-        registers.SP = registers.SP &- 2
+        registers.SP = registers.SP &- 1
         bus.writeByte(address: registers.SP, value: registers.PCH)
-        bus.writeByte(address: registers.SP + 1, value: registers.PCL)
+        registers.SP = registers.SP &- 1
+        bus.writeByte(address: registers.SP, value: registers.PCL)
     
         switch registers.IM
         {
-        case 0:
+        case 0:  // currently assumes RST 0x38 is placed on the bus.  This might change if any microbee hardware and/or software is found to used IM 0
             registers.PC = 0x0038
             registers.WZ = 0x0038
             registers.Q = 0
-            incrementR(opcodeCount:2)
+            incrementR(opcodeCount: 1)
             return 13
         case 1:
             registers.PC = 0x0038
@@ -1390,9 +1394,8 @@ actor microbee
             return 13
         case 2:
             let vectorAddress = (UInt16(registers.I) << 8) | UInt16(interruptVector)
-            registers.PCH = bus.readByte(address: vectorAddress)
-            registers.PCL = bus.readByte(address: vectorAddress &+ 1)
-            registers.WZ = registers.PC
+            registers.PC = vectorAddress
+            registers.WZ = vectorAddress
             registers.Q = 0
             incrementR(opcodeCount: 1)
             return 19
@@ -1410,9 +1413,10 @@ actor microbee
         registers.IFF2 = registers.IFF1
         registers.IFF1 = false
         
-        registers.SP = registers.SP &- 2
+        registers.SP = registers.SP &- 1
         bus.writeByte(address: registers.SP, value: registers.PCH)
-        bus.writeByte(address: registers.SP + 1, value: registers.PCL)
+        registers.SP = registers.SP &- 1
+        bus.writeByte(address: registers.SP, value: registers.PCL)
         
         registers.PC = 0x0066
         registers.WZ = 0x0066

@@ -394,30 +394,27 @@ struct emulatorView: View
                             }
                             .labelStyle(.titleAndIcon)
 #if DEBUG
-                                Button("Log",systemImage: "terminal")
-                                {
-                                    _ = Task
-                                    {
-                                        await vm.toggleLogging()
-                                        await vm.keyDown(.qKey, 0x0C)
-                                        try? await Task.sleep(nanoseconds: 50_000_000)
-                                        await vm.keyUp(.qKey, 0x0C)
-                                    }
-                                }
-                                .labelStyle(.titleAndIcon)
-                            Button("Inject",systemImage: "terminal")
+                            Button("Log",systemImage: "terminal")
                             {
                                 _ = Task
                                 {
-                                    await vm.keyDown(.qKey, 0x0C)
-                                    try? await Task.sleep(nanoseconds: 50_000_000)
-                                    await vm.keyUp(.qKey, 0x0C)
-                                    await vm.keyDown(.qKey, 0x0C)
-                                    try? await Task.sleep(nanoseconds: 50_000_000)
-                                    await vm.keyUp(.qKey, 0x0C)
-                                    await vm.keyDown(.qKey, 0x0C)
-                                    try? await Task.sleep(nanoseconds: 50_000_000)
-                                    await vm.keyUp(.qKey, 0x0C)
+                                    await vm.toggleLogging()
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
+                            Button("MI",systemImage: "terminal")
+                            {
+                                _ = Task
+                                {
+                                    await vm.requestInterrupt(im2InterruptVector: 0x00)
+                                }
+                            }
+                            .labelStyle(.titleAndIcon)
+                            Button("NMI",systemImage: "terminal")
+                            {
+                                _ = Task
+                                {
+                                    await vm.requestNMIInterrupt()
                                 }
                             }
                             .labelStyle(.titleAndIcon)

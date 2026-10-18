@@ -146,4 +146,16 @@ final class emulatorViewModel
     {
         await cpu.modifierChanged(modifier, pressed: pressed, keyCode)
     }
+    
+    func requestInterrupt(im2InterruptVector: UInt8 = 0) async
+    
+    {
+        await cpu.requestInterrupt(im2InterruptVector: im2InterruptVector)
+    }
+    
+    func requestNMIInterrupt() async
+    
+    {
+        await cpu.requestNMIInterrupt()
+    }
 }

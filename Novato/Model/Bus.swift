@@ -874,7 +874,6 @@ final class CRTC
     
         //print(" r18=",registers.R18," r19=",registers.R19," address=",address)
         
-
         let position = (address >> 4) & 0x3F
         
         if keyboard.isPressed(Int(position))
@@ -882,7 +881,7 @@ final class CRTC
             registers.R16 = UInt8((position & 0x30) >> 4)
             registers.R17 = UInt8((position & 0x0F) << 4)
             registers.lightPenReady = true
-            print("keyboard pressed r16=",registers.R16," r17=",registers.R17," r18=",registers.R18," r19=",registers.R19," position=",position," address=",address," lightpenready=",registers.lightPenReady)
+            //print("keyboard pressed r16=",registers.R16," r17=",registers.R17," r18=",registers.R18," r19=",registers.R19," position=",position," address=",address," lightpenready=",registers.lightPenReady)
         }
 
         registers.updateReady = true

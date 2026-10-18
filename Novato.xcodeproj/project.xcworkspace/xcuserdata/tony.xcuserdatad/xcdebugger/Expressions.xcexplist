@@ -3,7 +3,35 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "microbee.serviceNMIInterrupt():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "bus.readByte(address:registers.SP)">
+            </PersistentString>
+            <PersistentString
+               value = "UInt16(bus.readByte(address:registers.SP))*256 &amp;+ UInt16(bus.readByte(address:registers.SP &amp;+ 1))">
+            </PersistentString>
+            <PersistentString
+               value = "registers.SP">
+            </PersistentString>
+            <PersistentString
+               value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "microbee.executeInstructions():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "testHelper.runTest(_:isEI:):NovatoTests.swift">
+      </ContextState>
+      <ContextState
+         contextName = "microbee.serviceInterrupt():Microbee.swift">
          <PersistentStrings>
             <PersistentString
                value = "registers.PC">
