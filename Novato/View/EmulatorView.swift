@@ -393,32 +393,6 @@ struct emulatorView: View
                                 }
                             }
                             .labelStyle(.titleAndIcon)
-#if DEBUG
-                            Button("Log",systemImage: "terminal")
-                            {
-                                _ = Task
-                                {
-                                    await vm.toggleLogging()
-                                }
-                            }
-                            .labelStyle(.titleAndIcon)
-                            Button("MI",systemImage: "terminal")
-                            {
-                                _ = Task
-                                {
-                                    await vm.requestInterrupt(im2InterruptVector: 0x00)
-                                }
-                            }
-                            .labelStyle(.titleAndIcon)
-                            Button("NMI",systemImage: "terminal")
-                            {
-                                _ = Task
-                                {
-                                    await vm.requestNMIInterrupt()
-                                }
-                            }
-                            .labelStyle(.titleAndIcon)
-#endif
                             Button("Paste",systemImage: "sparkle.text.clipboard")
                             {
                                 _ = Task

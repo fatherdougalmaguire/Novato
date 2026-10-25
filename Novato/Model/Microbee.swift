@@ -669,7 +669,7 @@ actor microbee
     
     {
         logInstructions.toggle()
-        bus.crtc.toggleLogging()
+//        bus.crtc.toggleLogging()
     }
     
     func updateMemoryInspector(address: UInt16)
@@ -1233,7 +1233,7 @@ actor microbee
         
         totalTStates = totalTStates + UInt64(tStates)
         
-        bus.crtc.tick(tStates: tStates)
+        bus.crtc.tick(tStates: tStates, totaltStates : totalTStates)
         // sound.tick(tStates: tStates)
         // cassette.tick(tStates: tStates)
         
@@ -1265,6 +1265,8 @@ actor microbee
                 clockSpeedMultiplier = multiplier
 
                 let clockSpeed = baseClockSpeed * clockSpeedMultiplier
+                
+                bus.crtc.setCharacterClock(clockSpeedMultiplier: multiplier)
 
                 tStatesPerFrame = UInt64(clockSpeed / frameRate)
 
@@ -1300,8 +1302,8 @@ actor microbee
                 if breakpointHit
                 {
                     breakpointHit = false
-                        pause()
-                        break
+                    pause()
+                    break
                 }
                 
                 let tStates = nextInstruction()
@@ -1310,7 +1312,7 @@ actor microbee
                 executedTStates = executedTStates + UInt64(tStates)
                 totalTStates = totalTStates + UInt64(tStates)
             
-                bus.crtc.tick(tStates: tStates)
+                bus.crtc.tick(tStates: tStates, totaltStates : totalTStates)
                 // sound.tick(tStates: tStates)
                 // cassette.tick(tStates: tStates)
             }

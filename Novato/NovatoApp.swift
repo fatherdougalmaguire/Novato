@@ -23,6 +23,24 @@ struct NovatoApp: App
     
     var body: some Scene
     {
+        MenuBarExtra("Novato", image: "MenuBarIcon")
+        {
+            Text("Novato")
+            Divider()
+            Button("Do something")
+            {
+            }
+            Button("Do something else")
+            {
+            }
+            Divider()
+            Button("Quit")
+            {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q")
+        }
+        
         Window("Emulator",id: "emulatorWindow")
         {
             emulatorView().environment(vm)
@@ -148,6 +166,32 @@ struct NovatoApp: App
                 {
                 }
             }
+#if DEBUG
+            CommandMenu("Debug")
+            {
+                Button("Enable/Disable Logging")
+                {
+                    Task
+                    {
+                        await vm.toggleLogging()
+                    }
+                }
+                Button("Generate Maskable Interrupt")
+                {
+                    Task
+                    {
+                        await vm.requestInterrupt(im2InterruptVector: 0x00)
+                    }
+                }
+                Button("Generate Non-Maskable Interrupt")
+                {
+                    Task
+                    {
+                        await vm.requestNMIInterrupt()
+                    }
+                }
+            }
+#endif
             CommandGroup(replacing: .help)
             {
                 Divider()

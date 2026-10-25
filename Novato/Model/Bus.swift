@@ -618,7 +618,7 @@ final class CRTC
         var R19 : UInt8 = 0x00                              // Update Address Register ( low byte ) : 8 bits
         var R31 : UInt8 = 0x00                              // Dummy Location Register : when read or written to,  will
         
-        var statusRegister : UInt8            // Status register.  Bit 7 is update strobe.  Goes low during R31 read. initially set high.  Bit 6 is light pen strobe.  Goes high if key is pressed.  bit 5 is vblank.  Goes high if in vertical blank
+        var statusRegister : UInt8          // Status register.  Bit 7 is update strobe.  Goes low during R31 read. initially set high.  Bit 6 is light pen strobe.  Goes high if key is pressed.  bit 5 is vblank.  Goes high if in vertical blank
         {
             var status: UInt8 = 0
 
@@ -649,6 +649,8 @@ final class CRTC
         var lightPenReady : Bool = false
         var updateReady : Bool = true
     }
+    
+    var crtcTstates : UInt64 = 0
     
     var logInstructions: Bool = false
     
@@ -702,12 +704,12 @@ final class CRTC
         tStatesPerCharacterClock = UInt8((3.375*clockSpeedMultiplier)/1.6875)
     }
     
-    func toggleLogging()
-    
-    {
-        logInstructions.toggle( )
-    }
-    
+//    func toggleLogging()
+//    
+//    {
+//        logInstructions.toggle( )
+//    }
+//    
     func readStatusRegister() -> UInt8
     {
         return registers.statusRegister
@@ -797,6 +799,7 @@ final class CRTC
         inVerticalAdjust = false
 
         registers.verticalBlank = false
+        print("off",crtcTstates)
         frameComplete = true
     }
     
@@ -828,6 +831,7 @@ final class CRTC
         if rowCounter >= registers.R6
         {
             registers.verticalBlank = true
+            print("on:",crtcTstates)
         }
         
         if rowCounter >= registers.R4 + 1
@@ -837,9 +841,11 @@ final class CRTC
         }
     }
     
-    func tick(tStates: UInt8)
-    {        
+    func tick(tStates: UInt8, totaltStates: UInt64)
+    {
         characterClock = characterClock + tStates
+        
+        crtcTstates = totaltStates
         
         while characterClock >= tStatesPerCharacterClock
         {
