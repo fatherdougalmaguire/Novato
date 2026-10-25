@@ -1,8 +1,12 @@
 # Novato
-![Swift](https://img.shields.io/badge/Swift-D19D00?style=plastic&logo=swift&logoColor=white)
-![Static Badge](https://img.shields.io/badge/macOS-Sonoma-D19D00?style=plastic&logo=apple)
-![Static Badge](https://img.shields.io/badge/macOS-Sequioa-D19D00?style=plastic&logo=apple)
-![Static Badge](https://img.shields.io/badge/macOS-Tahoe-D19D00?style=plastic&logo=apple)
+![Swift](https://img.shields.io/badge/Swift-0D96F6?logo=swift&logoColor=white)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-0D96F6?logo=swift&logoColor=white)
+![Metal](https://img.shields.io/badge/Metal-8E8E93?logo=apple&logoColor=white)
+
+![macOS Sonoma](https://img.shields.io/badge/macOS-Sonoma-6B8E23?logo=apple&logoColor=white)
+![macOS Sequoia](https://img.shields.io/badge/macOS-Sequoia-2F6F5E?logo=apple&logoColor=white)
+![macOS Tahoe](https://img.shields.io/badge/macOS-Tahoe-3A7CA5?logo=apple&logoColor=white)
+![macOS Golden Gate](https://img.shields.io/badge/macOS-Golden%20Gate-blue?logo=apple&logoColor=white)
 
 ![Static Badge](https://img.shields.io/badge/Architecture-Apple_Silicon-D19D00?style=plastic&logo=apple)
 ![Static Badge](https://img.shields.io/badge/Architecture-Intel-D19D00?style=plastic&logo=apple)
@@ -11,7 +15,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-D19D00.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Latest Version](https://img.shields.io/github/v/release/fatherdougalmaguire/novato?style=plastic&color=D19D00)
 ![Last Commit](https://img.shields.io/github/last-commit/fatherdougalmaguire/novato?style=plastic&color=D19D00)
-
 
 Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.microbee-mspp.org/wiki/tiki-index.php?page=Microbee) family of home computers.
 
@@ -35,7 +38,7 @@ Novato is a SwiftUI/Swift emulator compatible with the [Microbee](https://www.mi
 <div>
   <br>
 </div>
-It runs on MacOS Sonoma, MacOS Sequoia and MacOS Tahoe.
+It runs on MacOS Sonoma, MacOS Sequoia, MacOS Tahoe and macOS Golden Gate.
 
 Universal binaries can be found in the [Releases](https://github.com/fatherdougalmaguire/Novato/releases) section.
 
