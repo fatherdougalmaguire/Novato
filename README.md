@@ -1,7 +1,7 @@
 # Novato
-![Swift](https://img.shields.io/badge/Swift-0D96F6?logo=swift&logoColor=white)
-![SwiftUI](https://img.shields.io/badge/SwiftUI-0D96F6?logo=swift&logoColor=white)
-![Metal](https://img.shields.io/badge/Metal-8E8E93?logo=apple&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-F05138?logo=swift&logoColor=white)
+![SwiftUI](https://img.shields.io/badge/SwiftUI-F05138?logo=swift&logoColor=white)
+![Metal](https://img.shields.io/badge/Metal-0066FF?logo=apple&logoColor=white)
 
 ![macOS Sonoma](https://img.shields.io/badge/macOS-Sonoma-6B8E23?logo=apple&logoColor=white)
 ![macOS Sequoia](https://img.shields.io/badge/macOS-Sequoia-2F6F5E?logo=apple&logoColor=white)
