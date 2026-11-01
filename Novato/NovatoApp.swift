@@ -11,6 +11,7 @@ struct NovatoApp: App
     
     @AppStorage("quickLoadAddress") private var quickLoadAddress: String = "0900"
     @AppStorage("quickLoadExecuteAddress") private var quickLoadExecuteAddress: String = "0900"
+    @AppStorage("modelSelection") private var modelSelection: emulatorModel = .IC
     
     private var restrictedTypes: [UTType]
     {
@@ -23,24 +24,6 @@ struct NovatoApp: App
     
     var body: some Scene
     {
-        MenuBarExtra("Novato", image: "MenuBarIcon")
-        {
-            Text("Novato")
-            Divider()
-            Button("Do something")
-            {
-            }
-            Button("Do something else")
-            {
-            }
-            Divider()
-            Button("Quit")
-            {
-                NSApplication.shared.terminate(nil)
-            }
-            .keyboardShortcut("q")
-        }
-        
         Window("Emulator",id: "emulatorWindow")
         {
             emulatorView().environment(vm)
@@ -83,36 +66,36 @@ struct NovatoApp: App
                 {
                     isImporting = true
                 }
-                    .fileImporter(
-                        isPresented: $isImporting,
-                        allowedContentTypes: restrictedTypes,
-                        allowsMultipleSelection: false
-                    )
+                .fileImporter(
+                    isPresented: $isImporting,
+                    allowedContentTypes: restrictedTypes,
+                    allowsMultipleSelection: false
+                )
+                {
+                    result in
+                    
+                    switch result
                     {
-                        result in
-
-                        switch result
+                    case .success(let urls):
+                        
+                        guard let url = urls.first else { return }
+                        
+                        Task
                         {
-                        case .success(let urls):
-
-                            guard let url = urls.first else { return }
-
-                            Task
-                            {
-                                let loadAddress = UInt16(quickLoadAddress, radix: 16) ?? 2304
-                                let executeAddress = UInt16(quickLoadExecuteAddress, radix: 16) ?? 2304
-                                
-                                print("Quickload starts here")
-                                
-                                await vm.quickload(path: url, loadAddress: loadAddress)
-                                await vm.updateProgramCounter(address: executeAddress)
-                                await vm.startEmulation()
-                            }
-
-                        case .failure(let error):
-
-                            print(error)
+                            let loadAddress = UInt16(quickLoadAddress, radix: 16) ?? 2304
+                            let executeAddress = UInt16(quickLoadExecuteAddress, radix: 16) ?? 2304
+                            
+                            print("Quickload starts here")
+                            
+                            await vm.quickload(path: url, loadAddress: loadAddress)
+                            await vm.updateProgramCounter(address: executeAddress)
+                            await vm.startEmulation()
                         }
+                        
+                    case .failure(let error):
+                        
+                        print(error)
+                    }
                 }.keyboardShortcut("L")
             }
             CommandMenu("Assembler")
@@ -200,6 +183,71 @@ struct NovatoApp: App
                 Link("Microbee Software Preservation Project Forum", destination: URL(string: "https://microbee-mspp.org/forum")!)
                 Link("Microbee Technology Forum", destination: URL(string: "https://microbeetechnology.com.au/forum")!)
             }
+        }
+        
+        MenuBarExtra("Novato", image: "MenuBarIcon")
+        {
+            Text("Model: \(modelSelection.displayName)")
+            Section("Emulator")
+            {
+                Button("Play/Pause", systemImage: "forward.frame.fill")
+                {
+                    Task
+                    {
+                        if vm.snapshot?.executionSnapshot.emulatorState == .running
+                        {
+                            await vm.pauseEmulation()
+                        }
+                        else
+                        {
+                            await vm.startEmulation()
+                        }
+                    }
+                }
+                Button("Step", systemImage: "forward.frame.fill")
+                {
+                    Task
+                    {
+                        vm.isStepActive = true
+                        try? await Task.sleep(for: .milliseconds(200))
+                        vm.isStepActive = false
+                        await vm.stepEmulation()
+                    }
+                }
+                Button("Reset")
+                {
+                    Task
+                    {
+                        vm.pasteTask?.cancel()
+                        vm.pasteTask = nil
+                        await vm.stopEmulation()
+                        try? await Task.sleep(for: .milliseconds(20))
+                        await vm.resetEmulation()
+                        await vm.startEmulation()
+                    }
+                }
+            }
+            Section("Tape")
+            {
+                Button("Select file")
+                {
+                }
+                Button("Rewind")
+                {
+                }
+            }
+            Section("Quick Load")
+            {
+                Button("Select file")
+                {
+                }
+            }
+            Divider()
+            Button("Quit")
+            {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q")
         }
     }
 }

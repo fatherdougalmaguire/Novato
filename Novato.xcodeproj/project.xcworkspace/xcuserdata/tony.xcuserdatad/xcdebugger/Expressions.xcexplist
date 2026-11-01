@@ -3,10 +3,18 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "microbee.executeInstructions():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "microbee.serviceNMIInterrupt():Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "bus.readByte(address:registers.SP)">
+               value = "registers.PC">
             </PersistentString>
             <PersistentString
                value = "UInt16(bus.readByte(address:registers.SP))*256 &amp;+ UInt16(bus.readByte(address:registers.SP &amp;+ 1))">
@@ -15,15 +23,7 @@
                value = "registers.SP">
             </PersistentString>
             <PersistentString
-               value = "registers.PC">
-            </PersistentString>
-         </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "microbee.executeInstructions():Microbee.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "registers.PC">
+               value = "bus.readByte(address:registers.SP)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -35,6 +35,14 @@
          <PersistentStrings>
             <PersistentString
                value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.init():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "UserDefaults.standard.string(forKey: &quot;emulationModel&quot;)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

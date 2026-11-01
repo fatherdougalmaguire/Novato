@@ -600,6 +600,8 @@ actor microbee
         snapshotsStream
     }
     
+    private var currentEmulation: emulatorModel
+    
     init()
     {
         let (stream, continuation) = AsyncStream.makeStream(of: microbeeSnapshot.self)
@@ -657,10 +659,12 @@ actor microbee
         self.frameDuration = .seconds(1.0 / frameRate)
         self.tStatesPerFrame = UInt64(baseClockSpeed * self.clockSpeedMultiplier / frameRate)
         
+        self.currentEmulation = emulatorModel(rawValue: UserDefaults.standard.string(forKey: "modelSelection") ?? "") ?? .IC
+        
         let keyboardInstance = MicrobeeKeyboard()
         self.keyboard = keyboardInstance
 
-        self.bus = BUS(keyboard: keyboardInstance)
+        self.bus = BUS(keyboard: keyboardInstance, currentEmulation: currentEmulation)
         
         bus.crtc.setCharacterClock(clockSpeedMultiplier: self.clockSpeedMultiplier)
     }
@@ -805,9 +809,9 @@ actor microbee
 
         if capsLockActive
         {
-            keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+ //           keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             keyboard.keyUp(.capsLockKey)
-            keyboard.printMatrix("modifier ", keyboard.keyMatrix)
+ //           keyboard.printMatrix("modifier ", keyboard.keyMatrix)
             capsLockActive.toggle()
  //           print("CAPSLOCK active ",capsLockActive)
         }
@@ -949,8 +953,8 @@ actor microbee
 //                    keyboard.printMatrix("up ", keyboard.keyMatrix)
                 case 3:
 //                    print("x3")
-                    keyboard.printMatrix("rup ", keyboard.keyMatrix)
-                    print(leftShiftDown,rightShiftDown)
+//                    keyboard.printMatrix("rup ", keyboard.keyMatrix)
+//                    print(leftShiftDown,rightShiftDown)
                     mappedKey = .atKey
                     keyboard.keyUp(.shiftKey)
 //                    keyboard.printMatrix("up ", keyboard.keyMatrix)
@@ -1147,23 +1151,9 @@ actor microbee
         
         bus.pio.reset()
         
-        bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)       // 32K System RAM
-        bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)     // 16K BASIC ROM
-        bus.mmu.map(readDevice: bus.pakROM, writeDevice: bus.pakROM , memoryLocation: 0xC000)        // 8K Optional ROM
-        bus.mmu.map(readDevice: bus.netROM, writeDevice: bus.netROM, memoryLocation: 0xE000)         // 4K Net ROM
-        bus.mmu.map(readDevice: bus.videoRAM, writeDevice: bus.videoRAM, memoryLocation: 0xF000)     // 2K Video RAM
-        bus.mmu.map(readDevice: bus.pcgRAM, writeDevice: bus.pcgRAM, memoryLocation: 0xF800)         // 2K PCG RAM
+        currentEmulation = emulatorModel(rawValue: UserDefaults.standard.string(forKey: "modelSelection") ?? "") ?? .IC
         
-        bus.basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
-        bus.pakROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-        bus.netROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
-        bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
-        
-        bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
-    
-        snapshotContinuation.yield(returnSnapshot(stepping: false))
-        
-        bus.colourLatch = false
+        bus.currentEmulation = currentEmulation
         
         UserDefaults.standard.register(
             defaults:
@@ -1171,13 +1161,54 @@ actor microbee
                 "colorSelection": "Green"
             ]
         )
-
+        
         bus.colourEnabled = UserDefaults.standard.string(forKey: "colorSelection") == "Colour" ? true : false
+        
+        switch self.currentEmulation
+        {
+        case .PPC85:
+            bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)                  // 32K System RAM
+            bus.mmu.map(readDevice: bus.basicALowerROM, writeDevice: bus.basicALowerROM, memoryLocation: 0x8000)    // 8K BASIC ROM A ( lower half )
+            bus.mmu.map(readDevice: bus.basicBROM, writeDevice: bus.basicBROM, memoryLocation: 0xA000)              // 8K BASIC ROM B
+            bus.mmu.map(readDevice: bus.pak0ROM, writeDevice: bus.pak0ROM , memoryLocation: 0xC000)                 // 8K PAK ROM
+            bus.mmu.map(readDevice: bus.telcomROM, writeDevice: bus.telcomROM, memoryLocation: 0xE000)              // 4K Telcom ROM
+            bus.mmu.map(readDevice: bus.videoRAM, writeDevice: bus.videoRAM, memoryLocation: 0xF000)                // 2K Video RAM
+            bus.mmu.map(readDevice: bus.pcg0RAM, writeDevice: bus.pcg0RAM, memoryLocation: 0xF800)                  // 2K PCG RAM
+            
+            bus.basicALowerROM.fillMemoryFromFile(fileName: "premium_pc85_a", fileExtension: "rom")
+            bus.basicAUpperROM.fillMemoryFromFile(fileName: "premium_pc85_a", fileExtension: "rom", memOffset: 0x2000)
+            bus.pak0ROM.fillMemoryFromFile(fileName: "premium_pc85_c", fileExtension: "rom")
+            bus.pak1ROM.fillMemoryFromFile(fileName: "premium_pc85_e", fileExtension: "rom")
+            bus.pak2ROM.fillMemoryFromFile(fileName: "premium_pc85_f", fileExtension: "rom")
+            bus.pak3ROM.fillMemoryFromFile(fileName: "premium_pc85_g", fileExtension: "rom")
+            bus.pak4ROM.fillMemoryFromFile(fileName: "premium_pc85_h", fileExtension: "rom")
+            bus.pak5ROM.fillMemoryFromFile(fileName: "premium_pc85_i", fileExtension: "rom")
+            bus.telcomROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom")
+            bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        default:
+            bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)          // 32K System RAM
+            bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)        // 16K BASIC ROM
+            bus.mmu.map(readDevice: bus.pak0ROM, writeDevice: bus.pak0ROM , memoryLocation: 0xC000)         // 8K PAK ROM
+            bus.mmu.map(readDevice: bus.telcomROM, writeDevice: bus.telcomROM, memoryLocation: 0xE000)      // 4K Telcom ROM
+            bus.mmu.map(readDevice: bus.videoRAM, writeDevice: bus.videoRAM, memoryLocation: 0xF000)        // 2K Video RAM
+            bus.mmu.map(readDevice: bus.pcg0RAM, writeDevice: bus.pcg0RAM, memoryLocation: 0xF800)          // 2K PCG RAM
+            
+            bus.basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
+            bus.pak0ROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
+            bus.telcomROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
+            bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        }
+        
+        bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
         
         if bus.colourEnabled
         {
             bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
         }
+    
+        snapshotContinuation.yield(returnSnapshot(stepping: false))
+        
+        bus.colourLatch = false
     }
     
     func start()
@@ -17872,7 +17903,7 @@ actor microbee
             memorySnapshot: memorySnapshot(
                 VDU: bus.videoRAM.bufferTransform(),
                 CharRom: bus.fontROM.bufferTransform(),
-                PcgRam: bus.pcgRAM.bufferTransform(),
+                PcgRam: bus.pcg0RAM.bufferTransform(),
                 ColourRam: bus.colourRAM.bufferTransform(),
                 memoryDump: bus.memorySlice(address: registers.PC & 0xFF00, size: 0x100)
             ),

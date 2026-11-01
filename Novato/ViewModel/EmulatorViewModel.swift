@@ -10,6 +10,8 @@ final class emulatorViewModel
 
     private(set) var snapshot: microbeeSnapshot?
     private var snapshotTask: Task<Void, Never>?
+    
+    var pasteTask: Task<Void, Never>?
         
     func startSnapshots()
     {

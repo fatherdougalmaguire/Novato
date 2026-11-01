@@ -71,7 +71,6 @@ struct emulatorView: View
     
     @AppStorage("scalingSelection") private var charScale: Double = 2.0 // Scale for visibility on 27" screen ( 2560 x 1440 )
     @AppStorage("aspectSelection") private var charAspect: Double = 4/3  // Correction for CRT aspect ratio
-    //@AppStorage("colorSelection") private var colourSelection = "Green"
     @AppStorage("bootModeSelection") private var bootModeSelection = "MicroWorld Basic 5.22e"
     @AppStorage("autoStartSelection") private var autoStartSelection: Bool = false
     @AppStorage("registerWindowVisible") private var registerWindowVisible: Bool = true
@@ -81,12 +80,9 @@ struct emulatorView: View
     @AppStorage("memoryInspectorWindowVisible") private var  memoryInspectorWindowVisible: Bool = true
     @AppStorage("speedSelection") private var speedSelection: Double = 1.0
     
-    //let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
-    // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
-    
     let startDate = Date()
     
-    @State private var pasteTask: Task<Void, Never>?
+    // @State private var pasteTask: Task<Void, Never>?
     
     struct CRTCDisplayView: View
     {
@@ -270,7 +266,7 @@ struct emulatorView: View
                                         guard let key = MicrobeeKeyboardMapper.key(for: event)
                                         else { return }
                                     
-                                        _ = Task
+                                        Task
                                         {
                                             if key == .resetKey
                                             {
@@ -288,7 +284,7 @@ struct emulatorView: View
                                         guard let key = MicrobeeKeyboardMapper.key(for: event)
                                         else { return }
                                     
-                                        _ = Task
+                                        Task
                                         {
                                             await vm.keyUp(key, event.keyCode)
                                         }
@@ -298,7 +294,7 @@ struct emulatorView: View
                                         guard let change = MicrobeeKeyboardMapper.modifierChange(for: event)
                                         else { return }
                                         
-                                        _ = Task
+                                        Task
                                         {
                                             await vm.modifierChanged(change.modifier, pressed: change.pressed, event.keyCode)
                                         }
@@ -321,8 +317,7 @@ struct emulatorView: View
                         
                         LedBar(value: Int(speedSelection))
                         
-                        Text("\(speedSelection, specifier: "%.0f")×")
-                            .monospacedDigit()
+                        Text("\(speedSelection, specifier: "%.0f")×").monospacedDigit()
                         
                         StatusLED(colour: vm.isStepActive ? .orange: vm.snapshot?.executionSnapshot.emulatorState == .running ? .green : .red)
                         
@@ -336,10 +331,10 @@ struct emulatorView: View
                         {
                             Button("", systemImage: "power")
                             {
-                                _ = Task
+                                Task
                                 {
-                                    pasteTask?.cancel()
-                                    pasteTask = nil
+                                    vm.pasteTask?.cancel()
+                                    vm.pasteTask = nil
                                     await vm.stopEmulation()
                                     try? await Task.sleep(for: .milliseconds(20))
                                     await vm.resetEmulation()
@@ -349,10 +344,10 @@ struct emulatorView: View
                             .labelStyle(.titleAndIcon)
                             Button("", systemImage: "arrow.counterclockwise")
                             {
-                                _ = Task
+                                Task
                                 {
-                                    pasteTask?.cancel()
-                                    pasteTask = nil
+                                    vm.pasteTask?.cancel()
+                                    vm.pasteTask = nil
                                     await vm.updateProgramCounter(address: 0x8003)
                                 }
                             }
@@ -369,7 +364,7 @@ struct emulatorView: View
                         {
                             Button("", systemImage: vm.snapshot?.executionSnapshot.emulatorState == .running ? "pause.fill" : "play.fill")
                             {
-                                _ = Task
+                                Task
                                 {
                                     if vm.snapshot?.executionSnapshot.emulatorState == .running
                                     {
@@ -384,7 +379,7 @@ struct emulatorView: View
                             .labelStyle(.titleAndIcon)
                             Button("", systemImage: "forward.frame.fill")
                             {
-                                _ = Task
+                                Task
                                 {
                                     vm.isStepActive = true
                                     try? await Task.sleep(for: .milliseconds(200))
@@ -395,9 +390,9 @@ struct emulatorView: View
                             .labelStyle(.titleAndIcon)
                             Button("Paste",systemImage: "sparkle.text.clipboard")
                             {
-                                _ = Task
+                                Task
                                 {
-                                    pasteTask?.cancel()
+                                    vm.pasteTask?.cancel()
                                     let clipBoard = NSPasteboard.general
                                     if clipBoard.canReadObject(forClasses: [NSString.self], options: nil),
                                        let strings = clipBoard.readObjects(forClasses: [NSString.self], options: nil) as? [String],
@@ -427,7 +422,7 @@ struct emulatorView: View
                                                                 .replacingOccurrences(of: "\u{200A}", with: " ")
                                                                 .replacingOccurrences(of: "\u{202F}", with: " ")
                                                                 .replacingOccurrences(of: "\u{3000}", with: " ")
-                                        pasteTask = Task {
+                                        vm.pasteTask = Task {
                                             for char in strippedText
                                             {
                                                 guard let code = char.asciiValue else { continue }

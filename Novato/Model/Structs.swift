@@ -1,5 +1,24 @@
 import Foundation
 
+enum emulatorModel: String, CaseIterable, Identifiable
+{
+    case IC, CIAB, PPC85, SBC, FP
+
+    var id: String { rawValue }
+
+    var displayName: String
+    {
+        switch self
+        {
+            case .IC:    return "32IC"
+            case .CIAB:  return "64K Computer in a Book (CIAB)"
+            case .PPC85: return "PC85 Premium"
+            case .SBC:   return "128K Small Business Computer Premium"
+            case .FP:    return "FreeBee Pixel"
+        }
+    }
+}
+
 enum emulatorState
 {
     case stopped, running, paused, halted

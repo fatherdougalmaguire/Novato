@@ -199,22 +199,22 @@ struct cpuSettingsView: View
 
 struct modelSettingsView: View
 {
-    @AppStorage("modelSelection") private var modelSelection = "Microbee 32IC"
+    @AppStorage("modelSelection") private var modelSelection: emulatorModel = .IC
     
     var body: some View
     {
-        let themes = ["Microbee 32IC","64K Computer in a Book (CIAB)","PC85 Premium","128K Small Business Computer Premium","FreeBee Freemium"]
         Form
         {
-            Picker("Model:", selection: $modelSelection)
+            Picker("Model", selection: $modelSelection)
             {
-                ForEach(themes, id: \.self) { theme in Text(theme) }
+                ForEach(emulatorModel.allCases)
+                { m in Text(m.displayName).tag(m) }
             }
             .pickerStyle(.menu)
             
             Divider()
             
-            Text("Currently disabled")
+            Text("Only 32IC and PC85 Premium currently emulated")
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
