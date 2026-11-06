@@ -89,8 +89,6 @@ struct emulatorView: View
         let snapshot: microbeeSnapshot
         let vm: emulatorViewModel
         let startDate: Date
-        //let colourSelection: String
-        //let colourOptions: [String: Int]
         let charScale: CGFloat
         let charAspect: CGFloat
         
@@ -108,6 +106,7 @@ struct emulatorView: View
             let interlaceEnabled: Bool
 
             // Shader inputs
+            let premiumGraphics: Float
             let scanLineHeight: Float
             let displayColumns: Float
             let displayOffset: Float
@@ -123,12 +122,14 @@ struct emulatorView: View
             let charRomArray: [Float]
             let pcgRamArray: [Float]
             let colourRamArray: [Float]
+            let attributeRamArray: [Float]
 
             var body: some View {
                 Rectangle()
                     .frame(width: baseWidth, height: baseHeight)
                     .colorEffect(
                         ShaderLibrary.ScreenBuffer(
+                            .float(premiumGraphics),
                             .float(scanLineHeight),
                             .float(displayColumns),
                             .float(displayOffset),
@@ -143,7 +144,8 @@ struct emulatorView: View
                             .floatArray(vduArray),
                             .floatArray(charRomArray),
                             .floatArray(pcgRamArray),
-                            .floatArray(colourRamArray)
+                            .floatArray(colourRamArray),
+                            .floatArray(attributeRamArray)
                         )
                     )
                     .colorEffect(
@@ -187,8 +189,9 @@ struct emulatorView: View
             let alternateFontROM: Float = Float(Int(snapshot.crtcSnapshot.R12) >> 5) // Is MA13 set to 1 ?  If so, select alternate font ROM
             let cursorPosition: Float = Float(Int(snapshot.crtcSnapshot.R14) << 8 | Int(snapshot.crtcSnapshot.R15))
 
-            //let colourMode: Float = Float(colourOptions[colourSelection] ?? 0)
             let colourMode: Float = Float(snapshot.crtcSnapshot.colourType)
+            
+            let premiumGraphics:Float = Float(snapshot.crtcSnapshot.premiumGraphics ? 1 : 0)
 
             // Base and scaled sizes (broken into smaller sub-expressions for type-checker)
             let baseWidthInt: Int = max(frameWidth, 1)
@@ -210,10 +213,11 @@ struct emulatorView: View
             let backGroundIntensity: Float = Float(bgPacked)
 
             // Pre-extract large arrays to avoid recomputation and inference across modifier chains
-            let vduArray: [Float] = snapshot.memorySnapshot.VDU
-            let charRomArray: [Float] = snapshot.memorySnapshot.CharRom
-            let pcgRamArray: [Float] = snapshot.memorySnapshot.PcgRam
-            let colourRamArray: [Float] = snapshot.memorySnapshot.ColourRam
+            let vduArray: [Float] = snapshot.memorySnapshot.videoRAM
+            let charRomArray: [Float] = snapshot.memorySnapshot.charROM
+            let pcgRamArray: [Float] = snapshot.memorySnapshot.pcgRAM
+            let colourRamArray: [Float] = snapshot.memorySnapshot.colourRAM
+            let attributeRamArray: [Float] = snapshot.memorySnapshot.attributeRAM
 
             TimelineView(.periodic(from: startDate, by: 0.02), content: { context in
                 let elapsedTime: Float = Float(context.date.timeIntervalSince(startDate))
@@ -229,6 +233,7 @@ struct emulatorView: View
                     frameYScale: frameYScale,
                     interlaceEnabled: interlaceEnabled,
                     // Shader inputs
+                    premiumGraphics: premiumGraphics,
                     scanLineHeight: scanLineHeight,
                     displayColumns: displayColumns,
                     displayOffset: displayOffset,
@@ -243,7 +248,8 @@ struct emulatorView: View
                     vduArray: vduArray,
                     charRomArray: charRomArray,
                     pcgRamArray: pcgRamArray,
-                    colourRamArray: colourRamArray
+                    colourRamArray: colourRamArray,
+                    attributeRamArray: attributeRamArray
                 )
             })
         }

@@ -2,7 +2,11 @@ import Foundation
 
 enum emulatorModel: String, CaseIterable, Identifiable
 {
-    case IC, CIAB, PPC85, SBC, FP
+    case IC,
+     //    CIAB,
+         PPC85
+      //   SBC,
+      //   FP
 
     var id: String { rawValue }
 
@@ -11,10 +15,10 @@ enum emulatorModel: String, CaseIterable, Identifiable
         switch self
         {
             case .IC:    return "32IC"
-            case .CIAB:  return "64K Computer in a Book (CIAB)"
+         //   case .CIAB:  return "64K Computer in a Book (CIAB)"
             case .PPC85: return "PC85 Premium"
-            case .SBC:   return "128K Small Business Computer Premium"
-            case .FP:    return "FreeBee Pixel"
+         //   case .SBC:   return "128K Small Business Computer Premium"
+         //   case .FP:    return "FreeBee Pixel"
         }
     }
 }
@@ -98,14 +102,17 @@ struct crtcSnapshot: Sendable, Equatable
     let blueBackgroundIntensity : UInt8
     
     let colourType : Int
+    
+    let premiumGraphics: Bool
 }
 
 struct memorySnapshot: Sendable, Equatable
 {
-    let VDU: [Float]
-    let CharRom: [Float]
-    let PcgRam: [Float]
-    let ColourRam: [Float]
+    let videoRAM: [Float]
+    let charROM: [Float]
+    let pcgRAM: [Float]
+    let attributeRAM: [Float]
+    let colourRAM: [Float]
     let memoryDump: [UInt8]
 }
 

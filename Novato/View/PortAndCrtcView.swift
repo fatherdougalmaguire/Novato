@@ -44,12 +44,17 @@ struct portAndCrtcView: View
                 displayPort(portLabel: "0x01",portDescription: "PIO port A control port       ",portValue: snapshot.executionSnapshot.ports[1], alternateRow: true)
                 displayPort(portLabel: "0x02",portDescription: "PIO port B data port          ",portValue: snapshot.executionSnapshot.ports[2], alternateRow: false)
                 displayPort(portLabel: "0x03",portDescription: "PIO port B control port       ",portValue: snapshot.executionSnapshot.ports[3], alternateRow: true)
-                displayPort(portLabel: "0x08",portDescription: "Colour control port           ",portValue: snapshot.executionSnapshot.ports[8], alternateRow: false)
-                displayPort(portLabel: "0x0A",portDescription: "PAK/NET selection port        ",portValue: snapshot.executionSnapshot.ports[10], alternateRow: true)
-                displayPort(portLabel: "0x0B",portDescription: "Character generator latch port",portValue: snapshot.executionSnapshot.ports[11], alternateRow: false)
-                displayPort(portLabel: "0x0C",portDescription: "6545 CRTC register port       ",portValue: snapshot.executionSnapshot.ports[12], alternateRow: true)
-                displayPort(portLabel: "0x0D",portDescription: "6545 CRTC data port           ",portValue: snapshot.executionSnapshot.ports[13], alternateRow: false)
-                
+                displayPort(portLabel: "0x04",portDescription: "RTC address port              ",portValue: snapshot.executionSnapshot.ports[4], alternateRow: false)
+                displayPort(portLabel: "0x06",portDescription: "RTC write port                ",portValue: snapshot.executionSnapshot.ports[6], alternateRow: true)
+                displayPort(portLabel: "0x07",portDescription: "RTC read port                 ",portValue: snapshot.executionSnapshot.ports[7], alternateRow: false)
+                displayPort(portLabel: "0x08",portDescription: "Colour control port           ",portValue: snapshot.executionSnapshot.ports[8], alternateRow: true)
+                displayPort(portLabel: "0x0A",portDescription: "PAK/NET selection port        ",portValue: snapshot.executionSnapshot.ports[0x0A], alternateRow: false)
+                displayPort(portLabel: "0x0B",portDescription: "Character generator latch port",portValue: snapshot.executionSnapshot.ports[0x0B], alternateRow: true)
+                displayPort(portLabel: "0x0C",portDescription: "6545 CRTC register port       ",portValue: snapshot.executionSnapshot.ports[0x0C], alternateRow: false)
+                displayPort(portLabel: "0x0D",portDescription: "6545 CRTC data port           ",portValue: snapshot.executionSnapshot.ports[0x0D], alternateRow: true)
+                displayPort(portLabel: "0x1C",portDescription: "Video memory latch port       ",portValue: snapshot.executionSnapshot.ports[0x1C], alternateRow: false)
+                displayPort(portLabel: "0x50",portDescription: "RAM switching port            ",portValue: snapshot.executionSnapshot.ports[0x50], alternateRow: true)
+              
                 Spacer()
                 
                 Text("CRTC registers").font(.headline)

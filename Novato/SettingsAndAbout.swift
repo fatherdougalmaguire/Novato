@@ -211,15 +211,9 @@ struct modelSettingsView: View
                 { m in Text(m.displayName).tag(m) }
             }
             .pickerStyle(.menu)
-            
-            Divider()
-            
-            Text("Only 32IC and PC85 Premium currently emulated")
-                .font(.caption)
-                .foregroundColor(.secondary)
         }
         .padding(30)
-        .frame(width: 400, height: 150)
+        .formStyle(.grouped)
     }
 }
 

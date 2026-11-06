@@ -3,10 +3,18 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "microbee.executeInstructions():Microbee.swift">
+         contextName = "BUS.writePort(portNum:portValue:):Bus.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.PC">
+               value = "">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "microbee.init():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "UserDefaults.standard.string(forKey: &quot;emulationModel&quot;)">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -28,6 +36,20 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
+         contextName = "microbee.executeInstructions():Microbee.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "registers.PC">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "BUS.init(keyboard:currentEmulation:):Bus.swift">
+      </ContextState>
+      <ContextState
+         contextName = "microbee.reset():Microbee.swift">
+      </ContextState>
+      <ContextState
          contextName = "testHelper.runTest(_:isEI:):NovatoTests.swift">
       </ContextState>
       <ContextState
@@ -39,12 +61,7 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "microbee.init():Microbee.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "UserDefaults.standard.string(forKey: &quot;emulationModel&quot;)">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):Bus.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>

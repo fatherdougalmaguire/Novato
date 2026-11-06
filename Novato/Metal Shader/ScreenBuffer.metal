@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float ScanLineHeight, float DisplayColumns, float displayOffset, float alternateFontROM, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float colorMode, float backGroundIntensity, float timeElapsed, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize)
+[[ stitchable ]] half4 ScreenBuffer(float2 position, half4 color, float premiumGraphics, float ScanLineHeight, float DisplayColumns, float displayOffset, float alternateFontROM, float CursorPosition, float CursorStartScanLine, float CursorEndScanLine, float CursorBlinkType, float colorMode, float backGroundIntensity, float timeElapsed, device const float *screenram, int screenramsize, device const float *fontrom, int fontromsize, device const float *pcgram, int pcgramsize, device const float *colourram, int colourramsize, device const float *attributerram, int attributeramsize)
 {
     half4 ForegroundColour;
     half4 BackgroundColour;
@@ -25,6 +25,8 @@ using namespace metal;
     uint cursorStep = (uint)floor(timeElapsed/cursorblinkInterval);
     bool cursorOn = (cursorStep & 1u) == 0u;
     
+    bool premium = premiumGraphics > 0;
+    
     int pixelLocation;
     
     const int CellWidth = 8;            // each character in font ROM is 8 pixels wide
@@ -36,15 +38,15 @@ using namespace metal;
     const half4 monoWhiteColour = half4(1,1,1,1);                   // monochrome - white
     const half4 monoBlackColour = half4(0,0,0,1);                   // monochrome - black
 
-    // background colours
+    // alpha background colours
     // 0 - black        1 - red         2 - green           3 - yellow      4 - blue        5 - magenta         6 - cyan            7 - white
-    // foreground colours
+    // alpha foreground colours
     // 0 - black        1 - blue        2 - green           3 - cyan        4 - red         5 - magenta         6 - yellow          7 - white
     // 8 - unknown      9 - unknown     10 - unknown        11 - unknown    12 - unknown    13 - unknown        14 - unknown        15 - unknown
     // 16 - black II    17 - blue II    18 - green II       19 - cyan II    20 - red II     21 - magenta II     22 - yellow II      23 - white II
     // 24 - unknown     25 - unknown    26 - unknown        27 - unknown    28 - unknown    29 - unknown        30 - unknown        31 - unknown
     
-    half4 backgroundColourArray[8][8] = {
+    half4 alphaBackgroundColourArray[8][8] = {
             {half4(0,0,0,1), half4(0.61,0.12,0.08,1), half4(0.29,0.66,0.24,1), half4(0.66,0.67,0.25,1), half4(0.07,0.1,0.95,1), half4(0.61,0.21,0.64,1), half4(0.3,0.65,0.66,1), half4(0.67,0.67,0.67,1)},
             {half4(0.3,0.04,0.02,1), half4(0.92,0.2,0.14,1), half4(0.42,0.66,0.24,1), half4(0.95,0.68,0.26,1), half4(0.31,0.2,0.64,1), half4(0.92,0.23,0.65,1), half4(0.42,0.65,0.66,1), half4(0.95,0.68,0.67,1)},
             {half4(0.13,0.33,0.1,1), half4(0.62,0.35,0.13,1), half4(0.45,0.96,0.36,1), half4(0.74,0.96,0.36,1), half4(0.14,0.33,0.64,1), half4(0.62,0.35,0.65,1), half4(0.46,0.97,0.69,1), half4(0.74,0.98,0.69,1)},
@@ -54,11 +56,26 @@ using namespace metal;
             {half4(0.13,0.33,0.33,1), half4(0.62,0.35,0.34,1), half4(0.45,0.96,0.42,1), half4(0.74,0.96,0.43,1), half4(0.15,0.32,0.95,1), half4(0.63,0.35,0.95,1), half4(0.46,0.98,0.99,1), half4(0.74,0.99,0.99,1)},
             {half4(0.74,0.99,0.99,1), half4(0.93,0.38,0.36,1), half4(0.54,0.96,0.42,1), half4(1,0.97,0.44,1), half4(0.34,0.33,0.95,1), half4(0.93,0.38,0.95,1), half4(0.54,0.99,0.99,1), half4(1,1,1,1)}};
     
-    half4 foregroundColourArray[32] = {half4(0,0,0,1), half4(0.07,0.1,0.95,1), half4(0.45,0.96,0.36,1), half4(0.46,0.98,0.99,1), half4(0.92,0.2,0.14,1), half4(0.92,0.33,0.95,1), half4(1,0.96,0.37,1), half4(1,1,1,1),
+    half4 alphaForegroundColourArray[32] = {half4(0,0,0,1), half4(0.07,0.1,0.95,1), half4(0.45,0.96,0.36,1), half4(0.46,0.98,0.99,1), half4(0.92,0.2,0.14,1), half4(0.92,0.33,0.95,1), half4(1,0.96,0.37,1), half4(1,1,1,1),
                                        half4(0.3,0.65,0.96,1), half4(0.46,0.98,0.7,1), half4(0.62,0.31,0.95,1), half4(0.92,0.33,0.95,1), half4(0.74,0.96,0.36,1), half4(0.95,0.68,0.26,1),  half4(0.67,0.66,0.67,1), half4(1,1,1,1),
                                        half4(0,0,0,1), half4(0.02,0.2,0.65,1), half4(0.29,0.65,0.24,1), half4(0.29,0.65,0.67,1), half4(0.62,0.12,0.08,1), half4(0.62,0.21,0.65,1), half4(0.67,0.66,0.24,1), half4(0.67,0.66,0.67,1),
                                        half4(0.67,0.66,0.96,1), half4(0.75,0.98,0.7,1), half4(0.75,0.99,1,1), half4(0.95,0.68,0.68,1), half4(0.95,0.68,0.97,1), half4(1,0.98,0.71,1), half4(0.67,0.66,0.67,1), half4(1,1,1,1)};
-   
+    
+    // premium colours
+    // 0 - Black        1 - Red         2 - Green           3 - Brown       4 - Blue            5 - Magenta             6 - Cyan            7 - Light Grey
+    // 8 - Dark Grey    9 - Light Red   10 - Light Green    11 - Yellow     12 - Light Blue     13 - Light Magenta      14 - Light Cyan     15 - White
+
+//    half4 premiumColourArray[16] = {
+//            half4(0,0,0,1), half4(0.604,0.098,0.043,1), half4(0.251,0.686,0,1), half4(0.612,0.361,0,1), half4(0.188,0,0.678,1), half4(0.627,0,0.678,1), half4(0.313,0.659,0.663,1), half4(0.667,0.667,0.667,1),
+//            half4(0.333,0.333,0.333,1), half4(0.917,0.369,0.345,1), half4(0.49,1,0.243,1), half4(0.973,1,0.263,1), half4(0.431,0.118,1,1), half4(0.949,0.208,1,1), half4(0.557,0.992,0.996,1), half4(1,1,1,1)};
+    
+    const half4 premiumColourArray[16] = {
+        half4(0,0,0,1),          half4(0.667,0,0,1),      half4(0,0.667,0,1),      half4(0.667,0.333,0,1),
+        half4(0,0,0.667,1),      half4(0.667,0,0.667,1),  half4(0,0.667,0.667,1),  half4(0.667,0.667,0.667,1),
+        half4(0.333,0.333,0.333,1), half4(1,0.333,0.333,1), half4(0.333,1,0.333,1), half4(1,1,0.333,1),
+        half4(0.333,0.333,1,1),  half4(1,0.333,1,1),      half4(0.333,1,1,1),      half4(1,1,1,1)
+    };
+
     ycursor = int(position.y) % int(ScanLineHeight);    // calculate x pixel position in cell
     xcursor = int(position.x) % CellWidth;              // calculate x pixel position in cell
         
@@ -79,8 +96,17 @@ using namespace metal;
     }
     else
     {
-        fontpos = int(screenram[screenpos]-128)*CellHeight+int(ycursor);  // return linear co-ordinates of pcg ram data
-        pixelLocation = int(pcgram[fontpos]);
+        if (premium)
+        {
+            int pcgBank = int(attributerram[screenpos]) & 0x07;  // select pcg bank from bits 0-2 ( actually 0-3 but only implementing 16K of PCG at this stage )
+            fontpos = int(screenram[screenpos]-128)*CellHeight+int(ycursor);  // return linear co-ordinates of pcg ram data
+            pixelLocation = int(pcgram[fontpos+(pcgBank*2048)]);
+        }
+        else
+        {
+            fontpos = int(screenram[screenpos]-128)*CellHeight+int(ycursor);  // return linear co-ordinates of pcg ram data
+            pixelLocation = int(pcgram[fontpos]);
+        }
     }
     
     if ( (pixelLocation & bitmask)  > 0 )  // test for pixel set in character definition in font rom/pcg ram
@@ -100,54 +126,55 @@ using namespace metal;
         switch (int(CursorBlinkType))
         {
             case 0: // 0 = always on
-                    if (cursorInside)
-                    {
-                        pixelset = !pixelset;
-                    }
-                    break;
+                if (cursorInside)
+                {
+                    pixelset = !pixelset;
+                }
+                break;
             case 1: break; // 1 = always off
             case 2: // 2 = normal flash 1/16 frame rate
-                    // if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
-                    if (cursorInside && cursorOn)
-                    {
-                        pixelset = !pixelset;
-                    }
-                    break;
+                if (cursorInside && cursorOn)
+                {
+                    pixelset = !pixelset;
+                }
+                break;
             case 3: // 3 = fast flash 1/32 frame rate
-                    if (cursorInside && cursorOn)
-                    //if ((ycursor >= int(CursorStartScanLine)) && (ycursor <= int(CursorEndScanLine)) && ( int(CursorBlinkCounter) < int(CursorFlashLimit) ))
-                    {
-                        pixelset = !pixelset;
-                    }
-                    break;
+                if (cursorInside && cursorOn)
+                {
+                    pixelset = !pixelset;
+                }
         }
     }
     
-    switch (int(colorMode))
+    if (premium)
     {
-        case 0 :    // Green on Black
-            ForegroundColour = monoGreenColour;
-            BackgroundColour = monoBlackColour;
-            break;
-        case 1 :    // Amber on Black
-            ForegroundColour = monoAmberColour;
-            BackgroundColour = monoBlackColour;
-            break;
-        case 2 :    // White on Black
-            ForegroundColour = monoWhiteColour;
-            BackgroundColour = monoBlackColour;
-            break;
-        case 3 :    // Blue on Black
-            ForegroundColour = monoBlueColour;
-            BackgroundColour = monoBlackColour;
-            break;
-        case 4 :    // Colour
-            ForegroundColour = foregroundColourArray[int(colourram[screenpos]) & 0x1F];
-            BackgroundColour = backgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
-            break;
-        default :   // Colour
-            ForegroundColour = foregroundColourArray[int(colourram[screenpos]) & 0x1F];
-            BackgroundColour = backgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
+        ForegroundColour = premiumColourArray[int(colourram[screenpos]) & 0x0F];
+        BackgroundColour = premiumColourArray[int(colourram[screenpos]) >> 4];
+    }
+    else
+    {
+        switch (int(colorMode))
+        {
+            case 0 :    // Green on Black
+                ForegroundColour = monoGreenColour;
+                BackgroundColour = monoBlackColour;
+                break;
+            case 1 :    // Amber on Black
+                ForegroundColour = monoAmberColour;
+                BackgroundColour = monoBlackColour;
+                break;
+            case 2 :    // White on Black
+                ForegroundColour = monoWhiteColour;
+                BackgroundColour = monoBlackColour;
+                break;
+            case 3 :    // Blue on Black
+                ForegroundColour = monoBlueColour;
+                BackgroundColour = monoBlackColour;
+                break;
+            case 4 :    // alpha Colour
+                ForegroundColour = alphaForegroundColourArray[int(colourram[screenpos]) & 0x1F];
+                BackgroundColour = alphaBackgroundColourArray[int(backGroundIntensity)][(int(colourram[screenpos]) & 0xE0) >> 5];
+        }
     }
     
     if (pixelset)

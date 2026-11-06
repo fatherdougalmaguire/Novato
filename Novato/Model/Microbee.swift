@@ -1171,7 +1171,7 @@ actor microbee
             bus.mmu.map(readDevice: bus.basicALowerROM, writeDevice: bus.basicALowerROM, memoryLocation: 0x8000)    // 8K BASIC ROM A ( lower half )
             bus.mmu.map(readDevice: bus.basicBROM, writeDevice: bus.basicBROM, memoryLocation: 0xA000)              // 8K BASIC ROM B
             bus.mmu.map(readDevice: bus.pak0ROM, writeDevice: bus.pak0ROM , memoryLocation: 0xC000)                 // 8K PAK ROM
-            bus.mmu.map(readDevice: bus.telcomROM, writeDevice: bus.telcomROM, memoryLocation: 0xE000)              // 4K Telcom ROM
+            bus.mmu.map(readDevice: bus.netLowerROM, writeDevice: bus.netLowerROM, memoryLocation: 0xE000)          // 4K Net ROM
             bus.mmu.map(readDevice: bus.videoRAM, writeDevice: bus.videoRAM, memoryLocation: 0xF000)                // 2K Video RAM
             bus.mmu.map(readDevice: bus.pcg0RAM, writeDevice: bus.pcg0RAM, memoryLocation: 0xF800)                  // 2K PCG RAM
             
@@ -1183,19 +1183,22 @@ actor microbee
             bus.pak3ROM.fillMemoryFromFile(fileName: "premium_pc85_g", fileExtension: "rom")
             bus.pak4ROM.fillMemoryFromFile(fileName: "premium_pc85_h", fileExtension: "rom")
             bus.pak5ROM.fillMemoryFromFile(fileName: "premium_pc85_i", fileExtension: "rom")
-            bus.telcomROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom")
+            bus.pak10ROM.fillMemoryFromFile(fileName: "premium_pc85_f", fileExtension: "rom", memOffset: 0x2000)
+            bus.pak11ROM.fillMemoryFromFile(fileName: "premium_pc85_g", fileExtension: "rom", memOffset: 0x2000)
+            bus.netLowerROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom")
+            bus.netUpperROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom", memOffset: 0x1000)
             bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         default:
             bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)          // 32K System RAM
             bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)        // 16K BASIC ROM
             bus.mmu.map(readDevice: bus.pak0ROM, writeDevice: bus.pak0ROM , memoryLocation: 0xC000)         // 8K PAK ROM
-            bus.mmu.map(readDevice: bus.telcomROM, writeDevice: bus.telcomROM, memoryLocation: 0xE000)      // 4K Telcom ROM
+            bus.mmu.map(readDevice: bus.netLowerROM, writeDevice: bus.netLowerROM, memoryLocation: 0xE000)  // 4K Net ROM
             bus.mmu.map(readDevice: bus.videoRAM, writeDevice: bus.videoRAM, memoryLocation: 0xF000)        // 2K Video RAM
             bus.mmu.map(readDevice: bus.pcg0RAM, writeDevice: bus.pcg0RAM, memoryLocation: 0xF800)          // 2K PCG RAM
             
             bus.basicROM.fillMemoryFromFile(fileName: "basic_5.22e", fileExtension: "rom")
             bus.pak0ROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
-            bus.telcomROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
+            bus.netLowerROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
             bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
         }
         
@@ -1209,6 +1212,8 @@ actor microbee
         snapshotContinuation.yield(returnSnapshot(stepping: false))
         
         bus.colourLatch = false
+        bus.attributeLatch = false
+        
     }
     
     func start()
@@ -17889,7 +17894,8 @@ actor microbee
                 redBackgroundIntensity: bus.crtc.registers.redBackgroundIntensity,
                 greenBackgroundIntensity: bus.crtc.registers.greenBackgroundIntensity,
                 blueBackgroundIntensity: bus.crtc.registers.blueBackgroundIntensity,
-                colourType: bus.crtc.colourType
+                colourType: bus.crtc.colourType,
+                premiumGraphics: bus.crtc.premiumGraphics
             ),
             executionSnapshot: executionSnapshot(
                 totalTStates: totalTStates,
@@ -17901,10 +17907,11 @@ actor microbee
                 currentInstruction :  z80Disassembler.decodeInstructions(address: registers.PC, bytes: [bus.readByte(address: registers.PC),bus.readByte(address: registers.PC &+ 1),bus.readByte(address: registers.PC &+ 2),bus.readByte(address: registers.PC &+ 3)])
             ),
             memorySnapshot: memorySnapshot(
-                VDU: bus.videoRAM.bufferTransform(),
-                CharRom: bus.fontROM.bufferTransform(),
-                PcgRam: bus.pcg0RAM.bufferTransform(),
-                ColourRam: bus.colourRAM.bufferTransform(),
+                videoRAM: bus.videoRAM.bufferTransform(),
+                charROM: bus.fontROM.bufferTransform(),
+                pcgRAM: bus.flattenBufferTransform(banks: [bus.pcg0RAM, bus.pcg1RAM, bus.pcg2RAM, bus.pcg3RAM, bus.pcg4RAM, bus.pcg5RAM, bus.pcg6RAM, bus.pcg7RAM]),
+                attributeRAM: bus.attributeRAM.bufferTransform(),
+                colourRAM: bus.colourRAM.bufferTransform(),
                 memoryDump: bus.memorySlice(address: registers.PC & 0xFF00, size: 0x100)
             ),
             memoryInspectorSnapshot: memoryInspectorSnapshot(memoryInspectorDump: bus.memorySlice(address: memoryInspectorAddress & 0xFF00, size: 0x100), memoryInspectorAddress: memoryInspectorAddress)
