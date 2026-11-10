@@ -534,8 +534,6 @@ actor microbee
     
     private var logInstructions : Bool = false
     
-    //private var preserveEI : UInt8 = 0
-    
     private var isStepping = false
     private var breakpointHit = false
     
@@ -1150,10 +1148,8 @@ actor microbee
         bus.crtc.reset()
         
         bus.pio.reset()
-        
-        currentEmulation = emulatorModel(rawValue: UserDefaults.standard.string(forKey: "modelSelection") ?? "") ?? .IC
-        
-        bus.currentEmulation = currentEmulation
+    
+        bus.currentEmulation = emulatorModel(rawValue: UserDefaults.standard.string(forKey: "modelSelection") ?? "") ?? .IC
         
         UserDefaults.standard.register(
             defaults:
@@ -1162,7 +1158,7 @@ actor microbee
             ]
         )
         
-        bus.colourEnabled = UserDefaults.standard.string(forKey: "colorSelection") == "Colour" ? true : false
+        bus.alphaColourMode = 4
         
         switch self.currentEmulation
         {
@@ -1188,7 +1184,9 @@ actor microbee
             bus.netLowerROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom")
             bus.netUpperROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom", memOffset: 0x1000)
             bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
-        default:
+            
+            bus.premiumGraphics = true
+        case .IC:
             bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)          // 32K System RAM
             bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)        // 16K BASIC ROM
             bus.mmu.map(readDevice: bus.pak0ROM, writeDevice: bus.pak0ROM , memoryLocation: 0xC000)         // 8K PAK ROM
@@ -1200,20 +1198,20 @@ actor microbee
             bus.pak0ROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
             bus.netLowerROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
             bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+            
+            bus.premiumGraphics = false
         }
+        
+        bus.activePcgBank = 0
         
         bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
         
-        if bus.colourEnabled
-        {
-            bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
-        }
+        bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
     
         snapshotContinuation.yield(returnSnapshot(stepping: false))
         
         bus.colourLatch = false
         bus.attributeLatch = false
-        
     }
     
     func start()
@@ -17894,8 +17892,8 @@ actor microbee
                 redBackgroundIntensity: bus.crtc.registers.redBackgroundIntensity,
                 greenBackgroundIntensity: bus.crtc.registers.greenBackgroundIntensity,
                 blueBackgroundIntensity: bus.crtc.registers.blueBackgroundIntensity,
-                colourType: bus.crtc.colourType,
-                premiumGraphics: bus.crtc.premiumGraphics
+                colourType: bus.alphaColourMode,
+                premiumGraphics: bus.premiumGraphics
             ),
             executionSnapshot: executionSnapshot(
                 totalTStates: totalTStates,

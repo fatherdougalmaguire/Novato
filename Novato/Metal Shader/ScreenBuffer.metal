@@ -62,19 +62,14 @@ using namespace metal;
                                        half4(0.67,0.66,0.96,1), half4(0.75,0.98,0.7,1), half4(0.75,0.99,1,1), half4(0.95,0.68,0.68,1), half4(0.95,0.68,0.97,1), half4(1,0.98,0.71,1), half4(0.67,0.66,0.67,1), half4(1,1,1,1)};
     
     // premium colours
-    // 0 - Black        1 - Red         2 - Green           3 - Brown       4 - Blue            5 - Magenta             6 - Cyan            7 - Light Grey
-    // 8 - Dark Grey    9 - Light Red   10 - Light Green    11 - Yellow     12 - Light Blue     13 - Light Magenta      14 - Light Cyan     15 - White
+        // 0 - Black        1 - Blue         2 - Green           3 - Brown       4 - Red           5 - Magenta             6 - Cyan            7 - Light Grey
+        // 8 - Dark Grey    9 - Light Blue   10 - Light Green    11 - Yellow     12 - Light Red    13 - Light Magenta      14 - Light Cyan     15 - White
 
-//    half4 premiumColourArray[16] = {
-//            half4(0,0,0,1), half4(0.604,0.098,0.043,1), half4(0.251,0.686,0,1), half4(0.612,0.361,0,1), half4(0.188,0,0.678,1), half4(0.627,0,0.678,1), half4(0.313,0.659,0.663,1), half4(0.667,0.667,0.667,1),
-//            half4(0.333,0.333,0.333,1), half4(0.917,0.369,0.345,1), half4(0.49,1,0.243,1), half4(0.973,1,0.263,1), half4(0.431,0.118,1,1), half4(0.949,0.208,1,1), half4(0.557,0.992,0.996,1), half4(1,1,1,1)};
-    
     const half4 premiumColourArray[16] = {
         half4(0,0,0,1),          half4(0.667,0,0,1),      half4(0,0.667,0,1),      half4(0.667,0.333,0,1),
         half4(0,0,0.667,1),      half4(0.667,0,0.667,1),  half4(0,0.667,0.667,1),  half4(0.667,0.667,0.667,1),
         half4(0.333,0.333,0.333,1), half4(1,0.333,0.333,1), half4(0.333,1,0.333,1), half4(1,1,0.333,1),
-        half4(0.333,0.333,1,1),  half4(1,0.333,1,1),      half4(0.333,1,1,1),      half4(1,1,1,1)
-    };
+        half4(0.333,0.333,1,1),  half4(1,0.333,1,1),      half4(0.333,1,1,1),      half4(1,1,1,1)};
 
     ycursor = int(position.y) % int(ScanLineHeight);    // calculate x pixel position in cell
     xcursor = int(position.x) % CellWidth;              // calculate x pixel position in cell

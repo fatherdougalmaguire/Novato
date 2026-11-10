@@ -1,5 +1,26 @@
 import Foundation
 
+enum colourOptions: Int, CaseIterable, Identifiable, Codable
+{
+    case green  = 0   // green on black
+    case amber  = 1   // amber on black
+    case white  = 2   // white on black
+    case blue   = 3   // blue on black
+    case colour = 4   // full colour
+
+    var id: Int { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .green:  "Green"
+        case .amber:  "Amber"
+        case .white:  "White"
+        case .blue:   "Blue"
+        case .colour: "Colour"
+        }
+    }
+}
+
 enum emulatorModel: String, CaseIterable, Identifiable
 {
     case IC,

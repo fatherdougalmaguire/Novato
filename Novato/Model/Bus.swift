@@ -679,41 +679,21 @@ final class CRTC
     var keyboardScanPosition : UInt8 = 0
     
     var romReadLatch : Bool = false
-    
-    var premiumGraphics : Bool = false
-    
+        
     private let keyboard: MicrobeeKeyboard
     
-    let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
-    // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
     
-    var colourType : Int = 0
     
     init(keyboard: MicrobeeKeyboard)
     {
         self.keyboard = keyboard
-        
-        UserDefaults.standard.register(
-            defaults:
-            [
-                "colorSelection": "Green"
-            ]
-        )
-        
-        self.colourType = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
     }
     
     func setCharacterClock(clockSpeedMultiplier: Double )
     {
         tStatesPerCharacterClock = UInt8((3.375*clockSpeedMultiplier)/1.6875)
     }
-    
-//    func toggleLogging()
-//    
-//    {
-//        logInstructions.toggle( )
-//    }
-//    
+      
     func readStatusRegister() -> UInt8
     {
         return registers.statusRegister
@@ -941,18 +921,18 @@ final class CRTC
         registers.R18 = 0x00
         registers.R19 = 0x00
         registers.R31 = 0x00
-
+        
         registers.redBackgroundIntensity = 0x00
         registers.greenBackgroundIntensity = 0x00
         registers.blueBackgroundIntensity = 0x00
-     
+        
         characterClock = 0
         
         columnCounter = 0
         rowCounter = 0
         
         scanlineCounter = 0
-           
+        
         displayEnable = false
         
         verticalAdjustCounter = 0
@@ -964,22 +944,10 @@ final class CRTC
         registers.updateReady = true
         
         keyboardScanPosition = 0
-    
+        
         romReadLatch = false
         
         keyboard.releaseAll()
-        
-        UserDefaults.standard.register(
-            defaults:
-            [
-                "colorSelection": "Green"
-            ]
-        )
-        
-        let colourOptions: [String:Int] = ["Green":0,"Amber":1,"White":2,"Blue":3,"Colour":4]
-        // 0 - green on black, 1 - amber on black, 2 - white on black, 3 - blue on black, 4 - Colour
-        
-        self.colourType = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
     }
 }
 
@@ -993,11 +961,19 @@ final class BUS
     
     var underTest : Bool = false
     
+    var premiumGraphics : Bool = false
+    
+    var alphaColourMode : Int = 0
+    
+    var colourType : Int = 0
+    
     var colourEnabled : Bool = false
     var colourLatch : Bool = false
     var attributeLatch : Bool = false
     
     var currentEmulation: emulatorModel
+    
+    var activePcgBank : UInt8 = 0
     
     let testRAM = memoryBlock(size:0x10000)
     
@@ -1046,20 +1022,6 @@ final class BUS
     {
         self.currentEmulation = currentEmulation
         
-        UserDefaults.standard.register(
-            defaults:
-            [
-                "colorSelection": "Green"
-            ]
-        )
-        
-        self.colourEnabled = UserDefaults.standard.string(forKey: "colorSelection") == "Colour" ? true : false
-        
-        if self.colourEnabled
-        {
-            mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
-        }
-        
         self.keyboard = keyboard
         self.crtc = CRTC(keyboard: keyboard)
             
@@ -1088,6 +1050,8 @@ final class BUS
             netLowerROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom")
             netUpperROM.fillMemoryFromFile(fileName: "premium_pc85_d", fileExtension: "rom", memOffset: 0x1000)
             fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+            
+            self.premiumGraphics = true
         case .IC:
             mmu.map(readDevice: mainRAM, writeDevice: mainRAM, memoryLocation: 0x0000)              // 32K System RAM
             mmu.map(readDevice: basicROM, writeDevice: basicROM, memoryLocation: 0x8000)            // 16K BASIC ROM
@@ -1100,6 +1064,12 @@ final class BUS
             pak0ROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
             netLowerROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
             fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+            
+            UserDefaults.standard.register(defaults: ["colorSelection": "Green"])
+            //self.alphaColourMode = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
+            self.alphaColourMode = 4
+            
+            mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour capable alpha microbee.  Required here to force basic to clear colour ram
         }
     }
     
@@ -1119,79 +1089,71 @@ final class BUS
             case 0x04: break // RTC address port
             case 0x06: break // RTC write port
             case 0x08:
-                if portValue & 0x01 == 0x01
+                switch currentEmulation
                 {
-                    crtc.registers.redBackgroundIntensity = 1  // set global background red intensity to 1 = full
-                }
-                if portValue & 0x01 == 0x00
-                {
-                    crtc.registers.redBackgroundIntensity = 0 // set global background red intensity to 0 = half
-                }
-                if portValue & 0x02 == 0x02
-                {
-                    crtc.registers.greenBackgroundIntensity = 1 // set global background green intensity to 1 = full
-                }
-                if portValue & 0x02 == 0x00
-                {
-                    crtc.registers.greenBackgroundIntensity = 0 // set global background green intensity to 0 = half
-                }
-                if portValue & 0x04 == 0x04
-                {
-                    crtc.registers.blueBackgroundIntensity = 1 // set global background blue intensity to 1 = full
-                }
-                if portValue & 0x04 == 0x00
-                {
-                    crtc.registers.blueBackgroundIntensity = 0 // set global background blue intensity to 0 = half
-                }
-                if portValue & 0x40 == 0x40 && colourEnabled
-                {
-                    colourLatch = true
-                    mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
-                }
-                if portValue & 0x40 == 0x00 && colourEnabled
-                {
-                    colourLatch = false
-                    if currentEmulation == .PPC85 && crtc.premiumGraphics
-                    {
-                        switch ports.readPort(portNum : 0x1C) & 0x0F
+                    case .IC:
+                        crtc.registers.redBackgroundIntensity = portValue & 0x01        // set global background red intensity to 0 for half or 1 = full
+                        crtc.registers.greenBackgroundIntensity = portValue & 0x02      // set global background green intensity to 0 for half or 1 = full
+                        crtc.registers.blueBackgroundIntensity = portValue & 0x04       // set global background blue intensity to 0 for half or 1 = full
+                        if portValue & 0x40 == 0x40 && alphaColourMode == 4
                         {
-                        case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
-                        case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
-                        case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
-                        case 3: mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
-                        case 4: mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
-                        case 5: mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
-                        case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
-                        case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
-                        default: break
+                            colourLatch = true
+                            mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
+                        }
+                        if portValue & 0x40 == 0x00
+                        {
+                            colourLatch = false
+                            mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
+                        }
+                    case .PPC85:
+                        if portValue & 0x40 == 0x40
+                        {
+                            colourLatch = true
+                            mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
+                        }
+                        if portValue & 0x40 == 0x00
+                        {
+                            colourLatch = false
+                            switch activePcgBank
+                            {
+                                case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
+                                case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
+                                case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
+                                case 3: mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
+                                case 4: mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
+                                case 5: mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
+                                case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
+                                case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
+                                default: break
+                            }
                         }
                     }
-                    else
-                    {
-                        mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
-                    }
-                }
             case 0x09: break // Colour "Wait off" OUTPUT to port - no idea what this does
             case 0x0A:
-                switch portValue
+                switch currentEmulation
                 {
-                case 0: mmu.map(readDevice: pak0ROM, writeDevice: pak0ROM, memoryLocation: 0xC000)
-                case 1: mmu.map(readDevice: pak1ROM, writeDevice: pak1ROM, memoryLocation: 0xC000)
-                case 2: mmu.map(readDevice: pak2ROM, writeDevice: pak2ROM, memoryLocation: 0xC000)
-                case 3: mmu.map(readDevice: pak3ROM, writeDevice: pak3ROM, memoryLocation: 0xC000)
-                case 4: mmu.map(readDevice: pak4ROM, writeDevice: pak4ROM, memoryLocation: 0xC000)
-                case 5: mmu.map(readDevice: pak5ROM, writeDevice: pak5ROM, memoryLocation: 0xC000)
-                case 6: mmu.map(readDevice: pak6ROM, writeDevice: pak6ROM, memoryLocation: 0xC000)
-                case 7: mmu.map(readDevice: pak7ROM, writeDevice: pak7ROM, memoryLocation: 0xC000)
-                case 8: mmu.map(readDevice: pak8ROM, writeDevice: pak8ROM, memoryLocation: 0xC000)
-                case 9: mmu.map(readDevice: pak9ROM, writeDevice: pak9ROM, memoryLocation: 0xC000)
-                case 10: mmu.map(readDevice: pak10ROM, writeDevice: pak10ROM, memoryLocation: 0xC000)
-                case 11: mmu.map(readDevice: pak11ROM, writeDevice: pak11ROM, memoryLocation: 0xC000)
-                case 12: mmu.map(readDevice: pak12ROM, writeDevice: pak12ROM, memoryLocation: 0xC000)
-                case 13: mmu.map(readDevice: pak13ROM, writeDevice: pak13ROM, memoryLocation: 0xC000)
-                case 14: mmu.map(readDevice: pak14ROM, writeDevice: pak14ROM, memoryLocation: 0xC000)
-                case 15: mmu.map(readDevice: pak15ROM, writeDevice: pak15ROM, memoryLocation: 0xC000)
-                default: break
+                    case .IC: break
+                    case .PPC85:
+                    switch portValue & 0x0f   //  Eigth PAK ROM slots of 16K each.  PAK 0-7 is lower 8K and 8-15 is upper 8K of each ROM
+                    {
+                        case 0: mmu.map(readDevice: pak0ROM, writeDevice: pak0ROM, memoryLocation: 0xC000)
+                        case 1: mmu.map(readDevice: pak1ROM, writeDevice: pak1ROM, memoryLocation: 0xC000)
+                        case 2: mmu.map(readDevice: pak2ROM, writeDevice: pak2ROM, memoryLocation: 0xC000)
+                        case 3: mmu.map(readDevice: pak3ROM, writeDevice: pak3ROM, memoryLocation: 0xC000)
+                        case 4: mmu.map(readDevice: pak4ROM, writeDevice: pak4ROM, memoryLocation: 0xC000)
+                        case 5: mmu.map(readDevice: pak5ROM, writeDevice: pak5ROM, memoryLocation: 0xC000)
+                        case 6: mmu.map(readDevice: pak6ROM, writeDevice: pak6ROM, memoryLocation: 0xC000)
+                        case 7: mmu.map(readDevice: pak7ROM, writeDevice: pak7ROM, memoryLocation: 0xC000)
+                        case 8: mmu.map(readDevice: pak8ROM, writeDevice: pak8ROM, memoryLocation: 0xC000)
+                        case 9: mmu.map(readDevice: pak9ROM, writeDevice: pak9ROM, memoryLocation: 0xC000)
+                        case 10: mmu.map(readDevice: pak10ROM, writeDevice: pak10ROM, memoryLocation: 0xC000)
+                        case 11: mmu.map(readDevice: pak11ROM, writeDevice: pak11ROM, memoryLocation: 0xC000)
+                        case 12: mmu.map(readDevice: pak12ROM, writeDevice: pak12ROM, memoryLocation: 0xC000)
+                        case 13: mmu.map(readDevice: pak13ROM, writeDevice: pak13ROM, memoryLocation: 0xC000)
+                        case 14: mmu.map(readDevice: pak14ROM, writeDevice: pak14ROM, memoryLocation: 0xC000)
+                        case 15: mmu.map(readDevice: pak15ROM, writeDevice: pak15ROM, memoryLocation: 0xC000)
+                        default: break
+                    }
                 }
             case 0x0B:
                 if portValue & 0x01 == 0x01
@@ -1217,19 +1179,19 @@ final class BUS
                     else
                     {
                         // if premium graphics enabled,  switch in the active PCG bank
-                        if currentEmulation == .PPC85 && crtc.premiumGraphics
+                        if currentEmulation == .PPC85
                         {
-                            switch ports.readPort(portNum : 0x1C) & 0x0F
+                            switch activePcgBank
                             {
-                            case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
-                            case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
-                            case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
-                            case 3: mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
-                            case 4: mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
-                            case 5: mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
-                            case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
-                            case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
-                            default: break
+                                case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
+                                case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
+                                case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
+                                case 3: mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
+                                case 4: mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
+                                case 5: mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
+                                case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
+                                case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
+                                default: break
                             }
                         }
                         else
@@ -1242,52 +1204,63 @@ final class BUS
                 let tempPort = ports.readPort(portNum: 0x0C)
                 crtc.writeRegister(RegNum: tempPort, RegValue: portValue)
             case 0x1C:
-                 // bit 0-3 PCG RAM bank select
-                let pcgSelect = portValue & 0x0F
-                if currentEmulation == .PPC85 && crtc.premiumGraphics && (0...0x0F).contains(pcgSelect)
+                if currentEmulation == .PPC85
                 {
-                    switch pcgSelect
+                    if portValue & 0x80 == 0x80  // bit 7 is the Video Memory Latch (VML).  Used to select attribute RAM at 0xf000 and which pcg bank lives at 0xf800
                     {
-                    case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
-                    case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
-                    case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
-                    case 3: mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
-                    case 4: mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
-                    case 5: mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
-                    case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
-                    case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
-                    default: break
+                        // bits 0-3 PCG RAM bank select ( only bits 0-2 used for standard 16K PCG RAM )
+                        let pcgSelect = portValue & 0x0F
+                        switch pcgSelect
+                        {
+                            case 0:
+                                mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
+                                activePcgBank = 0
+                            case 1:
+                                mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
+                                activePcgBank = 1
+                            case 2:
+                                mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
+                                activePcgBank = 2
+                            case 3:
+                                mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
+                                activePcgBank = 3
+                            case 4:
+                                mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
+                                activePcgBank = 4
+                            case 5:
+                                mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
+                                activePcgBank = 5
+                            case 6:
+                                mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
+                                activePcgBank = 6
+                            case 7:
+                                mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
+                                activePcgBank = 7
+                            default: break
+                        }
+                        // bit 4 Attribute RAM select - makes attribute RAM appear from F000h to F7FFh
+                        if portValue & 0x10 == 0x10
+                        {
+                            attributeLatch = true
+                            mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)
+                        }
+                        if portValue & 0x10 == 0x00
+                        {
+                            attributeLatch = false
+                            mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)
+                        }
                     }
-                }
-                 // bit 4 Attribute RAM select - makes attribute RAM appear from F000h to F7FFh
-                if portValue & 0x10 == 0x10 && currentEmulation == .PPC85 && crtc.premiumGraphics
-                {
-                    attributeLatch = true
-                    mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)
-                }
-                if portValue & 0x10 == 0x00 && currentEmulation == .PPC85 && crtc.premiumGraphics
-                {
-                    attributeLatch = false
-                    mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)
-                }
-                if portValue & 0x20 == 0x00 && currentEmulation == .PPC85
-                {
-                    // swap in lower half of BASIC A ROM at 0x8000 and all of BASIC B ROM at 0xA000 for PC85 Premium
-                    mmu.map(readDevice: basicALowerROM, writeDevice: basicALowerROM, memoryLocation: 0x8000)
-                    mmu.map(readDevice: basicBROM, writeDevice: basicBROM, memoryLocation: 0xA000)
-                }
-                if portValue & 0x20 == 0x20 && currentEmulation == .PPC85
-                {
-                    // swap in upper half of BASIC A ROM at 0x8000 for PC85 Premium
-                    mmu.map(readDevice: basicAUpperROM, writeDevice: basicAUpperROM, memoryLocation: 0x8000)
-                }
-                if portValue & 0x80 == 0x80 && currentEmulation == .PPC85
-                {
-                    crtc.premiumGraphics = true   // bit 7 Premium graphics enabled
-                }
-                if portValue & 0x80 == 0x00 && currentEmulation == .PPC85
-                {
-                    crtc.premiumGraphics = false   // bit 7 Premium graphics disabled
+                    if portValue & 0x20 == 0x20
+                    {
+                        // swap in upper half of BASIC A ROM at 0x8000 for PC85 Premium
+                        mmu.map(readDevice: basicAUpperROM, writeDevice: basicAUpperROM, memoryLocation: 0x8000)
+                    }
+                    if portValue & 0x20 == 0x00
+                    {
+                        // swap in lower half of BASIC A ROM at 0x8000 and all of BASIC B ROM at 0xA000 for PC85 Premium
+                        mmu.map(readDevice: basicALowerROM, writeDevice: basicALowerROM, memoryLocation: 0x8000)
+                        mmu.map(readDevice: basicBROM, writeDevice: basicBROM, memoryLocation: 0xA000)
+                    }
                 }
             case 0x48: break
                 // Disk controller select/side/DD latch bit assignments (write only)

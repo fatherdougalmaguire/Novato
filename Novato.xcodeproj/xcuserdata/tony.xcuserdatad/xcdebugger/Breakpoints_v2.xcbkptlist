@@ -14,8 +14,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "3154"
-            endingLineNumber = "3154"
+            startingLineNumber = "3152"
+            endingLineNumber = "3152"
             landmarkName = "executeCBInstructions(opcode2:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -30,8 +30,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "17357"
-            endingLineNumber = "17357"
+            startingLineNumber = "17355"
+            endingLineNumber = "17355"
             landmarkName = "executeInstructions()"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1356"
-            endingLineNumber = "1356"
+            startingLineNumber = "1332"
+            endingLineNumber = "1332"
             landmarkName = "readPort(portNum:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -62,8 +62,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "790"
-            endingLineNumber = "790"
+            startingLineNumber = "770"
+            endingLineNumber = "770"
             landmarkName = "readRegister(RegNum:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -78,8 +78,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "635"
-            endingLineNumber = "635"
+            startingLineNumber = "633"
+            endingLineNumber = "633"
             landmarkName = "init()"
             landmarkType = "7">
          </BreakpointContent>
@@ -158,8 +158,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "8279"
-            endingLineNumber = "8279"
+            startingLineNumber = "8277"
+            endingLineNumber = "8277"
             landmarkName = "executeDDCBInstructions(opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -174,8 +174,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "14569"
-            endingLineNumber = "14569"
+            startingLineNumber = "14567"
+            endingLineNumber = "14567"
             landmarkName = "executeFDInstructions(opcode2:opcode3:opcode4:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,8 +190,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "709"
-            endingLineNumber = "709"
+            startingLineNumber = "695"
+            endingLineNumber = "695"
             landmarkName = "setCharacterClock(clockSpeedMultiplier:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -207,8 +207,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "749"
-            endingLineNumber = "749"
+            startingLineNumber = "729"
+            endingLineNumber = "729"
             landmarkName = "writeRegister(RegNum:RegValue:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -239,8 +239,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1459"
-            endingLineNumber = "1459"
+            startingLineNumber = "1457"
+            endingLineNumber = "1457"
             landmarkName = "serviceNMIInterrupt()"
             landmarkType = "7">
          </BreakpointContent>
@@ -255,8 +255,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1454"
-            endingLineNumber = "1454"
+            startingLineNumber = "1452"
+            endingLineNumber = "1452"
             landmarkName = "serviceNMIInterrupt()"
             landmarkType = "7">
          </BreakpointContent>
@@ -271,8 +271,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1391"
-            endingLineNumber = "1391"
+            startingLineNumber = "1389"
+            endingLineNumber = "1389"
             landmarkName = "pollInterrupt()"
             landmarkType = "7">
          </BreakpointContent>
@@ -281,22 +281,6 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "A3CF6568-6340-47A7-9974-AE9F4739B37F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Microbee.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1408"
-            endingLineNumber = "1408"
-            landmarkName = "serviceInterrupt()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "256045F5-9741-4CF7-B019-9A98385C85F0"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -312,6 +296,22 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "256045F5-9741-4CF7-B019-9A98385C85F0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Novato/Model/Microbee.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1404"
+            endingLineNumber = "1404"
+            landmarkName = "serviceInterrupt()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
             uuid = "76E2C4B0-D245-483A-A340-F56BDD6E8336"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -319,8 +319,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1434"
-            endingLineNumber = "1434"
+            startingLineNumber = "1432"
+            endingLineNumber = "1432"
             landmarkName = "serviceInterrupt()"
             landmarkType = "7">
          </BreakpointContent>
@@ -335,8 +335,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1069"
-            endingLineNumber = "1069"
+            startingLineNumber = "1031"
+            endingLineNumber = "1031"
             landmarkName = "init(keyboard:currentEmulation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -351,8 +351,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1066"
-            endingLineNumber = "1066"
+            startingLineNumber = "1028"
+            endingLineNumber = "1028"
             landmarkName = "init(keyboard:currentEmulation:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -361,70 +361,6 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "25A26513-B7A5-4A66-B5B0-190586B38354"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Microbee.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1169"
-            endingLineNumber = "1169"
-            landmarkName = "reset()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "864A7587-C251-4E30-9121-33EEDA6102C5"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Microbee.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1154"
-            endingLineNumber = "1154"
-            landmarkName = "reset()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "5C7B1827-CA77-45B2-93AF-59A8E95E36A0"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Microbee.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "662"
-            endingLineNumber = "662"
-            landmarkName = "init()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0E5797F5-86AD-4088-91DC-885A1EAC99A3"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Bus.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1279"
-            endingLineNumber = "1279"
-            landmarkName = "writePort(portNum:portValue:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "D8FB00D5-46E0-40D5-AA4A-54804CD83A42"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
@@ -440,6 +376,38 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
+            uuid = "5C7B1827-CA77-45B2-93AF-59A8E95E36A0"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Novato/Model/Microbee.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "660"
+            endingLineNumber = "660"
+            landmarkName = "init()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D8FB00D5-46E0-40D5-AA4A-54804CD83A42"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Novato/Model/Microbee.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1161"
+            endingLineNumber = "1161"
+            landmarkName = "reset()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
             uuid = "D60CCE42-4923-4F89-B78E-AC387DAEDAFD"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -447,41 +415,9 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1079"
-            endingLineNumber = "1079"
+            startingLineNumber = "1041"
+            endingLineNumber = "1041"
             landmarkName = "init(keyboard:currentEmulation:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "69CD20FB-49BD-4ACD-880A-E51852A9334F"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Bus.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1277"
-            endingLineNumber = "1277"
-            landmarkName = "writePort(portNum:portValue:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7FFB959A-15AB-4CFB-8AC5-02ECB5E8A599"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Bus.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1282"
-            endingLineNumber = "1282"
-            landmarkName = "writePort(portNum:portValue:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -495,8 +431,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1251"
-            endingLineNumber = "1251"
+            startingLineNumber = "1218"
+            endingLineNumber = "1218"
             landmarkName = "writePort(portNum:portValue:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -511,8 +447,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1266"
-            endingLineNumber = "1266"
+            startingLineNumber = "1248"
+            endingLineNumber = "1248"
             landmarkName = "writePort(portNum:portValue:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -527,8 +463,8 @@
             filePath = "Novato/Model/Microbee.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "17913"
-            endingLineNumber = "17913"
+            startingLineNumber = "17911"
+            endingLineNumber = "17911"
             landmarkName = "returnSnapshot(stepping:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -543,10 +479,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1466"
-            endingLineNumber = "1466"
-            landmarkName = "flattenBufferTransform(banks:)"
-            landmarkType = "7">
+            startingLineNumber = "1442"
+            endingLineNumber = "1442">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -559,25 +493,9 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1457"
-            endingLineNumber = "1457"
+            startingLineNumber = "1433"
+            endingLineNumber = "1433"
             landmarkName = "flattenBufferTransform(banks:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "7B3C4804-CC33-4E9A-80FB-6ABFECE47D92"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Novato/Model/Bus.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1153"
-            endingLineNumber = "1153"
-            landmarkName = "writePort(portNum:portValue:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -591,8 +509,8 @@
             filePath = "Novato/Model/Bus.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1347"
-            endingLineNumber = "1347"
+            startingLineNumber = "1323"
+            endingLineNumber = "1323"
             landmarkName = "readPort(portNum:)"
             landmarkType = "7">
          </BreakpointContent>

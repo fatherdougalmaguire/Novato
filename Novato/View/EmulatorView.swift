@@ -185,9 +185,9 @@ struct emulatorView: View
             let cursorStartScanLine: Float = Float(Int(snapshot.crtcSnapshot.R10) & 0b00011111)
             let cursorEndScanLine: Float = Float(snapshot.crtcSnapshot.R11)
             let cursorBlinkType: Float = Float(Int(snapshot.crtcSnapshot.R10 >> 5))
-            let displayOffset: Float = Float(Int(snapshot.crtcSnapshot.R13))
-            let alternateFontROM: Float = Float(Int(snapshot.crtcSnapshot.R12) >> 5) // Is MA13 set to 1 ?  If so, select alternate font ROM
-            let cursorPosition: Float = Float(Int(snapshot.crtcSnapshot.R14) << 8 | Int(snapshot.crtcSnapshot.R15))
+            let displayOffset = Float(((Int(snapshot.crtcSnapshot.R12) & 0x3F) << 8) | Int(snapshot.crtcSnapshot.R13))
+            let alternateFontROM: Float = horizDisplayed == 64 ? 0.0 : 1.0
+            let cursorPosition: Float = Float(((Int(snapshot.crtcSnapshot.R14) & 0x3F) << 8) | Int(snapshot.crtcSnapshot.R15))
 
             let colourMode: Float = Float(snapshot.crtcSnapshot.colourType)
             
