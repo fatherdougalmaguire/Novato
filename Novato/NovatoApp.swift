@@ -49,6 +49,10 @@ struct NovatoApp: App
         {
             memoryInspectorView().environment(vm)
         }
+        Window("Video Memory Inspector", id: "videoMemoryInspectorWindow")
+        {
+            videoMemoryInspectorView().environment(vm)
+        }
         Settings
         {
             SettingsView().environment(vm)

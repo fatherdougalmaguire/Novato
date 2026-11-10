@@ -1068,9 +1068,8 @@ final class BUS
             UserDefaults.standard.register(defaults: ["colorSelection": "Green"])
             //self.alphaColourMode = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
             self.alphaColourMode = 4
-            
-            mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour capable alpha microbee.  Required here to force basic to clear colour ram
         }
+        mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour capable alpha microbee.  Required here to force basic to clear colour ram
     }
     
     @inline(__always)
@@ -1156,33 +1155,52 @@ final class BUS
                     }
                 }
             case 0x0B:
-                if portValue & 0x01 == 0x01
+                switch currentEmulation
                 {
-                    crtc.romReadLatch = true
-                    mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram/attribute ram/pcg ram
-                }
-                if portValue & 0x01 == 0x00
-                {
-                    crtc.romReadLatch = false
-                    if attributeLatch
-                    {
-                        mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)  // swap attribute ram back into 0xF000 if previously enabled
-                    }
-                    else
-                    {
-                        mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap video ram back into 0xF000 if previously enabled
-                    }
-                    if colourLatch
-                    {
-                        mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if color ram latch is on
-                    }
-                    else
-                    {
-                        // if premium graphics enabled,  switch in the active PCG bank
-                        if currentEmulation == .PPC85
+                    case .IC:
+                        if portValue & 0x01 == 0x01
                         {
-                            switch activePcgBank
+                            crtc.romReadLatch = true
+                            mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram/attribute ram/pcg ram
+                        }
+                        if portValue & 0x01 == 0x00
+                        {
+                            crtc.romReadLatch = false
+                            if colourLatch
                             {
+                                mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if color ram latch is on
+                            }
+                            else
+                            {
+                                mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)  // if premium graphics not enabled, swap in base PCG RAM block back in
+                            }
+                        }
+                    case .PPC85:
+                        if portValue & 0x01 == 0x01
+                        {
+                            crtc.romReadLatch = true
+                            mmu.map(readDevice: fontROM, writeDevice: nil, memoryLocation: 0xF000)     // swap in font rom to 0xf000 for reading whilst still allowing writing to video ram/attribute ram/pcg ram
+                        }
+                        if portValue & 0x01 == 0x00
+                        {
+                            crtc.romReadLatch = false
+                            //print(attributeLatch,colourLatch)
+                            if attributeLatch
+                            {
+                                mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)  // swap attribute ram back into 0xF000 if previously enabled
+                            }
+                            else
+                            {
+                                mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap video ram back into 0xF000 if previously enabled
+                            }
+                            if colourLatch
+                            {
+                                mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if color ram latch is on
+                            }
+                            else
+                            {
+                                switch activePcgBank
+                                {
                                 case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
                                 case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
                                 case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
@@ -1192,13 +1210,9 @@ final class BUS
                                 case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
                                 case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
                                 default: break
+                                }
                             }
                         }
-                        else
-                        {
-                            mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)  // if premium graphics not enabled, swap in base PCG RAM block back in
-                        }
-                    }
                 }
             case 0x0D:
                 let tempPort = ports.readPort(portNum: 0x0C)
@@ -1243,11 +1257,13 @@ final class BUS
                         {
                             attributeLatch = true
                             mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)
+                          //  print("attribute latch set")
                         }
                         if portValue & 0x10 == 0x00
                         {
                             attributeLatch = false
                             mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)
+                          //  print("attribute latch reset")
                         }
                     }
                     if portValue & 0x20 == 0x20

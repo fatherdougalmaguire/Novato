@@ -292,6 +292,7 @@ struct windowsView: View
     @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
     @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
     @AppStorage("memoryInspectorWindowVisible") private var memoryInspectorWindowVisible: Bool = true
+    @AppStorage("videoMemoryInspectorWindowVisible") private var videoMemoryInspectorWindowVisible: Bool = true
     
     var body: some View
     {
@@ -302,6 +303,7 @@ struct windowsView: View
             Toggle("Show memory window", isOn: $memoryWindowVisible)
             Toggle("Show breakpoint window", isOn: $breakpointWindowVisible)
             Toggle("Show memory inspector window", isOn: $memoryInspectorWindowVisible)
+            Toggle("Show video memory inspector window", isOn: $videoMemoryInspectorWindowVisible)
         }
         .formStyle(.grouped)
     }

@@ -78,6 +78,7 @@ struct emulatorView: View
     @AppStorage("memoryWindowVisible") private var memoryWindowVisible: Bool = true
     @AppStorage("breakpointWindowVisible") private var breakpointWindowVisible: Bool = true
     @AppStorage("memoryInspectorWindowVisible") private var  memoryInspectorWindowVisible: Bool = true
+    @AppStorage("videoMemoryInspectorWindowVisible") private var videoMemoryInspectorWindowVisible: Bool = true
     @AppStorage("speedSelection") private var speedSelection: Double = 1.0
     
     let startDate = Date()
@@ -472,6 +473,7 @@ struct emulatorView: View
                 if memoryWindowVisible { openWindow(id: "memoryAndInstructionWindow") }
                 if breakpointWindowVisible { openWindow(id: "breakpointsWindow") }
                 if memoryInspectorWindowVisible { openWindow(id: "memoryInspectorWindow") }
+                if videoMemoryInspectorWindowVisible { openWindow(id: "videoMemoryInspectorWindow") }
                 focusWindow(withId: "emulatorWindow")
                 _ = Task
                 {
