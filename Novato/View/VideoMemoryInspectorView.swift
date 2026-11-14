@@ -5,7 +5,7 @@ struct videoMemoryInspectorView: View
     @Environment(emulatorViewModel.self) private var vm
     @State private var memoryAddressText = "0000"
     @State private var videoMemorySelection = "Video RAM"
-    let videoMemoryOptions = ["Video RAM", "Attribute RAM", "Colour RAM", "PCG Bank 0", "PCG Bank 1","PCG Bank 2","PCG Bank 3","PCG Bank 4","PCG Bank 5","PCG Bank 6","PCG Bank 7"]
+    let videoMemoryOptions = ["Video RAM", "Attribute RAM", "Colour RAM", "Font ROM", "PCG Bank 0", "PCG Bank 1","PCG Bank 2","PCG Bank 3","PCG Bank 4","PCG Bank 5","PCG Bank 6","PCG Bank 7"]
 
     struct MemoryRowView: View
     {
@@ -50,6 +50,8 @@ struct videoMemoryInspectorView: View
                         return (0xF800, snapshot.memorySnapshot.pcgRAM[0x3000...0x37ff].map { UInt8(clamping: Int($0)) })
                     case "PCG Bank 7":
                         return (0xF800, snapshot.memorySnapshot.pcgRAM[0x3800...0x3fff].map { UInt8(clamping: Int($0)) })
+                    case "Font ROM":
+                        return (0xF000, snapshot.memorySnapshot.charROM.map { UInt8(clamping: Int($0)) })
                     default:
                         return (0xF000, snapshot.memorySnapshot.videoRAM.map { UInt8(clamping: Int($0)) })
                 }

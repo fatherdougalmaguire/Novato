@@ -1151,16 +1151,9 @@ actor microbee
     
         bus.currentEmulation = emulatorModel(rawValue: UserDefaults.standard.string(forKey: "modelSelection") ?? "") ?? .IC
         
-        UserDefaults.standard.register(
-            defaults:
-            [
-                "colorSelection": "Green"
-            ]
-        )
+        currentEmulation = bus.currentEmulation
         
-        bus.alphaColourMode = 4
-        
-        switch self.currentEmulation
+        switch currentEmulation
         {
         case .PPC85:
             bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)                  // 32K System RAM
@@ -1186,6 +1179,7 @@ actor microbee
             bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
             
             bus.premiumGraphics = true
+            bus.colourEnabled = true
         case .IC:
             bus.mmu.map(readDevice: bus.mainRAM, writeDevice: bus.mainRAM, memoryLocation: 0x0000)          // 32K System RAM
             bus.mmu.map(readDevice: bus.basicROM, writeDevice: bus.basicROM, memoryLocation: 0x8000)        // 16K BASIC ROM
@@ -1199,6 +1193,12 @@ actor microbee
             bus.netLowerROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
             bus.fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
             
+            let themes = ["Green", "Amber", "White", "Blue", "Colour"]
+
+            bus.alphaColourMode = themes.firstIndex(of: UserDefaults.standard.string(forKey: "colorSelection") ?? "Green") ?? 0
+            
+            bus.colourEnabled = bus.alphaColourMode == 4 ? true : false
+            
             bus.premiumGraphics = false
         }
         
@@ -1206,8 +1206,11 @@ actor microbee
         
         bus.mainRAM.fillMemory(memValue: 0x00) // wipe basic scratch area to force cold boot
         
-        bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
-    
+        if bus.colourEnabled
+        {
+            bus.mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour microbee.  Required here to force basic to clear colour ram
+        }
+        
         snapshotContinuation.yield(returnSnapshot(stepping: false))
         
         bus.colourLatch = false

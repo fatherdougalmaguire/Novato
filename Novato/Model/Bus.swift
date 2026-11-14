@@ -965,8 +965,6 @@ final class BUS
     
     var alphaColourMode : Int = 0
     
-    var colourType : Int = 0
-    
     var colourEnabled : Bool = false
     var colourLatch : Bool = false
     var attributeLatch : Bool = false
@@ -1052,6 +1050,7 @@ final class BUS
             fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
             
             self.premiumGraphics = true
+            self.colourEnabled = true
         case .IC:
             mmu.map(readDevice: mainRAM, writeDevice: mainRAM, memoryLocation: 0x0000)              // 32K System RAM
             mmu.map(readDevice: basicROM, writeDevice: basicROM, memoryLocation: 0x8000)            // 16K BASIC ROM
@@ -1064,12 +1063,17 @@ final class BUS
             pak0ROM.fillMemoryFromFile(fileName: "wordbee_1.2", fileExtension: "rom")
             netLowerROM.fillMemoryFromFile(fileName: "telcom_1.2", fileExtension: "rom")
             fontROM.fillMemoryFromFile(fileName: "charrom", fileExtension: "bin")
+        
+            let themes = ["Green", "Amber", "White", "Blue", "Colour"]
+
+            self.alphaColourMode = themes.firstIndex(of: UserDefaults.standard.string(forKey: "colorSelection") ?? "Green") ?? 0
             
-            UserDefaults.standard.register(defaults: ["colorSelection": "Green"])
-            //self.alphaColourMode = UserDefaults.standard.string(forKey: "colorSelection").flatMap { colourOptions[$0] } ?? 0
-            self.alphaColourMode = 4
+            self.colourEnabled = self.alphaColourMode == 4 ? true : false
         }
-        mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour capable alpha microbee.  Required here to force basic to clear colour ram
+        if colourEnabled
+        {
+            mainRAM.fillMemoryFromArray(memValues: [0xff], memOffset: 0x99)   // 0xff means this is a colour capable alpha microbee.  Required here to force basic to clear colour ram
+        }
     }
     
     @inline(__always)
@@ -1094,12 +1098,12 @@ final class BUS
                         crtc.registers.redBackgroundIntensity = portValue & 0x01        // set global background red intensity to 0 for half or 1 = full
                         crtc.registers.greenBackgroundIntensity = portValue & 0x02      // set global background green intensity to 0 for half or 1 = full
                         crtc.registers.blueBackgroundIntensity = portValue & 0x04       // set global background blue intensity to 0 for half or 1 = full
-                        if portValue & 0x40 == 0x40 && alphaColourMode == 4
+                        if portValue & 0x40 == 0x40 && colourEnabled
                         {
                             colourLatch = true
                             mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if colour capability is set
                         }
-                        if portValue & 0x40 == 0x00
+                        if portValue & 0x40 == 0x00 && colourEnabled
                         {
                             colourLatch = false
                             mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
@@ -1168,11 +1172,13 @@ final class BUS
                             crtc.romReadLatch = false
                             if colourLatch
                             {
-                                mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if color ram latch is on
+                                mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram at 0xf800
+                                mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)    // swap in video ram at 0xf000
                             }
                             else
                             {
-                                mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)  // if premium graphics not enabled, swap in base PCG RAM block back in
+                                mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)      // swap base PCG RAM block back in at 0xf800
+                                mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)    // swap video ram back in at 0xf000
                             }
                         }
                     case .PPC85:
@@ -1184,21 +1190,35 @@ final class BUS
                         if portValue & 0x01 == 0x00
                         {
                             crtc.romReadLatch = false
-                            //print(attributeLatch,colourLatch)
-                            if attributeLatch
+                            if attributeLatch && colourLatch
+                            {
+                                mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)     // swap attribute ram back into 0xF000 if previously enabled
+                                mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)          // swap in colour ram if color ram latch is on
+                            }
+                            else if attributeLatch && !colourLatch
                             {
                                 mmu.map(readDevice: attributeRAM, writeDevice: attributeRAM, memoryLocation: 0xF000)  // swap attribute ram back into 0xF000 if previously enabled
+                                switch activePcgBank // swap pcg ram bank back into 0xf800 if color ram latch is off
+                                {
+                                case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)
+                                case 1: mmu.map(readDevice: pcg1RAM, writeDevice: pcg1RAM, memoryLocation: 0xF800)
+                                case 2: mmu.map(readDevice: pcg2RAM, writeDevice: pcg2RAM, memoryLocation: 0xF800)
+                                case 3: mmu.map(readDevice: pcg3RAM, writeDevice: pcg3RAM, memoryLocation: 0xF800)
+                                case 4: mmu.map(readDevice: pcg4RAM, writeDevice: pcg4RAM, memoryLocation: 0xF800)
+                                case 5: mmu.map(readDevice: pcg5RAM, writeDevice: pcg5RAM, memoryLocation: 0xF800)
+                                case 6: mmu.map(readDevice: pcg6RAM, writeDevice: pcg6RAM, memoryLocation: 0xF800)
+                                case 7: mmu.map(readDevice: pcg7RAM, writeDevice: pcg7RAM, memoryLocation: 0xF800)
+                                default: break
+                                }
                             }
-                            else
+                            else if !attributeLatch && colourLatch
                             {
                                 mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap video ram back into 0xF000 if previously enabled
-                            }
-                            if colourLatch
-                            {
                                 mmu.map(readDevice: colourRAM, writeDevice: colourRAM, memoryLocation: 0xF800)  // swap in colour ram if color ram latch is on
                             }
                             else
                             {
+                                mmu.map(readDevice: videoRAM, writeDevice: videoRAM, memoryLocation: 0xF000)  // swap video ram back into 0xF000 if previously enabled
                                 switch activePcgBank
                                 {
                                 case 0: mmu.map(readDevice: pcg0RAM, writeDevice: pcg0RAM, memoryLocation: 0xF800)

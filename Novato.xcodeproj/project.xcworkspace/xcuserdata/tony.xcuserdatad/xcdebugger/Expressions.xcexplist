@@ -3,12 +3,7 @@
    version = "1.0">
    <ContextStates>
       <ContextState
-         contextName = "BUS.writePort(portNum:portValue:):Bus.swift">
-         <PersistentStrings>
-            <PersistentString
-               value = "">
-            </PersistentString>
-         </PersistentStrings>
+         contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):Bus.swift">
       </ContextState>
       <ContextState
          contextName = "microbee.init():Microbee.swift">
@@ -22,7 +17,7 @@
          contextName = "microbee.serviceNMIInterrupt():Microbee.swift">
          <PersistentStrings>
             <PersistentString
-               value = "registers.PC">
+               value = "bus.readByte(address:registers.SP)">
             </PersistentString>
             <PersistentString
                value = "UInt16(bus.readByte(address:registers.SP))*256 &amp;+ UInt16(bus.readByte(address:registers.SP &amp;+ 1))">
@@ -31,7 +26,7 @@
                value = "registers.SP">
             </PersistentString>
             <PersistentString
-               value = "bus.readByte(address:registers.SP)">
+               value = "registers.PC">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
@@ -44,13 +39,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "BUS.init(keyboard:currentEmulation:):Bus.swift">
+         contextName = "testHelper.runTest(_:isEI:):NovatoTests.swift">
       </ContextState>
       <ContextState
          contextName = "microbee.reset():Microbee.swift">
       </ContextState>
       <ContextState
-         contextName = "testHelper.runTest(_:isEI:):NovatoTests.swift">
+         contextName = "BUS.writePort(portNum:portValue:):Bus.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "">
+            </PersistentString>
+         </PersistentStrings>
       </ContextState>
       <ContextState
          contextName = "microbee.serviceInterrupt():Microbee.swift">
@@ -59,9 +59,6 @@
                value = "registers.PC">
             </PersistentString>
          </PersistentStrings>
-      </ContextState>
-      <ContextState
-         contextName = "memoryBlock.fillMemoryFromFile(fileName:fileExtension:memOffset:):Bus.swift">
       </ContextState>
    </ContextStates>
 </VariablesViewState>
